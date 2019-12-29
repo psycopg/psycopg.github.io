@@ -1,0 +1,1650 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>psycopg2.extras – Miscellaneous goodies for Psycopg 2 &#8212; Psycopg 2.8.5.dev0 documentation</title>
+    <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="psycopg2.errors – Exception classes mapping PostgreSQL errors" href="errors.html" />
+    <link rel="prev" title="psycopg2.extensions – Extensions to the DB API" href="extensions.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="errors.html" title="psycopg2.errors – Exception classes mapping PostgreSQL errors"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="psycopg2.extensions – Extensions to the DB API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Psycopg 2.8.5.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-psycopg2.extras">
+<span id="psycopg2-extras-miscellaneous-goodies-for-psycopg-2"></span><h1><a class="reference internal" href="#module-psycopg2.extras" title="psycopg2.extras"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras</span></code></a> – Miscellaneous goodies for Psycopg 2<a class="headerlink" href="#module-psycopg2.extras" title="Permalink to this headline">¶</a></h1>
+<p>This module is a generic place used to hold little helper functions and
+classes until a better place in the distribution is found.</p>
+<div class="section" id="connection-and-cursor-subclasses">
+<span id="cursor-subclasses"></span><h2>Connection and cursor subclasses<a class="headerlink" href="#connection-and-cursor-subclasses" title="Permalink to this headline">¶</a></h2>
+<p>A few objects that change the way the results are returned by the cursor or
+modify the object behavior in some other way. Typically <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code> subclasses
+are passed as <em>cursor_factory</em> argument to <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> so that the
+connection’s <a class="reference internal" href="connection.html#connection.cursor" title="connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method will generate objects of this
+class.  Alternatively a <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code> subclass can be used one-off by passing it
+as the <em>cursor_factory</em> argument to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> method.</p>
+<p>If you want to use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> subclass you can pass it as the
+<em>connection_factory</em> argument of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> function.</p>
+<div class="section" id="dictionary-like-cursor">
+<span id="dict-cursor"></span><span id="index-0"></span><h3>Dictionary-like cursor<a class="headerlink" href="#dictionary-like-cursor" title="Permalink to this headline">¶</a></h3>
+<p>The dict cursors allow to access to the retrieved records using an interface
+similar to the Python dictionaries instead of the tuples.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">cursor_factory</span><span class="o">=</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">DictCursor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dict_cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO test (num, data) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dict_cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">dict_cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;num&#39;</span><span class="p">]</span>
+<span class="go">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="go">&quot;abc&#39;def&quot;</span>
+</pre></div>
+</div>
+<p>The records still support indexing as the original tuple:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">&quot;abc&#39;def&quot;</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="psycopg2.extras.DictCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DictCursor</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.DictCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cursor that keeps a list of column name -&gt; index mappings.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.DictConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DictConnection</code><a class="headerlink" href="#psycopg2.extras.DictConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection that uses <a class="reference internal" href="#psycopg2.extras.DictCursor" title="psycopg2.extras.DictCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DictCursor</span></code></a> automatically.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not very useful since Psycopg 2.5: you can use <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.connect</span></code></a><code class="docutils literal notranslate"><span class="pre">(dsn,</span> <span class="pre">cursor_factory=DictCursor)</span></code> instead of <code class="xref py py-obj docutils literal notranslate"><span class="pre">DictConnection</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.DictRow">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DictRow</code><span class="sig-paren">(</span><em>cursor</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.DictRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A row object that allow by-column-name access to data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="real-dictionary-cursor">
+<h3>Real dictionary cursor<a class="headerlink" href="#real-dictionary-cursor" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="psycopg2.extras.RealDictCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">RealDictCursor</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.RealDictCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cursor that uses a real dict as the base type for rows.</p>
+<p>Note that this cursor is extremely specialized and does not allow
+the normal access (using integer indices) to fetched data. If you need
+to access database rows both as a dictionary and a list, then use
+the generic <a class="reference internal" href="#psycopg2.extras.DictCursor" title="psycopg2.extras.DictCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DictCursor</span></code></a> instead of <code class="xref py py-obj docutils literal notranslate"><span class="pre">RealDictCursor</span></code>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.RealDictConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">RealDictConnection</code><a class="headerlink" href="#psycopg2.extras.RealDictConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection that uses <a class="reference internal" href="#psycopg2.extras.RealDictCursor" title="psycopg2.extras.RealDictCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RealDictCursor</span></code></a> automatically.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not very useful since Psycopg 2.5: you can use <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.connect</span></code></a><code class="docutils literal notranslate"><span class="pre">(dsn,</span> <span class="pre">cursor_factory=RealDictCursor)</span></code> instead of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RealDictConnection</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.RealDictRow">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">RealDictRow</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.RealDictRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> subclass representing a data record.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="namedtuple-cursor">
+<span id="index-1"></span><h3><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor<a class="headerlink" href="#namedtuple-cursor" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.3.</span></p>
+</div>
+<dl class="class">
+<dt id="psycopg2.extras.NamedTupleCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">NamedTupleCursor</code><a class="headerlink" href="#psycopg2.extras.NamedTupleCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cursor that generates results as <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code></a>.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> methods will return named tuples instead of regular tuples, so
+their elements can be accessed both as regular numeric items as well as
+attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nt_cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">cursor_factory</span><span class="o">=</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">NamedTupleCursor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">nt_cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span>
+<span class="go">Record(id=1, num=100, data=&quot;abc&#39;def&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="o">.</span><span class="n">data</span>
+<span class="go">&quot;abc&#39;def&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.NamedTupleConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">NamedTupleConnection</code><a class="headerlink" href="#psycopg2.extras.NamedTupleConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection that uses <a class="reference internal" href="#psycopg2.extras.NamedTupleCursor" title="psycopg2.extras.NamedTupleCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTupleCursor</span></code></a> automatically.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not very useful since Psycopg 2.5: you can use <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.connect</span></code></a><code class="docutils literal notranslate"><span class="pre">(dsn,</span> <span class="pre">cursor_factory=NamedTupleCursor)</span></code> instead of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTupleConnection</span></code>.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="logging-cursor">
+<span id="index-2"></span><h3>Logging cursor<a class="headerlink" href="#logging-cursor" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="psycopg2.extras.LoggingConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">LoggingConnection</code><a class="headerlink" href="#psycopg2.extras.LoggingConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection that logs all queries to a file or <a class="reference external" href="https://docs.python.org/library/logging.html">logger</a> object.</p>
+<dl class="method">
+<dt id="psycopg2.extras.LoggingConnection.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>msg</em>, <em>curs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.LoggingConnection.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the query before logging it.</p>
+<p>This is the method to overwrite to filter unwanted queries out of the
+log or to add some extra data to the output. The default implementation
+just does nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.LoggingConnection.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><em>logobj</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.LoggingConnection.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the connection to log to <code class="xref py py-obj docutils literal notranslate"><span class="pre">logobj</span></code>.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">logobj</span></code> parameter can be an open file object or a Logger
+instance from the standard logging module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.LoggingCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">LoggingCursor</code><a class="headerlink" href="#psycopg2.extras.LoggingCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cursor that logs queries using its connection logging facilities.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Queries that are executed with <a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.executemany()</span></code></a> are not logged.</p>
+</div>
+<dl class="class">
+<dt id="psycopg2.extras.MinTimeLoggingConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">MinTimeLoggingConnection</code><a class="headerlink" href="#psycopg2.extras.MinTimeLoggingConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection that logs queries based on execution time.</p>
+<p>This is just an example of how to sub-class <a class="reference internal" href="#psycopg2.extras.LoggingConnection" title="psycopg2.extras.LoggingConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LoggingConnection</span></code></a> to
+provide some extra filtering for the logged queries. Both the
+<a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection.initialize" title="psycopg2.extras.MinTimeLoggingConnection.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize()</span></code></a> and <a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection.filter" title="psycopg2.extras.MinTimeLoggingConnection.filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter()</span></code></a> methods are overwritten to make sure
+that only queries executing for more than <code class="docutils literal notranslate"><span class="pre">mintime</span></code> ms are logged.</p>
+<p>Note that this connection uses the specialized cursor
+<a class="reference internal" href="#psycopg2.extras.MinTimeLoggingCursor" title="psycopg2.extras.MinTimeLoggingCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MinTimeLoggingCursor</span></code></a>.</p>
+<dl class="method">
+<dt id="psycopg2.extras.MinTimeLoggingConnection.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>msg</em>, <em>curs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.MinTimeLoggingConnection.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the query before logging it.</p>
+<p>This is the method to overwrite to filter unwanted queries out of the
+log or to add some extra data to the output. The default implementation
+just does nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.MinTimeLoggingConnection.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><em>logobj</em>, <em>mintime=0</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.MinTimeLoggingConnection.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the connection to log to <code class="xref py py-obj docutils literal notranslate"><span class="pre">logobj</span></code>.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">logobj</span></code> parameter can be an open file object or a Logger
+instance from the standard logging module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.MinTimeLoggingCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">MinTimeLoggingCursor</code><a class="headerlink" href="#psycopg2.extras.MinTimeLoggingCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cursor sub-class companion to <a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection" title="psycopg2.extras.MinTimeLoggingConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MinTimeLoggingConnection</span></code></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="replication-support-objects">
+<span id="replication-objects"></span><h2>Replication support objects<a class="headerlink" href="#replication-support-objects" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="advanced.html#replication-support"><span class="std std-ref">Replication protocol support</span></a> for an introduction to the topic.</p>
+<p>The following replication types are defined:</p>
+<dl class="data">
+<dt id="psycopg2.extras.REPLICATION_LOGICAL">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">REPLICATION_LOGICAL</code><a class="headerlink" href="#psycopg2.extras.REPLICATION_LOGICAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
+<dt id="psycopg2.extras.REPLICATION_PHYSICAL">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">REPLICATION_PHYSICAL</code><a class="headerlink" href="#psycopg2.extras.REPLICATION_PHYSICAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="index-3"></span><dl class="class">
+<dt id="psycopg2.extras.LogicalReplicationConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">LogicalReplicationConnection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.LogicalReplicationConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>This connection factory class can be used to open a special type of
+connection that is used for logical replication.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg2.extras</span> <span class="kn">import</span> <span class="n">LogicalReplicationConnection</span>
+<span class="n">log_conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">,</span> <span class="n">connection_factory</span><span class="o">=</span><span class="n">LogicalReplicationConnection</span><span class="p">)</span>
+<span class="n">log_cur</span> <span class="o">=</span> <span class="n">log_conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.PhysicalReplicationConnection">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">PhysicalReplicationConnection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.PhysicalReplicationConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>This connection factory class can be used to open a special type of
+connection that is used for physical replication.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg2.extras</span> <span class="kn">import</span> <span class="n">PhysicalReplicationConnection</span>
+<span class="n">phys_conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">,</span> <span class="n">connection_factory</span><span class="o">=</span><span class="n">PhysicalReplicationConnection</span><span class="p">)</span>
+<span class="n">phys_cur</span> <span class="o">=</span> <span class="n">phys_conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Both <a class="reference internal" href="#psycopg2.extras.LogicalReplicationConnection" title="psycopg2.extras.LogicalReplicationConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogicalReplicationConnection</span></code></a> and <a class="reference internal" href="#psycopg2.extras.PhysicalReplicationConnection" title="psycopg2.extras.PhysicalReplicationConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PhysicalReplicationConnection</span></code></a> use
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor" title="psycopg2.extras.ReplicationCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationCursor</span></code></a> for actual communication with the server.</p>
+</dd></dl>
+
+<p id="index-4">The individual messages in the replication stream are represented by
+<a class="reference internal" href="#psycopg2.extras.ReplicationMessage" title="psycopg2.extras.ReplicationMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a> objects (both logical and physical type):</p>
+<dl class="class">
+<dt id="psycopg2.extras.ReplicationMessage">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">ReplicationMessage</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A replication protocol message.</p>
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.payload">
+<code class="descname">payload</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.payload" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual data received from the server.</p>
+<p>An instance of either <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode()</span></code>, depending on the value
+of <code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code> option passed to <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a>
+on the connection.  See <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message" title="psycopg2.extras.ReplicationCursor.read_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_message()</span></code></a> for
+details.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.data_size">
+<code class="descname">data_size</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.data_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The raw size of the message payload (before possible unicode
+conversion).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.data_start">
+<code class="descname">data_start</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.data_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>LSN position of the start of the message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.wal_end">
+<code class="descname">wal_end</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.wal_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>LSN position of the current end of WAL on the server.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.send_time">
+<code class="descname">send_time</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.send_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the server timestamp at the moment
+when the message was sent.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationMessage.cursor">
+<code class="descname">cursor</code><a class="headerlink" href="#psycopg2.extras.ReplicationMessage.cursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A reference to the corresponding <a class="reference internal" href="#psycopg2.extras.ReplicationCursor" title="psycopg2.extras.ReplicationCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationCursor</span></code></a> object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="index-5"></span><dl class="class">
+<dt id="psycopg2.extras.ReplicationCursor">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">ReplicationCursor</code><a class="headerlink" href="#psycopg2.extras.ReplicationCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cursor used for communication on replication connections.</p>
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.create_replication_slot">
+<code class="descname">create_replication_slot</code><span class="sig-paren">(</span><em>slot_name</em>, <em>slot_type=None</em>, <em>output_plugin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.create_replication_slot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create streaming replication slot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slot_name</strong> – name of the replication slot to be created</li>
+<li><strong>slot_type</strong> – type of replication: should be either
+<a class="reference internal" href="#psycopg2.extras.REPLICATION_LOGICAL" title="psycopg2.extras.REPLICATION_LOGICAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPLICATION_LOGICAL</span></code></a> or <a class="reference internal" href="#psycopg2.extras.REPLICATION_PHYSICAL" title="psycopg2.extras.REPLICATION_PHYSICAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPLICATION_PHYSICAL</span></code></a></li>
+<li><strong>output_plugin</strong> – name of the logical decoding output plugin to be
+used by the slot; required for logical
+replication connections, disallowed for physical</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log_cur</span><span class="o">.</span><span class="n">create_replication_slot</span><span class="p">(</span><span class="s2">&quot;logical1&quot;</span><span class="p">,</span> <span class="s2">&quot;test_decoding&quot;</span><span class="p">)</span>
+<span class="n">phys_cur</span><span class="o">.</span><span class="n">create_replication_slot</span><span class="p">(</span><span class="s2">&quot;physical1&quot;</span><span class="p">)</span>
+
+<span class="c1"># either logical or physical replication connection</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">create_replication_slot</span><span class="p">(</span><span class="s2">&quot;slot1&quot;</span><span class="p">,</span> <span class="n">slot_type</span><span class="o">=</span><span class="n">REPLICATION_LOGICAL</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When creating a slot on a logical replication connection, a logical
+replication slot is created by default.  Logical replication requires
+name of the logical decoding output plugin to be specified.</p>
+<p>When creating a slot on a physical replication connection, a physical
+replication slot is created by default.  No output plugin parameter is
+required or allowed when creating a physical replication slot.</p>
+<p>In either case the type of slot being created can be specified
+explicitly using <em>slot_type</em> parameter.</p>
+<p>Replication slots are a feature of PostgreSQL server starting with
+version 9.4.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.drop_replication_slot">
+<code class="descname">drop_replication_slot</code><span class="sig-paren">(</span><em>slot_name</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.drop_replication_slot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop streaming replication slot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slot_name</strong> – name of the replication slot to drop</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># either logical or physical replication connection</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">drop_replication_slot</span><span class="p">(</span><span class="s2">&quot;slot1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replication slots are a feature of PostgreSQL server starting with
+version 9.4.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.start_replication">
+<code class="descname">start_replication</code><span class="sig-paren">(</span><em>slot_name=None</em>, <em>slot_type=None</em>, <em>start_lsn=0</em>, <em>timeline=0</em>, <em>options=None</em>, <em>decode=False</em>, <em>status_interval=10</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.start_replication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start replication on the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slot_name</strong> – name of the replication slot to use; required for
+logical replication, physical replication can work
+with or without a slot</li>
+<li><strong>slot_type</strong> – type of replication: should be either
+<a class="reference internal" href="#psycopg2.extras.REPLICATION_LOGICAL" title="psycopg2.extras.REPLICATION_LOGICAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPLICATION_LOGICAL</span></code></a> or <a class="reference internal" href="#psycopg2.extras.REPLICATION_PHYSICAL" title="psycopg2.extras.REPLICATION_PHYSICAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPLICATION_PHYSICAL</span></code></a></li>
+<li><strong>start_lsn</strong> – the optional LSN position to start replicating from,
+can be an integer or a string of hexadecimal digits
+in the form <code class="docutils literal notranslate"><span class="pre">XXX/XXX</span></code></li>
+<li><strong>timeline</strong> – WAL history timeline to start streaming from (optional,
+can only be used with physical replication)</li>
+<li><strong>options</strong> – a dictionary of options to pass to logical replication
+slot (not allowed with physical replication)</li>
+<li><strong>decode</strong> – a flag indicating that unicode conversion should be
+performed on messages received from the server</li>
+<li><strong>status_interval</strong> – time between feedback packets sent to the server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If a <em>slot_name</em> is specified, the slot must exist on the server and
+its type must match the replication type used.</p>
+<p>If not specified using <em>slot_type</em> parameter, the type of replication
+is defined by the type of replication connection.  Logical replication
+is only allowed on logical replication connection, but physical
+replication can be used with both types of connection.</p>
+<p>On the other hand, physical replication doesn’t require a named
+replication slot to be used, only logical replication does.  In any
+case logical replication and replication slots are a feature of
+PostgreSQL server starting with version 9.4.  Physical replication can
+be used starting with 9.0.</p>
+<p>If <em>start_lsn</em> is specified, the requested stream will start from that
+LSN.  The default is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> which passes the LSN <code class="docutils literal notranslate"><span class="pre">0/0</span></code> causing
+replay to begin at the last point for which the server got flush
+confirmation from the client, or the oldest available point for a new
+slot.</p>
+<p>The server might produce an error if a WAL file for the given LSN has
+already been recycled or it may silently start streaming from a later
+position: the client can verify the actual position using information
+provided by the <a class="reference internal" href="#psycopg2.extras.ReplicationMessage" title="psycopg2.extras.ReplicationMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a> attributes.  The exact server
+behavior depends on the type of replication and use of slots.</p>
+<p>The <em>timeline</em> parameter can only be specified with physical
+replication and only starting with server version 9.3.</p>
+<p>A dictionary of <em>options</em> may be passed to the logical decoding plugin
+on a logical replication slot.  The set of supported options depends
+on the output plugin that was used to create the slot.  Must be
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> for physical replication.</p>
+<p>If <em>decode</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> the messages received from the server
+would be converted according to the connection <a class="reference internal" href="connection.html#connection.encoding" title="connection.encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code></a>.
+<em>This parameter should not be set with physical replication or with
+logical replication plugins that produce binary output.</em></p>
+<p>Replication stream should periodically send feedback to the database
+to prevent disconnect via timeout. Feedback is automatically sent when
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message" title="psycopg2.extras.ReplicationCursor.read_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_message()</span></code></a> is called or during run of the <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="psycopg2.extras.ReplicationCursor.consume_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consume_stream()</span></code></a>.
+To specify the feedback interval use <em>status_interval</em> parameter.
+The value of this parameter must be set to at least 1 second, but
+it can have a fractional part.</p>
+<p>This function constructs a <a class="reference external" href="https://www.postgresql.org/docs/current/static/protocol-replication.html"><code class="sql docutils literal notranslate"><span class="pre">START_REPLICATION</span></code></a> command and calls
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication_expert" title="psycopg2.extras.ReplicationCursor.start_replication_expert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication_expert()</span></code></a> internally.</p>
+<p>After starting the replication, to actually consume the incoming
+server messages use <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="psycopg2.extras.ReplicationCursor.consume_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consume_stream()</span></code></a> or implement a loop around
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message" title="psycopg2.extras.ReplicationCursor.read_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_message()</span></code></a> in case of <a class="reference internal" href="advanced.html#async-support"><span class="std std-ref">asynchronous connection</span></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.8.3: </span>added the <em>status_interval</em> parameter.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.start_replication_expert">
+<code class="descname">start_replication_expert</code><span class="sig-paren">(</span><em>command</em>, <em>decode=False</em>, <em>status_interval=10</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.start_replication_expert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start replication on the connection using provided
+<a class="reference external" href="https://www.postgresql.org/docs/current/static/protocol-replication.html"><code class="sql docutils literal notranslate"><span class="pre">START_REPLICATION</span></code></a> command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>command</strong> – The full replication command. It can be a string or a
+<a class="reference internal" href="sql.html#psycopg2.sql.Composable" title="psycopg2.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> instance for dynamic generation.</li>
+<li><strong>decode</strong> – a flag indicating that unicode conversion should be
+performed on messages received from the server.</li>
+<li><strong>status_interval</strong> – time between feedback packets sent to the server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.8.3: </span>added the <em>status_interval</em> parameter.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.consume_stream">
+<code class="descname">consume_stream</code><span class="sig-paren">(</span><em>consume</em>, <em>keepalive_interval=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>consume</strong> – a callable object with signature <code class="samp docutils literal notranslate"><span class="pre">consume(</span><em><span class="pre">msg</span></em><span class="pre">)</span></code></li>
+<li><strong>keepalive_interval</strong> – interval (in seconds) to send keepalive
+messages to the server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This method can only be used with synchronous connection.  For
+asynchronous connections see <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message" title="psycopg2.extras.ReplicationCursor.read_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_message()</span></code></a>.</p>
+<p>Before using this method to consume the stream call
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a> first.</p>
+<p>This method enters an endless loop reading messages from the server
+and passing them to <code class="docutils literal notranslate"><span class="pre">consume()</span></code> one at a time, then waiting for more
+messages from the server.  In order to make this method break out of
+the loop and return, <code class="docutils literal notranslate"><span class="pre">consume()</span></code> can throw a <a class="reference internal" href="#psycopg2.extras.StopReplication" title="psycopg2.extras.StopReplication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StopReplication</span></code></a>
+exception.  Any unhandled exception will make it break out of the loop
+as well.</p>
+<p>The <em>msg</em> object passed to <code class="docutils literal notranslate"><span class="pre">consume()</span></code> is an instance of
+<a class="reference internal" href="#psycopg2.extras.ReplicationMessage" title="psycopg2.extras.ReplicationMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a> class.  See <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message" title="psycopg2.extras.ReplicationCursor.read_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_message()</span></code></a> for details about
+message decoding.</p>
+<p>This method also sends feedback messages to the server every
+<em>keepalive_interval</em> (in seconds). The value of this parameter must
+be set to at least 1 second, but it can have a fractional part.
+If the <em>keepalive_interval</em> is not specified, the value of
+<em>status_interval</em> specified in the <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a> or
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication_expert" title="psycopg2.extras.ReplicationCursor.start_replication_expert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication_expert()</span></code></a> will be used.</p>
+<p>The client must confirm every processed message by calling
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.send_feedback" title="psycopg2.extras.ReplicationCursor.send_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_feedback()</span></code></a> method on the corresponding replication cursor. A
+reference to the cursor is provided in the <a class="reference internal" href="#psycopg2.extras.ReplicationMessage" title="psycopg2.extras.ReplicationMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a> as an
+attribute.</p>
+<p>The following example is a sketch implementation of <code class="docutils literal notranslate"><span class="pre">consume()</span></code>
+callable for logical replication:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LogicalStreamConsumer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">send_feedback</span><span class="p">(</span><span class="n">flush_lsn</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">data_start</span><span class="p">)</span>
+
+<span class="n">consumer</span> <span class="o">=</span> <span class="n">LogicalStreamConsumer</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">consume_stream</span><span class="p">(</span><span class="n">consumer</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">When using replication with slots, failure to constantly consume
+<em>and</em> report success to the server appropriately can eventually
+lead to “disk full” condition on the server, because the server
+retains all the WAL segments that might be needed to stream the
+changes via all of the currently open replication slots.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.8.3: </span>changed the default value of the <em>keepalive_interval</em> parameter to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.send_feedback">
+<code class="descname">send_feedback</code><span class="sig-paren">(</span><em>write_lsn=0</em>, <em>flush_lsn=0</em>, <em>apply_lsn=0</em>, <em>reply=False</em>, <em>force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.send_feedback" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>write_lsn</strong> – a LSN position up to which the client has written the data locally</li>
+<li><strong>flush_lsn</strong> – a LSN position up to which the client has processed the
+data reliably (the server is allowed to discard all
+and every data that predates this LSN)</li>
+<li><strong>apply_lsn</strong> – a LSN position up to which the warm standby server
+has applied the changes (physical replication
+master-slave protocol only)</li>
+<li><strong>reply</strong> – request the server to send back a keepalive message immediately</li>
+<li><strong>force</strong> – force sending a feedback message regardless of status_interval timeout</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Use this method to report to the server that all messages up to a
+certain LSN position have been processed on the client and may be
+discarded on the server.</p>
+<p>If the <em>reply</em> or <em>force</em> parameters are not set, this method will
+just update internal structures without sending the feedback message
+to the server. The library sends feedback message automatically
+when <em>status_interval</em> timeout is reached.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.8.3: </span>added the <em>force</em> parameter.</p>
+</div>
+</dd></dl>
+
+<p>Low-level replication cursor methods for <a class="reference internal" href="advanced.html#async-support"><span class="std std-ref">asynchronous connection</span></a> operation.</p>
+<p>With the synchronous connection a call to <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="psycopg2.extras.ReplicationCursor.consume_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consume_stream()</span></code></a> handles all
+the complexity of handling the incoming messages and sending keepalive
+replies, but at times it might be beneficial to use low-level interface
+for better control, in particular to <a class="reference external" href="https://docs.python.org/3/library/select.html#module-select" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select</span></code></a> on multiple sockets.  The
+following methods are provided for asynchronous operation:</p>
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.read_message">
+<code class="descname">read_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.read_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to read the next message from the server without blocking and
+return an instance of <a class="reference internal" href="#psycopg2.extras.ReplicationMessage" title="psycopg2.extras.ReplicationMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, in case there
+are no more data messages from the server at the moment.</p>
+<p>This method should be used in a loop with asynchronous connections
+(after calling <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a> once).  For synchronous
+connections see <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="psycopg2.extras.ReplicationCursor.consume_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consume_stream()</span></code></a>.</p>
+<p>The returned message’s <a class="reference internal" href="#psycopg2.extras.ReplicationMessage.payload" title="psycopg2.extras.ReplicationMessage.payload"><code class="xref py py-obj docutils literal notranslate"><span class="pre">payload</span></code></a> is an instance of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> decoded according to connection <a class="reference internal" href="connection.html#connection.encoding" title="connection.encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code></a>
+<em>iff</em> <em>decode</em> was set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> in the initial call to
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a> on this connection, otherwise it is an instance
+of <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> with no decoding.</p>
+<p>It is expected that the calling code will call this method repeatedly
+in order to consume all of the messages that might have been buffered
+until <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> is returned.  After receiving <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> from this method
+the caller should use <code class="xref py py-obj docutils literal notranslate"><span class="pre">select()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">poll()</span></code> on the
+corresponding connection to block the process until there is more data
+from the server.</p>
+<p>Last, but not least, this method sends feedback messages when
+<em>status_interval</em> timeout is reached or when keepalive message with
+reply request arrived from the server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="psycopg2.extras.ReplicationCursor.fileno">
+<code class="descname">fileno</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.fileno" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the corresponding connection’s <a class="reference internal" href="connection.html#connection.fileno" title="connection.fileno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fileno()</span></code></a> method and
+return the result.</p>
+<p>This is a convenience method which allows replication cursor to be
+used directly in <code class="xref py py-obj docutils literal notranslate"><span class="pre">select()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">poll()</span></code> calls.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationCursor.io_timestamp">
+<code class="descname">io_timestamp</code><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.io_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the timestamp at the moment of last
+communication with the server (a data or keepalive message in either
+direction).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationCursor.feedback_timestamp">
+<code class="descname">feedback_timestamp</code><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.feedback_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the timestamp at the moment when
+the last feedback message sent to the server.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.8.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.ReplicationCursor.wal_end">
+<code class="descname">wal_end</code><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.wal_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>LSN position of the current end of WAL on the server at the
+moment of last data or keepalive message received from the
+server.</p>
+<blockquote>
+<div><div class="versionadded">
+<p><span class="versionmodified">New in version 2.8.</span></p>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<p>An actual example of asynchronous operation might look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">select</span> <span class="kn">import</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">send_feedback</span><span class="p">(</span><span class="n">flush_lsn</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">data_start</span><span class="p">)</span>
+
+<span class="n">status_interval</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">read_message</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">consume</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">status_interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">cur</span><span class="o">.</span><span class="n">feedback_timestamp</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">cur</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">timeout</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">InterruptedError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># recalculate timeout and continue</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="index-6"></span><dl class="class">
+<dt id="psycopg2.extras.StopReplication">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">StopReplication</code><a class="headerlink" href="#psycopg2.extras.StopReplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception used to break out of the endless loop in
+<a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="psycopg2.extras.ReplicationCursor.consume_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consume_stream()</span></code></a>.</p>
+<p>Subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code>.  Intentionally <em>not</em> inherited from
+<a class="reference internal" href="module.html#psycopg2.Error" title="psycopg2.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a> as occurrence of this exception does not indicate an
+error.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="additional-data-types">
+<span id="index-7"></span><h2>Additional data types<a class="headerlink" href="#additional-data-types" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="json-adaptation">
+<span id="adapt-json"></span><span id="index-8"></span><h3><a class="reference external" href="https://www.json.org/">JSON</a> adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.5.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.5.4: </span>added <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> support. In previous versions <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> values are returned
+as strings. See <a class="reference internal" href="faq.html#faq-jsonb-adapt"><span class="std std-ref">the FAQ</span></a> for a workaround.</p>
+</div>
+<p>Psycopg can adapt Python objects to and from the PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-json.html"><code class="sql docutils literal notranslate"><span class="pre">json</span></code> and <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code></a>
+types.  With PostgreSQL 9.2 and following versions adaptation is
+available out-of-the-box. To use JSON data with previous database versions
+(either with the <a class="reference external" href="http://people.planetpostgresql.org/andrew/index.php?/archives/255-JSON-for-PG-9.2-...-and-now-for-9.1!.html">9.1 json extension</a>, but even if you want to convert text
+fields to JSON) you can use the <a class="reference internal" href="#psycopg2.extras.register_json" title="psycopg2.extras.register_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_json()</span></code></a> function.</p>
+<p>The Python <a class="reference external" href="https://docs.python.org/3/library/json.html#module-json" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">json</span></code></a> module is used by default to convert Python objects
+to JSON and to parse data from the database.</p>
+<p>In order to pass a Python object to the database as query argument you can use
+the <a class="reference internal" href="#psycopg2.extras.Json" title="psycopg2.extras.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Json</span></code></a> adapter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into mytable (jsondata) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">Json</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})])</span>
+</pre></div>
+</div>
+<p>Reading from the database, <code class="sql docutils literal notranslate"><span class="pre">json</span></code> and <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> values will be automatically
+converted to Python objects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you are using the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">json</span></code> data type but you want to read
+it as string in Python instead of having it parsed, your can either cast
+the column to <code class="sql docutils literal notranslate"><span class="pre">text</span></code> in the query (it is an efficient operation, that
+doesn’t involve a copy):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select jsondata::text from mytable&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or you can register a no-op <code class="xref py py-obj docutils literal notranslate"><span class="pre">loads()</span></code> function with
+<a class="reference internal" href="#psycopg2.extras.register_default_json" title="psycopg2.extras.register_default_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_default_json()</span></code></a>:</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_default_json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can use <a class="reference internal" href="extensions.html#psycopg2.extensions.register_adapter" title="psycopg2.extensions.register_adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_adapter()</span></code></a> to adapt any Python
+dictionary to JSON, either registering <a class="reference internal" href="#psycopg2.extras.Json" title="psycopg2.extras.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Json</span></code></a> or any subclass or factory
+creating a compatible adapter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">Json</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">This setting is global though, so it is not compatible with similar
+adapters such as the one registered by <a class="reference internal" href="#psycopg2.extras.register_hstore" title="psycopg2.extras.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a>. Any other
+object supported by JSON can be registered the same way, but this will
+clobber the default adaptation rule, so be careful to unwanted side
+effects.</p>
+</div>
+<p>If you want to customize the adaptation from Python to PostgreSQL you can
+either provide a custom <code class="xref py py-obj docutils literal notranslate"><span class="pre">dumps()</span></code> function to <a class="reference internal" href="#psycopg2.extras.Json" title="psycopg2.extras.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Json</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into mytable (jsondata) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">Json</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span> <span class="n">dumps</span><span class="o">=</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>or you can subclass it overriding the <a class="reference internal" href="#psycopg2.extras.Json.dumps" title="psycopg2.extras.Json.dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumps()</span></code></a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyJson</span><span class="p">(</span><span class="n">Json</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into mytable (jsondata) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">MyJson</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})])</span>
+</pre></div>
+</div>
+<p>Customizing the conversion from PostgreSQL to Python can be done passing a
+custom <code class="xref py py-obj docutils literal notranslate"><span class="pre">loads()</span></code> function to <a class="reference internal" href="#psycopg2.extras.register_json" title="psycopg2.extras.register_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_json()</span></code></a>.  For the builtin data types
+(<code class="sql docutils literal notranslate"><span class="pre">json</span></code> from PostgreSQL 9.2, <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> from PostgreSQL 9.4) use
+<a class="reference internal" href="#psycopg2.extras.register_default_json" title="psycopg2.extras.register_default_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_default_json()</span></code></a> and <a class="reference internal" href="#psycopg2.extras.register_default_jsonb" title="psycopg2.extras.register_default_jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_default_jsonb()</span></code></a>.  For example, if you
+want to convert the float values from <code class="sql docutils literal notranslate"><span class="pre">json</span></code> into
+<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loads</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">parse_float</span><span class="o">=</span><span class="n">Decimal</span><span class="p">)</span>
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">loads</span><span class="o">=</span><span class="n">loads</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or, if you want to use an alternative JSON module implementation, such as the
+faster <a class="reference external" href="https://pypi.org/project/ujson/">UltraJSON</a>, you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_default_json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="n">ujson</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span> <span class="n">globally</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_default_jsonb</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="n">ujson</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span> <span class="n">globally</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="psycopg2.extras.Json">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">Json</code><span class="sig-paren">(</span><em>adapted</em>, <em>dumps=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.Json" title="Permalink to this definition">¶</a></dt>
+<dd><p>An <a class="reference internal" href="extensions.html#psycopg2.extensions.ISQLQuote" title="psycopg2.extensions.ISQLQuote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ISQLQuote</span></code></a> wrapper to adapt a Python object to
+<code class="sql docutils literal notranslate"><span class="pre">json</span></code> data type.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Json</span></code> can be used to wrap any object supported by the provided <em>dumps</em>
+function. If none is provided, the standard <a class="reference external" href="https://docs.python.org/3/library/json.html#json.dumps" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">json.dumps()</span></code></a> is
+used.</p>
+<dl class="method">
+<dt id="psycopg2.extras.Json.dumps">
+<code class="descname">dumps</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.Json.dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize <em>obj</em> in JSON format.</p>
+<p>The default is to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">json.dumps()</span></code> or the <em>dumps</em> function
+provided in the constructor. You can override this method to create a
+customized JSON wrapper.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="psycopg2.extras.register_json">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_json</code><span class="sig-paren">(</span><em>conn_or_curs=None</em>, <em>globally=False</em>, <em>loads=None</em>, <em>oid=None</em>, <em>array_oid=None</em>, <em>name='json'</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and register typecasters converting <code class="sql docutils literal notranslate"><span class="pre">json</span></code> type to Python objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conn_or_curs</strong> – a connection or cursor used to find the <code class="sql docutils literal notranslate"><span class="pre">json</span></code>
+and <code class="sql docutils literal notranslate"><span class="pre">json[]</span></code> oids; the typecasters are registered in a scope
+limited to this object, unless <em>globally</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>. It can be
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the oids are provided</li>
+<li><strong>globally</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> register the typecasters only on
+<em>conn_or_curs</em>, otherwise register them globally</li>
+<li><strong>loads</strong> – the function used to parse the data into a Python object. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> use <code class="xref py py-obj docutils literal notranslate"><span class="pre">json.loads()</span></code>, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">json</span></code> is the module chosen
+according to the Python version (see above)</li>
+<li><strong>oid</strong> – the OID of the <code class="sql docutils literal notranslate"><span class="pre">json</span></code> type if known; If not, it will be
+queried on <em>conn_or_curs</em></li>
+<li><strong>array_oid</strong> – the OID of the <code class="sql docutils literal notranslate"><span class="pre">json[]</span></code> array type if known;
+if not, it will be queried on <em>conn_or_curs</em></li>
+<li><strong>name</strong> – the name of the data type to look for in <em>conn_or_curs</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The connection or cursor passed to the function will be used to query the
+database and look for the OID of the <code class="sql docutils literal notranslate"><span class="pre">json</span></code> type (or an alternative
+type if <em>name</em> if provided). No query is performed if <em>oid</em> and <em>array_oid</em>
+are provided.  Raise <a class="reference internal" href="module.html#psycopg2.ProgrammingError" title="psycopg2.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> if the type is not found.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.5.4: </span>added the <em>name</em> parameter to enable <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> support.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="psycopg2.extras.register_default_json">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_default_json</code><span class="sig-paren">(</span><em>conn_or_curs=None</em>, <em>globally=False</em>, <em>loads=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_default_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and register <code class="sql docutils literal notranslate"><span class="pre">json</span></code> typecasters for PostgreSQL 9.2 and following.</p>
+<p>Since PostgreSQL 9.2 <code class="sql docutils literal notranslate"><span class="pre">json</span></code> is a builtin type, hence its oid is known
+and fixed. This function allows specifying a customized <em>loads</em> function
+for the default <code class="sql docutils literal notranslate"><span class="pre">json</span></code> type without querying the database.
+All the parameters have the same meaning of <a class="reference internal" href="#psycopg2.extras.register_json" title="psycopg2.extras.register_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_json()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psycopg2.extras.register_default_jsonb">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_default_jsonb</code><span class="sig-paren">(</span><em>conn_or_curs=None</em>, <em>globally=False</em>, <em>loads=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_default_jsonb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and register <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> typecasters for PostgreSQL 9.4 and following.</p>
+<p>As in <a class="reference internal" href="#psycopg2.extras.register_default_json" title="psycopg2.extras.register_default_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_default_json()</span></code></a>, the function allows to register a
+customized <em>loads</em> function for the <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> type at its known oid for
+PostgreSQL 9.4 and following versions.  All the parameters have the same
+meaning of <a class="reference internal" href="#psycopg2.extras.register_json" title="psycopg2.extras.register_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_json()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.5.4.</span></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="hstore-data-type">
+<span id="adapt-hstore"></span><span id="index-9"></span><h3>Hstore data type<a class="headerlink" href="#hstore-data-type" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.3.</span></p>
+</div>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/hstore.html"><code class="sql docutils literal notranslate"><span class="pre">hstore</span></code></a> data type is a key-value store embedded in PostgreSQL.  It has
+been available for several server versions but with the release 9.0 it has
+been greatly improved in capacity and usefulness with the addition of many
+functions.  It supports GiST or GIN indexes allowing search by keys or
+key/value pairs as well as regular BTree indexes for equality, uniqueness etc.</p>
+<p>Psycopg can convert Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> objects to and from <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> structures.
+Only dictionaries with string/unicode keys and values are supported.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>
+is also allowed as value but not as a key. Psycopg uses a more efficient <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code>
+representation when dealing with PostgreSQL 9.0 but previous server versions
+are supported as well.  By default the adapter/typecaster are disabled: they
+can be enabled using the <a class="reference internal" href="#psycopg2.extras.register_hstore" title="psycopg2.extras.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a> function.</p>
+<dl class="function">
+<dt id="psycopg2.extras.register_hstore">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_hstore</code><span class="sig-paren">(</span><em>conn_or_curs</em>, <em>globally=False</em>, <em>unicode=False</em>, <em>oid=None</em>, <em>array_oid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_hstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register adapter and typecaster for <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>-<code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> conversions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conn_or_curs</strong> – a connection or cursor: the typecaster will be
+registered only on this object unless <em>globally</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></li>
+<li><strong>globally</strong> – register the adapter globally, not only on <em>conn_or_curs</em></li>
+<li><strong>unicode</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, keys and values returned from the database
+will be <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> instead of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>. The option is not available on
+Python 3</li>
+<li><strong>oid</strong> – the OID of the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> type if known. If not, it will be
+queried on <em>conn_or_curs</em>.</li>
+<li><strong>array_oid</strong> – the OID of the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> array type if known. If not, it
+will be queried on <em>conn_or_curs</em>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The connection or cursor passed to the function will be used to query the
+database and look for the OID of the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> type (which may be different
+across databases). If querying is not desirable (e.g. with
+<a class="reference internal" href="advanced.html#async-support"><span class="std std-ref">asynchronous connections</span></a>) you may specify it in the
+<em>oid</em> parameter, which can be found using a query such as <code class="sql docutils literal notranslate"><span class="pre">SELECT</span>
+<span class="pre">'hstore'::regtype::oid</span></code>. Analogously you can obtain a value for <em>array_oid</em>
+using a query such as <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">'hstore[]'::regtype::oid</span></code>.</p>
+<p>Note that, when passing a dictionary from Python to the database, both
+strings and unicode keys and values are supported. Dictionaries returned
+from the database have keys/values according to the <em>unicode</em> parameter.</p>
+<p>The <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> contrib module must be already installed in the database
+(executing the <code class="docutils literal notranslate"><span class="pre">hstore.sql</span></code> script in your <code class="docutils literal notranslate"><span class="pre">contrib</span></code> directory).
+Raise <a class="reference internal" href="module.html#psycopg2.ProgrammingError" title="psycopg2.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> if the type is not found.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.4: </span>added the <em>oid</em> parameter. If not specified, the typecaster is
+installed also if <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> is not installed in the <code class="sql docutils literal notranslate"><span class="pre">public</span></code>
+schema.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.4.3: </span>added support for <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> array.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="composite-types-casting">
+<span id="adapt-composite"></span><span id="index-10"></span><h3>Composite types casting<a class="headerlink" href="#composite-types-casting" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.4.</span></p>
+</div>
+<p>Using <a class="reference internal" href="#psycopg2.extras.register_composite" title="psycopg2.extras.register_composite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_composite()</span></code></a> it is possible to cast a PostgreSQL composite
+type (either created with the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> command or implicitly defined
+after a table row type) into a Python named tuple, or into a regular tuple if
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">collections.namedtuple()</span></code></a> is not found.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE card AS (value int, suit text);&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_composite</span><span class="p">(</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+<span class="go">&lt;psycopg2.extras.CompositeCaster object at 0x...&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select (8, &#39;hearts&#39;)::card&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">card(value=8, suit=&#39;hearts&#39;)</span>
+</pre></div>
+</div>
+<p>Nested composite types are handled as expected, provided that the type of the
+composite components are registered as well.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE card_back AS (face card, back text);&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_composite</span><span class="p">(</span><span class="s1">&#39;card_back&#39;</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+<span class="go">&lt;psycopg2.extras.CompositeCaster object at 0x...&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select ((8, &#39;hearts&#39;), &#39;blue&#39;)::card_back&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">card_back(face=card(value=8, suit=&#39;hearts&#39;), back=&#39;blue&#39;)</span>
+</pre></div>
+</div>
+<p>Adaptation from Python tuples to composite types is automatic instead and
+requires no adapter registration.</p>
+<div class="admonition note" id="custom-composite">
+<p class="first admonition-title">Note</p>
+<p>If you want to convert PostgreSQL composite types into something different
+than a <code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> you can subclass the <a class="reference internal" href="#psycopg2.extras.CompositeCaster" title="psycopg2.extras.CompositeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeCaster</span></code></a> overriding
+<a class="reference internal" href="#psycopg2.extras.CompositeCaster.make" title="psycopg2.extras.CompositeCaster.make"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make()</span></code></a>. For example, if you want to convert your type
+into a Python dictionary you can use:</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">DictComposite</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">CompositeCaster</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attnames</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_composite</span><span class="p">(</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> <span class="n">cur</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">factory</span><span class="o">=</span><span class="n">DictComposite</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select (8, &#39;hearts&#39;)::card&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">{&#39;suit&#39;: &#39;hearts&#39;, &#39;value&#39;: 8}</span>
+</pre></div>
+</div>
+</div>
+<dl class="function">
+<dt id="psycopg2.extras.register_composite">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_composite</code><span class="sig-paren">(</span><em>name</em>, <em>conn_or_curs</em>, <em>globally=False</em>, <em>factory=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_composite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a typecaster to convert a composite type into a tuple.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> – the name of a PostgreSQL composite type, e.g. created using
+the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> command</li>
+<li><strong>conn_or_curs</strong> – a connection or cursor used to find the type oid and
+components; the typecaster is registered in a scope limited to this
+object, unless <em>globally</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></li>
+<li><strong>globally</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> (default) register the typecaster only on
+<em>conn_or_curs</em>, otherwise register it globally</li>
+<li><strong>factory</strong> – if specified it should be a <a class="reference internal" href="#psycopg2.extras.CompositeCaster" title="psycopg2.extras.CompositeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeCaster</span></code></a> subclass: use
+it to <a class="reference internal" href="#custom-composite"><span class="std std-ref">customize how to cast composite types</span></a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the registered <a class="reference internal" href="#psycopg2.extras.CompositeCaster" title="psycopg2.extras.CompositeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeCaster</span></code></a> or <em>factory</em> instance
+responsible for the conversion</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.4.3: </span>added support for array of composite types</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.5: </span>added the <em>factory</em> parameter</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.CompositeCaster">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">CompositeCaster</code><span class="sig-paren">(</span><em>name</em>, <em>oid</em>, <em>attrs</em>, <em>array_oid=None</em>, <em>schema=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.CompositeCaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helps conversion of a PostgreSQL composite type into a Python object.</p>
+<p>The class is usually created by the <a class="reference internal" href="#psycopg2.extras.register_composite" title="psycopg2.extras.register_composite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_composite()</span></code></a> function.
+You may want to create and register manually instances of the class if
+querying the database at registration time is not desirable (such as when
+using an <a class="reference internal" href="advanced.html#async-support"><span class="std std-ref">asynchronous connections</span></a>).</p>
+<dl class="method">
+<dt id="psycopg2.extras.CompositeCaster.make">
+<code class="descname">make</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.CompositeCaster.make" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new Python object representing the data being casted.</p>
+<p><em>values</em> is the list of attributes, already casted into their Python
+representation.</p>
+<p>You can subclass this method to <a class="reference internal" href="#custom-composite"><span class="std std-ref">customize the composite cast</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.5.</span></p>
+</div>
+</dd></dl>
+
+<p>Object attributes:</p>
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.name">
+<code class="descname">name</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the PostgreSQL type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.schema">
+<code class="descname">schema</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>The schema where the type is defined.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.oid">
+<code class="descname">oid</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.oid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The oid of the PostgreSQL type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.array_oid">
+<code class="descname">array_oid</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.array_oid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The oid of the PostgreSQL array type, if available.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.type">
+<code class="descname">type</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the Python objects returned. If <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">collections.namedtuple()</span></code></a>
+is available, it is a named tuple with attributes equal to the type
+components. Otherwise it is just the <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.attnames">
+<code class="descname">attnames</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.attnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of component names of the type to be casted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.CompositeCaster.atttypes">
+<code class="descname">atttypes</code><a class="headerlink" href="#psycopg2.extras.CompositeCaster.atttypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of component type oids of the type to be casted.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="range-data-types">
+<span id="adapt-range"></span><span id="index-11"></span><h3>Range data types<a class="headerlink" href="#range-data-types" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.5.</span></p>
+</div>
+<p>Psycopg offers a <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> Python type and supports adaptation between them and
+PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/rangetypes.html"><code class="sql docutils literal notranslate"><span class="pre">range</span></code></a> types. Builtin <code class="sql docutils literal notranslate"><span class="pre">range</span></code> types are supported out-of-the-box;
+user-defined <code class="sql docutils literal notranslate"><span class="pre">range</span></code> types can be adapted using <a class="reference internal" href="#psycopg2.extras.register_range" title="psycopg2.extras.register_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_range()</span></code></a>.</p>
+<dl class="class">
+<dt id="psycopg2.extras.Range">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">Range</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em>, <em>bounds='[)'</em>, <em>empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.Range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python representation for a PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/rangetypes.html"><code class="sql docutils literal notranslate"><span class="pre">range</span></code></a> type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>lower</strong> – lower bound for the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> means unbound</li>
+<li><strong>upper</strong> – upper bound for the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> means unbound</li>
+<li><strong>bounds</strong> – one of the literal strings <code class="docutils literal notranslate"><span class="pre">()</span></code>, <code class="docutils literal notranslate"><span class="pre">[)</span></code>, <code class="docutils literal notranslate"><span class="pre">(]</span></code>, <code class="docutils literal notranslate"><span class="pre">[]</span></code>,
+representing whether the lower or upper bounds are included</li>
+<li><strong>empty</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, the range is empty</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This Python type is only used to pass and retrieve range values to and
+from PostgreSQL and doesn’t attempt to replicate the PostgreSQL range
+features: it doesn’t perform normalization and doesn’t implement all the
+<a class="reference external" href="https://www.postgresql.org/docs/current/static/functions-range.html#RANGE-OPERATORS-TABLE">operators</a> supported by the database.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects are immutable, hashable, and support the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator
+(checking if an element is within the range). They can be tested for
+equivalence. Empty ranges evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> in boolean context,
+nonempty evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.5.3: </span><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects can be sorted although, as on the server-side, this
+ordering is not particularly meangingful. It is only meant to be used
+by programs assuming objects using <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> as primary key can be
+sorted on them. In previous versions comparing <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code>s raises
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
+</div>
+<p>Although it is possible to instantiate <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects, the class doesn’t
+have an adapter registered, so you cannot normally pass these instances as
+query arguments. To use range objects as query arguments you can either
+use one of the provided subclasses, such as <a class="reference internal" href="#psycopg2.extras.NumericRange" title="psycopg2.extras.NumericRange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NumericRange</span></code></a> or create a
+custom subclass using <a class="reference internal" href="#psycopg2.extras.register_range" title="psycopg2.extras.register_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_range()</span></code></a>.</p>
+<p>Object attributes:</p>
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.isempty">
+<code class="descname">isempty</code><a class="headerlink" href="#psycopg2.extras.Range.isempty" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the range is empty.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.lower">
+<code class="descname">lower</code><a class="headerlink" href="#psycopg2.extras.Range.lower" title="Permalink to this definition">¶</a></dt>
+<dd><p>The lower bound of the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if empty or unbound.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.upper">
+<code class="descname">upper</code><a class="headerlink" href="#psycopg2.extras.Range.upper" title="Permalink to this definition">¶</a></dt>
+<dd><p>The upper bound of the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if empty or unbound.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.lower_inc">
+<code class="descname">lower_inc</code><a class="headerlink" href="#psycopg2.extras.Range.lower_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the lower bound is included in the range.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.upper_inc">
+<code class="descname">upper_inc</code><a class="headerlink" href="#psycopg2.extras.Range.upper_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the upper bound is included in the range.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.lower_inf">
+<code class="descname">lower_inf</code><a class="headerlink" href="#psycopg2.extras.Range.lower_inf" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the range doesn’t have a lower bound.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.Range.upper_inf">
+<code class="descname">upper_inf</code><a class="headerlink" href="#psycopg2.extras.Range.upper_inf" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the range doesn’t have an upper bound.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The following <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> subclasses map builtin PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">range</span></code> types to
+Python objects: they have an adapter registered so their instances can be
+passed as query arguments. <code class="sql docutils literal notranslate"><span class="pre">range</span></code> values read from database queries are
+automatically casted into instances of these classes.</p>
+<dl class="class">
+<dt id="psycopg2.extras.NumericRange">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">NumericRange</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em>, <em>bounds='[)'</em>, <em>empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.NumericRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> suitable to pass Python numeric types to a PostgreSQL range.</p>
+<p>PostgreSQL types <code class="sql docutils literal notranslate"><span class="pre">int4range</span></code>, <code class="sql docutils literal notranslate"><span class="pre">int8range</span></code>, <code class="sql docutils literal notranslate"><span class="pre">numrange</span></code> are
+casted into <code class="xref py py-obj docutils literal notranslate"><span class="pre">NumericRange</span></code> instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.DateRange">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DateRange</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em>, <em>bounds='[)'</em>, <em>empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.DateRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents <code class="sql docutils literal notranslate"><span class="pre">daterange</span></code> values.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.DateTimeRange">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DateTimeRange</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em>, <em>bounds='[)'</em>, <em>empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.DateTimeRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents <code class="sql docutils literal notranslate"><span class="pre">tsrange</span></code> values.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.DateTimeTZRange">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">DateTimeTZRange</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em>, <em>bounds='[)'</em>, <em>empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.DateTimeTZRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents <code class="sql docutils literal notranslate"><span class="pre">tstzrange</span></code> values.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Python lacks a representation for <code class="sql docutils literal notranslate"><span class="pre">infinity</span></code> date so Psycopg converts
+the value to <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code> and such. When written into the database these
+dates will assume their literal value (e.g. <code class="sql docutils literal notranslate"><span class="pre">9999-12-31</span></code> instead of
+<code class="sql docutils literal notranslate"><span class="pre">infinity</span></code>).  Check <a class="reference internal" href="usage.html#infinite-dates-handling"><span class="std std-ref">Infinite dates handling</span></a> for an example of
+an alternative adapter to map <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code> to <code class="sql docutils literal notranslate"><span class="pre">infinity</span></code>. An
+alternative dates adapter will be used automatically by the <a class="reference internal" href="#psycopg2.extras.DateRange" title="psycopg2.extras.DateRange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DateRange</span></code></a>
+adapter and so on.</p>
+</div>
+<p>Custom <code class="sql docutils literal notranslate"><span class="pre">range</span></code> types (created with <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> <code class="sql docutils literal notranslate"><span class="pre">...</span> <span class="pre">AS</span> <span class="pre">RANGE</span></code>) can be
+adapted to a custom <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> subclass:</p>
+<dl class="function">
+<dt id="psycopg2.extras.register_range">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_range</code><span class="sig-paren">(</span><em>pgrange</em>, <em>pyrange</em>, <em>conn_or_curs</em>, <em>globally=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and register an adapter and the typecasters to convert between
+a PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/rangetypes.html"><code class="sql docutils literal notranslate"><span class="pre">range</span></code></a> type and a PostgreSQL <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> subclass.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pgrange</strong> – the name of the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">range</span></code> type. Can be
+schema-qualified</li>
+<li><strong>pyrange</strong> – a <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> strict subclass, or just a name to give to a new
+class</li>
+<li><strong>conn_or_curs</strong> – a connection or cursor used to find the oid of the
+range and its subtype; the typecaster is registered in a scope limited
+to this object, unless <em>globally</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></li>
+<li><strong>globally</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> (default) register the typecaster only on
+<em>conn_or_curs</em>, otherwise register it globally</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#psycopg2.extras.RangeCaster" title="psycopg2.extras.RangeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeCaster</span></code></a> instance responsible for the conversion</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If a string is passed to <em>pyrange</em>, a new <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> subclass is created
+with such name and will be available as the <a class="reference internal" href="#psycopg2.extras.RangeCaster.range" title="psycopg2.extras.RangeCaster.range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">range</span></code></a> attribute
+of the returned <a class="reference internal" href="#psycopg2.extras.RangeCaster" title="psycopg2.extras.RangeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeCaster</span></code></a> object.</p>
+<p>The function queries the database on <em>conn_or_curs</em> to inspect the
+<em>pgrange</em> type and raises <a class="reference internal" href="module.html#psycopg2.ProgrammingError" title="psycopg2.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> if the type is not
+found.  If querying the database is not advisable, use directly the
+<a class="reference internal" href="#psycopg2.extras.RangeCaster" title="psycopg2.extras.RangeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeCaster</span></code></a> class and register the adapter and typecasters using the
+provided functions.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.RangeCaster">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">RangeCaster</code><span class="sig-paren">(</span><em>pgrange</em>, <em>pyrange</em>, <em>oid</em>, <em>subtype_oid</em>, <em>array_oid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.RangeCaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper class to convert between <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> and PostgreSQL range types.</p>
+<p>Objects of this class are usually created by <a class="reference internal" href="#psycopg2.extras.register_range" title="psycopg2.extras.register_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_range()</span></code></a>. Manual
+creation could be useful if querying the database is not advisable: in
+this case the oids must be provided.</p>
+<p>Object attributes:</p>
+<dl class="attribute">
+<dt id="psycopg2.extras.RangeCaster.range">
+<code class="descname">range</code><a class="headerlink" href="#psycopg2.extras.RangeCaster.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> subclass adapted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.RangeCaster.adapter">
+<code class="descname">adapter</code><a class="headerlink" href="#psycopg2.extras.RangeCaster.adapter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="extensions.html#psycopg2.extensions.ISQLQuote" title="psycopg2.extensions.ISQLQuote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ISQLQuote</span></code></a> responsible to adapt <code class="xref py py-obj docutils literal notranslate"><span class="pre">range</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.RangeCaster.typecaster">
+<code class="descname">typecaster</code><a class="headerlink" href="#psycopg2.extras.RangeCaster.typecaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object responsible for casting.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="psycopg2.extras.RangeCaster.array_typecaster">
+<code class="descname">array_typecaster</code><a class="headerlink" href="#psycopg2.extras.RangeCaster.array_typecaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object responsible to cast arrays, if available, else <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="uuid-data-type">
+<span id="adapt-uuid"></span><span id="index-12"></span><h3>UUID data type<a class="headerlink" href="#uuid-data-type" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.9.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.0.13: </span>added UUID array support.</p>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_uuid</span><span class="p">()</span>
+<span class="go">&lt;psycopg2._psycopg.type object at 0x...&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Python UUID can be used in SQL queries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">uuid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">(</span><span class="s1">&#39;{12345678-1234-5678-1234-567812345678}&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">my_uuid</span><span class="p">)</span><span class="o">.</span><span class="n">getquoted</span><span class="p">()</span>
+<span class="go">&quot;&#39;12345678-1234-5678-1234-567812345678&#39;::uuid&quot;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># PostgreSQL UUID are transformed into Python UUID objects.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11&#39;::uuid&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">UUID(&#39;a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11&#39;)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="psycopg2.extras.register_uuid">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_uuid</code><span class="sig-paren">(</span><em>oids=None</em>, <em>conn_or_curs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the UUID type and an uuid.UUID adapter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>oids</strong> – oid for the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">uuid</span></code> type, or 2-items sequence
+with oids of the type and the array. If not specified, use PostgreSQL
+standard oids.</li>
+<li><strong>conn_or_curs</strong> – where to register the typecaster. If not specified,
+register it globally.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="psycopg2.extras.UUID_adapter">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">UUID_adapter</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.UUID_adapter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adapt Python’s <a class="reference external" href="https://docs.python.org/library/uuid.html">uuid.UUID</a> type to PostgreSQL’s <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-uuid.html">uuid</a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="networking-data-types">
+<span id="adapt-network"></span><span id="index-13"></span><h3>Networking data types<a class="headerlink" href="#networking-data-types" title="Permalink to this headline">¶</a></h3>
+<p>By default Psycopg casts the PostgreSQL networking data types (<code class="sql docutils literal notranslate"><span class="pre">inet</span></code>,
+<code class="sql docutils literal notranslate"><span class="pre">cidr</span></code>, <code class="sql docutils literal notranslate"><span class="pre">macaddr</span></code>) into ordinary strings; array of such types are
+converted into lists of strings.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.7: </span>in previous version array of networking types were not treated as arrays.</p>
+</div>
+<dl class="function">
+<dt id="psycopg2.extras.register_ipaddress">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_ipaddress</code><span class="sig-paren">(</span><em>conn_or_curs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_ipaddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register conversion support between <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#module-ipaddress" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipaddress</span></code></a> objects and <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-net-types.html">network types</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conn_or_curs</strong> – the scope where to register the type casters.
+If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> register them globally.</td>
+</tr>
+</tbody>
+</table>
+<p>After the function is called, PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> values will be
+converted into <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Interface" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Interface" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Interface</span></code></a>
+objects, <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> values into into <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Network" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Network</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Network" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Network</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psycopg2.extras.register_inet">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">register_inet</code><span class="sig-paren">(</span><em>oid=None</em>, <em>conn_or_curs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_inet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the INET type and an Inet adapter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>oid</strong> – oid for the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> type, or 2-items sequence
+with oids of the type and the array. If not specified, use PostgreSQL
+standard oids.</li>
+<li><strong>conn_or_curs</strong> – where to register the typecaster. If not specified,
+register it globally.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.7: </span>this function will not receive further development and may disappear in
+future versions.</p>
+</div>
+</dd></dl>
+
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_inet</span><span class="p">()</span>
+<span class="go">&lt;psycopg2._psycopg.type object at 0x...&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">Inet</span><span class="p">(</span><span class="s1">&#39;127.0.0.1/32&#39;</span><span class="p">),))</span>
+<span class="go">&quot;SELECT E&#39;127.0.0.1/32&#39;::inet&quot;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;192.168.0.1/24&#39;::inet&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">addr</span>
+<span class="go">&#39;192.168.0.1/24&#39;</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="psycopg2.extras.Inet">
+<em class="property">class </em><code class="descclassname">psycopg2.extras.</code><code class="descname">Inet</code><span class="sig-paren">(</span><em>addr</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.Inet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap a string to allow for correct SQL-quoting of inet values.</p>
+<p>Note that this adapter does NOT check the passed value to make
+sure it really is an inet-compatible address but DOES call adapt()
+on it to make sure it is impossible to execute an SQL-injection
+by passing an evil value to the initializer.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.7: </span>this object will not receive further development and may disappear in
+future versions.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="fast-execution-helpers">
+<span id="fast-exec"></span><h2>Fast execution helpers<a class="headerlink" href="#fast-execution-helpers" title="Permalink to this headline">¶</a></h2>
+<p>The current implementation of <a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> is (using an extremely
+charitable understatement) not particularly performing. These functions can
+be used to speed up the repeated execution of a statement against a set of
+parameters.  By reducing the number of server roundtrips the performance can be
+<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/491#issuecomment-276551038">orders of magnitude better</a> than using <code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code>.</p>
+<dl class="function">
+<dt id="psycopg2.extras.execute_batch">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">execute_batch</code><span class="sig-paren">(</span><em>cur</em>, <em>sql</em>, <em>argslist</em>, <em>page_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.execute_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute groups of statements in fewer server roundtrips.</p>
+<p>Execute <em>sql</em> several times, against all parameters set (sequences or
+mappings) found in <em>argslist</em>.</p>
+<p>The function is semantically similar to</p>
+<pre class="literal-block">
+<em>cur</em>.<a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany</span></code></a>(<em>sql</em>, <em>argslist</em>)
+</pre>
+<p>but has a different implementation: Psycopg will join the statements into
+fewer multi-statement commands, each one containing at most <em>page_size</em>
+statements, resulting in a reduced number of server roundtrips.</p>
+<p>After the execution of the function the <a class="reference internal" href="cursor.html#cursor.rowcount" title="cursor.rowcount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.rowcount</span></code></a> property will
+<strong>not</strong> contain a total result.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.7.</span></p>
+</div>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_batch()</span></code> can be also used in conjunction with PostgreSQL
+prepared statements using <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-prepare.html"><code class="sql docutils literal notranslate"><span class="pre">PREPARE</span></code></a>, <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-execute.html"><code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code></a>, <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-deallocate.html"><code class="sql docutils literal notranslate"><span class="pre">DEALLOCATE</span></code></a>.
+Instead of executing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">execute_batch</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span>
+    <span class="s2">&quot;big and complex SQL with </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> params&quot;</span><span class="p">,</span>
+    <span class="n">params_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>it is possible to execute something like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PREPARE stmt AS big and complex SQL with $1 $2 params&quot;</span><span class="p">)</span>
+<span class="n">execute_batch</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="s2">&quot;EXECUTE stmt (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">params_list</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DEALLOCATE stmt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">which may bring further performance benefits: if the operation to perform
+is complex, every single execution will be faster as the query plan is
+already cached; furthermore the amount of data to send on the server will
+be lesser (one <code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code> per param set instead of the whole, likely
+longer, statement).</p>
+</div>
+<dl class="function">
+<dt id="psycopg2.extras.execute_values">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">execute_values</code><span class="sig-paren">(</span><em>cur</em>, <em>sql</em>, <em>argslist</em>, <em>template=None</em>, <em>page_size=100</em>, <em>fetch=False</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.execute_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a statement using <code class="sql docutils literal notranslate"><span class="pre">VALUES</span></code> with a sequence of parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cur</strong> – the cursor to use to execute the query.</li>
+<li><strong>sql</strong> – the query to execute. It must contain a single <code class="docutils literal notranslate"><span class="pre">%s</span></code>
+placeholder, which will be replaced by a <a class="reference external" href="https://www.postgresql.org/docs/current/static/queries-values.html">VALUES list</a>.
+Example: <code class="docutils literal notranslate"><span class="pre">&quot;INSERT</span> <span class="pre">INTO</span> <span class="pre">mytable</span> <span class="pre">(id,</span> <span class="pre">f1,</span> <span class="pre">f2)</span> <span class="pre">VALUES</span> <span class="pre">%s&quot;</span></code>.</li>
+<li><strong>argslist</strong> – sequence of sequences or dictionaries with the arguments
+to send to the query. The type and content must be consistent with
+<em>template</em>.</li>
+<li><strong>template</strong> – <p>the snippet to merge to every item in <em>argslist</em> to
+compose the query.</p>
+<ul>
+<li>If the <em>argslist</em> items are sequences it should contain positional
+placeholders (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;(%s,</span> <span class="pre">%s,</span> <span class="pre">%s)&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;(%s,</span> <span class="pre">%s,</span> <span class="pre">42)</span></code>” if there
+are constants value…).</li>
+<li>If the <em>argslist</em> items are mappings it should contain named
+placeholders (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;(%(id)s,</span> <span class="pre">%(f1)s,</span> <span class="pre">42)&quot;</span></code>).</li>
+</ul>
+<p>If not specified, assume the arguments are sequence and use a simple
+positional template (i.e.  <code class="docutils literal notranslate"><span class="pre">(%s,</span> <span class="pre">%s,</span> <span class="pre">...)</span></code>), with the number of
+placeholders sniffed by the first element in <em>argslist</em>.</p>
+</li>
+<li><strong>page_size</strong> – maximum number of <em>argslist</em> items to include in every
+statement. If there are more items the function will execute more than
+one statement.</li>
+<li><strong>fetch</strong> – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> return the query results into a list (like in a
+<a class="reference internal" href="cursor.html#cursor.fetchall" title="cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>).  Useful for queries with <code class="sql docutils literal notranslate"><span class="pre">RETURNING</span></code>
+clause.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>After the execution of the function the <a class="reference internal" href="cursor.html#cursor.rowcount" title="cursor.rowcount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.rowcount</span></code></a> property will
+<strong>not</strong> contain a total result.</p>
+<p>While <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> is an obvious candidate for this function it is
+possible to use it with other statements, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span><span class="s2">&quot;create table test (id int primary key, v1 int, v2 int)&quot;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_values</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span>
+<span class="gp">... </span><span class="s2">&quot;INSERT INTO test (id, v1, v2) VALUES </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_values</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span>
+<span class="gp">... </span><span class="sd">&quot;&quot;&quot;UPDATE test SET v1 = data.v1 FROM (VALUES %s) AS data (id, v1)</span>
+<span class="gp">... </span><span class="sd">WHERE test.id = data.id&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">50</span><span class="p">)])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select * from test order by id&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+<span class="go">[(1, 20, 3), (4, 50, 6), (7, 8, 9)])</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.7.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.8: </span>added the <em>fetch</em> parameter.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="coroutine-support">
+<span id="index-14"></span><h2>Coroutine support<a class="headerlink" href="#coroutine-support" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="psycopg2.extras.wait_select">
+<code class="descclassname">psycopg2.extras.</code><code class="descname">wait_select</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.wait_select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until a connection or cursor has data available.</p>
+<p>The function is an example of a wait callback to be registered with
+<a class="reference internal" href="extensions.html#psycopg2.extensions.set_wait_callback" title="psycopg2.extensions.set_wait_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_wait_callback()</span></code></a>. This function uses
+<a class="reference external" href="https://docs.python.org/3/library/select.html#select.select" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> to wait for data to become available, and
+therefore is able to handle/receive SIGINT/KeyboardInterrupt.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.6.2: </span>allow to cancel a query using <kbd class="kbd docutils literal notranslate">Ctrl-C</kbd>, see
+<a class="reference internal" href="faq.html#faq-interrupt-query"><span class="std std-ref">the FAQ</span></a> for an example.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">psycopg2.extras</span></code> – Miscellaneous goodies for Psycopg 2</a><ul>
+<li><a class="reference internal" href="#connection-and-cursor-subclasses">Connection and cursor subclasses</a><ul>
+<li><a class="reference internal" href="#dictionary-like-cursor">Dictionary-like cursor</a></li>
+<li><a class="reference internal" href="#real-dictionary-cursor">Real dictionary cursor</a></li>
+<li><a class="reference internal" href="#namedtuple-cursor"><code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor</a></li>
+<li><a class="reference internal" href="#logging-cursor">Logging cursor</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#replication-support-objects">Replication support objects</a></li>
+<li><a class="reference internal" href="#additional-data-types">Additional data types</a><ul>
+<li><a class="reference internal" href="#json-adaptation">JSON adaptation</a></li>
+<li><a class="reference internal" href="#hstore-data-type">Hstore data type</a></li>
+<li><a class="reference internal" href="#composite-types-casting">Composite types casting</a></li>
+<li><a class="reference internal" href="#range-data-types">Range data types</a></li>
+<li><a class="reference internal" href="#uuid-data-type">UUID data type</a></li>
+<li><a class="reference internal" href="#networking-data-types">Networking data types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fast-execution-helpers">Fast execution helpers</a></li>
+<li><a class="reference internal" href="#coroutine-support">Coroutine support</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="extensions.html"
+                        title="previous chapter"><code class="docutils literal notranslate"><span class="pre">psycopg2.extensions</span></code> – Extensions to the DB API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="errors.html"
+                        title="next chapter"><code class="docutils literal notranslate"><span class="pre">psycopg2.errors</span></code> – Exception classes mapping PostgreSQL errors</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/extras.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="errors.html" title="psycopg2.errors – Exception classes mapping PostgreSQL errors"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="psycopg2.extensions – Extensions to the DB API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Psycopg 2.8.5.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2001-2019, Federico Di Gregorio, Daniele Varrazzo.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.
+    </div>
+  </body>
+</html>

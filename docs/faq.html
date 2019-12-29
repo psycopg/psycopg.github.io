@@ -1,0 +1,405 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Frequently Asked Questions &#8212; Psycopg 2.8.5.dev0 documentation</title>
+    <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release notes" href="news.html" />
+    <link rel="prev" title="psycopg2.errorcodes – Error codes defined by PostgreSQL" href="errorcodes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="news.html" title="Release notes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="errorcodes.html" title="psycopg2.errorcodes – Error codes defined by PostgreSQL"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Psycopg 2.8.5.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<p>Here are a few gotchas you may encounter using <a class="reference internal" href="module.html#module-psycopg2" title="psycopg2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>.  Feel free to
+suggest new entries!</p>
+<div class="section" id="meta">
+<h2>Meta<a class="headerlink" href="#meta" title="Permalink to this headline">¶</a></h2>
+<dl class="faq docutils" id="faq-question">
+<dt>How do I ask a question?</dt>
+<dd><ul class="first last simple">
+<li>Have you first checked if your question is answered already in the
+documentation?</li>
+<li>If your question is about installing psycopg, have you checked the
+<a class="reference internal" href="#faq-compile"><span class="std std-ref">install FAQ</span></a> and the <a class="reference internal" href="install.html#installation"><span class="std std-ref">install docs</span></a>?</li>
+<li>Have you googled for your error message?</li>
+<li>If you haven’t found an answer yet, please write to the <a class="reference external" href="https://www.postgresql.org/list/psycopg/">Mailing List</a>.</li>
+<li>If you haven’t found a bug, DO NOT write to the bug tracker to ask
+questions. You will only get piro grumpy.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="problems-with-transactions-handling">
+<span id="faq-transactions"></span><h2>Problems with transactions handling<a class="headerlink" href="#problems-with-transactions-handling" title="Permalink to this headline">¶</a></h2>
+<dl class="faq docutils" id="faq-idle-in-transaction">
+<dt>Why does <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> leave database sessions “idle in transaction”?</dt>
+<dd><p class="first">Psycopg normally starts a new transaction the first time a query is
+executed, e.g. calling <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.execute()</span></code></a>, even if the command is a
+<code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code>.  The transaction is not closed until an explicit
+<a class="reference internal" href="connection.html#connection.commit" title="connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or <a class="reference internal" href="connection.html#connection.rollback" title="connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p>
+<p class="last">If you are writing a long-living program, you should probably make sure to
+call one of the transaction closing methods before leaving the connection
+unused for a long time (which may also be a few seconds, depending on the
+concurrency level in your database).  Alternatively you can use a
+connection in <a class="reference internal" href="connection.html#connection.autocommit" title="connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> mode to avoid a new transaction to
+be started at the first command.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-transaction-aborted">
+<dt>I receive the error <em>current transaction is aborted, commands ignored until end of transaction block</em> and can’t do anything else!</dt>
+<dd>There was a problem <em>in the previous</em> command to the database, which
+resulted in an error.  The database will not recover automatically from
+this condition: you must run a <a class="reference internal" href="connection.html#connection.rollback" title="connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> before sending
+new commands to the session (if this seems too harsh, remember that
+PostgreSQL supports nested transactions using the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-savepoint.html"><code class="sql docutils literal notranslate"><span class="pre">SAVEPOINT</span></code></a> command).</dd>
+</dl>
+<dl class="faq docutils" id="faq-transaction-aborted-multiprocess">
+<dt>Why do I get the error <em>current transaction is aborted, commands ignored until end of transaction block</em> when I use <code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code> (or any other forking system) and not when use <code class="xref py py-obj docutils literal notranslate"><span class="pre">threading</span></code>?</dt>
+<dd>Psycopg’s connections can’t be shared across processes (but are thread
+safe).  If you are forking the Python process make sure to create a new
+connection in each forked child. See <a class="reference internal" href="usage.html#thread-safety"><span class="std std-ref">Thread and process safety</span></a> for further
+informations.</dd>
+</dl>
+</div>
+<div class="section" id="problems-with-type-conversions">
+<span id="faq-types"></span><h2>Problems with type conversions<a class="headerlink" href="#problems-with-type-conversions" title="Permalink to this headline">¶</a></h2>
+<dl class="faq docutils" id="faq-cant-adapt">
+<dt>Why does <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.execute()</span></code> raise the exception <em>can’t adapt</em>?</dt>
+<dd>Psycopg converts Python objects in a SQL string representation by looking
+at the object class.  The exception is raised when you are trying to pass
+as query parameter an object for which there is no adapter registered for
+its class.  See <a class="reference internal" href="advanced.html#adapting-new-types"><span class="std std-ref">Adapting new Python types to SQL syntax</span></a> for informations.</dd>
+</dl>
+<dl class="faq docutils" id="faq-number-required">
+<dt>I can’t pass an integer or a float parameter to my query: it says <em>a number is required</em>, but <em>it is</em> a number!</dt>
+<dd><p class="first">In your query string, you always have to use <code class="docutils literal notranslate"><span class="pre">%s</span></code>  placeholders,
+even when passing a number.  All Python objects are converted by Psycopg
+in their SQL representation, so they get passed to the query as strings.
+See <a class="reference internal" href="usage.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a>.</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">42</span><span class="p">,))</span> <span class="c1"># WRONG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">42</span><span class="p">,))</span> <span class="c1"># correct</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-not-all-arguments-converted">
+<dt>I try to execute a query but it fails with the error <em>not all arguments converted during string formatting</em> (or <em>object does not support indexing</em>). Why?</dt>
+<dd><p class="first">Psycopg always require positional arguments to be passed as a sequence, even
+when the query takes a single parameter.  And remember that to make a
+single item tuple in Python you need a comma!  See <a class="reference internal" href="usage.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a>.</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">)</span>    <span class="c1"># WRONG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">))</span>  <span class="c1"># WRONG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,))</span> <span class="c1"># correct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">])</span>  <span class="c1"># correct</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-unicode">
+<dt>My database is Unicode, but I receive all the strings as UTF-8 <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>. Can I receive <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> objects instead?</dt>
+<dd><p class="first">The following magic formula will do the trick:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_type</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">)</span>
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_type</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">UNICODEARRAY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See <a class="reference internal" href="usage.html#unicode-handling"><span class="std std-ref">Unicode handling</span></a> for the gory details.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-bytes">
+<dt>My database is in mixed encoding. My program was working on Python 2 but Python 3 fails decoding the strings. How do I avoid decoding?</dt>
+<dd><p class="first">From psycopg 2.8 you can use the following adapters to always return bytes
+from strings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_type</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">BYTES</span><span class="p">)</span>
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_type</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">BYTESARRAY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See <a class="reference internal" href="usage.html#unicode-handling"><span class="std std-ref">Unicode handling</span></a> for an example.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-float">
+<dt>Psycopg converts <code class="sql docutils literal notranslate"><span class="pre">decimal</span></code>/<code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> database types into Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code> objects. Can I have <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> instead?</dt>
+<dd><p class="first">You can register a customized adapter for PostgreSQL decimal type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DEC2FLOAT</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">new_type</span><span class="p">(</span>
+    <span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">DECIMAL</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="s1">&#39;DEC2FLOAT&#39;</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">value</span><span class="p">,</span> <span class="n">curs</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_type</span><span class="p">(</span><span class="n">DEC2FLOAT</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See <a class="reference internal" href="advanced.html#type-casting-from-sql-to-python"><span class="std std-ref">Type casting of SQL types into Python objects</span></a> to read the relevant
+documentation. If you find <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.DECIMAL</span></code> not available, use
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2._psycopg.DECIMAL</span></code> instead.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-json-adapt">
+<dt>Psycopg automatically converts PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">json</span></code> data into Python objects. How can I receive strings instead?</dt>
+<dd><p class="first">The easiest way to avoid JSON parsing is to register a no-op function with
+<a class="reference internal" href="extras.html#psycopg2.extras.register_default_json" title="psycopg2.extras.register_default_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_default_json()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_default_json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See <a class="reference internal" href="extras.html#adapt-json"><span class="std std-ref">JSON adaptation</span></a> for further details.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-jsonb-adapt">
+<dt>Psycopg converts <code class="sql docutils literal notranslate"><span class="pre">json</span></code> values into Python objects but <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> values are returned as strings. Can <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> be converted automatically?</dt>
+<dd><p class="first">Automatic conversion of <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> values is supported from Psycopg
+release 2.5.4. For previous versions you can register the <code class="sql docutils literal notranslate"><span class="pre">json</span></code>
+typecaster on the <code class="sql docutils literal notranslate"><span class="pre">jsonb</span></code> oids (which are known and not suppsed to
+change in future PostgreSQL versions):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">register_json</span><span class="p">(</span><span class="n">oid</span><span class="o">=</span><span class="mi">3802</span><span class="p">,</span> <span class="n">array_oid</span><span class="o">=</span><span class="mi">3807</span><span class="p">,</span> <span class="n">globally</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See <a class="reference internal" href="extras.html#adapt-json"><span class="std std-ref">JSON adaptation</span></a> for further details.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-identifier">
+<dt>How can I pass field/table names to a query?</dt>
+<dd><p class="first">The arguments in the <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> methods can only represent data
+to pass to the query: they cannot represent a table or field name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This doesn&#39;t work</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into </span><span class="si">%s</span><span class="s2"> values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;my_table&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If you want to build a query dynamically you can use the objects exposed
+by the <a class="reference internal" href="sql.html#module-psycopg2.sql" title="psycopg2.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.sql</span></code></a> module:</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;insert into </span><span class="si">%s</span><span class="s2"> values (</span><span class="si">%%</span><span class="s2">s)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">[</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s2">&quot;my_table&quot;</span><span class="p">)],</span>
+    <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-bytea-9-0">
+<dt>Transferring binary data from PostgreSQL 9.0 doesn’t work.</dt>
+<dd><p class="first">PostgreSQL 9.0 uses by default <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-binary.html">the “hex” format</a> to transfer
+<code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> data: the format can’t be parsed by the libpq 8.4 and
+earlier. The problem is solved in Psycopg 2.4.1, that uses its own parser
+for the <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> format. For previous Psycopg releases, three options
+to solve the problem are:</p>
+<ul class="last simple">
+<li>set the <a class="reference external" href="https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-BYTEA-OUTPUT">bytea_output</a> parameter to <code class="docutils literal notranslate"><span class="pre">escape</span></code> in the server;</li>
+<li>execute the database command <code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">bytea_output</span> <span class="pre">TO</span> <span class="pre">escape;</span></code> in the
+session before reading binary data;</li>
+<li>upgrade the libpq library on the client to at least 9.0.</li>
+</ul>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-array">
+<dt>Arrays of <em>TYPE</em> are not casted to list.</dt>
+<dd>Arrays are only casted to list when their oid is known, and an array
+typecaster is registered for them. If there is no typecaster, the array is
+returned unparsed from PostgreSQL (e.g. <code class="docutils literal notranslate"><span class="pre">{a,b,c}</span></code>). It is easy to create
+a generic arrays typecaster, returning a list of array: an example is
+provided in the <a class="reference internal" href="extensions.html#psycopg2.extensions.new_array_type" title="psycopg2.extensions.new_array_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_array_type()</span></code></a> documentation.</dd>
+</dl>
+</div>
+<div class="section" id="best-practices">
+<span id="faq-best-practices"></span><h2>Best practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
+<dl class="faq docutils" id="faq-reuse-cursors">
+<dt>When should I save and re-use a cursor as opposed to creating a new one as needed?</dt>
+<dd>Cursors are lightweight objects and creating lots of them should not pose
+any kind of problem. But note that cursors used to fetch result sets will
+cache the data and use memory in proportion to the result set size. Our
+suggestion is to almost always create a new cursor and dispose old ones as
+soon as the data is not required anymore (call <a class="reference internal" href="cursor.html#cursor.close" title="cursor.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> on
+them.) The only exception are tight loops where one usually use the same
+cursor for a whole bunch of <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code>s or <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code>s.</dd>
+</dl>
+<dl class="faq docutils" id="faq-reuse-connections">
+<dt>When should I save and re-use a connection as opposed to creating a new one as needed?</dt>
+<dd>Creating a connection can be slow (think of SSL over TCP) so the best
+practice is to create a single connection and keep it open as long as
+required. It is also good practice to rollback or commit frequently (even
+after a single <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> statement) to make sure the backend is never
+left “idle in transaction”.  See also <a class="reference internal" href="pool.html#module-psycopg2.pool" title="psycopg2.pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.pool</span></code></a> for lightweight
+connection pooling.</dd>
+</dl>
+<dl class="faq docutils" id="faq-named-cursors">
+<dt>What are the advantages or disadvantages of using named cursors?</dt>
+<dd>The only disadvantages is that they use up resources on the server and
+that there is a little overhead because at least two queries (one to
+create the cursor and one to fetch the initial result set) are issued to
+the backend. The advantage is that data is fetched one chunk at a time:
+using small <a class="reference internal" href="cursor.html#cursor.fetchmany" title="cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a> values it is possible to use very
+little memory on the client and to skip or discard parts of the result set.</dd>
+</dl>
+<dl class="faq docutils" id="faq-interrupt-query">
+<dt>How do I interrupt a long-running query in an interactive shell?</dt>
+<dd><p class="first">Normally the interactive shell becomes unresponsive to <kbd class="kbd docutils literal notranslate">Ctrl-C</kbd> when
+running a query. Using a connection in green mode allows Python to
+receive and handle the interrupt, although it may leave the connection
+broken, if the async callback doesn’t handle the <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code>
+correctly.</p>
+<p>Starting from psycopg 2.6.2, the <a class="reference internal" href="extras.html#psycopg2.extras.wait_select" title="psycopg2.extras.wait_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait_select</span></code></a> callback
+can handle a <kbd class="kbd docutils literal notranslate">Ctrl-C</kbd> correctly. For previous versions, you can use
+<a class="reference external" href="http://initd.org/psycopg/articles/2014/07/20/cancelling-postgresql-statements-python/">this implementation</a>.</p>
+<div class="last highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">set_wait_callback</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">wait_select</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(10)&quot;</span><span class="p">)</span>
+<span class="go">^C</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">  QueryCanceledError</span>: <span class="n">canceling statement due to user request</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can use the connection and cursor again from here</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="problems-compiling-and-installing-psycopg2">
+<span id="faq-compile"></span><h2>Problems compiling and installing psycopg2<a class="headerlink" href="#problems-compiling-and-installing-psycopg2" title="Permalink to this headline">¶</a></h2>
+<dl class="faq docutils" id="faq-wheels">
+<dt>Psycopg 2.8 fails to install, Psycopg 2.7 was working fine.</dt>
+<dd>With Psycopg 2.7 you were installing binary packages, but they have proven
+unreliable so now you have to install them explicitly using the
+<code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> package. See <a class="reference internal" href="install.html#binary-packages"><span class="std std-ref">Binary install from PyPI</span></a> for all the
+details.</dd>
+</dl>
+<dl class="faq docutils" id="faq-python-h">
+<dt>I can’t compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>: the compiler says <em>error: Python.h: No such file or directory</em>. What am I missing?</dt>
+<dd>You need to install a Python development package: it is usually called
+<code class="docutils literal notranslate"><span class="pre">python-dev</span></code>.</dd>
+</dl>
+<dl class="faq docutils" id="faq-libpq-fe-h">
+<dt>I can’t compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>: the compiler says <em>error: libpq-fe.h: No such file or directory</em>. What am I missing?</dt>
+<dd>You need to install the development version of the libpq: the package is
+usually called <code class="docutils literal notranslate"><span class="pre">libpq-dev</span></code>.</dd>
+</dl>
+<dl class="faq docutils" id="faq-lo-truncate">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> raises <code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code> with message <em>_psycopg.so: undefined symbol: lo_truncate</em> when imported.</dt>
+<dd><p class="first">This means that Psycopg was compiled with <a class="reference external" href="https://www.postgresql.org/docs/current/static/lo-interfaces.html#LO-TRUNCATE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lo_truncate()</span></code></a> support (<em>i.e.</em>
+the libpq used at compile time was version &gt;= 8.3) but at runtime an older
+libpq dynamic library is found.</p>
+<p>Fast-forward several years, if the message reports <em>undefined symbol:
+lo_truncate64</em> it means that Psycopg was built with large objects 64 bits
+API support (<em>i.e.</em> the libpq used at compile time was at least 9.3) but
+at runtime an older libpq dynamic library is found.</p>
+<p>You can use:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ldd /path/to/packages/psycopg2/_psycopg.so <span class="p">|</span> grep libpq
+</pre></div>
+</div>
+<p>to find what is the libpq dynamic library used at runtime.</p>
+<p class="last">You can avoid the problem by using the same version of the
+<strong class="program">pg_config</strong> at install time and the libpq at runtime.</p>
+</dd>
+</dl>
+<dl class="faq docutils" id="faq-import-mod-wsgi">
+<dt>Psycopg raises <em>ImportError: cannot import name tz</em> on import in mod_wsgi / ASP, but it works fine otherwise.</dt>
+<dd>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is installed in an <a class="reference external" href="http://peak.telecommunity.com/DevCenter/PythonEggs">egg</a> (e.g. because installed by
+<strong class="program">easy_install</strong>), the user running the program may be unable to
+write in the <a class="reference external" href="https://stackoverflow.com/questions/2192323/what-is-the-python-egg-cache-python-egg-cache">eggs cache</a>. Set the env variable
+<span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHON_EGG_CACHE</span></code> to a writable directory. With modwsgi you can
+use the <a class="reference external" href="https://modwsgi.readthedocs.io/en/develop/configuration-directives/WSGIPythonEggs.html">WSGIPythonEggs</a> directive.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#meta">Meta</a></li>
+<li><a class="reference internal" href="#problems-with-transactions-handling">Problems with transactions handling</a></li>
+<li><a class="reference internal" href="#problems-with-type-conversions">Problems with type conversions</a></li>
+<li><a class="reference internal" href="#best-practices">Best practices</a></li>
+<li><a class="reference internal" href="#problems-compiling-and-installing-psycopg2">Problems compiling and installing psycopg2</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="errorcodes.html"
+                        title="previous chapter"><code class="docutils literal notranslate"><span class="pre">psycopg2.errorcodes</span></code> – Error codes defined by PostgreSQL</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="news.html"
+                        title="next chapter">Release notes</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/faq.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="news.html" title="Release notes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="errorcodes.html" title="psycopg2.errorcodes – Error codes defined by PostgreSQL"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Psycopg 2.8.5.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2001-2019, Federico Di Gregorio, Daniele Varrazzo.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.
+    </div>
+  </body>
+</html>
