@@ -1,0 +1,92 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.8.3 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.8.3 released</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2019-06-14
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>We have released Psycopg 2.8.3, which includes a slight change to the logical replication.</p>
+<p>Choosing the right frequency to send replication feedback messages from the client to the server was previously the developer's responsibility, with too many feedback messages being a waste of bandwidth and server resources, too few slowing down WAL cleanup and possibly preventing a server graceful shutdown.</p>
+<!-- CUT-HERE -->
+<p>Psycopg will now make sure that feedback is only sent after a certain period of time from the previous one, so that the client can simply call <tt class="docutils literal">send_feedback()</tt> at each message without the fear of overwhelming the server.</p>
+<p>Further details are available in <a class="reference external" href="https://github.com/psycopg/psycopg2/pull/913">the MR</a> by <a class="reference external" href="https://github.com/CyberDem0n">Alexander Kukushkin</a> and <a class="reference external" href="https://github.com/a1exsh">Oleksandr Shulgin</a>. Thank you very much!</p>
+<p>For completeness, the changes included in the release are:</p>
+<ul class="simple">
+<li>Added <em>interval_status</em> parameter to <tt class="docutils literal">start_replication()</tt> method and other facilities to send automatic replication keepalives at periodic intervals (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/913">ticket #913</a>).</li>
+<li>Fixed namedtuples caching introduced in 2.8 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/928">ticket #928</a>).</li>
+</ul>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

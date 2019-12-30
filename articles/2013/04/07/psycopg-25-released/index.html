@@ -1,0 +1,167 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.5 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.5 released</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2013-04-07
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>We are happy to introduce the release 2.5 of Psycopg, packed with several juicy new features!</p>
+<ul class="simple">
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/PSYCOPG-2-5/psycopg2-2.5.tar.gz">Download source package</a></li>
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/PSYCOPG-2-5/psycopg2-2.5.tar.gz.asc">Signature</a></li>
+</ul>
+<p>Here are a few highlights of the release:</p>
+<!-- CUT-HERE -->
+<div class="section" id="json-adapter">
+<h2>JSON adapter</h2>
+<p>The JSON adapter allows easy exchange of unstructured data with the database:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="o">...</span>     <span class="s2">&quot;&quot;&quot;select '{&quot;a&quot;:[1,2,3],&quot;b&quot;:[4,5,6]}'::json&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">{</span><span class="sa">u</span><span class="s1">'a'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="sa">u</span><span class="s1">'b'</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]}</span>
+</pre>
+<p>It works with PostgreSQL 9.2 native <a class="reference external" href="http://www.postgresql.org/docs/current/static/datatype-json.html">JSON data type</a>, with previous versions' <a class="reference external" href="http://people.planetpostgresql.org/andrew/index.php?/archives/255-JSON-for-PG-9.2-...-and-now-for-9.1!.html">extension modules</a> and, in a pinch, with regular text too. You can feed JSON data to PostgreSQL using <a class="reference external" href="/psycopg/docs/extras.html#psycopg2.extras.Json">a specific adapter</a>:</p>
+<pre class="code python literal-block">
+<span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into mytable (jsondata) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">Json</span><span class="p">({</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">100</span><span class="p">})])</span>
+</pre>
+<p>or you can be more aggressive and ask for automatic JSON serialization for every type you want to support, dictionaries for instance:</p>
+<pre class="code python literal-block">
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Json</span><span class="p">)</span>
+<span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;insert into mytable (jsondata) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[{</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">100</span><span class="p">}])</span>
+</pre>
+</div>
+<div class="section" id="range-adapters">
+<h2>Range adapters</h2>
+<p>Other handy adapters for PostgreSQL 9.2 are the <a class="reference external" href="http://www.postgresql.org/docs/current/static/rangetypes.html">Range data type</a> adapters family: ranges are returned as <a class="reference external" href="/psycopg/docs/extras.html#psycopg2.extras.Range">an object</a> allowing access to their properties:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;select '[10,20)'::int4range&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r</span><span class="o">.</span><span class="n">lower</span>
+<span class="mi">10</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r</span><span class="o">.</span><span class="n">upper_inc</span>
+<span class="kc">False</span>
+</pre>
+<p>Of course the Python object can be used as arguments in query parameters:</p>
+<pre class="code python literal-block">
+<span class="n">r</span> <span class="o">=</span> <span class="n">DateRange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="s1">'[)'</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select * from events where </span><span class="si">%s</span><span class="s2"> &#64;&gt; date&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">r</span><span class="p">])</span>
+</pre>
+<p>Built-in range types are supported out-of-the-box, while the function <a class="reference external" href="/psycopg/docs/extras.html#psycopg2.extras.register_range">register_range()</a> allows handling user-defined range types.</p>
+</div>
+<div class="section" id="connections-and-cursors-as-context-managers">
+<h2>Connections and cursors as context managers</h2>
+<p>A recent DBAPI extension has standardized the use of connections and cursors as context managers: it is now possible to use an idiom such as:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">curs</span><span class="p">:</span>
+       <span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">)</span>
+</pre>
+<p>with the intuitive behaviour: when the cursor block exits the cursor is closed; when the connection block exits normally the current transaction is committed, if it exits with an exception instead the transaction is rolled back, in either case the connection is ready to be used again (<strong>FIXED:</strong> the connection is NOT closed as originally stated).</p>
+</div>
+<div class="section" id="other-new-features-in-psycopg-2-5">
+<h2>Other new features in Psycopg 2.5</h2>
+<ul class="simple">
+<li>Added <a class="reference external" href="/psycopg/docs/extensions.html#psycopg2.extensions.Diagnostics">Diagnostics</a> object to get extended info from a database error.  Many thanks to Matthew Woodcraft for the
+implementation (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/149">ticket #149</a>).</li>
+<li>Added <tt class="docutils literal">connection.cursor_factory</tt> attribute to customize the default object returned by <tt class="docutils literal">cursor()</tt>.</li>
+<li>Added support for backward scrollable cursors. Thanks to Jon Nelson
+for the initial patch (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/108">ticket #108</a>).</li>
+<li>Added a simple way to <a class="reference external" href="/psycopg/docs/extras.html#adapt-composite">customize casting of composite types</a> into Python objects other than namedtuples.
+Many thanks to Ronan Dunklau and Tobias Oberstein for the feature
+development.</li>
+<li><a class="reference external" href="/psycopg/docs/connection.html#connection.reset">connection.reset()</a> implemented using <tt class="docutils literal">DISCARD ALL</tt> on server
+versions supporting it.</li>
+</ul>
+<p>Bug fixes:</p>
+<ul class="simple">
+<li>Properly cleanup memory of broken connections (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/148">ticket #148</a>).</li>
+<li>Fixed bad interaction of <tt class="docutils literal">setup.py</tt> with other dependencies in
+Distribute projects on Python 3 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/153">ticket #153</a>).</li>
+</ul>
+<p>Other changes:</p>
+<ul class="simple">
+<li>Added support for Python 3.3.</li>
+<li>Dropped support for Python 2.4. Please use Psycopg 2.4.x if you need it.</li>
+<li><a class="reference external" href="/psycopg/docs/errorcodes.html#module-psycopg2.errorcodes">errorcodes</a> map updated to PostgreSQL 9.2.</li>
+<li>Dropped Zope adapter from source repository. ZPsycopgDA has now its own
+project at &lt;<a class="reference external" href="http://github.com/psycopg/ZPsycopgDA">http://github.com/psycopg/ZPsycopgDA</a>&gt;.</li>
+</ul>
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

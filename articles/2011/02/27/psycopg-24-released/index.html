@@ -1,0 +1,151 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.4 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.4 released</h2>
+  
+  <p class="header">
+    Posted by Federico Di Gregorio on 2011-02-27
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>Hi *,</p>
+<p>this is probably one of the best psycopg releases ever. Daniele, Jason
+and all the others that sent patches did an impressive work to have
+psycopg build and work flawlessy on all the supported platforms (well..
+we can probably do a little bit better on MacOS but everything else is
+almost perfect). So here it is (followed by NEWS excerpt, as always):</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.psycopg.org/psycopg/tarballs/PSYCOPG-2-4/psycopg2-2.4.tar.gz">Source code</a></li>
+<li><a class="reference external" href="http://www.psycopg.org/psycopg/tarballs/PSYCOPG-2-4/psycopg2-2.4.tar.gz.asc">Signature</a></li>
+</ul>
+<div class="line-block">
+<div class="line">Have fun,</div>
+<div class="line">federico</div>
+</div>
+<!-- CUT-HERE -->
+<div class="section" id="what-s-new-in-psycopg-2-4">
+<h2>What's new in psycopg 2.4</h2>
+<p>Added support for Python 3.1 and 3.2. The conversion has also
+brought several improvements:</p>
+<ul class="simple">
+<li>Added 'b' and 't' mode to large objects: write can deal with both
+bytes strings and unicode; read can return either bytes strings
+or decoded unicode.</li>
+<li>COPY sends Unicode data to files implementing 'io.TextIOBase'.</li>
+<li>Improved PostgreSQL-Python encodings mapping.</li>
+<li>Added a few missing encodings: EUC_CN, EUC_JIS_2004, ISO885910,
+ISO885916, LATIN10, SHIFT_JIS_2004.</li>
+<li>Dropped repeated dictionary lookups with unicode query/parameters.</li>
+</ul>
+<p>Improvements to the named cusors:</p>
+<ul class="simple">
+<li>More efficient iteration on named cursors, fetching 'itersize'
+records at time from the backend.</li>
+<li>The named cursors name can be an invalid identifier.</li>
+</ul>
+<p>Improvements in data handling:</p>
+<ul class="simple">
+<li>Added 'register_composite()' function to cast PostgreSQL
+composite types into Python tuples/namedtuples.</li>
+<li>Adapt types 'bytearray' (from Python 2.6), 'memoryview' (from
+Python 2.7) and other objects implementing the &quot;Revised Buffer
+Protocol&quot; to 'bytea' data type.</li>
+<li>The 'hstore' adapter can work even when the data type is not
+installed in the 'public' namespace.</li>
+<li>Raise a clean exception instead of returning bad data when
+receiving bytea in 'hex' format and the client libpq can't parse
+them.</li>
+<li>Empty lists correctly roundtrip Python -&gt; PostgreSQL -&gt; Python.</li>
+</ul>
+<p>Other changes:</p>
+<ul class="simple">
+<li>'cursor.description' is provided as named tuples if available.</li>
+<li>The build script refuses to guess values if 'pg_config' is not
+found.</li>
+<li>Connections and cursors are weakly referenceable.</li>
+</ul>
+<p>Bug fixes:</p>
+<ul class="simple">
+<li>Fixed adaptation of None in composite types (ticket #26). Bug
+report by Karsten Hilbert.</li>
+<li>Fixed several reference leaks in less common code paths.</li>
+<li>Fixed segfault when a large object is closed and its connection no
+more available.</li>
+<li>Added missing icon to ZPsycopgDA package, not available in Zope
+2.12.9 (ticket #30). Bug report and patch by Pumukel.</li>
+<li>Fixed conversion of negative infinity (ticket #40). Bug report and
+patch by Marti Raudsepp.</li>
+</ul>
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

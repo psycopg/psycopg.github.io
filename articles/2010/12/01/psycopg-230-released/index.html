@@ -1,0 +1,140 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.3.0 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.3.0 released</h2>
+  
+  <p class="header">
+    Posted by Federico Di Gregorio on 2010-12-01
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>Hi *,</p>
+<p>lately my involvment on psycopg has been quite small (work and other
+projects are taking their toll) but thanks to Daniele (with some help
+from Jan) here is a new psycopg2 release. The number of changes is big
+(an excerpt from the NEWS file is at the end, as always) so we decided
+to bump up the version to 2.3.0 and to test, and test... and test. We
+tested this new release on Linux and Windows, with Python 2.4, 2.5, 2.6,
+2.7 and on PostgreSQL from 7.4 to 9.0.</p>
+<!-- CUT-HERE -->
+<p>As always, signed download from:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/psycopg2-2.3.0.tar.gz">http://initd.org/psycopg/tarballs/psycopg2-2.3.0.tar.gz</a></li>
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/psycopg2-2.3.0.tar.gz.asc">http://initd.org/psycopg/tarballs/psycopg2-2.3.0.tar.gz.asc</a></li>
+</ul>
+<p>Have fun,
+federico</p>
+<p>And here are the NEWS:</p>
+<p>psycopg 2.3 aims to expose some new features introduced in PostgreSQL 9.0.</p>
+<div class="section" id="main-new-features">
+<h2>Main new features</h2>
+<ul class="simple">
+<li><tt class="docutils literal">dict</tt> to <tt class="docutils literal">hstore</tt> adapter and <tt class="docutils literal">hstore</tt> to <tt class="docutils literal">dict</tt> typecaster, using
+both 9.0 and pre-9.0 syntax.</li>
+<li>Two-phase commit protocol support as per DBAPI specification.</li>
+<li>Support for payload in notifications received from the backed.</li>
+<li><tt class="docutils literal">namedtuple</tt>-returning cursor.</li>
+<li>Query execution cancel.</li>
+</ul>
+</div>
+<div class="section" id="other-features-and-changes">
+<h2>Other features and changes</h2>
+<ul class="simple">
+<li>Dropped support for protocol 2: Psycopg 2.3 can only connect to
+PostgreSQL servers with version at least 7.4.</li>
+<li>Don't issue a query at every connection to detect the client
+encoding and to set the datestyle to ISO if it is already
+compatible with what expected.</li>
+<li><tt class="docutils literal">mogrify()</tt> now supports unicode queries.</li>
+<li>Subclasses of a type that can be adapted are adapted as the
+superclass.</li>
+<li><tt class="docutils literal">errorcodes</tt> knows a couple of new codes introduced in PostgreSQL
+9.0.</li>
+<li>Dropped deprecated Psycopg &quot;own quoting&quot;.</li>
+<li>Never issue a ROLLBACK on close/GC. This behaviour was introduced
+as a bug in release 2.2, but trying to send a command while being
+destroyed has been considered not safe.</li>
+</ul>
+</div>
+<div class="section" id="bug-fixes">
+<h2>Bug fixes</h2>
+<ul class="simple">
+<li>Fixed use of <tt class="docutils literal">PQfreemem</tt> instead of <tt class="docutils literal">free</tt> in binary typecaster.</li>
+<li>Fixed access to freed memory in <tt class="docutils literal">conn_get_isolation_level()</tt>.</li>
+<li>Fixed crash during Decimal adaptation with a few 2.5.x Python
+versions (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/7">ticket #7</a>).</li>
+<li>Fixed notices order (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/9">ticket #9</a>).</li>
+</ul>
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

@@ -1,0 +1,144 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.4.2 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.4.2 released</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2011-06-12
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>Psycopg 2.4.2 has been released: it brings a few small but interesting new features, and a lot of bug fixes.</p>
+<!-- CUT-HERE -->
+<p>Transaction control has been overhauled: a new connection method <a class="reference external" href="/docs/connection.html#connection.set_session">set_session()</a> allows setting all the session properties affecting the transactions behaviour: the <a class="reference external" href="http://www.postgresql.org/docs/9.1/static/transaction-iso.html">isolation level</a> but it can also be used to have auto-commit, read-only, and deferrable transactions. You can use for example:</p>
+<pre class="code python literal-block">
+<span class="n">conn</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="s1">'read committed'</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="s1">'serializable'</span><span class="p">,</span>
+                 <span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">deferrable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre>
+<p>There is also a welcome improvement for all the users thinking that</p>
+<pre class="code python literal-block">
+<span class="n">conn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span>
+    <span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="p">)</span>
+</pre>
+<p>was an excessively verbose syntax: a new read/write property allows to set</p>
+<pre class="code python literal-block">
+<span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span>
+</pre>
+<p>a much handier syntax for an often used connection property.</p>
+<p>The improvements to the transactions control are not only at interface level: Psycopg doesn't require any more setup queries when connecting to a database. A sequence of statements:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span> <span class="nn">psycopg2</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">curs</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'SELECT 1'</span><span class="p">)</span>
+<span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'SELECT 2'</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre>
+<p>in older versions of the library would have resulted in the following commands sent to the backend:</p>
+<pre class="literal-block">
+SHOW default_transaction_isolation
+SET DATESTYLE TO 'ISO'
+SHOW client_encoding
+BEGIN; SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+SELECT 1
+SELECT 2
+COMMIT
+</pre>
+<p>In Psycopg 2.4.2 the only commands sent are instead the essential:</p>
+<pre class="literal-block">
+BEGIN
+SELECT 1
+SELECT 2
+COMMIT
+</pre>
+<p>with the <tt class="docutils literal">BEGIN</tt>/<tt class="docutils literal">COMMIT</tt> obviously omitted in autocommit mode (the datestyle and encoding statements were already dropped in 2.3).</p>
+<p>The new release also brings a lot of bug fixes, so we encourage updating soon, particularly if you use Psycopg in multithread programs:</p>
+<ul class="simple">
+<li>Fixed bug with multithread code potentially causing loss of sync
+with the server communication or lock of the client (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/55">ticket #55</a>).</li>
+<li>Don't fail import if mx.DateTime module can't be found, even if its
+support was built (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/53">ticket #53</a>): a fix for the &quot;ghost mx.DateTime&quot; issue reported in virtualenv.</li>
+<li>Fixed escape for negative numbers prefixed by minus operator
+(<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/57">ticket #57</a>).</li>
+<li>Fixed GC race condition during copy in multithread programs, potentially resulting in refcount errors.  Fixed by Dave
+Malcolm (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/58">ticket #58</a>, Red Hat <a class="reference external" href="https://bugzilla.redhat.com/show_bug.cgi?id=711095">Bug 711095</a>).</li>
+<li>Trying to execute concurrent operations on the same connection
+through concurrent green thread results in an error instead of a
+deadlock.</li>
+<li>Fixed detection of pg_config on Windows. Report and fix, plus some
+long needed <tt class="docutils literal">setup.py</tt> cleanup by Steve Lacy: thanks!</li>
+</ul>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

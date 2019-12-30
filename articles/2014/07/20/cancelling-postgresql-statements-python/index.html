@@ -1,0 +1,118 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Cancelling PostgreSQL statements from Python — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Cancelling PostgreSQL statements from Python</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2014-07-20
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/recipe/"
+          >recipe</a>
+      
+    
+  </p>
+  
+    <p>Cancelling a long running query from Python is not something that happens automatically: the libpq doesn't react to Python signals so the only way to stop a query is to run a <tt class="docutils literal">pg_cancel_backend</tt> from another process. Killing the Python process won't cancel the query: it will run until completion and then rolled back. This makes working wth long-running query from the Python interpreter somewhat frustrating.</p>
+<!-- CUT-HERE -->
+<p>Using psycopg in <a class="reference external" href="/docs/advanced.html#support-for-coroutine-libraries">green mode</a> moves the waiting from the libpq C code to Python: this gives Python some chance of interaction: it is possible for instance to catch a ctrl-c and send a cancel request:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">select</span> <span class="kn">import</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">POLL_OK</span><span class="p">,</span> <span class="n">POLL_READ</span><span class="p">,</span> <span class="n">POLL_WRITE</span>
+
+<span class="k">def</span> <span class="nf">wait_select_inter</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_OK</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_READ</span><span class="p">:</span>
+                <span class="n">select</span><span class="p">([</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[],</span> <span class="p">[])</span>
+            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_WRITE</span><span class="p">:</span>
+                <span class="n">select</span><span class="p">([],</span> <span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">conn</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">(</span>
+                    <span class="s2">&quot;bad state from poll: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="c1"># the loop will be broken by a server error</span>
+            <span class="k">continue</span>
+
+<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">set_wait_callback</span><span class="p">(</span><span class="n">wait_select_inter</span><span class="p">)</span>
+</pre>
+<p>An interactive session would look like:</p>
+<pre class="code pycon literal-block">
+<span class="n"></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(10)&quot;</span><span class="p">)</span>
+<span class="go">^C
+</span><span class="gt">Traceback (most recent call last):
+</span>  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">QueryCanceledError</span>: <span class="n">canceling statement due to user request</span>
+</pre>
+<p>The connection is now in error state, but a <tt class="docutils literal">cnn.rollback()</tt> would make it working again.</p>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

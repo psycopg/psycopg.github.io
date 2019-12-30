@@ -1,0 +1,138 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.2.0 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.2.0 released</h2>
+  
+  <p class="header">
+    Posted by Federico Di Gregorio on 2010-05-16
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>With many thanks to all the contributors here it is, psycopg 2.2.0:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.2.0.tar.gz">http://initd.org/pub/software/psycopg/psycopg2-2.2.0.tar.gz</a></li>
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.2.0.tar.gz.asc">http://initd.org/pub/software/psycopg/psycopg2-2.2.0.tar.gz.asc</a></li>
+</ul>
+<p>From this release on I'll also provide &quot;stable&quot; URLs to the last
+available version; so you can download psycopg 2.0 or 2.2 from:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.0-latest.tar.gz">http://initd.org/pub/software/psycopg/psycopg2-2.0-latest.tar.gz</a></li>
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.0-latest.tar.gz.asc">http://initd.org/pub/software/psycopg/psycopg2-2.0-latest.tar.gz.asc</a></li>
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.2-latest.tar.gz">http://initd.org/pub/software/psycopg/psycopg2-2.2-latest.tar.gz</a></li>
+<li><a class="reference external" href="http://initd.org/pub/software/psycopg/psycopg2-2.2-latest.tar.gz.asc">http://initd.org/pub/software/psycopg/psycopg2-2.2-latest.tar.gz.asc</a></li>
+</ul>
+<p>As always, an excerpt from the NEWS file follows.</p>
+<div class="line-block">
+<div class="line">Have fun,</div>
+<div class="line">federico</div>
+</div>
+<!-- CUT-HERE -->
+<div class="section" id="what-s-new-in-psycopg-2-2-0">
+<h2>What's new in psycopg 2.2.0</h2>
+<p>This is the first release of the new 2.2 series, supporting not just
+one but two different ways of executing asynchronous queries, thanks to
+Jan and Daniele (with a little help from me and others, but they did
+99% of the work so they deserve their names here in the news.)</p>
+<p>psycopg now supports both classic <tt class="docutils literal">select()</tt> loops and &quot;green&quot; coroutine
+libraries. It is all in the documentation, so just point your browser to
+<a class="reference external" href="/psycopg/docs/advanced.html#asynchronous-support">doc/html/advanced.html</a>.</p>
+<div class="section" id="other-new-features">
+<h3>Other new features</h3>
+<ul class="simple">
+<li><tt class="docutils literal">truncate()</tt> method for lobjects.</li>
+<li><tt class="docutils literal">COPY</tt> functions are now a little bit faster.</li>
+<li>All builtin PostgreSQL to Python typecasters are now available from
+the <tt class="docutils literal">psycopg2.extensions</tt> module.</li>
+<li>Notifications from the backend are now available right after the
+<tt class="docutils literal">execute()</tt> call (before client code needed to call <tt class="docutils literal">isbusy()</tt> to
+ensure <tt class="docutils literal">NOTIFY</tt> reception.)</li>
+<li>Better timezone support.</li>
+<li>Lots of documentation updates.</li>
+</ul>
+</div>
+<div class="section" id="bug-fixes">
+<h3>Bug fixes</h3>
+<ul class="simple">
+<li>Fixed some gc/refcounting problems.</li>
+<li>Fixed reference leak in <tt class="docutils literal">NOTIFY</tt> reception.</li>
+<li>Fixed problem with PostgreSQL not casting string literals to the
+correct types in some situations: psycopg now add an explicit cast
+to dates, times and bytea representations.</li>
+<li>Fixed <tt class="docutils literal">TimestampFromTicks()</tt> and <tt class="docutils literal">TimeFromTicks()</tt> for seconds &gt;= 59.5.</li>
+<li>Fixed spurious exception raised when calling C typecasters from
+Python ones.</li>
+</ul>
+</div>
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

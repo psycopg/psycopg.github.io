@@ -1,0 +1,178 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../static/css/syntax.css">
+  <title>Articles tagged recipe — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  <h1>Articles tagged <em>recipe</em></h1>
+  
+    
+  <div class="article">
+  
+    <h2><a href="../../../articles/2014/07/20/cancelling-postgresql-statements-python/">Cancelling PostgreSQL statements from Python</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2014-07-20
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../articles/tag/recipe/"
+          >recipe</a>
+      
+    
+  </p>
+  
+    <p>Cancelling a long running query from Python is not something that happens automatically: the libpq doesn't react to Python signals so the only way to stop a query is to run a <tt class="docutils literal">pg_cancel_backend</tt> from another process. Killing the Python process won't cancel the query: it will run until completion and then rolled back. This makes working wth long-running query from the Python interpreter somewhat frustrating.</p>
+
+    
+    <p class="read-more"><a href="../../../articles/2014/07/20/cancelling-postgresql-statements-python/">Read more...</a></p>
+    
+  
+  </div>
+
+  
+    
+  <div class="article">
+  
+    <h2><a href="../../../articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">PostgreSQL notifications with Psycopg2 and Eventlet</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2010-12-01
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../articles/tag/recipe/"
+          >recipe</a>,
+      <a class="tag" href="../../../articles/tag/async/"
+          >async</a>,
+      <a class="tag" href="../../../articles/tag/eventlet/"
+          >eventlet</a>,
+      <a class="tag" href="../../../articles/tag/notify/"
+          >notify</a>
+      
+    
+  </p>
+  
+    <p>PostgreSQL supports <a class="reference external" href="http://www.postgresql.org/docs/9.0/interactive/sql-notify.html">asynchronous notifications</a>, a simple messaging system allowing clients to be notified about events occurred in the database. Notifications can be sent by any session using a &quot;<tt class="docutils literal">NOTIFY</tt> <em>channel</em>&quot; command and will be received by any session which has subscribed with a <tt class="docutils literal">LISTEN</tt> <em>channel</em> to receive updates. The system has been greatly improved in PostgreSQL 9.0 with the addition of a <em>message payload</em>, making the feature even more useful. Previously a typical use case would have been to notify interested sessions that a certain table was updated: now it is possible to signal for instance <em>which record</em> was changed. You can put the <tt class="docutils literal">NOTIFY</tt> command in a database trigger for automatic notifications on insert or update... the possibilities are actually quite interesting.</p>
+
+    
+    <p class="read-more"><a href="../../../articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">Read more...</a></p>
+    
+  
+  </div>
+
+  
+    
+  <div class="article">
+  
+    <h2><a href="../../../articles/2010/11/11/links-about-building-psycopg-mac-os-x/">Links about building Psycopg on Mac OS X</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2010-11-11
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../articles/tag/recipe/"
+          >recipe</a>,
+      <a class="tag" href="../../../articles/tag/os-x/"
+          >os-x</a>
+      
+    
+  </p>
+  
+    <p>Looks like building Psycopg on OS X is tricky: the code needs no tweak, but linking against the right library seems problematic.</p>
+
+    
+    <p class="read-more"><a href="../../../articles/2010/11/11/links-about-building-psycopg-mac-os-x/">Read more...</a></p>
+    
+  
+  </div>
+
+  
+    
+  <div class="article">
+  
+    <h2><a href="../../../articles/2010/10/22/passing-connections-functions-using-decorator/">Passing connections to functions using a decorator</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2010-10-22
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../articles/tag/recipe/"
+          >recipe</a>
+      
+    
+  </p>
+  
+    <p>In many script I write, there are functions requiring database operations. Every time I need them, I try to write such code in functions like:</p>
+<pre class="code python literal-block">
+<span class="nd">&#64;with_connection</span>
+<span class="k">def</span> <span class="nf">do_some_job</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">))</span> <span class="c1"># or something else</span>
+
+<span class="n">do_some_job</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">'hi'</span><span class="p">)</span>
+</pre>
+
+    
+    <p class="read-more"><a href="../../../articles/2010/10/22/passing-connections-functions-using-decorator/">Read more...</a></p>
+    
+  
+  </div>
+
+  
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

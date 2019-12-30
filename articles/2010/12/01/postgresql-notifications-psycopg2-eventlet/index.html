@@ -1,0 +1,138 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>PostgreSQL notifications with Psycopg2 and Eventlet — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>PostgreSQL notifications with Psycopg2 and Eventlet</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2010-12-01
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/recipe/"
+          >recipe</a>,
+      <a class="tag" href="../../../../../articles/tag/async/"
+          >async</a>,
+      <a class="tag" href="../../../../../articles/tag/eventlet/"
+          >eventlet</a>,
+      <a class="tag" href="../../../../../articles/tag/notify/"
+          >notify</a>
+      
+    
+  </p>
+  
+    <p>PostgreSQL supports <a class="reference external" href="http://www.postgresql.org/docs/9.0/interactive/sql-notify.html">asynchronous notifications</a>, a simple messaging system allowing clients to be notified about events occurred in the database. Notifications can be sent by any session using a &quot;<tt class="docutils literal">NOTIFY</tt> <em>channel</em>&quot; command and will be received by any session which has subscribed with a <tt class="docutils literal">LISTEN</tt> <em>channel</em> to receive updates. The system has been greatly improved in PostgreSQL 9.0 with the addition of a <em>message payload</em>, making the feature even more useful. Previously a typical use case would have been to notify interested sessions that a certain table was updated: now it is possible to signal for instance <em>which record</em> was changed. You can put the <tt class="docutils literal">NOTIFY</tt> command in a database trigger for automatic notifications on insert or update... the possibilities are actually quite interesting.</p>
+<!-- CUT-HERE -->
+<p>Psycopg2 allows a client program to <a class="reference external" href="/docs/advanced.html#asynchronous-notifications">receive notifications from the database backend</a>. Starting from version 2.3 the notification received will also include the payload, when connected to a PostgreSQL 9.0 server. The notification are received automatically after each query and are made available in the <a class="reference external" href=":/docs/connection.html#connection.notifies"><tt class="docutils literal">notifies</tt></a> attribute of the connection. They are also received using the <a class="reference external" href="/docs/connection.html#connection.poll"><tt class="docutils literal">poll()</tt></a> method, without the need of issuing queries only to receive notifications.</p>
+<p>But polling a connection is not the most efficient nor timely way to receive notifications: a better approach is to ask the OS to wake us up when there is something to read on the connection socket. This approach is particularly appealing when using an event-driven framework such as <a class="reference external" href="http://twistedmatrix.com/">Twisted</a> or <a class="reference external" href="http://eventlet.net/">Eventlet</a>, with which is easy to perform other tasks while there is nothing to read on the connection. In &quot;regular&quot; Python programs it is possible to use <tt class="docutils literal">select()</tt> to block until a notification arrives (see the documentation for an example): this would block the entire program. If some concurrency is required it is possible to use the blocking syscall in a thread to allow the rest of the program to carry on.</p>
+<div class="section" id="eventlet-example">
+<h2>Eventlet example</h2>
+<p>This example shows how hook the notifications system into Eventlet: using it with a <a class="reference external" href="http://en.wikipedia.org/wiki/WebSockets">WebSocket</a> it is possible to send an event from the database to the application and up to a web browser, all in push mode! The example requires PostgreSQL 9.0 and Psycopg 2.3 as it uses notification payloads.</p>
+<p>This function handles a WebSocket connection in a green thread: it creates a <tt class="docutils literal">Queue</tt> and opens a database connection (calling the <tt class="docutils literal">dblisten()</tt> function), then blocks on the queue waiting to receive notifications: as soon as any is received, its payload is forwarded to the browser. This is obviously just an example: a database connection for every browser wouldn't scale very much...</p>
+<pre class="code python literal-block">
+<span class="kn">import</span> <span class="nn">eventlet</span>
+<span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">wsgi</span>
+<span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">websocket</span>
+
+<span class="nd">&#64;websocket</span><span class="o">.</span><span class="n">WebSocketWSGI</span>
+<span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;
+    Receive a connection and send it database notifications.
+    &quot;&quot;&quot;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">eventlet</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">eventlet</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">dblisten</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="n">n</span>
+        <span class="n">ws</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+</pre>
+<p>When <tt class="docutils literal">handle()</tt> blocks on the queue the control of the program switches to a different green thread, allowing the rest of the program to keep on running even if single-threaded.</p>
+<p>The <tt class="docutils literal">dblisten</tt> function sets up the listening database connection:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span> <span class="nn">psycopg2</span>
+<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span>
+<span class="kn">from</span> <span class="nn">eventlet.hubs</span> <span class="kn">import</span> <span class="n">trampoline</span>
+
+<span class="k">def</span> <span class="nf">dblisten</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;
+    Open a db connection and add notifications to *q*.
+    &quot;&quot;&quot;</span>
+    <span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span>
+    <span class="n">cnn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span><span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="p">)</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN data;&quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">trampoline</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">cnn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre>
+<p>The connection is set in <a class="reference external" href="/docs/usage.html#transactions-control">autocommit mode</a>, otherwise the notification would be postponed until the end of the transaction. The <em>trampoline</em> is the Eventlet function that schedules a green thread switch: we ask it to return us the control when the file descriptor underlying the connection will have something to read. Once the system wakes up again we use <tt class="docutils literal">poll()</tt> to parse eventual notifications received, that will be added to the queue and thus passed to the client.</p>
+<p>The rest of the example is not shown here: it only consists in a static page and the web server setup. You can <a class="reference external" href="pushdemo.py">download the complete example</a>.</p>
+<p>Running the program and opening the page <a class="reference external" href="http://localhost:7000/">http://localhost:7000/</a> in a WebSocket-enabled browser you will see a page with three coloured bars: using a command such as <tt class="docutils literal">NOTIFY data, 'green'</tt> in a psql shell, one of the bars in the page will be updated accordingly. Here is a screenshot:</p>
+<img alt="psycopg eventlet push demo" class="align-center" src="pushdemo.png" style="width: 477px; height: 327px;" />
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

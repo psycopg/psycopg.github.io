@@ -1,0 +1,133 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.8 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.8 released</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2019-04-04
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>After about two years from the previous major release, psycopg 2.8 is finally here!</p>
+<p>Among the highlights, <a class="reference external" href="/docs/errors.html">PostgreSQL errors are now mapped to Python exceptions</a> for a more idiomatic way to handle them. Several additions allow a better insight of the <a class="reference external" href="/docs/extensions.html#psycopg2.extensions.ConnectionInfo">connection status</a> and <a class="reference external" href="/docs/extensions.html#psycopg2.extensions.Column">query results</a>.</p>
+<p>Behind the scene, asynchronous communication and concurrency received several improvements, and dropping support for older versions of Python gave the chance to refactor and modernise the codebase (with the especial help from Jon Dufresne who ruthlessly butchered our code into a streamlined pulp).</p>
+<p>Thank you very much to everyone contributing so far. Happy hacking!</p>
+<!-- CUT-HERE -->
+<p>You can download as usual from the canonical urls:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/PSYCOPG-2-8/psycopg2-2.8.tar.gz">source package</a></li>
+<li><a class="reference external" href="http://initd.org/psycopg/tarballs/PSYCOPG-2-8/psycopg2-2.8.tar.gz.asc">signature</a></li>
+</ul>
+<p>Or just use <tt class="docutils literal">pip</tt>:</p>
+<pre class="literal-block">
+pip install psycopg2
+</pre>
+<p>New features:</p>
+<ul class="simple">
+<li>Added <tt class="docutils literal">errors</tt> module. Every PostgreSQL error is converted into a specific exception class (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/682">ticket #682</a>).</li>
+<li>Added <tt class="docutils literal">encrypt_password()</tt> function (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/576">ticket #576</a>).</li>
+<li>Added <tt class="docutils literal">BYTES</tt> adapter to manage databases with mixed encodings on Python 3 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/835">ticket #835</a>).</li>
+<li>Added <tt class="docutils literal">table_oid</tt> and <tt class="docutils literal">table_column</tt> attributes on <tt class="docutils literal">cursor.description</tt> items (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/661">ticket #661</a>).</li>
+<li>Added <tt class="docutils literal">connection.info</tt> object to retrieve various PostgreSQL connection information (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/726">ticket #726</a>).</li>
+<li>Added <tt class="docutils literal">get_native_connection()</tt> to expose the raw <tt class="docutils literal">PGconn</tt> structure to C extensions via Capsule (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/782">ticket #782</a>).</li>
+<li>Added <tt class="docutils literal">pgconn_ptr</tt> and <tt class="docutils literal">pgresult_ptr</tt> to expose raw C structures to Python and interact with libpq via ctypes (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/782">ticket #782</a>).</li>
+<li><tt class="docutils literal">sql.Identifier</tt> can represent qualified names in SQL composition (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/732">ticket #732</a>).</li>
+<li>Added <tt class="docutils literal">ReplicationCursor.wal_end</tt> attribute (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/800">ticket #800</a>).</li>
+<li>Added <em>fetch</em> parameter to <tt class="docutils literal">execute_values()</tt> function (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/813">ticket #813</a>).</li>
+<li><tt class="docutils literal">str()</tt> on <tt class="docutils literal">Range</tt> produces a human-readable representation (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/773">ticket #773</a>).</li>
+<li><tt class="docutils literal">DictCursor</tt> and <tt class="docutils literal">RealDictCursor</tt> rows maintain columns order (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/177">ticket #177</a>).</li>
+<li>Added <tt class="docutils literal">severity_nonlocalized</tt> attribute on the <tt class="docutils literal">Diagnostics</tt> object (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/783">ticket #783</a>).</li>
+<li>More efficient <tt class="docutils literal">NamedTupleCursor</tt> (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/838">ticket #838</a>).</li>
+</ul>
+<p>Bug fixes:</p>
+<ul class="simple">
+<li>Fixed connections occasionally broken by the unrelated use of the multiprocessing module (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/829">ticket #829</a>).</li>
+<li>Fixed async communication blocking if results are returned in different chunks, e.g. with notices interspersed to the results (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/856">ticket #856</a>).</li>
+<li>Fixed adaptation of numeric subclasses such as <tt class="docutils literal">IntEnum</tt> (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/591">ticket #591</a>).</li>
+</ul>
+<p>Other changes:</p>
+<ul class="simple">
+<li>Dropped support for Python 2.6, 3.2, 3.3.</li>
+<li>Dropped <tt class="docutils literal">psycopg1</tt> module.</li>
+<li>Dropped deprecated <tt class="docutils literal">register_tstz_w_secs()</tt> (was previously a no-op).</li>
+<li>Dropped deprecated <tt class="docutils literal">PersistentConnectionPool</tt>. This pool class was mostly
+designed to interact with Zope. Use <tt class="docutils literal">ZPsycopgDA.pool</tt> instead.</li>
+<li>Binary packages no longer installed by default. The <tt class="docutils literal"><span class="pre">psycopg2-binary</span></tt> package must be used explicitly.</li>
+<li>Dropped <tt class="docutils literal">PSYCOPG_DISPLAY_SIZE</tt> build parameter.</li>
+<li>Dropped support for mxDateTime as the default date and time adapter. mxDatetime support continues to be available as an alternative to Python's builtin datetime.</li>
+<li>No longer use 2to3 during installation for Python 2 &amp; 3 compatibility. All source files are now compatible with Python 2 &amp; 3 as is.</li>
+<li>The <tt class="docutils literal">psycopg2.test</tt> package is no longer installed by <tt class="docutils literal">python setup.py install</tt>.</li>
+<li>Wheel package compiled against OpenSSL 1.0.2r and PostgreSQL 11.2 libpq.</li>
+</ul>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>

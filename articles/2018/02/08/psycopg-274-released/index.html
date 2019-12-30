@@ -1,0 +1,121 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en-us" />
+  <meta name="description" content="Python adapter for PostgreSQL" />
+  <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+  <link rel="stylesheet" href="../../../../../static/css/psycopg.css">
+  <link rel="stylesheet" href="../../../../../static/css/syntax.css">
+  <title>Psycopg 2.7.4 released — Psycopg</title>
+  
+</head>
+<body>
+  <header>
+    <div id="logoContainer">
+      <div id="logo"><h1><a href="../../../../../">psycopg</a></h1></div>
+      <div class="clearLeft"></div>
+    </div>
+    <div id="menu">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <nav>
+                <ul>
+                  <li><a href="../../../../../">Home</a></li>
+                  
+                    <li><a href="https://pypi.org/project/psycopg2/">Download</a></li>
+                  
+                    <li><a href="/docs/install.html">Install</a></li>
+                  
+                    <li><a href="/docs/">Documentation</a></li>
+                  
+                    <li class="active"><a href="/articles/">Articles</a></li>
+                  
+                </ul>
+              </nav>
+              <div class="clearLeft"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <div id="site">
+    <div id="content">
+      
+  
+  <div class="article">
+  
+    <h2>Psycopg 2.7.4 released</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2018-02-08
+    
+      <br />
+      Tagged as
+      <a class="tag" href="../../../../../articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="../../../../../articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>We have released Psycopg version 2.7.4, bringing a few bug fixes... and working out the problem with Wheel packages.</p>
+<!-- CUT-HERE -->
+<div class="section" id="what-s-the-problem-with-wheels">
+<h2>What's the problem with Wheels?</h2>
+<p><a class="reference external" href="https://pythonwheels.com/">Wheel packages</a> are a Python standard to distribute self-contained binary package. They are especially convenient for packages containing C extensions, such as Psycopg, and for packages depending on external C libraries... such as Psycopg, because the package will contain a binary, pre-compiled, version of the C extension and all the depending libraries (excluding a list of libraries expected to be found on any system and with a versioned ABI, such as libc). Since the release of the wheel packages with <a class="reference external" href="/articles/2017/03/01/psycopg-27-released/">psycopg 2.7</a> it has been possible to install Psycopg without the <a class="reference external" href="/docs/install.html#build-prerequisites">prerequisites</a> of a C compiler and of Python/Postgres dev packages at build time, and the need of a system libpq at runtime.</p>
+<p>Unfortunately, after the packages were released, <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/543">it was reported</a> of occasional segfaults of Python processes using Psycopg from the Wheel package. This was traced to the use of the Python <tt class="docutils literal">ssl</tt> library concurrently with Psycopg opening connections, for instance in a multithread program opening concurrently <tt class="docutils literal">https</tt> resources and database connections. The problem seems caused by a non-reentrant OpenSSL initialization function (unfortunately invoked by libpq at every connection) and the fact that the Python process ends up binding two different versions of the <tt class="docutils literal">libssl</tt> library: the system one via the Python <tt class="docutils literal">ssl</tt> library (e.g. imported by <tt class="docutils literal">urllib</tt> or <tt class="docutils literal">requests</tt>) and the Wheel one imported by the <tt class="docutils literal">libpq</tt>, in turn imported by <tt class="docutils literal">psycopg2</tt>.</p>
+<p>While the problem doesn't affect many users, a library behaving unreliably in combination with part of the stdlib is a situation less than optimal. The workaround is to force installing Psycopg from source, but this must be specified explicitly in the project dependencies (e.g. using the <tt class="docutils literal"><span class="pre">--no-binary</span></tt> flag in the <tt class="docutils literal">pip</tt> command line or in the <tt class="docutils literal">requirements.txt</tt> file); the Python packaging system doesn't really have a way to declare something like &quot;install a package preferably from source&quot;... so we had to create one ourselves.</p>
+<p>Starting with Psycopg 2.7.4, we are releasing two different packages on PyPI: <a class="reference external" href="https://pypi.python.org/pypi/psycopg2/">psycopg2</a> and <a class="reference external" href="https://pypi.python.org/pypi/psycopg2-binary/">psycopg2-binary</a>. The latter is a Wheels-only package, with a behaviour identical to the classic one – the different name is used only in installation (it is installed by <tt class="docutils literal">pip install <span class="pre">psycopg2-binary</span></tt>, but still imported with <tt class="docutils literal">import psycopg2</tt> in Python).</p>
+<p>For the lifespan of the Psycopg 2.7 cycle, the <tt class="docutils literal">psycopg2</tt> PyPI package will still contain wheel packages, but starting from Psycopg 2.8 it will become again a source-only package. Starting from Psycopg 2.7.4, if the package is installed as binary from the <tt class="docutils literal">psycopg2</tt> PyPI entry, a warning will be reported on import:</p>
+<blockquote>
+The psycopg2 wheel package will be renamed from release 2.8; in order to keep installing from binary please use &quot;pip install psycopg2-binary&quot; instead. For details see: &lt;/docs/install.html#binary-install-from-pypi&gt;.</blockquote>
+<p>The choices for the users are then two:</p>
+<ul class="simple">
+<li>if the program works fine with the Wheel packages, and the convenience of the binary distribution is preferred, it is possible to <a class="reference external" href="/docs/install.html#binary-install-from-pypi">specify the dependency on the binary package</a> using the <tt class="docutils literal"><span class="pre">psycopg2-binary</span></tt> instead of the <tt class="docutils literal">psycopg2</tt> PyPI package. No change to the program code is needed;</li>
+<li>if there are concerns about the unreliability of the Wheels package, it is adviced to <a class="reference external" href="/docs/install.html#disabling-wheel-packages-for-psycopg-2-7">force installation from source</a>. This requires the presence of build tools and runtime libraries on the client, but again it requires no change to the code.</li>
+</ul>
+<p>We hope this solution will suggest the default use of a reliable version of the library, while still allowing the convenience of a dependencies-free package. Feedback is welcome on the <a class="reference external" href="https://www.postgresql.org/list/psycopg/">mailing list</a>.</p>
+</div>
+<div class="section" id="other-changes-in-this-version">
+<h2>Other changes in this version</h2>
+<ul class="simple">
+<li>Convert fields names into valid Python identifiers in
+<tt class="docutils literal">NamedTupleCursor</tt> (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/211">ticket #211</a>).</li>
+<li>Fixed Solaris 10 support (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/532">ticket #532</a>).</li>
+<li><tt class="docutils literal">cursor.mogrify()</tt> can be called on closed cursors (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/579">ticket #579</a>).</li>
+<li>Fixed setting session characteristics in corner cases on autocommit
+connections (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/580">ticket #580</a>).</li>
+<li>Fixed <tt class="docutils literal">MinTimeLoggingCursor</tt> on Python 3 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/609">ticket #609</a>).</li>
+<li>Fixed parsing of array of points as floats (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/613">ticket #613</a>).</li>
+<li>Fixed <tt class="docutils literal">__libpq_version__</tt> building with libpq &gt;= 10.1
+(<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/632">ticket 632</a>).</li>
+<li>Fixed <tt class="docutils literal">rowcount</tt> after <tt class="docutils literal">executemany()</tt> with <tt class="docutils literal">RETURNING</tt>
+statements (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/633">ticket 633</a>).</li>
+<li>Fixed compatibility problem with pypy3 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/649">ticket #649</a>).</li>
+<li>Wheel packages compiled against PostgreSQL 10.1 libpq and OpenSSL 1.0.2n.</li>
+<li>Wheel packages for Python 2.6 no more available (support dropped from
+wheel building infrastructure).</li>
+</ul>
+</div>
+
+  
+  </div>
+
+
+    </div>
+    <div id="sidebar">
+      
+    </div>
+  </div>
+
+  <div class="clearBoth"></div>
+
+  <footer>
+    &copy; Copyright 2010&mdash;2019 by Daniele Varrazzo (at gmail).
+  </footer>
+</body>
