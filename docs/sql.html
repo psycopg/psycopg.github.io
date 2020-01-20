@@ -107,10 +107,51 @@ from the query parameters:</p>
     <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>The objects exposed by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> module can be used to compose a query as a
-Python string (using the <a class="reference internal" href="#psycopg2.sql.Composable.as_string" title="psycopg2.sql.Composable.as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_string()</span></code></a> method) or passed directly
-to cursor methods such as <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>, <a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,
-<a class="reference internal" href="cursor.html#cursor.copy_expert" title="cursor.copy_expert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_expert()</span></code></a>.</p>
+<div class="section" id="module-usage">
+<h2>Module usage<a class="headerlink" href="#module-usage" title="Permalink to this headline">¶</a></h2>
+<p>Usually you should express the template of your query as an <a class="reference internal" href="#psycopg2.sql.SQL" title="psycopg2.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL</span></code></a> instance
+with <code class="xref py py-obj docutils literal notranslate"><span class="pre">{}</span></code>-style placeholders and use <a class="reference internal" href="#psycopg2.sql.SQL.format" title="psycopg2.sql.SQL.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format()</span></code></a> to merge the variable
+parts into them, all of which must be <a class="reference internal" href="#psycopg2.sql.Composable" title="psycopg2.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> subclasses. You can still
+have <code class="xref py py-obj docutils literal notranslate"><span class="pre">%s</span></code>-style placeholders in your query and pass values to
+<a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>: such value placeholders will be untouched by
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">format()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;select {field} from {table} where {pkey} = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">field</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;my_name&#39;</span><span class="p">),</span>
+    <span class="n">table</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;some_table&#39;</span><span class="p">),</span>
+    <span class="n">pkey</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The resulting object is meant to be passed directly to cursor methods such as
+<a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>, <a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>, <a class="reference internal" href="cursor.html#cursor.copy_expert" title="cursor.copy_expert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_expert()</span></code></a>, but can
+also be used to compose a query as a Python string, using the
+<a class="reference internal" href="#psycopg2.sql.Composable.as_string" title="psycopg2.sql.Composable.as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_string()</span></code></a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="mi">42</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>If part of your query is a variable sequence of arguments, such as a
+comma-separated list of field names, you can use the <a class="reference internal" href="#psycopg2.sql.SQL.join" title="psycopg2.sql.SQL.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL.join()</span></code></a> method to
+pass them to the query:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;select {fields} from {table}&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">fields</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;field1&#39;</span><span class="p">),</span>
+        <span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;field2&#39;</span><span class="p">),</span>
+        <span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;field3&#39;</span><span class="p">),</span>
+    <span class="p">]),</span>
+    <span class="n">table</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;some_table&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sql-objects">
+<h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> objects<a class="headerlink" href="#sql-objects" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> objects are in the following inheritance hierarchy:</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#psycopg2.sql.Composable" title="psycopg2.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a>: the base class exposing the common interface</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">|__</span></code> <a class="reference internal" href="#psycopg2.sql.SQL" title="psycopg2.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL</span></code></a>: a literal snippet of an SQL query</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">|__</span></code> <a class="reference internal" href="#psycopg2.sql.Identifier" title="psycopg2.sql.Identifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Identifier</span></code></a>: a PostgreSQL identifier or dot-separated sequence of identifiers</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">|__</span></code> <a class="reference internal" href="#psycopg2.sql.Literal" title="psycopg2.sql.Literal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>: a value hardcoded into a query</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">|__</span></code> <a class="reference internal" href="#psycopg2.sql.Placeholder" title="psycopg2.sql.Placeholder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Placeholder</span></code></a>: a <code class="xref py py-obj docutils literal notranslate"><span class="pre">%s</span></code>-style placeholder whose value will be added later e.g. by <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">|__</span></code> <a class="reference internal" href="#psycopg2.sql.Composed" title="psycopg2.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code></a>: a sequence of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code> instances.</div>
+</div>
 <dl class="class">
 <dt id="psycopg2.sql.Composable">
 <em class="property">class </em><code class="descclassname">psycopg2.sql.</code><code class="descname">Composable</code><span class="sig-paren">(</span><em>wrapped</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.sql.Composable" title="Permalink to this definition">¶</a></dt>
@@ -376,6 +417,7 @@ an <a class="reference internal" href="#psycopg2.sql.SQL" title="psycopg2.sql.SQ
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -383,6 +425,15 @@ an <a class="reference internal" href="#psycopg2.sql.SQL" title="psycopg2.sql.SQ
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">psycopg2.sql</span></code> – SQL string composition</a><ul>
+<li><a class="reference internal" href="#module-usage">Module usage</a></li>
+<li><a class="reference internal" href="#sql-objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> objects</a></li>
+</ul>
+</li>
+</ul>
+
 <h3>Quick search</h3>
 <form class="search" action="search.html" method="get">
   <input type="text" name="q"
