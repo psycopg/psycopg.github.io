@@ -6,7 +6,7 @@
   <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Basic module usage &#8212; Psycopg 2.8.5 documentation</title>
+    <title>Basic module usage &#8212; Psycopg 2.8.6.dev0 documentation</title>
     <link rel="stylesheet" href="_static/better.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
@@ -28,7 +28,7 @@
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
   </head><body>
     <header id="pageheader"><h1><a href="index.html ">
-        Psycopg 2.8.5 documentation
+        Psycopg 2.8.6.dev0 documentation
     </a></h1></header>
   <div class="related top">
   <nav id="rellinks">
@@ -731,7 +731,8 @@ connection object (using <code class="xref py py-obj docutils literal notranslat
 will result in an implicit rollback.</p>
 <p>It is possible to set the connection in <em>autocommit</em> mode: this way all the
 commands executed will be immediately committed and no rollback is possible. A
-few commands (e.g. <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>…) require to be run
+few commands (e.g. <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>, <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on
+<a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control…) require to be run
 outside any transaction: in order to be able to run these commands from
 Psycopg, the connection must be in autocommit mode: you can use the
 <a class="reference internal" href="connection.html#connection.autocommit" title="connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> property.</p>
@@ -794,7 +795,7 @@ a certain point, you should still use a try-catch block:</p>
 </div>
 </div>
 <div class="section" id="server-side-cursors">
-<span id="index-16"></span><span id="id16"></span><h2>Server side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
+<span id="index-16"></span><span id="id17"></span><h2>Server side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
 <p>When a database query is executed, the Psycopg <a class="reference internal" href="cursor.html#cursor" title="cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a> usually fetches
 all the records returned by the backend, transferring them to the client
 process. If the query returned an huge amount of data, a proportionally large
