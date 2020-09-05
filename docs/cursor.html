@@ -72,6 +72,14 @@ be isolated, depending on the connections’ <a class="reference internal" href=
 <p>Cursors are <em>not</em> thread safe: a multithread application can create
 many cursors from the same connection and should use each cursor from
 a single thread. See <a class="reference internal" href="usage.html#thread-safety"><span class="std std-ref">Thread and process safety</span></a> for details.</p>
+<p>Cursors can be used as context managers: leaving the context will close
+the cursor.</p>
+<div class="code python highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">curs</span><span class="p">:</span>
+    <span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">)</span>
+
+<span class="c1"># the cursor is now closed</span>
+</pre></div>
+</div>
 <dl class="attribute">
 <dt id="cursor.description">
 <code class="descname">description</code><a class="headerlink" href="#cursor.description" title="Permalink to this definition">¶</a></dt>

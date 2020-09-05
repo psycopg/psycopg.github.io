@@ -66,6 +66,25 @@ a database session.</p>
 <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>.</p>
 <p>Connections are thread safe and can be shared among many threads. See
 <a class="reference internal" href="usage.html#thread-safety"><span class="std std-ref">Thread and process safety</span></a> for details.</p>
+<p>Connections can be used as context managers. Note that a context wraps a
+transaction: if the context exits with success the transaction is
+committed, if it exits with an exception the transaction is rolled back.
+Note that the connection is not closed by the context and it can be used
+for several contexts.</p>
+<div class="code python highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">curs</span><span class="p">:</span>
+        <span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL1</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">curs</span><span class="p">:</span>
+        <span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL2</span><span class="p">)</span>
+
+<span class="c1"># leaving contexts doesn&#39;t close the connection</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="connection.cursor">
 <code class="descname">cursor</code><span class="sig-paren">(</span><em>name=None</em>, <em>cursor_factory=None</em>, <em>scrollable=None</em>, <em>withhold=False</em><span class="sig-paren">)</span><a class="headerlink" href="#connection.cursor" title="Permalink to this definition">¶</a></dt>
