@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Basic module usage &#8212; psycopg3 UNRELEASED documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/better.css" type="text/css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Differences from psycopg2" href="from_pg2.html" />
+    <link rel="prev" title="Installation" href="install.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
+  </head><body>
+    <header id="pageheader"><h1><a href="index.html ">
+        psycopg3 UNRELEASED documentation
+    </a></h1></header>
+  <div class="related top">
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="install.html" title="Previous document">Installation</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+  <nav id="breadcrumbs">
+    <ul>
+      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
+    </ul>
+  </nav>
+  </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basic-module-usage">
+<span id="usage"></span><span id="index-0"></span><h1>Basic module usage<a class="headerlink" href="#basic-module-usage" title="Permalink to this headline">¶</a></h1>
+<p>The basic Psycopg usage is common to all the database adapters implementing
+the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB API</a> protocol. Here is an interactive session showing some of the
+basic commands:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg3</span>
+
+<span class="c1"># Connect to an existing database</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span>
+
+<span class="c1"># Open a cursor to perform database operations</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="c1"># Execute a command: this creates a new table</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    CREATE TABLE test (</span>
+<span class="s2">        id serial PRIMARY KEY,</span>
+<span class="s2">        num integer,</span>
+<span class="s2">        data text)</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pass data to fill a query placeholders and let Psycopg perform</span>
+<span class="c1"># the correct conversion (no SQL injections!)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
+
+<span class="c1"># Query the database and obtain data as Python objects.</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># will return (1, 100, &quot;abc&#39;def&quot;)</span>
+
+<span class="c1"># You can use `cur.fetchmany()`, `cur.fetchall()` to return a list</span>
+<span class="c1"># of several records, or even iterate on the cursor</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+<span class="c1"># Make the changes to the database persistent</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="c1"># Close communication with the database</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.execute()</span></code> method returns the cursor itself, so the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> methods can be appended right after it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The main entry points of <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> are:</p>
+<ul class="simple">
+<li><p>The function <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> creates a new database session and
+returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> instance. <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.connect" title="psycopg3.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
+creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
+<li><p>The <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
+<ul>
+<li><p>create new <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="connection.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
+execute database commands and queries,</p></li>
+<li><p>terminate transactions using the methods <a class="reference internal" href="connection.html#psycopg3.Connection.commit" title="psycopg3.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or
+<a class="reference internal" href="connection.html#psycopg3.Connection.rollback" title="psycopg3.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p></li>
+</ul>
+</li>
+<li><p>The class <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> allows interaction with the database:</p>
+<ul>
+<li><p>send commands to the database using methods such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
+and <a class="reference internal" href="cursor.html#psycopg3.Cursor.executemany" title="psycopg3.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,</p></li>
+<li><p>retrieve data from the database <span class="xref std std-ref">by iteration</span> or
+using methods such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>,
+<a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="with-connections-and-cursors">
+<span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors<a class="headerlink" href="#with-connections-and-cursors" title="Permalink to this headline">¶</a></h2>
+<p>The connections and cursors act as context managers, so you can run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="c1"># will return (1, 100, &quot;abc&#39;def&quot;)</span>
+
+    <span class="c1"># the cursor is closed upon leaving the context</span>
+
+<span class="c1"># the transaction is committed on successful exit of the context</span>
+<span class="c1"># and the connection closed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="passing-parameters-to-sql-queries">
+<span id="query-parameters"></span><span id="index-2"></span><h2>Passing parameters to SQL queries<a class="headerlink" href="#passing-parameters-to-sql-queries" title="Permalink to this headline">¶</a></h2>
+<p>TODO: lift from psycopg2 docs</p>
+</div>
+<div class="section" id="transaction-management">
+<span id="transactions"></span><h2>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="using-copy-to-and-copy-from">
+<span id="copy"></span><span id="index-3"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+</div>
+<div class="section" id="async-operations">
+<span id="index-4"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
+<p>psycopg3 <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
+<a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
+<p>The design of the asynchronous objects is pretty much the same of the sync
+ones: in order to use them you will only have to scatter the <code class="docutils literal notranslate"><span class="pre">async</span></code> keyword
+here and there.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+        <span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">acur</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="c1"># will return (1, 100, &quot;abc&#39;def&quot;)</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">acur</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="asynchronous-notifications">
+<span id="async-notify"></span><span id="index-5"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
+<p>Psycopg allows asynchronous interaction with other database sessions using the
+facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
+refer to the PostgreSQL documentation for examples about how to use this form
+of communication.</p>
+<p>Because of the way sessions interact with notifications (see <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>
+documentation), you should keep the connection in <a class="reference internal" href="connection.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>
+mode if you wish to receive or send notifications in a timely manner.</p>
+<p>Notifications are received as instances of <a class="reference internal" href="connection.html#psycopg3.Notify" title="psycopg3.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a>. If you are reserving a
+connection only to receive notifications, the simplest way is to consume the
+<a class="reference internal" href="connection.html#psycopg3.Connection.notifies" title="psycopg3.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies</span></code></a> generator. The generator can be stopped using
+<code class="docutils literal notranslate"><span class="pre">close()</span></code>. The following example will print notifications and stop when one
+containing the <code class="docutils literal notranslate"><span class="pre">stop</span></code> message is received.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg3</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN mychan&quot;</span><span class="p">)</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">gen</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">notify</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">notify</span><span class="o">.</span><span class="n">payload</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span><span class="p">:</span>
+        <span class="n">gen</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;there, I stopped&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you run some <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code> in a <strong class="program">psql</strong> session:</p>
+<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="gp">=#</span> <span class="k">notify</span> <span class="n">mychan</span><span class="p">,</span> <span class="s1">&#39;hello&#39;</span><span class="p">;</span>
+<span class="go">NOTIFY</span>
+<span class="gp">=#</span> <span class="k">notify</span> <span class="n">mychan</span><span class="p">,</span> <span class="s1">&#39;hey&#39;</span><span class="p">;</span>
+<span class="go">NOTIFY</span>
+<span class="gp">=#</span> <span class="k">notify</span> <span class="n">mychan</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">;</span>
+<span class="go">NOTIFY</span>
+</pre></div>
+</div>
+<p>You may get output from the Python process such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;hey&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<span class="n">there</span><span class="p">,</span> <span class="n">I</span> <span class="n">stopped</span>
+</pre></div>
+</div>
+<p>Alternatively, you can use <a class="reference internal" href="connection.html#psycopg3.Connection.add_notify_handler" title="psycopg3.Connection.add_notify_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notify_handler()</span></code></a> to register a
+callback function, which will be invoked whenever a notification is received,
+during the normal query processing; you will be then able to use the
+connection normally. Please note that in this case notifications will not be
+received immediately, but only during a connection operation, such as a query.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">add_notify_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;got this: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+<span class="c1"># meanwhile in psql...</span>
+<span class="c1"># =# notify mychan, &#39;hey&#39;;</span>
+<span class="c1"># NOTIFY</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
+<span class="c1"># got this: Notify(channel=&#39;mychan&#39;, payload=&#39;hey&#39;, pid=961823)</span>
+<span class="c1"># (1,)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Basic module usage</a><ul>
+<li><a class="reference internal" href="#with-connections-and-cursors"><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors</a></li>
+<li><a class="reference internal" href="#passing-parameters-to-sql-queries">Passing parameters to SQL queries</a></li>
+<li><a class="reference internal" href="#transaction-management">Transaction management</a></li>
+<li><a class="reference internal" href="#using-copy-to-and-copy-from">Using COPY TO and COPY FROM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#async-operations">Async operations</a><ul>
+<li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="from_pg2.html"
+                        title="next chapter">Differences from psycopg2</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/usage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<form class="search" action="search.html" method="get">
+  <input type="text" name="q"
+   placeholder="type to search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="related bottom">
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="install.html" title="Previous document">Installation</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+  <nav id="breadcrumbs">
+    <ul>
+      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
+    </ul>
+  </nav>
+  </div>
+  <footer id="pagefooter">&copy; 2020, Daniele Varrazzo and The Psycopg Team.
+
+  </footer>
+
+  
+  </body>
+</html>
