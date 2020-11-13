@@ -22,7 +22,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Differences from psycopg2" href="from_pg2.html" />
+    <link rel="next" title="Adaptation of data between Python and PostgreSQL" href="adaptation.html" />
     <link rel="prev" title="Installation" href="install.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
@@ -38,7 +38,7 @@
           <a href="install.html" title="Previous document">Installation</a>
         </li>
         <li>
-          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          <a href="adaptation.html" title="Next document">Adaptation of data between Python and PostgreSQL</a>
           &rarr;
         </li>
     </ul>
@@ -125,9 +125,8 @@ execute database commands and queries,</p></li>
 <ul>
 <li><p>send commands to the database using methods such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
 and <a class="reference internal" href="cursor.html#psycopg3.Cursor.executemany" title="psycopg3.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,</p></li>
-<li><p>retrieve data from the database <span class="xref std std-ref">by iteration</span> or
-using methods such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>,
-<a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
+<li><p>retrieve data from the database, iterating on the cursor or using methods
+such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
 </ul>
 </li>
 </ul>
@@ -153,17 +152,62 @@ using methods such as <a class="reference internal" href="cursor.html#psycopg3.C
 <span id="query-parameters"></span><span id="index-2"></span><h2>Passing parameters to SQL queries<a class="headerlink" href="#passing-parameters-to-sql-queries" title="Permalink to this headline">¶</a></h2>
 <p>TODO: lift from psycopg2 docs</p>
 </div>
+<div class="section" id="binary-parameters-and-results">
+<span id="binary-data"></span><span id="index-3"></span><h2>Binary parameters and results<a class="headerlink" href="#binary-parameters-and-results" title="Permalink to this headline">¶</a></h2>
+<p>TODO: lift from psycopg2 docs</p>
+</div>
 <div class="section" id="transaction-management">
 <span id="transactions"></span><h2>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
 </div>
 <div class="section" id="using-copy-to-and-copy-from">
-<span id="copy"></span><span id="index-3"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<span id="copy"></span><span id="index-4"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> allows to operate with <a class="reference external" href="https://www.postgresql.org/docs/current/sql-copy.html">PostgreSQL COPY protocol</a>. <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> is
+one of the most efficient ways to load data into the database (and to modify
+it, with some SQL creativity).</p>
+<p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> you can do three things:</p>
+<ul class="simple">
+<li><p>loading data into the database row-by-row, from a stream of Python objects;</p></li>
+<li><p>loading data into the database block-by-block, with data already formatted in
+a way suitable for <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code>;</p></li>
+<li><p>reading data from the database block-by-block, with data emitted by a
+<code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> statement.</p></li>
+</ul>
+<p>The missing quadrant, copying data from database row-by-row, is not covered by
+COPY because that’s pretty much normal querying, and <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> doesn’t
+offer enough metadata to decode the data to Python objects.</p>
+<p>The first option is the most powerful, because it allows to load data into the
+database from any Python iterable (a list of tuple, or any iterable of
+sequences): the Python values are adapted as they would be in normal querying.
+To perform such operation use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">[table]</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> with
+<a class="reference internal" href="cursor.html#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and use <a class="reference internal" href="cursor.html#psycopg3.Copy.write_row" title="psycopg3.Copy.write_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code></a> on the resulting object in a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block. On exiting the block the operation will be concluded:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name (col1, col2) FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
+        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If an exception is raised inside the block, the operation is interrupted and
+the records inserted so far discarded.</p>
+<p>If data is already formatted in a way suitable for copy (for instance because
+it is coming from a file resulting from a previous <code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation) it can
+be loaded using <a class="reference internal" href="cursor.html#psycopg3.Copy.write" title="psycopg3.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code></a> instead.</p>
+<p>In order to read data in <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> format you can use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span>
+<span class="pre">STDOUT</span></code> statement and iterate over the resulting <a class="reference internal" href="cursor.html#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object, which will
+produce <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;data.out&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Asynchronous operations are supported using the same patterns on an
+<a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>.</p>
+<p>Binary data can be produced and consumed using <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code> in the
+<code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> command: see <a class="reference internal" href="#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details and limitations.</p>
 </div>
 </div>
 <div class="section" id="async-operations">
-<span id="index-4"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
+<span id="index-5"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
 <p>psycopg3 <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
 <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
@@ -183,7 +227,7 @@ here and there.</p>
 </pre></div>
 </div>
 <div class="section" id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-5"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
+<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form
@@ -254,6 +298,7 @@ received immediately, but only during a connection operation, such as a query.</
 <li><a class="reference internal" href="#">Basic module usage</a><ul>
 <li><a class="reference internal" href="#with-connections-and-cursors"><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors</a></li>
 <li><a class="reference internal" href="#passing-parameters-to-sql-queries">Passing parameters to SQL queries</a></li>
+<li><a class="reference internal" href="#binary-parameters-and-results">Binary parameters and results</a></li>
 <li><a class="reference internal" href="#transaction-management">Transaction management</a></li>
 <li><a class="reference internal" href="#using-copy-to-and-copy-from">Using COPY TO and COPY FROM</a></li>
 </ul>
@@ -268,8 +313,8 @@ received immediately, but only during a connection operation, such as a query.</
   <p class="topless"><a href="install.html"
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="from_pg2.html"
-                        title="next chapter">Differences from psycopg2</a></p>
+  <p class="topless"><a href="adaptation.html"
+                        title="next chapter">Adaptation of data between Python and PostgreSQL</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -296,7 +341,7 @@ received immediately, but only during a connection operation, such as a query.</
           <a href="install.html" title="Previous document">Installation</a>
         </li>
         <li>
-          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          <a href="adaptation.html" title="Next document">Adaptation of data between Python and PostgreSQL</a>
           &rarr;
         </li>
     </ul>

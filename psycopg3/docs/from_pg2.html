@@ -22,8 +22,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Connection classes" href="connection.html" />
-    <link rel="prev" title="Basic module usage" href="usage.html" />
+    <link rel="prev" title="Cursor classes" href="cursor.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
   </head><body>
@@ -35,11 +34,7 @@
     <ul>
         <li>
           &larr;
-          <a href="usage.html" title="Previous document">Basic module usage</a>
-        </li>
-        <li>
-          <a href="connection.html" title="Next document">Connection classes</a>
-          &rarr;
+          <a href="cursor.html" title="Previous document">Cursor classes</a>
         </li>
     </ul>
   </nav>
@@ -81,6 +76,16 @@ explicit cast.</p>
 (separated by semicolon), if they contain parameters. If parameters are used
 you should use distinct <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> calls; otherwise you may consider merging
 the query client-side, using <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> module.</p>
+<p>Certain commands cannot be used with server-side binding, for instance
+<code class="sql docutils literal notranslate"><span class="pre">SET</span></code> or <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET timezone TO </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;utc&quot;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="go">psycopg3.errors.SyntaxError: syntax error at or near &quot;$1&quot;</span>
+</pre></div>
+</div>
+<p>Sometimes PostgreSQL offers an alternative (e.g. <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">set_config()</span></code>,
+<code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">pg_notify()</span></code>). If no alternative exist you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code>
+to compose the query client-side.</p>
 </div>
 <div class="section" id="different-adaptation-system">
 <h2>Different adaptation system<a class="headerlink" href="#different-adaptation-system" title="Permalink to this headline">¶</a></h2>
@@ -88,7 +93,7 @@ the query client-side, using <code class="xref py py-obj docutils literal notran
 server-side parameters adaptation, but also to consider performance,
 flexibility, ease of customization.</p>
 <p>Builtin data types should work as expected; if you have wrapped a custom data
-type you should check the <code class="xref py py-obj docutils literal notranslate"><span class="pre">&lt;ref&gt;</span> <span class="pre">Adaptation</span></code> topic.</p>
+type you should check the <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Adaptation of data between Python and PostgreSQL</span></a> topic.</p>
 </div>
 <div class="section" id="other-differences">
 <h2>Other differences<a class="headerlink" href="#other-differences" title="Permalink to this headline">¶</a></h2>
@@ -128,11 +133,8 @@ array of any supported type are dealt with automatically.</p></li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="usage.html"
-                        title="previous chapter">Basic module usage</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="connection.html"
-                        title="next chapter">Connection classes</a></p>
+  <p class="topless"><a href="cursor.html"
+                        title="previous chapter">Cursor classes</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -156,11 +158,7 @@ array of any supported type are dealt with automatically.</p></li>
     <ul>
         <li>
           &larr;
-          <a href="usage.html" title="Previous document">Basic module usage</a>
-        </li>
-        <li>
-          <a href="connection.html" title="Next document">Connection classes</a>
-          &rarr;
+          <a href="cursor.html" title="Previous document">Cursor classes</a>
         </li>
     </ul>
   </nav>

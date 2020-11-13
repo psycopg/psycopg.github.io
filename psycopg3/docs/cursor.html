@@ -22,6 +22,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Differences from psycopg2" href="from_pg2.html" />
     <link rel="prev" title="Connection classes" href="connection.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
@@ -35,6 +36,10 @@
         <li>
           &larr;
           <a href="connection.html" title="Previous document">Connection classes</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
         </li>
     </ul>
   </nav>
@@ -64,7 +69,7 @@ uncommitted data.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class<a class="headerlink" href="#the-cursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.Cursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Cursor</code><span class="sig-paren">(</span><em class="sig-param">connection: Connection</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Cursor</code><span class="sig-paren">(</span><em class="sig-param">connection: ConnectionType</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#cursor-objects">DBAPI-compliant interface</a>. It is what the
 classic <a class="reference internal" href="connection.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> method returns. <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.cursor" title="psycopg3.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a>
 will create instead <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> objects, which have the same set of
@@ -154,6 +159,8 @@ will iterate on the records in the current recordset.</p>
 <dt id="psycopg3.Cursor.nextset">
 <code class="sig-name descname">nextset</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.nextset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move to the next result set if <a class="reference internal" href="#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> returned more than one.</p>
+<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if a new result is available, which will be the one
+methods <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> will operate on.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -167,7 +174,7 @@ will iterate on the records in the current recordset.</p>
 <dt id="psycopg3.Cursor.description">
 <em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#psycopg3.Cursor.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of <a class="reference internal" href="#psycopg3.Column" title="psycopg3.Column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Column</span></code></a> object describing the current resultset.</p>
-<p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> if the current resulset didn’t return tuples.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the current resultset didn’t return tuples.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -183,7 +190,7 @@ will iterate on the records in the current recordset.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class<a class="headerlink" href="#the-asynccursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.AsyncCursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCursor</code><span class="sig-paren">(</span><em class="sig-param">connection: AsyncConnection</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCursor</code><span class="sig-paren">(</span><em class="sig-param">connection: ConnectionType</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a DBAPI-inspired interface, with all the blocking
 methods implemented as coroutines. Unless specified otherwise,
 non-blocking methods are shared with the <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> class.</p>
@@ -237,7 +244,7 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 <h2>Cursor support objects<a class="headerlink" href="#cursor-support-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.Column">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgresult</span><span class="p">:</span> <span class="n">psycopg3.pq.proto.PGresult</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">encoding</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Column" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgresult</span><span class="p">:</span> <span class="n">PGresult</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">encoding</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Column" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object describing a column of data from a database result, <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#description">as described
 by the DBAPI</a>, so it can also be unpacked as a 7-items tuple</p>
 <dl class="py method">
@@ -281,33 +288,53 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple</p>
 
 <dl class="py class">
 <dt id="psycopg3.Copy">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Copy</code><span class="sig-paren">(</span><em class="sig-param">context: Union[None, BaseConnection, BaseCursor, Transformer], result: Optional[psycopg3.pq.proto.PGresult], format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n">ConnectionType</span></em>, <em class="sig-param"><span class="n">transformer</span><span class="p">:</span> <span class="n">psycopg3.proto.Transformer</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation.</p>
+<p>The object is normally returned by <a class="reference internal" href="#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a>. It can be used as a
+context manager (useful to load data into a database using <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code>)
+and can be iterated (useful to read data after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code>).</p>
+<p>See <a class="reference internal" href="usage.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for details.</p>
+<dl class="py method">
 <dt id="psycopg3.Copy.read">
 <code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span><a class="headerlink" href="#psycopg3.Copy.read" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read a row after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
+<p>Return <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> when the data is finished.</p>
+<p>Alternatively, you can iterate on the <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object to read its data
+row by row.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.Copy.write">
 <code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Copy.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write a block of data after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.Copy.write_row">
 <code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write a record after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
+<p>The data in the tuple will be converted as configured on the cursor;
+see <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Adaptation of data between Python and PostgreSQL</span></a> for details.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.Copy.finish">
 <code class="sig-name descname">finish</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">error</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Copy.finish" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Terminate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
+<p>If an <em>error</em> is specified, the <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation is cancelled.</p>
+<p>The method is called automatically at the end of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt id="psycopg3.AsyncCopy">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCopy</code><span class="sig-paren">(</span><em class="sig-param">context: Union[None, BaseConnection, BaseCursor, Transformer], result: Optional[psycopg3.pq.proto.PGresult], format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCopy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n">ConnectionType</span></em>, <em class="sig-param"><span class="n">transformer</span><span class="p">:</span> <span class="n">psycopg3.proto.Transformer</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage an asynchronous <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation.</p>
+<p>The object is normally returned by <a class="reference internal" href="#psycopg3.AsyncCursor.copy" title="psycopg3.AsyncCursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a>. Its methods are
+the same of the <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object but offering an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>).</p>
+<dl class="py method">
 <dt id="psycopg3.AsyncCopy.read">
 <em class="property">async </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCopy.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -352,6 +379,9 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="connection.html"
                         title="previous chapter">Connection classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="from_pg2.html"
+                        title="next chapter">Differences from psycopg2</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -376,6 +406,10 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple</p>
         <li>
           &larr;
           <a href="connection.html" title="Previous document">Connection classes</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
         </li>
     </ul>
   </nav>
