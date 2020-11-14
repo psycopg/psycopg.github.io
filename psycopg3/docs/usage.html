@@ -144,7 +144,7 @@ basic commands:</p>
 <p>The main entry points of <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> are:</p>
 <ul class="simple">
 <li><p>The function <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> creates a new database session and
-returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> instance. <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.connect" title="psycopg3.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
+returns a new <a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> instance. <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.connect" title="psycopg3.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
 creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
 <li><p>The <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
 <ul>
@@ -234,7 +234,17 @@ produce <code class="xref py py-obj docutils literal notranslate"><span class="p
 </pre></div>
 </div>
 <p>Asynchronous operations are supported using the same patterns on an
-<a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>.</p>
+<a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an object supporting an
+asynchronous <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> method and returning <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> data, a fully-async
+copy operation could be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY data FROM STDIN&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">break</span>
+
+    <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Binary data can be produced and consumed using <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code> in the
 <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> command: see <a class="reference internal" href="#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details and limitations.</p>
 </div>
