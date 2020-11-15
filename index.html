@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
-    <link rel="stylesheet" href="/css/psycopg.css?h=fe05fbea">
+    <link rel="stylesheet" href="/css/psycopg.css?h=cf59a065">
     <title>PostgreSQL driver for Python — Psycopg</title>
     <link rel="alternate" type="application/atom+xml" title="Psycopg news"
       href="/news.xml" />
@@ -115,6 +115,46 @@ list</a> psycopg&#64;postgresql.org.</p>
   <h1>Latest articles</h1>
   <div class="article">
   
+    <h2><a href="/articles/2020/11/15/psycopg3-copy/">The new COPY support in psycopg3</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2020-11-15
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/"
+          >psycopg3</a>,
+      <a class="tag" href="/"
+          >development</a>,
+      <a class="tag" href="/"
+          >news</a>
+      
+    
+  </p>
+  
+    <p><tt class="docutils literal">psycopg2</tt> allows <a class="reference external" href="https://www.psycopg.org/docs/usage.html#copy">interaction with PostgreSQL COPY commands</a>. However
+what is possible to do with them is relatively limited: the only possible
+interaction is with file-like objects:</p>
+<ul class="simple">
+<li>there is no adaptation from Python objects to PostgreSQL, as there is for
+normal queries: data must be formatted &quot;manually&quot; by the user;</li>
+<li>psycopg2 &quot;pulls&quot; data from the file: writing a system that produces data and
+pushes it into PostgreSQL is a very contrived operation, requiring to write
+a blocking file-like object;</li>
+<li>there is no support for <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/428">asynchronous copy</a>.</li>
+</ul>
+<p><a class="reference external" href="/psycopg3/">psycopg3</a> addresses these shortcoming and makes easy to write Python
+programs producing data and pushing it efficiently to the database using the
+<tt class="docutils literal">COPY</tt> protocol.</p>
+
+    
+    <p class="read-more"><a href="/articles/2020/11/15/psycopg3-copy/">Read more...</a></p>
+    
+  
+  </div>
+
+  <div class="article">
+  
     <h2><a href="/articles/2020/09/06/psycopg-286-released/">Psycopg 2.8.6 released</a></h2>
   
   <p class="header">
@@ -164,32 +204,6 @@ list</a> psycopg&#64;postgresql.org.</p>
   
   </div>
 
-  <div class="article">
-  
-    <h2><a href="/articles/2019/10/20/psycopg-284-released/">Psycopg 2.8.4 released</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2019-10-20
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/"
-          >news</a>,
-      <a class="tag" href="/"
-          >release</a>
-      
-    
-  </p>
-  
-    <p>Psycopg 2.8.4 has been released.</p>
-<p>The release brings a few assorted bugfixes and adds support for Python 3.8 and PostgreSQL 12.</p>
-
-    
-    <p class="read-more"><a href="/articles/2019/10/20/psycopg-284-released/">Read more...</a></p>
-    
-  
-  </div>
-
   <a href="/articles/">See all articles...</a>
 </div>
         </div>
@@ -230,6 +244,11 @@ list</a> psycopg&#64;postgresql.org.</p>
   <h3>psycopg3</h3>
 
   <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
     <li>
       <a href="/psycopg3/docs/">
         <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>

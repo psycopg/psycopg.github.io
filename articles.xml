@@ -2,16 +2,154 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title type="text">Articles</title>
   <id>urn:uuid:2c1dc889-18e5-364f-aebe-4eb10b25c80c</id>
-  <updated>2020-09-06T00:00:00Z</updated>
+  <updated>2020-11-15T00:00:00Z</updated>
   <link href="https://www.psycopg.org/articles/" />
   <link href="https://www.psycopg.org/articles.xml" rel="self" />
   <author>
     <name></name>
   </author>
   <generator uri="https://github.com/t73fde/lektor-feed" version="20191006.1">Lektor Feed Plugin</generator>
+  <entry xml:base="https://www.psycopg.org/articles/2020/11/15/psycopg3-copy/">
+    <title type="text">The new COPY support in psycopg3</title>
+    <id>urn:uuid:c10f8d1c-46a3-3db3-8542-aa60253cf8c7</id>
+    <updated>2020-11-15T00:00:00Z</updated>
+    <link href="https://www.psycopg.org/articles/2020/11/15/psycopg3-copy/" />
+    <author>
+      <name>Daniele Varrazzo</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; allows &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/usage.html#copy&quot;&gt;interaction with PostgreSQL COPY commands&lt;/a&gt;. However
+what is possible to do with them is relatively limited: the only possible
+interaction is with file-like objects:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;there is no adaptation from Python objects to PostgreSQL, as there is for
+normal queries: data must be formatted &amp;quot;manually&amp;quot; by the user;&lt;/li&gt;
+&lt;li&gt;psycopg2 &amp;quot;pulls&amp;quot; data from the file: writing a system that produces data and
+pushes it into PostgreSQL is a very contrived operation, requiring to write
+a blocking file-like object;&lt;/li&gt;
+&lt;li&gt;there is no support for &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/psycopg/psycopg2/issues/428&quot;&gt;asynchronous copy&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a class=&quot;reference external&quot; href=&quot;/psycopg3/&quot;&gt;psycopg3&lt;/a&gt; addresses these shortcoming and makes easy to write Python
+programs producing data and pushing it efficiently to the database using the
+&lt;tt class=&quot;docutils literal&quot;&gt;COPY&lt;/tt&gt; protocol.&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;p&gt;&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; adaptation system is designed to compose queries client-side, so
+it is concerned with the right use of the quotes: the python string
+&lt;tt class=&quot;docutils literal&quot;&gt;O'Reilly&lt;/tt&gt; is converted to &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;'O''Reilly'&lt;/span&gt;&lt;/tt&gt;, and the &lt;tt class=&quot;docutils literal&quot;&gt;date(2020, 11, 15)&lt;/tt&gt;
+to &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;'2020-11-15'::date&lt;/span&gt;&lt;/tt&gt;. These extra quotes get in the way of COPY, and
+there isn't an intermediate level where a conversion to string is performed,
+but no quote or other SQL construct are added.&lt;/p&gt;
+&lt;p&gt;&lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; uses the PostgreSQL extended query protocol and sends query and
+parameters separately. Parameters require adaptation to the PostgreSQL
+formats, but quoting, and quotes escaping, are no more its concern: the string
+&lt;tt class=&quot;docutils literal&quot;&gt;O'Reilly&lt;/tt&gt; doesn't need further manipulation and the date is converted only
+to the string &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;2020-11-15&lt;/span&gt;&lt;/tt&gt;; types informations are passed as additional
+separate information according to &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/current/libpq-exec.html#LIBPQ-PQEXECPARAMS&quot;&gt;the libpq API&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The server-side format of these values are exactly what the &lt;tt class=&quot;docutils literal&quot;&gt;COPY FROM&lt;/tt&gt;
+command expects, so it's now easy to compose a row by adapting Python objects
+and to pass&lt;/p&gt;
+&lt;pre class=&quot;literal-block&quot;&gt;
+O'Reilly\t2020-11-15\n
+&lt;/pre&gt;
+&lt;p&gt;to the server. The mechanism to do so is exposed to Python by a new context
+manager, returned by the &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/cursor.html#psycopg3.Cursor.copy&quot;&gt;Cursor.copy()&lt;/a&gt; method, which enables to write:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write_row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;O'Reilly&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Any list of tuples of values, or generator of sequences of values, can be used
+to push data into Postgres:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;my_generator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write_row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The copy operation is concluded as soon as the &lt;tt class=&quot;docutils literal&quot;&gt;with&lt;/tt&gt; block is exited and,
+in case a Python exception is raised, the error is pushed to the server, which
+will cancel the COPY operation in progress.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;binary-format&quot;&gt;
+&lt;h2&gt;Binary format&lt;/h2&gt;
+&lt;p&gt;The &lt;tt class=&quot;docutils literal&quot;&gt;Copy&lt;/tt&gt; object is also able to write data in &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/13/sql-copy.html#id-1.9.3.55.9.4&quot;&gt;binary format&lt;/a&gt;: at Python
+level this is entirely transparent:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN (FORMAT BINARY)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;generator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write_row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;which might be more efficient than the textual format, but requires more care
+with the data types, as the server will not even perform an innocent
+&lt;tt class=&quot;docutils literal&quot;&gt;int4&lt;/tt&gt; -&amp;gt; &lt;tt class=&quot;docutils literal&quot;&gt;int8&lt;/tt&gt; cast for you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;block-level-copy&quot;&gt;
+&lt;h2&gt;Block-level COPY&lt;/h2&gt;
+&lt;p&gt;&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; allows (only) to operate on a COPY stream using a Python
+file-like objects: behind the scenes it reads one block of data from the
+source and writes it to the destination:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# From a file to the database&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;input.data&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cursor2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy_expert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# From the database to a file&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;input.data&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cursor2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy_expert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable TO STDOUT&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This way of operating is not lost, but now the responsibility of moving data
+from one stream to the other is left to the user's code:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;input.data&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SIZE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable TO STDOUT&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;input.data&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;While the new pattern is more verbose, it allows to produce and consume data
+with interfaces different than the file one, whereas previously it would have
+required to write some form of file-like adapter, blocking the copy in case no
+data was ready. This inversion of control allows, finally, the use of...&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;asynchronous-copy&quot;&gt;
+&lt;h2&gt;Asynchronous COPY&lt;/h2&gt;
+&lt;p&gt;If you data producer, either at rows level or at blocks level, is capable of
+asynchronous operations, it is now possible to operate asynchronously with
+COPY using exactly the same pattern as the sync code, only sprinkling the
+magic words here and there:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN (FORMAT BINARY)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;my_async_generator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write_row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_producer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;COPY mytable FROM STDIN&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;which covers an important use case pretty much impossible to introduce in
+&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;project-sponsorship&quot;&gt;
+&lt;h2&gt;Project sponsorship&lt;/h2&gt;
+&lt;div class=&quot;sponsor docutils container&quot;&gt;
+&lt;p&gt;The new COPY support is one of several new features that are being
+designed and implemented in &lt;a class=&quot;reference external&quot; href=&quot;/psycopg3/&quot;&gt;psycopg3&lt;/a&gt;. The project is currently &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/psycopg/psycopg3&quot;&gt;under
+active development&lt;/a&gt;: if there is enough support it will be possible to
+work at the project full-time and bring it to release swiftly.&lt;/p&gt;
+&lt;p&gt;If you use Python and PostgreSQL, and you would like to support the
+creation of the most advanced adapter between the two systems, &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/sponsors/dvarrazzo/&quot;&gt;please
+consider becoming a sponsor&lt;/a&gt;. Thank you!&lt;/p&gt;
+&lt;iframe src=&quot;https://github.com/sponsors/dvarrazzo/button&quot;
+    title=&quot;Sponsor the project&quot; style=&quot;border: 0&quot;
+    width=&quot;116&quot; height=&quot;35&quot;&gt;
+&lt;/iframe&gt;&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2020/09/06/psycopg-286-released/">
     <title type="text">Psycopg 2.8.6 released</title>
-    <id>urn:uuid:3d1e760a-87c2-362f-871e-bb4002a375d9</id>
+    <id>urn:uuid:22e7871e-8188-3868-9649-cf355a04484b</id>
     <updated>2020-09-06T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2020/09/06/psycopg-286-released/" />
     <author>
@@ -40,7 +178,7 @@ pip install --upgrade psycopg2
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2020/04/06/psycopg-285-released/">
     <title type="text">Psycopg 2.8.5 released</title>
-    <id>urn:uuid:cb067e28-eaaa-3626-abe0-273c539a5e68</id>
+    <id>urn:uuid:604ceb4a-4dca-35e4-80a3-601c2e85e879</id>
     <updated>2020-04-06T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2020/04/06/psycopg-285-released/" />
     <author>
@@ -69,7 +207,7 @@ pip install --upgrade psycopg2
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2019/10/20/psycopg-284-released/">
     <title type="text">Psycopg 2.8.4 released</title>
-    <id>urn:uuid:ead9d74c-3e2d-3719-b9d8-6a9daef07c74</id>
+    <id>urn:uuid:cad23173-7ec1-317c-bfed-8457e88ce5df</id>
     <updated>2019-10-20T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2019/10/20/psycopg-284-released/" />
     <author>
@@ -96,7 +234,7 @@ PostgreSQL 12.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2019/06/14/psycopg-283-released/">
     <title type="text">Psycopg 2.8.3 released</title>
-    <id>urn:uuid:50b8c9d0-7e44-37bd-86e2-dbd4bac77f9b</id>
+    <id>urn:uuid:b2f83901-1a52-3aa4-af40-a406eb4eaa20</id>
     <updated>2019-06-14T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2019/06/14/psycopg-283-released/" />
     <author>
@@ -116,7 +254,7 @@ PostgreSQL 12.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2019/04/14/psycopg-281-282-released/">
     <title type="text">Psycopg 2.8.1, 2.8.2 released</title>
-    <id>urn:uuid:86ff6504-0381-3653-b55f-ba77dab2d0dc</id>
+    <id>urn:uuid:2610031e-9967-3432-9994-850279530a66</id>
     <updated>2019-04-14T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2019/04/14/psycopg-281-282-released/" />
     <author>
@@ -144,7 +282,7 @@ thanks to Matthew Brett and Jason Erickson for this improvement!&lt;/p&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2019/04/04/psycopg-28-released/">
     <title type="text">Psycopg 2.8 released</title>
-    <id>urn:uuid:fc612e06-8bb9-325a-8f66-96855040355e</id>
+    <id>urn:uuid:fd2fe9e9-3999-372a-9cf3-18c2c7efd83e</id>
     <updated>2019-04-04T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2019/04/04/psycopg-28-released/" />
     <author>
@@ -205,7 +343,7 @@ designed to interact with Zope. Use &lt;tt class=&quot;docutils literal&quot;&gt
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2018/06/17/psycopg-275-released/">
     <title type="text">Psycopg 2.7.5 released</title>
-    <id>urn:uuid:894af1cd-6c05-3f1b-80cd-b91dcb9983fd</id>
+    <id>urn:uuid:6dea8ed1-f58e-313f-904c-1e0b4f77414a</id>
     <updated>2018-06-17T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2018/06/17/psycopg-275-released/" />
     <author>
@@ -233,7 +371,7 @@ designed to interact with Zope. Use &lt;tt class=&quot;docutils literal&quot;&gt
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2018/02/08/psycopg-274-released/">
     <title type="text">Psycopg 2.7.4 released</title>
-    <id>urn:uuid:d939bee0-cb58-3404-9614-520e55b3f75b</id>
+    <id>urn:uuid:068b0a9f-67be-322d-9ac4-3b8444c8d0de</id>
     <updated>2018-02-08T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2018/02/08/psycopg-274-released/" />
     <author>
@@ -282,7 +420,7 @@ wheel building infrastructure).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/10/24/psycopg-2732-released/">
     <title type="text">Psycopg 2.7.3.2 released</title>
-    <id>urn:uuid:2347b12a-33b7-39f6-a113-9b54927d54a2</id>
+    <id>urn:uuid:5103d367-2299-3e5f-b726-e662eeab35bb</id>
     <updated>2017-10-24T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/10/24/psycopg-2732-released/" />
     <author>
@@ -300,7 +438,7 @@ wheel building infrastructure).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/08/26/psycopg-2731-released/">
     <title type="text">Psycopg 2.7.3.1 released</title>
-    <id>urn:uuid:503492d4-92e6-3dee-9190-bbc12965eb5f</id>
+    <id>urn:uuid:42ce0e40-cba4-3b5f-bc0d-556685759a03</id>
     <updated>2017-08-26T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/08/26/psycopg-2731-released/" />
     <author>
@@ -318,7 +456,7 @@ wheel building infrastructure).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/07/24/psycopg-273-released/">
     <title type="text">Psycopg 2.7.3 released</title>
-    <id>urn:uuid:07fc0984-bbf2-31ca-bfe7-84e051e5284e</id>
+    <id>urn:uuid:d57822f6-3d2a-342c-a052-23bfa9928cff</id>
     <updated>2017-07-24T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/07/24/psycopg-273-released/" />
     <author>
@@ -340,7 +478,7 @@ Regression introduced in Psycopg 2.7.2 (&lt;a class=&quot;reference external&quo
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/07/22/psycopg-272-released/">
     <title type="text">Psycopg 2.7.2 released</title>
-    <id>urn:uuid:35ae74c8-dc90-3be7-b149-7c03c7e7b7a4</id>
+    <id>urn:uuid:1b046e55-ea47-3cb3-8f58-b7b9ff97ea93</id>
     <updated>2017-07-22T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/07/22/psycopg-272-released/" />
     <author>
@@ -375,7 +513,7 @@ Regression introduced in Psycopg 2.7.2 (&lt;a class=&quot;reference external&quo
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/03/13/psycopg-271-released/">
     <title type="text">Psycopg 2.7.1 released</title>
-    <id>urn:uuid:6ea65b70-7559-3e7c-8c17-5eb83f61012c</id>
+    <id>urn:uuid:427a5259-4606-3ac6-84c4-5607ba22237f</id>
     <updated>2017-03-13T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/03/13/psycopg-271-released/" />
     <author>
@@ -398,7 +536,7 @@ Regression introduced in Psycopg 2.7.2 (&lt;a class=&quot;reference external&quo
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/03/01/psycopg-27-released/">
     <title type="text">Psycopg 2.7 released</title>
-    <id>urn:uuid:e53eb76c-2786-3b0b-a93c-08655fe90031</id>
+    <id>urn:uuid:170c3d28-040e-3800-ae4b-ef1750b743e4</id>
     <updated>2017-03-01T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/03/01/psycopg-27-released/" />
     <author>
@@ -482,7 +620,7 @@ connection.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2017/02/17/psycopg-27-beta-2-released/">
     <title type="text">Psycopg 2.7 beta 2 released</title>
-    <id>urn:uuid:b52c255d-b919-3a71-aacd-6cad654cb522</id>
+    <id>urn:uuid:f9a558ec-bd02-3035-850d-a88c19c10ac1</id>
     <updated>2017-02-17T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2017/02/17/psycopg-27-beta-2-released/" />
     <author>
@@ -514,7 +652,7 @@ pip install -i https://testpypi.python.org/pypi psycopg2==2.7b2
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2016/07/07/psycopg-262-released/">
     <title type="text">Psycopg 2.6.2 released</title>
-    <id>urn:uuid:3ef8933d-97b9-335d-b0dc-2980a4653759</id>
+    <id>urn:uuid:7aa22508-3198-30ff-b679-1f958f9096c0</id>
     <updated>2016-07-07T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2016/07/07/psycopg-262-released/" />
     <author>
@@ -552,7 +690,7 @@ long-running query in an interactive shell using &lt;tt class=&quot;docutils lit
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2015/06/16/psycopg-261-released/">
     <title type="text">Psycopg 2.6.1 released</title>
-    <id>urn:uuid:92a56e27-3557-3d4c-a4a3-7bfc04aa90d6</id>
+    <id>urn:uuid:dd4f61dc-220c-380b-825c-030e2de140fa</id>
     <updated>2015-06-16T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2015/06/16/psycopg-261-released/" />
     <author>
@@ -576,7 +714,7 @@ Urbański: thank you very much. Other bugs fixed:&lt;/p&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2015/02/09/psycopg-26-and-255-released/">
     <title type="text">Psycopg 2.6 and 2.5.5 released</title>
-    <id>urn:uuid:0f011101-62e7-34bc-bb65-ce9aed7b1791</id>
+    <id>urn:uuid:85065faf-0a0c-3def-8d62-5636e28b7e62</id>
     <updated>2015-02-09T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2015/02/09/psycopg-26-and-255-released/" />
     <author>
@@ -615,7 +753,7 @@ data are converted into each other (&lt;a class=&quot;reference external&quot; h
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2014/08/30/psycopg-254-released/">
     <title type="text">Psycopg 2.5.4 released</title>
-    <id>urn:uuid:06950948-dcca-372b-b5b4-12a2790671a4</id>
+    <id>urn:uuid:d58b64a4-e4cb-3e36-b695-685b632347cb</id>
     <updated>2014-08-30T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2014/08/30/psycopg-254-released/" />
     <author>
@@ -647,7 +785,7 @@ allow modules juggling such as the one described in &lt;a class=&quot;reference 
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2014/07/20/cancelling-postgresql-statements-python/">
     <title type="text">Cancelling PostgreSQL statements from Python</title>
-    <id>urn:uuid:51363353-13db-31a8-9c0f-e6607966070d</id>
+    <id>urn:uuid:f2f4cd29-0f0d-3847-a887-e6b67f6a8e2f</id>
     <updated>2014-07-20T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2014/07/20/cancelling-postgresql-statements-python/" />
     <author>
@@ -695,7 +833,7 @@ allow modules juggling such as the one described in &lt;a class=&quot;reference 
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2014/05/13/psycopg-253-released/">
     <title type="text">Psycopg 2.5.3 Released</title>
-    <id>urn:uuid:6b2a560b-feac-3738-ac6a-fec60d72c8cf</id>
+    <id>urn:uuid:93b46916-90d5-375e-865b-54877b06ddd8</id>
     <updated>2014-05-13T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2014/05/13/psycopg-253-released/" />
     <author>
@@ -740,7 +878,7 @@ happens for TCP connections instead (&lt;a class=&quot;reference external&quot; 
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2014/01/07/psycopg-252-released/">
     <title type="text">Psycopg 2.5.2 released</title>
-    <id>urn:uuid:36079899-14f8-3e76-857a-1629d68f58b2</id>
+    <id>urn:uuid:c48636fa-8cb0-3d5f-bb82-18b0f07b09b5</id>
     <updated>2014-01-07T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2014/01/07/psycopg-252-released/" />
     <author>
@@ -765,7 +903,7 @@ Alexey Borzenkov (&lt;a class=&quot;reference external&quot; href=&quot;https://
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2013/06/23/psycopg-251-released/">
     <title type="text">Psycopg 2.5.1 released</title>
-    <id>urn:uuid:3b487fc7-f5f2-3013-92db-e6b3a653e8f8</id>
+    <id>urn:uuid:6e009f5f-b874-3dbe-8e82-452c7fd8fb2d</id>
     <updated>2013-06-23T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2013/06/23/psycopg-251-released/" />
     <author>
@@ -790,7 +928,7 @@ Gangadharan S.A. for the report and fix suggestion.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2013/04/07/psycopg-25-released/">
     <title type="text">Psycopg 2.5 released</title>
-    <id>urn:uuid:9cfcbd3b-2653-30b2-a43f-33130c152449</id>
+    <id>urn:uuid:0db41bb0-00a4-340f-a60e-ad33adce3ff3</id>
     <updated>2013-04-07T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2013/04/07/psycopg-25-released/" />
     <author>
@@ -885,7 +1023,7 @@ project at &amp;lt;&lt;a class=&quot;reference external&quot; href=&quot;http://
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2012/12/12/psycopg-246-released/">
     <title type="text">Psycopg 2.4.6 released</title>
-    <id>urn:uuid:b40548e4-d701-38c5-ac42-5caaafb9a3c1</id>
+    <id>urn:uuid:66d72d45-3b31-30d3-b4fe-be9145d4d432</id>
     <updated>2012-12-12T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2012/12/12/psycopg-246-released/" />
     <author>
@@ -927,7 +1065,7 @@ when a connection string is specified as well (ticket #131).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2012/10/01/prepared-statements-psycopg/">
     <title type="text">Prepared statements in Psycopg</title>
-    <id>urn:uuid:0891f54b-6cf7-31c9-9438-84500729dcce</id>
+    <id>urn:uuid:d90e9363-e5f2-3115-8e82-a03295624457</id>
     <updated>2012-10-01T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2012/10/01/prepared-statements-psycopg/" />
     <author>
@@ -974,7 +1112,7 @@ when a connection string is specified as well (ticket #131).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2012/03/29/psycopg-245-released/">
     <title type="text">Psycopg 2.4.5 released</title>
-    <id>urn:uuid:7213c905-5b24-3cf8-9540-4dbbfeffe22f</id>
+    <id>urn:uuid:dc417146-ac6d-3071-b569-80c3f2dedb69</id>
     <updated>2012-03-29T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2012/03/29/psycopg-245-released/" />
     <author>
@@ -1013,7 +1151,7 @@ Malcolm for the useful tool and the assistance provided using it.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/12/19/psycopg-244-released/">
     <title type="text">Psycopg 2.4.4 released</title>
-    <id>urn:uuid:6c64f720-cdbb-31e1-9d15-870c9d5ce417</id>
+    <id>urn:uuid:80d21088-9a8f-3cdb-9e8b-6b0da17413f7</id>
     <updated>2011-12-19T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/12/19/psycopg-244-released/" />
     <author>
@@ -1044,7 +1182,7 @@ introduced in release 2.4.1 (ticket #82).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/12/12/psycopg-243-released/">
     <title type="text">Psycopg 2.4.3 released</title>
-    <id>urn:uuid:32e22f10-3019-3246-bf7f-150e8a2c6a61</id>
+    <id>urn:uuid:fc3c78b8-8f02-324b-963b-c4c7f3f545ef</id>
     <updated>2011-12-12T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/12/12/psycopg-243-released/" />
     <author>
@@ -1085,7 +1223,7 @@ in queries (ticket #81).&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/06/12/psycopg-242-released/">
     <title type="text">Psycopg 2.4.2 released</title>
-    <id>urn:uuid:570af3d1-1556-3824-ada6-2289b5861eeb</id>
+    <id>urn:uuid:56b0e06d-ac51-317a-8826-c6b057871b5a</id>
     <updated>2011-06-12T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/06/12/psycopg-242-released/" />
     <author>
@@ -1157,7 +1295,7 @@ long needed &lt;tt class=&quot;docutils literal&quot;&gt;setup.py&lt;/tt&gt; cle
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/06/05/psycopg-windows-mingw/">
     <title type="text">Building Psycopg on Windows using MinGW</title>
-    <id>urn:uuid:43e893d5-c91b-3ea2-b2b6-b618b0e97ca6</id>
+    <id>urn:uuid:eb1cff63-877c-3109-9199-1f5a76bdbd36</id>
     <updated>2011-06-05T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/06/05/psycopg-windows-mingw/" />
     <author>
@@ -1177,7 +1315,7 @@ python setup.py build_ext --pg-config=C:\path\to\pg_config.exe build
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/05/11/psycopg-241-released/">
     <title type="text">Psycopg 2.4.1 released</title>
-    <id>urn:uuid:fb3e8c3d-54f5-395a-ba79-c16c9ded9d6a</id>
+    <id>urn:uuid:b7428757-b66a-348e-bd9d-2ffc23a3b6f8</id>
     <updated>2011-05-11T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/05/11/psycopg-241-released/" />
     <author>
@@ -1213,7 +1351,7 @@ just in 'setup.cfg'. Patch provided by Matthew Ryan (&lt;a class=&quot;reference
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/02/27/psycopg-24-released/">
     <title type="text">Psycopg 2.4 released</title>
-    <id>urn:uuid:58d7499b-b3ab-3cea-9c1b-57ae7637ce5e</id>
+    <id>urn:uuid:2bd86c43-f1e2-3ee3-9414-54897da31c0e</id>
     <updated>2011-02-27T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/02/27/psycopg-24-released/" />
     <author>
@@ -1292,7 +1430,7 @@ patch by Marti Raudsepp.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/02/06/psycopg-24-beta1-released/">
     <title type="text">Psycopg 2.4 beta1 released</title>
-    <id>urn:uuid:1d2f8b58-72dd-3eb2-813b-a9a4c0ff35ab</id>
+    <id>urn:uuid:782481e5-d55c-391e-9f17-6cd6d3f6d22c</id>
     <updated>2011-02-06T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/02/06/psycopg-24-beta1-released/" />
     <author>
@@ -1345,7 +1483,7 @@ more available.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/01/24/psycopg2-porting-python-3-report/">
     <title type="text">psycopg2 porting to Python 3: a report</title>
-    <id>urn:uuid:36b9e2b4-a2a8-39d9-9284-1e3fc012c176</id>
+    <id>urn:uuid:cfea95fd-c594-308f-bb0d-97772a105112</id>
     <updated>2011-01-24T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/01/24/psycopg2-porting-python-3-report/" />
     <author>
@@ -1464,7 +1602,7 @@ but if there is anything to point out I'd be happy to know. Best option would be
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2011/01/08/new-psycopg-mailing-list-online/">
     <title type="text">New Psycopg Mailing List Online!</title>
-    <id>urn:uuid:bdd732b1-c2f8-32b4-a028-fe8531e47b6a</id>
+    <id>urn:uuid:51e647fb-5baa-3885-8edf-170af0f6ed36</id>
     <updated>2011-01-08T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2011/01/08/new-psycopg-mailing-list-online/" />
     <author>
@@ -1478,7 +1616,7 @@ but if there is anything to point out I'd be happy to know. Best option would be
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/12/20/psycopg-232-released/">
     <title type="text">Psycopg 2.3.2 released</title>
-    <id>urn:uuid:00dacfd9-229a-348c-a4d0-19c56cb73b42</id>
+    <id>urn:uuid:de4adce1-c1b8-31ff-8bc0-ff97be98d62b</id>
     <updated>2010-12-20T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/12/20/psycopg-232-released/" />
     <author>
@@ -1497,7 +1635,7 @@ but if there is anything to point out I'd be happy to know. Best option would be
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/12/04/psycopg-231-released/">
     <title type="text">Psycopg 2.3.1 released</title>
-    <id>urn:uuid:88690cf5-c94b-3fda-8a48-00a2076ccbc3</id>
+    <id>urn:uuid:7d8288ee-1236-3f25-8adb-4dee553f9d47</id>
     <updated>2010-12-04T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/12/04/psycopg-231-released/" />
     <author>
@@ -1514,9 +1652,71 @@ but if there is anything to point out I'd be happy to know. Best option would be
 &lt;p&gt;Cheers!&lt;/p&gt;
 </content>
   </entry>
+  <entry xml:base="https://www.psycopg.org/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">
+    <title type="text">PostgreSQL notifications with Psycopg2 and Eventlet</title>
+    <id>urn:uuid:a7f01feb-2086-3b11-8991-d0c3a1ee01e5</id>
+    <updated>2010-12-01T00:00:00Z</updated>
+    <link href="https://www.psycopg.org/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/" />
+    <author>
+      <name>Daniele Varrazzo</name>
+    </author>
+    <content type="html">&lt;p&gt;PostgreSQL supports &lt;a class=&quot;reference external&quot; href=&quot;http://www.postgresql.org/docs/9.0/interactive/sql-notify.html&quot;&gt;asynchronous notifications&lt;/a&gt;, a simple messaging system allowing clients to be notified about events occurred in the database. Notifications can be sent by any session using a &amp;quot;&lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY&lt;/tt&gt; &lt;em&gt;channel&lt;/em&gt;&amp;quot; command and will be received by any session which has subscribed with a &lt;tt class=&quot;docutils literal&quot;&gt;LISTEN&lt;/tt&gt; &lt;em&gt;channel&lt;/em&gt; to receive updates. The system has been greatly improved in PostgreSQL 9.0 with the addition of a &lt;em&gt;message payload&lt;/em&gt;, making the feature even more useful. Previously a typical use case would have been to notify interested sessions that a certain table was updated: now it is possible to signal for instance &lt;em&gt;which record&lt;/em&gt; was changed. You can put the &lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY&lt;/tt&gt; command in a database trigger for automatic notifications on insert or update... the possibilities are actually quite interesting.&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;p&gt;Psycopg2 allows a client program to &lt;a class=&quot;reference external&quot; href=&quot;/docs/advanced.html#asynchronous-notifications&quot;&gt;receive notifications from the database backend&lt;/a&gt;. Starting from version 2.3 the notification received will also include the payload, when connected to a PostgreSQL 9.0 server. The notification are received automatically after each query and are made available in the &lt;a class=&quot;reference external&quot; href=&quot;:/docs/connection.html#connection.notifies&quot;&gt;&lt;tt class=&quot;docutils literal&quot;&gt;notifies&lt;/tt&gt;&lt;/a&gt; attribute of the connection. They are also received using the &lt;a class=&quot;reference external&quot; href=&quot;/docs/connection.html#connection.poll&quot;&gt;&lt;tt class=&quot;docutils literal&quot;&gt;poll()&lt;/tt&gt;&lt;/a&gt; method, without the need of issuing queries only to receive notifications.&lt;/p&gt;
+&lt;p&gt;But polling a connection is not the most efficient nor timely way to receive notifications: a better approach is to ask the OS to wake us up when there is something to read on the connection socket. This approach is particularly appealing when using an event-driven framework such as &lt;a class=&quot;reference external&quot; href=&quot;http://twistedmatrix.com/&quot;&gt;Twisted&lt;/a&gt; or &lt;a class=&quot;reference external&quot; href=&quot;http://eventlet.net/&quot;&gt;Eventlet&lt;/a&gt;, with which is easy to perform other tasks while there is nothing to read on the connection. In &amp;quot;regular&amp;quot; Python programs it is possible to use &lt;tt class=&quot;docutils literal&quot;&gt;select()&lt;/tt&gt; to block until a notification arrives (see the documentation for an example): this would block the entire program. If some concurrency is required it is possible to use the blocking syscall in a thread to allow the rest of the program to carry on.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;eventlet-example&quot;&gt;
+&lt;h2&gt;Eventlet example&lt;/h2&gt;
+&lt;p&gt;This example shows how hook the notifications system into Eventlet: using it with a &lt;a class=&quot;reference external&quot; href=&quot;http://en.wikipedia.org/wiki/WebSockets&quot;&gt;WebSocket&lt;/a&gt; it is possible to send an event from the database to the application and up to a web browser, all in push mode! The example requires PostgreSQL 9.0 and Psycopg 2.3 as it uses notification payloads.&lt;/p&gt;
+&lt;p&gt;This function handles a WebSocket connection in a green thread: it creates a &lt;tt class=&quot;docutils literal&quot;&gt;Queue&lt;/tt&gt; and opens a database connection (calling the &lt;tt class=&quot;docutils literal&quot;&gt;dblisten()&lt;/tt&gt; function), then blocks on the queue waiting to receive notifications: as soon as any is received, its payload is forwarded to the browser. This is obviously just an example: a database connection for every browser wouldn't scale very much...&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsgi&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;websocket&lt;/span&gt;
+
+&lt;span class=&quot;nd&quot;&gt;&amp;#64;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketWSGI&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;sd&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
+    Receive a connection and send it database notifications.
+    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eventlet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;eventlet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;spawn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dblisten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;payload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;When &lt;tt class=&quot;docutils literal&quot;&gt;handle()&lt;/tt&gt; blocks on the queue the control of the program switches to a different green thread, allowing the rest of the program to keep on running even if single-threaded.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class=&quot;docutils literal&quot;&gt;dblisten&lt;/tt&gt; function sets up the listening database connection:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg2&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg2.extensions&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ISOLATION_LEVEL_AUTOCOMMIT&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet.hubs&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trampoline&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;dblisten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;sd&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
+    Open a db connection and add notifications to *q*.
+    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dsn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_isolation_level&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ISOLATION_LEVEL_AUTOCOMMIT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;LISTEN data;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;trampoline&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The connection is set in &lt;a class=&quot;reference external&quot; href=&quot;/docs/usage.html#transactions-control&quot;&gt;autocommit mode&lt;/a&gt;, otherwise the notification would be postponed until the end of the transaction. The &lt;em&gt;trampoline&lt;/em&gt; is the Eventlet function that schedules a green thread switch: we ask it to return us the control when the file descriptor underlying the connection will have something to read. Once the system wakes up again we use &lt;tt class=&quot;docutils literal&quot;&gt;poll()&lt;/tt&gt; to parse eventual notifications received, that will be added to the queue and thus passed to the client.&lt;/p&gt;
+&lt;p&gt;The rest of the example is not shown here: it only consists in a static page and the web server setup. You can &lt;a class=&quot;reference external&quot; href=&quot;pushdemo.py&quot;&gt;download the complete example&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Running the program and opening the page &lt;a class=&quot;reference external&quot; href=&quot;http://localhost:7000/&quot;&gt;http://localhost:7000/&lt;/a&gt; in a WebSocket-enabled browser you will see a page with three coloured bars: using a command such as &lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY data, 'green'&lt;/tt&gt; in a psql shell, one of the bars in the page will be updated accordingly. Here is a screenshot:&lt;/p&gt;
+&lt;img alt=&quot;psycopg eventlet push demo&quot; class=&quot;align-center&quot; src=&quot;pushdemo.png&quot; style=&quot;width: 477px; height: 327px;&quot; /&gt;
+&lt;/div&gt;
+</content>
+  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/12/01/psycopg-230-released/">
     <title type="text">Psycopg 2.3.0 released</title>
-    <id>urn:uuid:b541c051-8207-3c93-bb98-8fa3743e2127</id>
+    <id>urn:uuid:2166f1d2-38c2-32b9-b6d9-d3f99e0c72a7</id>
     <updated>2010-12-01T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/12/01/psycopg-230-released/" />
     <author>
@@ -1582,71 +1782,9 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
 &lt;/div&gt;
 </content>
   </entry>
-  <entry xml:base="https://www.psycopg.org/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">
-    <title type="text">PostgreSQL notifications with Psycopg2 and Eventlet</title>
-    <id>urn:uuid:bcd3f647-c0c0-3d70-96fa-77631037e5da</id>
-    <updated>2010-12-01T00:00:00Z</updated>
-    <link href="https://www.psycopg.org/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/" />
-    <author>
-      <name>Daniele Varrazzo</name>
-    </author>
-    <content type="html">&lt;p&gt;PostgreSQL supports &lt;a class=&quot;reference external&quot; href=&quot;http://www.postgresql.org/docs/9.0/interactive/sql-notify.html&quot;&gt;asynchronous notifications&lt;/a&gt;, a simple messaging system allowing clients to be notified about events occurred in the database. Notifications can be sent by any session using a &amp;quot;&lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY&lt;/tt&gt; &lt;em&gt;channel&lt;/em&gt;&amp;quot; command and will be received by any session which has subscribed with a &lt;tt class=&quot;docutils literal&quot;&gt;LISTEN&lt;/tt&gt; &lt;em&gt;channel&lt;/em&gt; to receive updates. The system has been greatly improved in PostgreSQL 9.0 with the addition of a &lt;em&gt;message payload&lt;/em&gt;, making the feature even more useful. Previously a typical use case would have been to notify interested sessions that a certain table was updated: now it is possible to signal for instance &lt;em&gt;which record&lt;/em&gt; was changed. You can put the &lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY&lt;/tt&gt; command in a database trigger for automatic notifications on insert or update... the possibilities are actually quite interesting.&lt;/p&gt;
-&lt;!-- CUT-HERE --&gt;
-&lt;p&gt;Psycopg2 allows a client program to &lt;a class=&quot;reference external&quot; href=&quot;/docs/advanced.html#asynchronous-notifications&quot;&gt;receive notifications from the database backend&lt;/a&gt;. Starting from version 2.3 the notification received will also include the payload, when connected to a PostgreSQL 9.0 server. The notification are received automatically after each query and are made available in the &lt;a class=&quot;reference external&quot; href=&quot;:/docs/connection.html#connection.notifies&quot;&gt;&lt;tt class=&quot;docutils literal&quot;&gt;notifies&lt;/tt&gt;&lt;/a&gt; attribute of the connection. They are also received using the &lt;a class=&quot;reference external&quot; href=&quot;/docs/connection.html#connection.poll&quot;&gt;&lt;tt class=&quot;docutils literal&quot;&gt;poll()&lt;/tt&gt;&lt;/a&gt; method, without the need of issuing queries only to receive notifications.&lt;/p&gt;
-&lt;p&gt;But polling a connection is not the most efficient nor timely way to receive notifications: a better approach is to ask the OS to wake us up when there is something to read on the connection socket. This approach is particularly appealing when using an event-driven framework such as &lt;a class=&quot;reference external&quot; href=&quot;http://twistedmatrix.com/&quot;&gt;Twisted&lt;/a&gt; or &lt;a class=&quot;reference external&quot; href=&quot;http://eventlet.net/&quot;&gt;Eventlet&lt;/a&gt;, with which is easy to perform other tasks while there is nothing to read on the connection. In &amp;quot;regular&amp;quot; Python programs it is possible to use &lt;tt class=&quot;docutils literal&quot;&gt;select()&lt;/tt&gt; to block until a notification arrives (see the documentation for an example): this would block the entire program. If some concurrency is required it is possible to use the blocking syscall in a thread to allow the rest of the program to carry on.&lt;/p&gt;
-&lt;div class=&quot;section&quot; id=&quot;eventlet-example&quot;&gt;
-&lt;h2&gt;Eventlet example&lt;/h2&gt;
-&lt;p&gt;This example shows how hook the notifications system into Eventlet: using it with a &lt;a class=&quot;reference external&quot; href=&quot;http://en.wikipedia.org/wiki/WebSockets&quot;&gt;WebSocket&lt;/a&gt; it is possible to send an event from the database to the application and up to a web browser, all in push mode! The example requires PostgreSQL 9.0 and Psycopg 2.3 as it uses notification payloads.&lt;/p&gt;
-&lt;p&gt;This function handles a WebSocket connection in a green thread: it creates a &lt;tt class=&quot;docutils literal&quot;&gt;Queue&lt;/tt&gt; and opens a database connection (calling the &lt;tt class=&quot;docutils literal&quot;&gt;dblisten()&lt;/tt&gt; function), then blocks on the queue waiting to receive notifications: as soon as any is received, its payload is forwarded to the browser. This is obviously just an example: a database connection for every browser wouldn't scale very much...&lt;/p&gt;
-&lt;pre class=&quot;code python literal-block&quot;&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsgi&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;websocket&lt;/span&gt;
-
-&lt;span class=&quot;nd&quot;&gt;&amp;#64;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketWSGI&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;sd&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
-    Receive a connection and send it database notifications.
-    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eventlet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;eventlet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;spawn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dblisten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;payload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/pre&gt;
-&lt;p&gt;When &lt;tt class=&quot;docutils literal&quot;&gt;handle()&lt;/tt&gt; blocks on the queue the control of the program switches to a different green thread, allowing the rest of the program to keep on running even if single-threaded.&lt;/p&gt;
-&lt;p&gt;The &lt;tt class=&quot;docutils literal&quot;&gt;dblisten&lt;/tt&gt; function sets up the listening database connection:&lt;/p&gt;
-&lt;pre class=&quot;code python literal-block&quot;&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg2&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg2.extensions&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ISOLATION_LEVEL_AUTOCOMMIT&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;eventlet.hubs&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;trampoline&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;dblisten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;sd&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
-    Open a db connection and add notifications to *q*.
-    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dsn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_isolation_level&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ISOLATION_LEVEL_AUTOCOMMIT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;LISTEN data;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;trampoline&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/pre&gt;
-&lt;p&gt;The connection is set in &lt;a class=&quot;reference external&quot; href=&quot;/docs/usage.html#transactions-control&quot;&gt;autocommit mode&lt;/a&gt;, otherwise the notification would be postponed until the end of the transaction. The &lt;em&gt;trampoline&lt;/em&gt; is the Eventlet function that schedules a green thread switch: we ask it to return us the control when the file descriptor underlying the connection will have something to read. Once the system wakes up again we use &lt;tt class=&quot;docutils literal&quot;&gt;poll()&lt;/tt&gt; to parse eventual notifications received, that will be added to the queue and thus passed to the client.&lt;/p&gt;
-&lt;p&gt;The rest of the example is not shown here: it only consists in a static page and the web server setup. You can &lt;a class=&quot;reference external&quot; href=&quot;pushdemo.py&quot;&gt;download the complete example&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Running the program and opening the page &lt;a class=&quot;reference external&quot; href=&quot;http://localhost:7000/&quot;&gt;http://localhost:7000/&lt;/a&gt; in a WebSocket-enabled browser you will see a page with three coloured bars: using a command such as &lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY data, 'green'&lt;/tt&gt; in a psql shell, one of the bars in the page will be updated accordingly. Here is a screenshot:&lt;/p&gt;
-&lt;img alt=&quot;psycopg eventlet push demo&quot; class=&quot;align-center&quot; src=&quot;pushdemo.png&quot; style=&quot;width: 477px; height: 327px;&quot; /&gt;
-&lt;/div&gt;
-</content>
-  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/11/12/psycopg-pgday-italy-2010/">
     <title type="text">Psycopg at PGDay Italy 2010</title>
-    <id>urn:uuid:b4054391-f4a7-3c11-97d1-2c894db8a7df</id>
+    <id>urn:uuid:1527e60b-1619-34f5-a37f-7ace0edf1c3b</id>
     <updated>2010-11-12T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/11/12/psycopg-pgday-italy-2010/" />
     <author>
@@ -1664,7 +1802,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/11/11/links-about-building-psycopg-mac-os-x/">
     <title type="text">Links about building Psycopg on Mac OS X</title>
-    <id>urn:uuid:8b577806-949f-3867-995b-2e55f47eedcd</id>
+    <id>urn:uuid:a4cb07b5-6d3c-3964-8209-da0ed8354521</id>
     <updated>2010-11-11T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/11/11/links-about-building-psycopg-mac-os-x/" />
     <author>
@@ -1684,7 +1822,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/11/06/psycopg-230-beta1-released/">
     <title type="text">Psycopg 2.3.0-beta1 released</title>
-    <id>urn:uuid:48ca27f5-aff7-3fe0-bc45-69352cc254e5</id>
+    <id>urn:uuid:91232779-f3cd-3aba-a4d2-ce0911792e4e</id>
     <updated>2010-11-06T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/11/06/psycopg-230-beta1-released/" />
     <author>
@@ -1709,7 +1847,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/11/02/new-features-upcoming-psycopg-release/">
     <title type="text">New features in the upcoming Psycopg release</title>
-    <id>urn:uuid:453d0342-9f73-3f99-acfe-581a370a3113</id>
+    <id>urn:uuid:413c0b8e-4fef-31cc-a524-af0976acb3b5</id>
     <updated>2010-11-02T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/11/02/new-features-upcoming-psycopg-release/" />
     <author>
@@ -1736,7 +1874,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/10/26/psycopg-pgday-europe/">
     <title type="text">Psycopg at PgDay Europe</title>
-    <id>urn:uuid:fc4823c2-50f0-3d13-b563-b956056c6083</id>
+    <id>urn:uuid:b2f657c3-59b5-3a60-ad67-2f17a9dbe7cc</id>
     <updated>2010-10-26T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/10/26/psycopg-pgday-europe/" />
     <author>
@@ -1751,7 +1889,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/10/22/passing-connections-functions-using-decorator/">
     <title type="text">Passing connections to functions using a decorator</title>
-    <id>urn:uuid:77e5db4b-2f25-3886-ab5d-79d868fc9f8d</id>
+    <id>urn:uuid:b0bc168f-1a23-3dfb-8be1-eaa2fac86913</id>
     <updated>2010-10-22T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/10/22/passing-connections-functions-using-decorator/" />
     <author>
@@ -1798,7 +1936,7 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/07/18/psycopg-222-released/">
     <title type="text">Psycopg 2.2.2 released</title>
-    <id>urn:uuid:14ca6ea8-b080-34c8-88d9-161a91647c09</id>
+    <id>urn:uuid:8ae65f27-918f-3c18-8a06-4321c99e964f</id>
     <updated>2010-07-18T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/07/18/psycopg-222-released/" />
     <author>
@@ -1835,7 +1973,7 @@ will raise a warning if called.&lt;/li&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/05/17/psycopg-221-released/">
     <title type="text">Psycopg 2.2.1 released</title>
-    <id>urn:uuid:567fdca1-60be-3327-85b1-bbe19d6d14e5</id>
+    <id>urn:uuid:f4304ab1-a375-36cf-92a6-ee7fd717f56b</id>
     <updated>2010-05-17T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/05/17/psycopg-221-released/" />
     <author>
@@ -1861,7 +1999,7 @@ No excerpt this time, it's a single liner, but here are the URLs:&lt;/p&gt;
   </entry>
   <entry xml:base="https://www.psycopg.org/articles/2010/05/16/psycopg-220-released/">
     <title type="text">Psycopg 2.2.0 released</title>
-    <id>urn:uuid:782a7a3a-7582-3ff0-beb3-c4df0af1838c</id>
+    <id>urn:uuid:fb0c2017-13b1-3257-b96b-216e84fb86f5</id>
     <updated>2010-05-16T00:00:00Z</updated>
     <link href="https://www.psycopg.org/articles/2010/05/16/psycopg-220-released/" />
     <author>

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=cf59a065">
+    <title>The new COPY support in psycopg3 — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h2>The new COPY support in psycopg3</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2020-11-15
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/psycopg3/"
+          >psycopg3</a>,
+      <a class="tag" href="/articles/tag/development/"
+          >development</a>,
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>
+      
+    
+  </p>
+  
+    <p><tt class="docutils literal">psycopg2</tt> allows <a class="reference external" href="https://www.psycopg.org/docs/usage.html#copy">interaction with PostgreSQL COPY commands</a>. However
+what is possible to do with them is relatively limited: the only possible
+interaction is with file-like objects:</p>
+<ul class="simple">
+<li>there is no adaptation from Python objects to PostgreSQL, as there is for
+normal queries: data must be formatted &quot;manually&quot; by the user;</li>
+<li>psycopg2 &quot;pulls&quot; data from the file: writing a system that produces data and
+pushes it into PostgreSQL is a very contrived operation, requiring to write
+a blocking file-like object;</li>
+<li>there is no support for <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/428">asynchronous copy</a>.</li>
+</ul>
+<p><a class="reference external" href="/psycopg3/">psycopg3</a> addresses these shortcoming and makes easy to write Python
+programs producing data and pushing it efficiently to the database using the
+<tt class="docutils literal">COPY</tt> protocol.</p>
+<!-- CUT-HERE -->
+<p><tt class="docutils literal">psycopg2</tt> adaptation system is designed to compose queries client-side, so
+it is concerned with the right use of the quotes: the python string
+<tt class="docutils literal">O'Reilly</tt> is converted to <tt class="docutils literal"><span class="pre">'O''Reilly'</span></tt>, and the <tt class="docutils literal">date(2020, 11, 15)</tt>
+to <tt class="docutils literal"><span class="pre">'2020-11-15'::date</span></tt>. These extra quotes get in the way of COPY, and
+there isn't an intermediate level where a conversion to string is performed,
+but no quote or other SQL construct are added.</p>
+<p><tt class="docutils literal">psycopg3</tt> uses the PostgreSQL extended query protocol and sends query and
+parameters separately. Parameters require adaptation to the PostgreSQL
+formats, but quoting, and quotes escaping, are no more its concern: the string
+<tt class="docutils literal">O'Reilly</tt> doesn't need further manipulation and the date is converted only
+to the string <tt class="docutils literal"><span class="pre">2020-11-15</span></tt>; types informations are passed as additional
+separate information according to <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-exec.html#LIBPQ-PQEXECPARAMS">the libpq API</a>.</p>
+<p>The server-side format of these values are exactly what the <tt class="docutils literal">COPY FROM</tt>
+command expects, so it's now easy to compose a row by adapting Python objects
+and to pass</p>
+<pre class="literal-block">
+O'Reilly\t2020-11-15\n
+</pre>
+<p>to the server. The mechanism to do so is exposed to Python by a new context
+manager, returned by the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/cursor.html#psycopg3.Cursor.copy">Cursor.copy()</a> method, which enables to write:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">((</span><span class="s2">&quot;O'Reilly&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+</pre>
+<p>Any list of tuples of values, or generator of sequences of values, can be used
+to push data into Postgres:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_generator</span><span class="p">():</span>
+        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre>
+<p>The copy operation is concluded as soon as the <tt class="docutils literal">with</tt> block is exited and,
+in case a Python exception is raised, the error is pushed to the server, which
+will cancel the COPY operation in progress.</p>
+<div class="section" id="binary-format">
+<h2>Binary format</h2>
+<p>The <tt class="docutils literal">Copy</tt> object is also able to write data in <a class="reference external" href="https://www.postgresql.org/docs/13/sql-copy.html#id-1.9.3.55.9.4">binary format</a>: at Python
+level this is entirely transparent:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre>
+<p>which might be more efficient than the textual format, but requires more care
+with the data types, as the server will not even perform an innocent
+<tt class="docutils literal">int4</tt> -&gt; <tt class="docutils literal">int8</tt> cast for you.</p>
+</div>
+<div class="section" id="block-level-copy">
+<h2>Block-level COPY</h2>
+<p><tt class="docutils literal">psycopg2</tt> allows (only) to operate on a COPY stream using a Python
+file-like objects: behind the scenes it reads one block of data from the
+source and writes it to the destination:</p>
+<pre class="code python literal-block">
+<span class="c1"># From a file to the database</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span>
+
+<span class="c1"># From the database to a file</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span>
+</pre>
+<p>This way of operating is not lost, but now the responsibility of moving data
+from one stream to the other is left to the user's code:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">SIZE</span><span class="p">)</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">copy</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre>
+<p>While the new pattern is more verbose, it allows to produce and consume data
+with interfaces different than the file one, whereas previously it would have
+required to write some form of file-like adapter, blocking the copy in case no
+data was ready. This inversion of control allows, finally, the use of...</p>
+</div>
+<div class="section" id="asynchronous-copy">
+<h2>Asynchronous COPY</h2>
+<p>If you data producer, either at rows level or at blocks level, is capable of
+asynchronous operations, it is now possible to operate asynchronously with
+COPY using exactly the same pattern as the sync code, only sprinkling the
+magic words here and there:</p>
+<pre class="code python literal-block">
+<span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_async_generator</span><span class="p">():</span>
+        <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">with</span> <span class="n">async_producer</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre>
+<p>which covers an important use case pretty much impossible to introduce in
+<tt class="docutils literal">psycopg2</tt>.</p>
+</div>
+<div class="section" id="project-sponsorship">
+<h2>Project sponsorship</h2>
+<div class="sponsor docutils container">
+<p>The new COPY support is one of several new features that are being
+designed and implemented in <a class="reference external" href="/psycopg3/">psycopg3</a>. The project is currently <a class="reference external" href="https://github.com/psycopg/psycopg3">under
+active development</a>: if there is enough support it will be possible to
+work at the project full-time and bring it to release swiftly.</p>
+<p>If you use Python and PostgreSQL, and you would like to support the
+creation of the most advanced adapter between the two systems, <a class="reference external" href="https://github.com/sponsors/dvarrazzo/">please
+consider becoming a sponsor</a>. Thank you!</p>
+<iframe src="https://github.com/sponsors/dvarrazzo/button"
+    title="Sponsor the project" style="border: 0"
+    width="116" height="35">
+</iframe></div>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>psycopg2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+    <li>
+      <a href="https://pypi.org/project/psycopg2/">
+        <i class="fa-li fa-lg fa fa-cloud-download" aria-hidden="true"></i>
+        Download</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>psycopg3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2020 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
