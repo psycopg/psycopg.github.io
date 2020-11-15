@@ -144,22 +144,22 @@ basic commands:</p>
 <p>The main entry points of <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> are:</p>
 <ul class="simple">
 <li><p>The function <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> creates a new database session and
-returns a new <a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> instance. <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.connect" title="psycopg3.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
+returns a new <a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> instance. <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code>
 creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
-<li><p>The <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
+<li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> class encapsulates a database session. It allows to:</p>
 <ul>
-<li><p>create new <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="connection.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
+<li><p>create new <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> instances using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> method to
 execute database commands and queries,</p></li>
-<li><p>terminate transactions using the methods <a class="reference internal" href="connection.html#psycopg3.Connection.commit" title="psycopg3.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or
-<a class="reference internal" href="connection.html#psycopg3.Connection.rollback" title="psycopg3.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p></li>
+<li><p>terminate transactions using the methods <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code> or
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code>.</p></li>
 </ul>
 </li>
-<li><p>The class <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> allows interaction with the database:</p>
+<li><p>The class <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> allows interaction with the database:</p>
 <ul>
-<li><p>send commands to the database using methods such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
-and <a class="reference internal" href="cursor.html#psycopg3.Cursor.executemany" title="psycopg3.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,</p></li>
+<li><p>send commands to the database using methods such as <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code>,</p></li>
 <li><p>retrieve data from the database, iterating on the cursor or using methods
-such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
+such as <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code>.</p></li>
 </ul>
 </li>
 </ul>
@@ -213,7 +213,7 @@ offer enough metadata to decode the data to Python objects.</p>
 database from any Python iterable (a list of tuple, or any iterable of
 sequences): the Python values are adapted as they would be in normal querying.
 To perform such operation use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">[table]</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> with
-<a class="reference internal" href="cursor.html#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and use <a class="reference internal" href="cursor.html#psycopg3.Copy.write_row" title="psycopg3.Copy.write_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code></a> on the resulting object in a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code> and use <code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code> on the resulting object in a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block. On exiting the block the operation will be concluded:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name (col1, col2) FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
@@ -224,20 +224,21 @@ To perform such operation use a <code class="sql docutils literal notranslate"><
 the records inserted so far discarded.</p>
 <p>If data is already formatted in a way suitable for copy (for instance because
 it is coming from a file resulting from a previous <code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation) it can
-be loaded using <a class="reference internal" href="cursor.html#psycopg3.Copy.write" title="psycopg3.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code></a> instead.</p>
+be loaded using <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code> instead.</p>
 <p>In order to read data in <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> format you can use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span>
-<span class="pre">STDOUT</span></code> statement and iterate over the resulting <a class="reference internal" href="cursor.html#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object, which will
+<span class="pre">STDOUT</span></code> statement and iterate over the resulting <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object, which will
 produce <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;data.out&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Asynchronous operations are supported using the same patterns on an
-<a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an object supporting an
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an object supporting an
 asynchronous <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> method and returning <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> data, a fully-async
 copy operation could be:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY data FROM STDIN&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY data FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
         <span class="k">break</span>
@@ -251,8 +252,8 @@ copy operation could be:</p>
 </div>
 <div class="section" id="async-operations">
 <span id="index-5"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
-<p>psycopg3 <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
-<a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
+<p>psycopg3 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> have counterparts <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
 ones: in order to use them you will only have to scatter the <code class="docutils literal notranslate"><span class="pre">async</span></code> keyword
 here and there.</p>
@@ -276,11 +277,11 @@ facilities offered by PostgreSQL commands <a class="reference external" href="ht
 refer to the PostgreSQL documentation for examples about how to use this form
 of communication.</p>
 <p>Because of the way sessions interact with notifications (see <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>
-documentation), you should keep the connection in <a class="reference internal" href="connection.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>
+documentation), you should keep the connection in <code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code>
 mode if you wish to receive or send notifications in a timely manner.</p>
-<p>Notifications are received as instances of <a class="reference internal" href="connection.html#psycopg3.Notify" title="psycopg3.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a>. If you are reserving a
+<p>Notifications are received as instances of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code>. If you are reserving a
 connection only to receive notifications, the simplest way is to consume the
-<a class="reference internal" href="connection.html#psycopg3.Connection.notifies" title="psycopg3.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies</span></code></a> generator. The generator can be stopped using
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies</span></code> generator. The generator can be stopped using
 <code class="docutils literal notranslate"><span class="pre">close()</span></code>. The following example will print notifications and stop when one
 containing the <code class="docutils literal notranslate"><span class="pre">stop</span></code> message is received.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg3</span>
@@ -310,7 +311,7 @@ containing the <code class="docutils literal notranslate"><span class="pre">stop
 <span class="n">there</span><span class="p">,</span> <span class="n">I</span> <span class="n">stopped</span>
 </pre></div>
 </div>
-<p>Alternatively, you can use <a class="reference internal" href="connection.html#psycopg3.Connection.add_notify_handler" title="psycopg3.Connection.add_notify_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notify_handler()</span></code></a> to register a
+<p>Alternatively, you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notify_handler()</span></code> to register a
 callback function, which will be invoked whenever a notification is received,
 during the normal query processing; you will be then able to use the
 connection normally. Please note that in this case notifications will not be
