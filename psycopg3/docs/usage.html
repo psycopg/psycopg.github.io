@@ -187,14 +187,87 @@ such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone
 </div>
 <div class="section" id="binary-parameters-and-results">
 <span id="binary-data"></span><span id="index-3"></span><h2>Binary parameters and results<a class="headerlink" href="#binary-parameters-and-results" title="Permalink to this headline">¶</a></h2>
-<p>TODO: lift from psycopg2 docs</p>
+<p>TODO</p>
+<span class="target" id="index-4"></span><span class="target" id="index-5"></span></div>
 </div>
 <div class="section" id="transaction-management">
-<span id="transactions"></span><h2>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<span id="transactions"></span><span id="index-6"></span><h1>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h1>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> has a behaviour that may result surprising compared to
+<strong class="program">psql</strong>: by default, any database operation will start a new
+transaction. As a consequence, changes made by any cursor of the connection
+will not be visible until <a class="reference internal" href="connection.html#psycopg3.Connection.commit" title="psycopg3.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> is called, and will be
+discarded by <a class="reference internal" href="connection.html#psycopg3.Connection.rollback" title="psycopg3.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a>. The following operation on the same
+connection will start a new transaction.</p>
+<p>If a database operation fails, the server will refuse further commands, until
+a <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> is called.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If a database operation fails with an error message such as
+<em>InFailedSqlTransaction: current transaction is aborted, commands ignored
+until end of transaction block</em>, it means that <strong>a previous operation
+failed</strong> and the database session is in a state on error. You need to call
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> if you want to keep on using the same connection.</p>
+</div>
+<p>The manual commit requirement can be suspended using <a class="reference internal" href="connection.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
+either as connection attribute or as <a class="reference internal" href="connection.html#psycopg3.Connection.connect" title="psycopg3.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
+parameter. This may be required to run operations that need to run outside a
+transaction, such as <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>, <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on
+<a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>By default even a simple <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> will start a transaction: in
+long-running programs, if no further action is taken, the session will
+remain <em>idle in transaction</em>, an undesirable condition for several
+reasons (locks are held by the session, tables bloat…). For long lived
+scripts, either make sure to terminate a transaction as soon as possible or
+use an <a class="reference internal" href="connection.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> connection.</p>
+</div>
+<div class="section" id="transaction-blocks">
+<span id="transaction-block"></span><h2>Transaction blocks<a class="headerlink" href="#transaction-blocks" title="Permalink to this headline">¶</a></h2>
+<p>A more transparent way to make sure that transactions are finalised at the
+right time is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="connection.html#psycopg3.Connection.transaction" title="psycopg3.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
+transaction block. When the block is entered a transaction is started; when
+leaving the block the transaction is committed, or it is rolled back if an
+exception is raised inside the block.</p>
+<p>For instance, an hypothetical but extremely secure bank may have the following
+code to avoid that no accident between the following two lines leaves the
+accounts unbalanced:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+    <span class="n">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account1</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account2</span><span class="p">,</span> <span class="o">+</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># The transaction is now committed</span>
+</pre></div>
+</div>
+<p>Transaction blocks can also be nested (internal transaction blocks are
+implemented using <code class="sql docutils literal notranslate"><span class="pre">SAVEPOINT</span></code>): an exception raised inside an inner block
+has a chance of being handled and not fail completely outer operations. The
+following is an example where a series of operation interact with the
+database. Operations are allowed to fail, and we want to store the number of
+operations successfully processed too.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx1</span><span class="p">:</span>
+    <span class="n">num_ok</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx2</span><span class="p">:</span>
+                <span class="n">unreliable_operation</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_ok</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">save_number_of_successes</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">num_ok</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">unreliable_operation()</span></code> causes an error, including an operation causing a
+database error, all its changes will be reverted. The exception bubbles up
+outside the block: in the example it is intercepted by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">try</span></code> so that the
+loop can complete. The outermost loop is unaffected (unless other errors
+happen there).</p>
+</div>
 </div>
 <div class="section" id="using-copy-to-and-copy-from">
-<span id="copy"></span><span id="index-4"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h2>
+<span id="copy"></span><span id="index-7"></span><h1>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h1>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> allows to operate with <a class="reference external" href="https://www.postgresql.org/docs/current/sql-copy.html">PostgreSQL COPY protocol</a>. <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> is
 one of the most efficient ways to load data into the database (and to modify
 it, with some SQL creativity).</p>
@@ -249,13 +322,12 @@ copy operation could be:</p>
 <p>Binary data can be produced and consumed using <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code> in the
 <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> command: see <a class="reference internal" href="#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details and limitations.</p>
 </div>
-</div>
 <div class="section" id="async-operations">
-<span id="index-5"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
+<span id="index-8"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
 <p>psycopg3 <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
 <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
-ones: in order to use them you will only have to scatter the <code class="docutils literal notranslate"><span class="pre">async</span></code> keyword
+ones: in order to use them you will only have to scatter the <code class="docutils literal notranslate"><span class="pre">await</span></code> keyword
 here and there.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
         <span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
@@ -271,7 +343,7 @@ here and there.</p>
 </pre></div>
 </div>
 <div class="section" id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
+<span id="async-notify"></span><span id="index-9"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form
@@ -343,10 +415,13 @@ received immediately, but only during a connection operation, such as a query.</
 <li><a class="reference internal" href="#with-connections-and-cursors"><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors</a></li>
 <li><a class="reference internal" href="#passing-parameters-to-sql-queries">Passing parameters to SQL queries</a></li>
 <li><a class="reference internal" href="#binary-parameters-and-results">Binary parameters and results</a></li>
-<li><a class="reference internal" href="#transaction-management">Transaction management</a></li>
-<li><a class="reference internal" href="#using-copy-to-and-copy-from">Using COPY TO and COPY FROM</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#transaction-management">Transaction management</a><ul>
+<li><a class="reference internal" href="#transaction-blocks">Transaction blocks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-copy-to-and-copy-from">Using COPY TO and COPY FROM</a></li>
 <li><a class="reference internal" href="#async-operations">Async operations</a><ul>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
 </ul>
