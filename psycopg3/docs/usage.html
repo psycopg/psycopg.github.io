@@ -166,8 +166,8 @@ such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone
 </li>
 </ul>
 <div class="section" id="with-connections-and-cursors">
-<span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors<a class="headerlink" href="#with-connections-and-cursors" title="Permalink to this headline">¶</a></h2>
-<p>The connections and cursors act as context managers, so you can run:</p>
+<span id="with-statement"></span><span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> connections and cursors<a class="headerlink" href="#with-connections-and-cursors" title="Permalink to this headline">¶</a></h2>
+<p>Connections and cursors act as context managers, so you can run:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
@@ -182,6 +182,25 @@ such as <a class="reference internal" href="cursor.html#psycopg3.Cursor.fetchone
 <span class="c1"># and the connection closed</span>
 </pre></div>
 </div>
+<p>For asynchronous connections and cursor it’s <em>almost</em> what you’d expect, but
+not quite. Please note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> <em>don’t return a
+context</em>: they are both factory methods which return <em>an object which can be
+used as a context</em>. So you cannot use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">connect()</span></code>: you have to do
+it in two steps instead, as in</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="p">:</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which can be condensed as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">())</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>…but no less than that: you still need to do the double async thing.</p>
 </div>
 <div class="section" id="passing-parameters-to-sql-queries">
 <span id="query-parameters"></span><span id="index-2"></span><h2>Passing parameters to SQL queries<a class="headerlink" href="#passing-parameters-to-sql-queries" title="Permalink to this headline">¶</a></h2>
@@ -207,7 +226,7 @@ a <code class="xref py py-obj docutils literal notranslate"><span class="pre">ro
 <p>If a database operation fails with an error message such as
 <em>InFailedSqlTransaction: current transaction is aborted, commands ignored
 until end of transaction block</em>, it means that <strong>a previous operation
-failed</strong> and the database session is in a state on error. You need to call
+failed</strong> and the database session is in a state of error. You need to call
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> if you want to keep on using the same connection.</p>
 </div>
 <p>The manual commit requirement can be suspended using <a class="reference internal" href="connection.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
@@ -241,6 +260,18 @@ accounts unbalanced:</p>
 <span class="c1"># The transaction is now committed</span>
 </pre></div>
 </div>
+<p>But because the bank is, like, <em>extremely secure</em>, they also verify that no
+account goes negative:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+    <span class="n">new_balance</span> <span class="o">=</span> <span class="n">add_to_balance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">new_balance</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;account balance cannot go negative&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case this function raises an exception, be it the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code> in the
+example or any other exception expected or not, the transaction will be rolled
+back, and the exception will propagate out of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block, further down
+the call stack.</p>
 <p>Transaction blocks can also be nested (internal transaction blocks are
 implemented using <a class="reference external" href="https://www.postgresql.org/docs/current/sql-savepoint.html">SAVEPOINT</a>): an exception raised inside an inner block
 has a chance of being handled and not completely fail outer operations. The
@@ -302,9 +333,9 @@ a way suitable for <code class="sql docutils literal notranslate"><span class="p
 <li><p>reading data from the database block-by-block, with data emitted by a
 <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> statement.</p></li>
 </ul>
-<p>The missing quadrant, copying data from database row-by-row, is not covered by
-COPY because that’s pretty much normal querying, and <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> doesn’t
-offer enough metadata to decode the data to Python objects.</p>
+<p>The missing quadrant, copying data from the database row-by-row, is not
+covered by COPY because that’s pretty much normal querying, and <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code>
+doesn’t offer enough metadata to decode the data to Python objects.</p>
 <p>The first option is the most powerful, because it allows to load data into the
 database from any Python iterable (a list of tuple, or any iterable of
 sequences): the Python values are adapted as they would be in normal querying.
@@ -332,14 +363,11 @@ produce <code class="xref py py-obj docutils literal notranslate"><span class="p
 </div>
 <p>Asynchronous operations are supported using the same patterns on an
 <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an object supporting an
-asynchronous <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> method and returning <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> data, a fully-async
-copy operation could be:</p>
+asynchronous <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> method returning <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> data, a fully-async copy
+operation could be:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY data FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
-        <span class="k">break</span>
-
-    <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Binary data can be produced and consumed using <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code> in the

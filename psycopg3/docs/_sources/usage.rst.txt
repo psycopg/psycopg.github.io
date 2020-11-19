@@ -94,10 +94,12 @@ The main entry points of `!psycopg3` are:
 
 .. index:: with
 
+.. _with-statement:
+
 ``with`` connections and cursors
 --------------------------------
 
-The connections and cursors act as context managers, so you can run:
+Connections and cursors act as context managers, so you can run:
 
 .. code:: python
 
@@ -114,6 +116,29 @@ The connections and cursors act as context managers, so you can run:
     # the transaction is committed on successful exit of the context
     # and the connection closed
 
+For asynchronous connections and cursor it's *almost* what you'd expect, but
+not quite. Please note that `!connect()` and `!cursor()` *don't return a
+context*: they are both factory methods which return *an object which can be
+used as a context*. So you cannot use ``async with connect()``: you have to do
+it in two steps instead, as in
+
+.. code:: python
+
+    aconn = await psycopg3.AsyncConnection.connect():
+    async with aconn:
+        cur = await aconn.cursor()
+        async with as cur:
+            await cur.execute(...)
+
+which can be condensed as:
+
+.. code:: python
+
+    async with (await psycopg3.AsyncConnection.connect()) as aconn:
+        async with (await aconn.cursor()) as cur:
+            await cur.execute(...)
+
+...but no less than that: you still need to do the double async thing.
 
 
 .. index::
@@ -163,7 +188,7 @@ a `~rollback()` is called.
     If a database operation fails with an error message such as
     *InFailedSqlTransaction: current transaction is aborted, commands ignored
     until end of transaction block*, it means that **a previous operation
-    failed** and the database session is in a state on error. You need to call
+    failed** and the database session is in a state of error. You need to call
     `!rollback()` if you want to keep on using the same connection.
 
 The manual commit requirement can be suspended using `~Connection.autocommit`,
@@ -206,6 +231,21 @@ accounts unbalanced:
         move_money(conn, account2, +100)
 
     # The transaction is now committed
+
+But because the bank is, like, *extremely secure*, they also verify that no
+account goes negative:
+
+.. code:: python
+
+    def move_money(conn, account, amount):
+        new_balance = add_to_balance(conn, account, amount)
+        if new_balance < 0:
+            raise ValueError("account balance cannot go negative")
+
+In case this function raises an exception, be it the `!ValueError` in the
+example or any other exception expected or not, the transaction will be rolled
+back, and the exception will propagate out of the `with` block, further down
+the call stack.
 
 Transaction blocks can also be nested (internal transaction blocks are
 implemented using SAVEPOINT__): an exception raised inside an inner block
@@ -283,9 +323,9 @@ Using `!psycopg3` you can do three things:
 - reading data from the database block-by-block, with data emitted by a
   :sql:`COPY TO` statement.
 
-The missing quadrant, copying data from database row-by-row, is not covered by
-COPY because that's pretty much normal querying, and :sql:`COPY TO` doesn't
-offer enough metadata to decode the data to Python objects.
+The missing quadrant, copying data from the database row-by-row, is not
+covered by COPY because that's pretty much normal querying, and :sql:`COPY TO`
+doesn't offer enough metadata to decode the data to Python objects.
 
 The first option is the most powerful, because it allows to load data into the
 database from any Python iterable (a list of tuple, or any iterable of
@@ -320,17 +360,14 @@ produce `!bytes`:
 
 Asynchronous operations are supported using the same patterns on an
 `AsyncConnection`. For instance, if `!f` is an object supporting an
-asynchronous `!read()` method and returning :sql:`COPY` data, a fully-async
-copy operation could be:
+asynchronous `!read()` method returning :sql:`COPY` data, a fully-async copy
+operation could be:
 
 .. code:: python
 
     async with cursor.copy("COPY data FROM STDIN") as copy:
-        data = await f.read()
-        if not data:
-            break
-
-        await copy.write(data)
+        while data := await f.read()
+            await copy.write(data)
 
 Binary data can be produced and consumed using :sql:`FORMAT BINARY` in the
 :sql:`COPY` command: see :ref:`binary-data` for details and limitations.

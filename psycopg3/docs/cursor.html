@@ -117,11 +117,16 @@ terminate a transaction or a session though.</p>
 <dt id="psycopg3.Cursor.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Cursor.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the current cursor and free associated resources.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with conn.cursor(): …</span></a>
+to close the cursor automatically when the block is exited.</p>
+</div>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py attribute">
 <dt id="psycopg3.Cursor.closed">
-<em class="property">property </em><code class="sig-name descname">closed</code><a class="headerlink" href="#psycopg3.Cursor.closed" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">closed</code><em class="property"> bool</em><a class="headerlink" href="#psycopg3.Cursor.closed" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if the cursor is closed.</p>
 </dd></dl>
 
@@ -234,7 +239,13 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.close">
 <em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncCursor.close" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
+automatically when the block is exited, but be careful about
+the async quirkness: see <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connections and cursors</span></a> for details.</p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.execute">

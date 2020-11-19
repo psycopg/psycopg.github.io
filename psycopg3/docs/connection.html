@@ -134,12 +134,28 @@ Keyword parameters override the ones specified in the connection string.</p>
 <dt id="psycopg3.Connection.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Connection.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the database connection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connect(): …</span></a> to
+close the connection automatically when the block is exited.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.Connection.closed">
+<code class="sig-name descname">closed</code><em class="property"> bool</em><a class="headerlink" href="#psycopg3.Connection.closed" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if the connection is closed.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.Connection.cursor">
 <code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span> &#x2192; psycopg3.cursor.Cursor<a class="headerlink" href="#psycopg3.Connection.cursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> to send commands and queries to the connection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with conn.cursor(): …</span></a>
+to close the cursor automatically when the block is exited.</p>
+</div>
 </dd></dl>
 
 <p class="rubric">Transaction management methods</p>
@@ -184,12 +200,6 @@ ones: you should call <code class="xref py py-obj docutils literal notranslate">
 </dd></dl>
 
 <p class="rubric">Checking and configuring the connection state</p>
-<dl class="py attribute">
-<dt id="psycopg3.Connection.closed">
-<code class="sig-name descname">closed</code><em class="property"> bool</em><a class="headerlink" href="#psycopg3.Connection.closed" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if the connection is closed.</p>
-</dd></dl>
-
 <dl class="py attribute">
 <dt id="psycopg3.Connection.client_encoding">
 <code class="sig-name descname">client_encoding</code><em class="property"> str</em><a class="headerlink" href="#psycopg3.Connection.client_encoding" title="Permalink to this definition">¶</a></dt>
@@ -268,12 +278,24 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.close">
 <em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncConnection.close" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the connection
+automatically when the block is exited, but be careful about
+the async quirkness: see <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connections and cursors</span></a> for details.</p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.cursor">
 <em class="property">async </em><code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">format: psycopg3.pq.enums.Format = &lt;Format.TEXT: 0&gt;</em><span class="sig-paren">)</span> &#x2192; psycopg3.cursor.AsyncCursor<a class="headerlink" href="#psycopg3.AsyncConnection.cursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> to send commands and queries to the connection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
+automatically when the block is exited, but be careful about
+the async quirkness: see <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connections and cursors</span></a> for details.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
