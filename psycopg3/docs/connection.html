@@ -10,8 +10,10 @@
 div.sponsor {
   background-color: #ffc;
   border: 2px solid #888;
+  border-radius: 8px;
   padding: 1em;
   padding-bottom: 0.25em;
+  margin-top: 1em;
 }
 div.sponsor p {
   margin: 0.5rem 0;
@@ -369,6 +371,16 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 made within this context.</p>
 <p>If a transaction context is specified in the constructor, rollback
 enclosing transactions contexts up to and including the one specified.</p>
+<p>It can be used as</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback</span></code>: roll back the operation that happened in the current
+transaction block and continue the program after the block.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback()</span></code>: same effect as above</p></li>
+<li><p><code class="samp docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback(</span><em><span class="pre">tx</span></em><span class="pre">)</span></code>: roll back any operation that happened in
+the <a class="reference internal" href="#psycopg3.Transaction" title="psycopg3.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> <em>tx</em> (returned by a statement such as <code class="samp docutils literal notranslate"><span class="pre">with</span>
+<span class="pre">conn.transaction()</span> <span class="pre">as</span> <em><span class="pre">tx</span></em><span class="pre">:</span></code> and all the blocks nested within. The
+program will continue after the <em>tx</em> block.</p></li>
+</ul>
 </dd></dl>
 
 </div>

@@ -10,8 +10,10 @@
 div.sponsor {
   background-color: #ffc;
   border: 2px solid #888;
+  border-radius: 8px;
   padding: 1em;
   padding-bottom: 0.25em;
+  margin-top: 1em;
 }
 div.sponsor p {
   margin: 0.5rem 0;
@@ -272,11 +274,13 @@ back the innermost transaction block, but any current block can be specified
 as the target. In the following example, an hypothetical <code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelCommand</span></code>
 may stop the processing and cancel any operation previously performed,
 but not entirely committed yet.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">outer_tx</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3</span> <span class="kn">import</span> <span class="n">Rollback</span>
+
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">outer_tx</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">():</span>
         <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">inner_tx</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">CancelCommand</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">Rollback</span><span class="p">(</span><span class="n">outer_tx</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">Rollback</span><span class="p">(</span><span class="n">outer_tx</span><span class="p">)</span>
         <span class="n">process_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
 
 <span class="c1"># If `Rollback` is raised, it would propagate only up to this block,</span>
