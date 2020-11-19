@@ -337,6 +337,7 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 
 </dd></dl>
 
+<p class="rubric">Objects involved in <a class="reference internal" href="usage.html#transactions"><span class="std std-ref">Transaction management</span></a></p>
 <dl class="py class">
 <dt id="psycopg3.Transaction">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#psycopg3.Connection" title="psycopg3.Connection">Connection</a></span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Transaction" title="Permalink to this definition">¶</a></dt>
@@ -359,6 +360,15 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 <dt id="psycopg3.AsyncTransaction">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection">AsyncConnection</a></span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="#psycopg3.AsyncConnection.transaction" title="psycopg3.AsyncConnection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a> to handle a transaction block.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="psycopg3.Rollback">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Rollback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transaction</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span><a class="reference internal" href="#psycopg3.Transaction" title="psycopg3.Transaction">Transaction</a><span class="p">, </span><a class="reference internal" href="#psycopg3.AsyncTransaction" title="psycopg3.AsyncTransaction">AsyncTransaction</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exit the current <a class="reference internal" href="#psycopg3.Transaction" title="psycopg3.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> context immediately and rollback any changes
+made within this context.</p>
+<p>If a transaction context is specified in the constructor, rollback
+enclosing transactions contexts up to and including the one specified.</p>
 </dd></dl>
 
 </div>

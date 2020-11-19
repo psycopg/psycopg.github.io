@@ -240,11 +240,11 @@ accounts unbalanced:</p>
 </pre></div>
 </div>
 <p>Transaction blocks can also be nested (internal transaction blocks are
-implemented using <code class="sql docutils literal notranslate"><span class="pre">SAVEPOINT</span></code>): an exception raised inside an inner block
-has a chance of being handled and not fail completely outer operations. The
-following is an example where a series of operation interact with the
-database. Operations are allowed to fail, and we want to store the number of
-operations successfully processed too.</p>
+implemented using <a class="reference external" href="https://www.postgresql.org/docs/current/sql-savepoint.html">SAVEPOINT</a>): an exception raised inside an inner block
+has a chance of being handled and not completely fail outer operations. The
+following is an example where a series of operations interact with the
+database: operations are allowed to fail, plus we also want to store the
+number of operations successfully processed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx1</span><span class="p">:</span>
     <span class="n">num_ok</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
@@ -262,8 +262,27 @@ operations successfully processed too.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">unreliable_operation()</span></code> causes an error, including an operation causing a
 database error, all its changes will be reverted. The exception bubbles up
 outside the block: in the example it is intercepted by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">try</span></code> so that the
-loop can complete. The outermost loop is unaffected (unless other errors
+loop can complete. The outermost block is unaffected (unless other errors
 happen there).</p>
+<p>You can also write code to explicitly roll back any currently active
+transaction block, by raising the <a class="reference internal" href="connection.html#psycopg3.Rollback" title="psycopg3.Rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rollback</span></code></a> exception. The exception “jumps”
+to the end of a transaction block, rolling back its transaction but allowing
+the program execution to continue from there. By default the exception rolls
+back the innermost transaction block, but any current block can be specified
+as the target. In the following example, an hypothetical <code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelCommand</span></code>
+may stop the processing and cancel any operation previously performed,
+but not entirely committed yet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">outer_tx</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">inner_tx</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">CancelCommand</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">Rollback</span><span class="p">(</span><span class="n">outer_tx</span><span class="p">)</span>
+        <span class="n">process_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+<span class="c1"># If `Rollback` is raised, it would propagate only up to this block,</span>
+<span class="c1"># and the program would continue from here with no exception.</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="using-copy-to-and-copy-from">
