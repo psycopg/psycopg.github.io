@@ -236,7 +236,7 @@ transaction, such as <code class="sql docutils literal notranslate"><span class=
 <a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>By default even a simple <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> will start a transaction: in
+<p>by default even a simple <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> will start a transaction: in
 long-running programs, if no further action is taken, the session will
 remain <em>idle in transaction</em>, an undesirable condition for several
 reasons (locks are held by the session, tables bloat…). For long lived
@@ -246,7 +246,7 @@ use an <a class="reference internal" href="connection.html#psycopg3.Connection.a
 <div class="section" id="transaction-blocks">
 <span id="transaction-block"></span><h2>Transaction blocks<a class="headerlink" href="#transaction-blocks" title="Permalink to this headline">¶</a></h2>
 <p>A more transparent way to make sure that transactions are finalised at the
-right time is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="connection.html#psycopg3.Connection.transaction" title="psycopg3.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
+right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="connection.html#psycopg3.Connection.transaction" title="psycopg3.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
 transaction block. When the block is entered a transaction is started; when
 leaving the block the transaction is committed, or it is rolled back if an
 exception is raised inside the block.</p>
@@ -294,7 +294,7 @@ number of operations successfully processed.</p>
 </div>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">unreliable_operation()</span></code> causes an error, including an operation causing a
 database error, all its changes will be reverted. The exception bubbles up
-outside the block: in the example it is intercepted by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">try</span></code> so that the
+outside the block: in the example it is intercepted by the <code class="docutils literal notranslate"><span class="pre">try</span></code> so that the
 loop can complete. The outermost block is unaffected (unless other errors
 happen there).</p>
 <p>You can also write code to explicitly roll back any currently active
@@ -341,7 +341,7 @@ database from any Python iterable (a list of tuple, or any iterable of
 sequences): the Python values are adapted as they would be in normal querying.
 To perform such operation use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">[table]</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> with
 <a class="reference internal" href="cursor.html#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and use <a class="reference internal" href="cursor.html#psycopg3.Copy.write_row" title="psycopg3.Copy.write_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code></a> on the resulting object in a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block. On exiting the block the operation will be concluded:</p>
+<code class="docutils literal notranslate"><span class="pre">with</span></code> block. On exiting the block the operation will be concluded:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY table_name (col1, col2) FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
         <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>

@@ -103,7 +103,7 @@ Take a look to <a class="reference internal" href="usage.html#transactions"><spa
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> class<a class="headerlink" href="#the-connection-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.Connection">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Connection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgconn</span><span class="p">:</span> <span class="n">PGconn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Connection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Connection</code><a class="headerlink" href="#psycopg3.Connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for a connection to the database.</p>
 <p>This class implements a <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#connection-objects">DBAPI-compliant interface</a>. It is what you want
 to use if you write a “classic”, blocking program (eventually using
@@ -196,7 +196,7 @@ or <a class="reference internal" href="#psycopg3.Connection.rollback" title="psy
 <code class="sig-name descname">autocommit</code><em class="property"> bool</em><a class="headerlink" href="#psycopg3.Connection.autocommit" title="Permalink to this definition">¶</a></dt>
 <dd><p>The autocommit state of the connection.</p>
 <p>The property is writable for sync connections, read-only for async
-ones: you should call <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg3.AsyncConnection.set_autocommit" title="psycopg3.AsyncConnection.set_autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_autocommit</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
+ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg3.AsyncConnection.set_autocommit" title="psycopg3.AsyncConnection.set_autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_autocommit</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
 </dd></dl>
 
 <p class="rubric">Checking and configuring the connection state</p>
@@ -205,7 +205,7 @@ ones: you should call <code class="xref py py-obj docutils literal notranslate">
 <code class="sig-name descname">client_encoding</code><em class="property"> str</em><a class="headerlink" href="#psycopg3.Connection.client_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Python codec name of the connection’s client encoding.</p>
 <p>The property is writable for sync connections, read-only for async
-ones: you should call <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg3.AsyncConnection.set_client_encoding" title="psycopg3.AsyncConnection.set_client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_client_encoding</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
+ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg3.AsyncConnection.set_client_encoding" title="psycopg3.AsyncConnection.set_client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_client_encoding</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -263,13 +263,13 @@ listened channels.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> class<a class="headerlink" href="#the-asyncconnection-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.AsyncConnection">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncConnection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgconn</span><span class="p">:</span> <span class="n">PGconn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncConnection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncConnection</code><a class="headerlink" href="#psycopg3.AsyncConnection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Asynchronous wrapper for a connection to the database.</p>
 <p>This class implements a DBAPI-inspired interface, with all the blocking
 methods implemented as coroutines. Unless specified otherwise,
 non-blocking methods are shared with the <a class="reference internal" href="#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class.</p>
 <p>The following methods have the same behaviour of the matching <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>
-methods, but have an <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> interface.</p>
+methods, but should be called using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword.</p>
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.connect">
 <em class="property">async classmethod </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conninfo</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; psycopg3.connection.AsyncConnection<a class="headerlink" href="#psycopg3.AsyncConnection.connect" title="Permalink to this definition">¶</a></dt>
@@ -280,7 +280,7 @@ methods, but have an <code class="xref py py-obj docutils literal notranslate"><
 <em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncConnection.close" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the connection
+<p>you can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the connection
 automatically when the block is exited, but be careful about
 the async quirkness: see <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connections and cursors</span></a> for details.</p>
 </div>
@@ -292,7 +292,7 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 <dd><p>Return a new <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> to send commands and queries to the connection.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>you can use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
+<p>you can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
 automatically when the block is exited, but be careful about
 the async quirkness: see <a class="reference internal" href="usage.html#with-statement"><span class="std std-ref">with connections and cursors</span></a> for details.</p>
 </div>
@@ -339,8 +339,9 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 <h2>Connection support objects<a class="headerlink" href="#connection-support-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.Notify">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Notify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">channel</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">payload</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">pid</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Notify" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Notify</code><a class="headerlink" href="#psycopg3.Notify" title="Permalink to this definition">¶</a></dt>
 <dd><p>An asynchronous notification received from the database.</p>
+<p>The objet is usually returned by <a class="reference internal" href="#psycopg3.Connection.notifies" title="psycopg3.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies()</span></code></a>.</p>
 <dl class="py attribute">
 <dt id="psycopg3.Notify.channel">
 <code class="sig-name descname">channel</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg3.Notify.channel" title="Permalink to this definition">¶</a></dt>
@@ -364,7 +365,7 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 <p class="rubric">Objects involved in <a class="reference internal" href="usage.html#transactions"><span class="std std-ref">Transaction management</span></a></p>
 <dl class="py class">
 <dt id="psycopg3.Transaction">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#psycopg3.Connection" title="psycopg3.Connection">Connection</a></span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Transaction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Transaction</code><a class="headerlink" href="#psycopg3.Transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="#psycopg3.Connection.transaction" title="psycopg3.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to handle a transaction block.</p>
 <dl class="py method">
 <dt id="psycopg3.Transaction.savepoint_name">
@@ -382,7 +383,7 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 
 <dl class="py class">
 <dt id="psycopg3.AsyncTransaction">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection">AsyncConnection</a></span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncTransaction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncTransaction</code><a class="headerlink" href="#psycopg3.AsyncTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="#psycopg3.AsyncConnection.transaction" title="psycopg3.AsyncConnection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a> to handle a transaction block.</p>
 </dd></dl>
 
