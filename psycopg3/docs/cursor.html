@@ -30,7 +30,7 @@ div.sponsor p {
     </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Differences from psycopg2" href="from_pg2.html" />
+    <link rel="next" title="psycopg3.sql – SQL string composition" href="sql.html" />
     <link rel="prev" title="Connection classes" href="connection.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
@@ -46,7 +46,7 @@ div.sponsor p {
           <a href="connection.html" title="Previous document">Connection classes</a>
         </li>
         <li>
-          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          <a href="sql.html" title="Next document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a>
           &rarr;
         </li>
     </ul>
@@ -162,7 +162,7 @@ queries.</p>
 
 <dl class="py method">
 <dt id="psycopg3.Cursor.callproc">
-<code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>psycopg3.sql.Identifier<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.callproc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference internal" href="sql.html#psycopg3.sql.Identifier" title="psycopg3.sql.Identifier">psycopg3.sql.Identifier</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.callproc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call a stored procedure to the database.</p>
 <p>This method exists for DBAPI compatibility but it’s not much different
 than calling <a class="reference internal" href="#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> on a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">myproc(%s,</span> <span class="pre">%s,</span> <span class="pre">...)</span></code>, which
@@ -270,7 +270,7 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.callproc">
-<em class="property">async </em><code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>psycopg3.sql.Identifier<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.callproc" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference internal" href="sql.html#psycopg3.sql.Identifier" title="psycopg3.sql.Identifier">psycopg3.sql.Identifier</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.callproc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -426,8 +426,8 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
   <p class="topless"><a href="connection.html"
                         title="previous chapter">Connection classes</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="from_pg2.html"
-                        title="next chapter">Differences from psycopg2</a></p>
+  <p class="topless"><a href="sql.html"
+                        title="next chapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -454,7 +454,7 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
           <a href="connection.html" title="Previous document">Connection classes</a>
         </li>
         <li>
-          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          <a href="sql.html" title="Next document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a>
           &rarr;
         </li>
     </ul>
