@@ -113,9 +113,15 @@ method but expose an <a class="reference external" href="https://docs.python.org
 <p>Cursors behave as context managers: on block exit they are closed and
 further operation will not be possible. Closing a cursor will not
 terminate a transaction or a session though.</p>
+<dl class="py attribute">
+<dt id="psycopg3.Cursor.connection">
+<code class="sig-name descname">connection</code><em class="property">: <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection">Connection</a></em><a class="headerlink" href="#psycopg3.Cursor.connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection this cursor is using.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="psycopg3.Cursor.close">
-<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Cursor.close" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the current cursor and free associated resources.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -133,18 +139,34 @@ to close the cursor automatically when the block is exited.</p>
 <p class="rubric">Methods to send commands</p>
 <dl class="py method">
 <dt id="psycopg3.Cursor.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query or command to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
+<li><p><strong>vars</strong> (<em>Mapping</em><em>, </em><em>Sequence</em>) – The parameters to pass to the query, if any</p></li>
+</ul>
+</dd>
+</dl>
 <p>Return the cursor itself, so that it will be possible to chain a fetch
-operation after the call</p>
+operation after the call.</p>
 <p>See <a class="reference internal" href="usage.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.Cursor.executemany">
-<code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the same command with a sequence of input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
+<li><p><strong>vars_seq</strong> (<em>Sequence of Mapping</em><em> or </em><em>Sequence</em>) – The parameters to pass to the query</p></li>
+</ul>
+</dd>
+</dl>
 <p>This is more efficient than performing separate queries, but in case of
 several <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> (and with some SQL creativity for massive
 <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code> too) you may consider using <a class="reference internal" href="#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a>.</p>
@@ -154,20 +176,21 @@ queries.</p>
 
 <dl class="py method">
 <dt id="psycopg3.Cursor.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterator<span class="p">[</span>psycopg3.copy.Copy<span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initiate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation and return a <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object to manage it.</p>
-<p>It must be called as <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy">Copy</a><a class="headerlink" href="#psycopg3.Cursor.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initiate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation and return an object to manage it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p></li>
+<li><p><strong>args</strong> (<em>Mapping</em><em>, </em><em>Sequence</em>) – The parameters to pass to the query, if any</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>it must be called as <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
+</div>
 <p>See <a class="reference internal" href="usage.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for information about <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="psycopg3.Cursor.callproc">
-<code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference internal" href="sql.html#psycopg3.sql.Identifier" title="psycopg3.sql.Identifier">psycopg3.sql.Identifier</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.callproc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call a stored procedure to the database.</p>
-<p>This method exists for DBAPI compatibility but it’s not much different
-than calling <a class="reference internal" href="#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> on a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">myproc(%s,</span> <span class="pre">%s,</span> <span class="pre">...)</span></code>, which
-will give you more flexibility in passing arguments and retrieving
-results. Don’t bother…</p>
 </dd></dl>
 
 <p class="rubric">Methods to retrieve results</p>
@@ -183,7 +206,8 @@ an exception if used with operations that don’t return result, such as an
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchone">
 <code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the next record from the current recordset, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> if not available.</p>
+<dd><p>Return the next record from the current recordset.</p>
+<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> the recordset is finished.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -214,16 +238,16 @@ methods <code class="xref py py-obj docutils literal notranslate"><span class="p
 </dd></dl>
 
 <p class="rubric">Information about the data</p>
-<dl class="py method">
+<dl class="py attribute">
 <dt id="psycopg3.Cursor.description">
-<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#psycopg3.Cursor.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of <a class="reference internal" href="#psycopg3.Column" title="psycopg3.Column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Column</span></code></a> object describing the current resultset.</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the current resultset didn’t return tuples.</p>
+<code class="sig-name descname">description</code><em class="property">: Optional<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="#psycopg3.Column" title="psycopg3.Column">Column</a><span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#psycopg3.Cursor.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of objects describing each column of the current queryset.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the last operation didn’t return a queryset.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py attribute">
 <dt id="psycopg3.Cursor.rowcount">
-<em class="property">property </em><code class="sig-name descname">rowcount</code><a class="headerlink" href="#psycopg3.Cursor.rowcount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rowcount</code><em class="property"> int</em><a class="headerlink" href="#psycopg3.Cursor.rowcount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of records affected by the precedent operation.</p>
 </dd></dl>
 
@@ -240,9 +264,14 @@ methods implemented as coroutines. Unless specified otherwise,
 non-blocking methods are shared with the <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> class.</p>
 <p>The following methods have the same behaviour of the matching <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>
 methods, but should be called using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword.</p>
+<dl class="py attribute">
+<dt id="psycopg3.AsyncCursor.connection">
+<code class="sig-name descname">connection</code><em class="property">: <a class="reference internal" href="connection.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection">AsyncConnection</a></em><a class="headerlink" href="#psycopg3.AsyncCursor.connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.close">
-<em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncCursor.close" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor.close" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>you can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
@@ -253,25 +282,22 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.execute">
-<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.execute" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.executemany">
-<em class="property">async </em><code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span>Composable<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; AsyncIterator<span class="p">[</span>psycopg3.copy.AsyncCopy<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initiate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation and return an <a class="reference internal" href="#psycopg3.AsyncCopy" title="psycopg3.AsyncCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code></a> object.</p>
-<p>It must be called as <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCopy" title="psycopg3.AsyncCopy">AsyncCopy</a><a class="headerlink" href="#psycopg3.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>it must be called as <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
+</div>
 </dd></dl>
-
-<dl class="py method">
-<dt id="psycopg3.AsyncCursor.callproc">
-<em class="property">async </em><code class="sig-name descname">callproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference internal" href="sql.html#psycopg3.sql.Identifier" title="psycopg3.sql.Identifier">psycopg3.sql.Identifier</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>Union<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Mapping<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.callproc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchone">
@@ -360,7 +386,7 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
 
 <dl class="py method">
 <dt id="psycopg3.Copy.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Copy.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a block of data after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
 <p>If the COPY is in binary format <em>buffer</em> must be <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>. In text mode
 it can be either <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>.</p>
@@ -368,7 +394,7 @@ it can be either <code class="xref py py-obj docutils literal notranslate"><span
 
 <dl class="py method">
 <dt id="psycopg3.Copy.write_row">
-<code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a record after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
 <p>The data in the tuple will be converted as configured on the cursor;
 see <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Adaptation of data between Python and PostgreSQL</span></a> for details.</p>
@@ -392,12 +418,12 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCopy.write">
-<em class="property">async </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncCopy.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCopy.write_row">
-<em class="property">async </em><code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="headerlink" href="#psycopg3.AsyncCopy.write_row" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy.write_row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
