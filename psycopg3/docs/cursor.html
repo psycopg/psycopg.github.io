@@ -176,14 +176,11 @@ queries.</p>
 
 <dl class="py method">
 <dt id="psycopg3.Cursor.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy">Copy</a><a class="headerlink" href="#psycopg3.Cursor.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy">Copy</a><a class="headerlink" href="#psycopg3.Cursor.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initiate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation and return an object to manage it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p></li>
-<li><p><strong>args</strong> (<em>Mapping</em><em>, </em><em>Sequence</em>) – The parameters to pass to the query, if any</p></li>
-</ul>
+<dd class="field-odd"><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -251,6 +248,22 @@ methods <code class="xref py py-obj docutils literal notranslate"><span class="p
 <dd><p>Number of records affected by the precedent operation.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="psycopg3.Cursor.query">
+<code class="sig-name descname">query</code><em class="property"> Optional[bytes]</em><a class="headerlink" href="#psycopg3.Cursor.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>The last query sent to the server, if available.</p>
+<p>The query will be in PostgreSQL format (with <code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code>…
+parameters), the parameters will <em>not</em> be merged to the query: see
+<a class="reference internal" href="#psycopg3.Cursor.params" title="psycopg3.Cursor.params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.Cursor.params">
+<code class="sig-name descname">params</code><em class="property"> Optional[List[Optional[bytes]]]</em><a class="headerlink" href="#psycopg3.Cursor.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>The last set of parameters sent to the server, if available.</p>
+<p>The parameters are adapted to PostgreSQL format.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -292,7 +305,7 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCopy" title="psycopg3.AsyncCopy">AsyncCopy</a><a class="headerlink" href="#psycopg3.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span><span class="p">:</span> <span class="n">Query</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCopy" title="psycopg3.AsyncCopy">AsyncCopy</a><a class="headerlink" href="#psycopg3.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>it must be called as <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
