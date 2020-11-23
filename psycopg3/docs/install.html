@@ -92,9 +92,68 @@ div.sponsor p {
             
   <div class="section" id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> is still in a development phase, and hasn’t been released yet.</p>
-<p>Please refer to <a class="reference external" href="https://github.com/psycopg/psycopg3#readme">the README</a> for the current installation state, and please know
-that things may change.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> is still in a development phase: packages haven’t been
+released yet on PyPI.</p>
+<p>Please refer to <a class="reference external" href="https://github.com/psycopg/psycopg3#readme">the README</a> for the current installation state, and
+please know that things may change.</p>
+<p>The following is how it will be <em>supposed</em> to work, once it is released…</p>
+</div>
+<div class="section" id="quick-install">
+<h2>Quick install<a class="headerlink" href="#quick-install" title="Permalink to this headline">¶</a></h2>
+<p>The quickest way to start developing with psycopg3 is to run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg3</span><span class="p">[</span><span class="n">binary</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This will install a self-contained package with all the libraries needed.</p>
+<p>The above package should work in most situations. It <strong>will not work</strong> in
+some though:</p>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">binary</span></code> package doesn’t work on Alpine Linux;</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">binary</span></code> package is not advised in production.</p></li>
+</ul>
+</div>
+<div class="section" id="proper-installation">
+<h2>Proper installation<a class="headerlink" href="#proper-installation" title="Permalink to this headline">¶</a></h2>
+<p>Proper install means obtaining a performing and maintainable library. The
+library will include a performing C module and will be bound to the system
+libpq, so that system upgrade of libraries will upgrade the library used by
+<code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>.</p>
+<p>In order to perform a “proper” installation you need some prerequisites:</p>
+<ul class="simple">
+<li><p>a C compiler,</p></li>
+<li><p>Python development headers (e.g. the python3-dev package).</p></li>
+<li><p>PostgreSQL client development headers (e.g. the libpq-dev package).</p></li>
+<li><p>The <strong class="program">pg_config</strong> program available in the <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>.</p></li>
+</ul>
+<p>You <strong>must be able</strong> to troubleshoot an extension build, for instance you must
+be able to read your compiler’s error message. If you are not, please don’t
+try this and follow the <a class="reference internal" href="#quick-install">quick install</a> instead.</p>
+<p>If your build prerequisites are in place you can run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg3</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pure-python-installation">
+<h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this headline">¶</a></h2>
+<p>If you simply install:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg3</span>
+</pre></div>
+</div>
+<p>without <code class="docutils literal notranslate"><span class="pre">[c]</span></code> or <code class="docutils literal notranslate"><span class="pre">[binary]</span></code> extras you will obtain a pure Python
+implementation. This is particularly handy to debug and hack, but it still
+requires the system libpq to operate (which will be used dynamically via
+<a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>).</p>
+<p>In order to use the pure Python installation you will need the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>
+installed in the system: for instance on Debian system you will probably
+need:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libpq5</span>
+</pre></div>
+</div>
+<p>If you are not able to fulfill this requirement please follow the <a class="reference internal" href="#quick-install">quick
+install</a>.</p>
+</div>
 </div>
 
 
@@ -104,6 +163,16 @@ that things may change.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#quick-install">Quick install</a></li>
+<li><a class="reference internal" href="#proper-installation">Proper installation</a></li>
+<li><a class="reference internal" href="#pure-python-installation">Pure Python installation</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Psycopg 3 – PostgreSQL database adapter for Python</a></p>

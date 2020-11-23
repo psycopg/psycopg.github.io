@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>psycopg3.pq – Libpq wrapper module &#8212; psycopg3 UNRELEASED documentation</title>
+    <style type="text/css" media="screen">
+div.sponsor {
+  background-color: #ffc;
+  border: 2px solid #888;
+  border-radius: 8px;
+  padding: 1em;
+  padding-bottom: 0.25em;
+  margin-top: 1em;
+}
+div.sponsor p {
+  margin: 0.5rem 0;
+}
+    </style>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/better.css" type="text/css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Differences from psycopg2" href="from_pg2.html" />
+    <link rel="prev" title="psycopg3.errors – package exceptions" href="errors.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
+  </head><body>
+    <header id="pageheader"><h1><a href="index.html ">
+        psycopg3 UNRELEASED documentation
+    </a></h1></header>
+  <div class="related top">
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="errors.html" title="Previous document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code> – package exceptions</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+  <nav id="breadcrumbs">
+    <ul>
+      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
+    </ul>
+  </nav>
+  </div>  
+
+    <div class="document">
+    <div class="sponsor">
+      <p>
+      The <a href="https://psycopg.org/psycopg3" target="_blank"
+        >psycopg3 project</a>
+      is currently
+      <a href="https://github.com/psycopg/psycopg3" target="_blank"
+        >under active development</a>.
+      </p>
+
+      <p>
+      Sponsoring this project will help achieve swift completion and
+      ensure the maintenance of psycopg2, psycopg3 and other related
+      projects.
+      </p>
+
+      <p>
+      If you use Python and PostgreSQL, and you would like to support the
+      creation of the most advanced adapter between the two systems,
+      <a href="https://github.com/sponsors/dvarrazzo/" target="_blank"
+        >please consider becoming a sponsor</a>. Thank you!
+      </p>
+
+      <iframe src="https://github.com/sponsors/dvarrazzo/button"
+              title="Sponsor the project" style="border: 0"
+              width="116" height="35">
+      </iframe>
+    </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="psycopg3-pq-libpq-wrapper-module">
+<h1><a class="reference internal" href="#module-psycopg3.pq" title="psycopg3.pq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code></a> – Libpq wrapper module<a class="headerlink" href="#psycopg3-pq-libpq-wrapper-module" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-psycopg3.pq"><span id="index-0"></span></span><p><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> is built around the <a class="reference external" href="https://www.postgresql.org/docs/current/libpq.html">libpq</a>, the PostgreSQL client library, which
+performs most of the network communications and returns query results in C
+structures.</p>
+<p>The low-level functions of the library are exposed by the objects in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> module.</p>
+<div class="section" id="pq-module-implementations">
+<span id="pq-impl"></span><h2><code class="docutils literal notranslate"><span class="pre">pq</span></code> module implementations<a class="headerlink" href="#pq-module-implementations" title="Permalink to this headline">¶</a></h2>
+<p>There are actually several implementations of the module, all offering the
+same interface. Current implementations are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span></code>: a pure-python implementation, implemented using the <a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>
+module. It is less performing than the others, but it doesn’t need a C
+compiler to install. It requires the libpq installed in the system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: a C implementation of the libpq wrapper (more precisely, implemented
+in <a class="reference external" href="https://cython.org/">Cython</a>). It is much better performing than the <code class="docutils literal notranslate"><span class="pre">python</span></code>
+implementation, however it requires development packages installed on the
+client machine. It can be installed using the <code class="docutils literal notranslate"><span class="pre">c</span></code> extra, i.e. running
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">psycopg3[c]</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">binary</span></code>: a pre-compiled C implementation, bundled with all the required
+libraries. It is the easiest option to deal with, fast to install and it
+should require no development tool or client library, however it may be not
+available for every platform. You can install it using the <code class="docutils literal notranslate"><span class="pre">binary</span></code> extra,
+i.e. running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">psycopg3[binary]</span></code>.</p></li>
+</ul>
+<p>The implementation currently used is available in the <a class="reference internal" href="#psycopg3.pq.__impl__" title="psycopg3.pq.__impl__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__impl__</span></code></a>
+module constant.</p>
+<p>At import, <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> will try to use the best implementation available and
+will fail if none is usable. You can force the use of a specific
+implementation by exporting the env var <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG3_IMPL</span></code>: importing the
+library will fail if the requested implementation is not available.</p>
+</div>
+<div class="section" id="module-content">
+<h2>Module content<a class="headerlink" href="#module-content" title="Permalink to this headline">¶</a></h2>
+<dl class="py data">
+<dt id="psycopg3.pq.__impl__">
+<code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">__impl__</code><em class="property"> str:</em><a class="headerlink" href="#psycopg3.pq.__impl__" title="Permalink to this definition">¶</a></dt>
+<dd><p>The currently loaded implementation of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> package.</p>
+<p>Possible values include <code class="docutils literal notranslate"><span class="pre">python</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">binary</span></code>.</p>
+<p>The choice of implementation is automatic but can be forced setting the
+<span class="target" id="index-2"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG3_IMPL</span></code> env var.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="psycopg3.pq.version">
+<code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><a class="headerlink" href="#psycopg3.pq.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the version number of the libpq currently loaded.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>the <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-misc.html#LIBPQ-PQLIBVERSION"><span class="pre">PQlibVersion</span></a><span class="pre">()</span></code> function</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="psycopg3.pq.error_message">
+<code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">error_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>psycopg3.pq.proto.PGconn<span class="p">, </span>psycopg3.pq.proto.PGresult<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">encoding</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'utf8'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.pq.error_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an error message from a PGconn or PGresult.</p>
+<p>The return value is a str (unlike pq data which is usually bytes): use
+the connection encoding if available, otherwise the <em>encoding</em> parameter
+as a fallback for decoding. Don’t raise exception on decode errors.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="objects">
+<h2>Objects<a class="headerlink" href="#objects" title="Permalink to this headline">¶</a></h2>
+<p>TODO: finish documentation</p>
+<dl class="py class">
+<dt id="psycopg3.pq.PGconn">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">PGconn</code><a class="headerlink" href="#psycopg3.pq.PGconn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python representation of a libpq connection.</p>
+<dl class="py method">
+<dt id="psycopg3.pq.PGconn.get_cancel">
+<code class="sig-name descname">get_cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.pq.PGcancel" title="psycopg3.pq.PGcancel">psycopg3.pq.PGcancel</a><a class="headerlink" href="#psycopg3.pq.PGconn.get_cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an object with the information needed to cancel a command.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-cancel.html#LIBPQ-PQGETCANCEL"><span class="pre">PQgetCancel</span></a></code> for details.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.PGresult">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">PGresult</code><a class="headerlink" href="#psycopg3.pq.PGresult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python representation of a libpq result.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.Conninfo">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">Conninfo</code><a class="headerlink" href="#psycopg3.pq.Conninfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility object to manipulate connection strings.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.Escaping">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">Escaping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>psycopg3.pq.pq_ctypes.PGconn<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.Escaping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility object to escape strings for SQL interpolation.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.PGcancel">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">PGcancel</code><a class="headerlink" href="#psycopg3.pq.PGcancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to cancel the current operation on a connection.</p>
+<p>Created by <a class="reference internal" href="#psycopg3.pq.PGconn.get_cancel" title="psycopg3.pq.PGconn.get_cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn.get_cancel()</span></code></a>.</p>
+<dl class="py method">
+<dt id="psycopg3.pq.PGcancel.free">
+<code class="sig-name descname">free</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.PGcancel.free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free the data structure created by PQgetCancel.</p>
+<p>Automatically invoked by <code class="xref py py-obj docutils literal notranslate"><span class="pre">__del__()</span></code>.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-cancel.html#LIBPQ-PQFREECANCEL"><span class="pre">PQfreeCancel</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="psycopg3.pq.PGcancel.cancel">
+<code class="sig-name descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.PGcancel.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requests that the server abandon processing of the current command.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-cancel.html#LIBPQ-PQCANCEL"><span class="pre">PQcancel</span></a><span class="pre">()</span></code> for details.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="enumerations">
+<h2>Enumerations<a class="headerlink" href="#enumerations" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="psycopg3.pq.ConnStatus">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">ConnStatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.ConnStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current status of the connection.</p>
+<p>Other possible status are only seen during the connection phase.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQSTATUS"><span class="pre">PQstatus</span></a><span class="pre">()</span></code> returns this value.</p>
+</div>
+<dl class="py attribute">
+<dt id="psycopg3.pq.ConnStatus.OK">
+<code class="sig-name descname">OK</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.ConnStatus.OK" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection is in a working state.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ConnStatus.BAD">
+<code class="sig-name descname">BAD</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.ConnStatus.BAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection is closed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.PollingStatus">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">PollingStatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.PollingStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>The status of the socket during a connection.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">READING</span></code> or <code class="docutils literal notranslate"><span class="pre">WRITING</span></code> you may select before polling again.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-connect.html#LIBPQ-PQCONNECTSTARTPARAMS"><span class="pre">PQconnectPoll</span></a></code> for a description of these states.</p>
+</div>
+<dl class="py attribute">
+<dt id="psycopg3.pq.PollingStatus.FAILED">
+<code class="sig-name descname">FAILED</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.PollingStatus.FAILED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connection attempt failed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.PollingStatus.READING">
+<code class="sig-name descname">READING</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.PollingStatus.READING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will have to wait before reading new data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.PollingStatus.WRITING">
+<code class="sig-name descname">WRITING</code><em class="property"> = 2</em><a class="headerlink" href="#psycopg3.pq.PollingStatus.WRITING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will have to wait before writing new data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.PollingStatus.OK">
+<code class="sig-name descname">OK</code><em class="property"> = 3</em><a class="headerlink" href="#psycopg3.pq.PollingStatus.OK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connection completed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.TransactionStatus">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">TransactionStatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.TransactionStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transaction status of a connection.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQTRANSACTIONSTATUS"><span class="pre">PQtransactionStatus</span></a></code> for a description of these states.</p>
+</div>
+<dl class="py attribute">
+<dt id="psycopg3.pq.TransactionStatus.IDLE">
+<code class="sig-name descname">IDLE</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.TransactionStatus.IDLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connection ready, no transaction active.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.TransactionStatus.ACTIVE">
+<code class="sig-name descname">ACTIVE</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.TransactionStatus.ACTIVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>A command is in progress.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.TransactionStatus.INTRANS">
+<code class="sig-name descname">INTRANS</code><em class="property"> = 2</em><a class="headerlink" href="#psycopg3.pq.TransactionStatus.INTRANS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connection idle in an open transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.TransactionStatus.INERROR">
+<code class="sig-name descname">INERROR</code><em class="property"> = 3</em><a class="headerlink" href="#psycopg3.pq.TransactionStatus.INERROR" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error happened in the current transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.TransactionStatus.UNKNOWN">
+<code class="sig-name descname">UNKNOWN</code><em class="property"> = 4</em><a class="headerlink" href="#psycopg3.pq.TransactionStatus.UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unknown connection state, broken connection.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.Format">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">Format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.Format" title="Permalink to this definition">¶</a></dt>
+<dd><p>The format of a query argument or return value.</p>
+<dl class="py attribute">
+<dt id="psycopg3.pq.Format.TEXT">
+<code class="sig-name descname">TEXT</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.Format.TEXT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text parameter.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.Format.BINARY">
+<code class="sig-name descname">BINARY</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.Format.BINARY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.ExecStatus">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">ExecStatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.ExecStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>The status of a command.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQRESULTSTATUS"><span class="pre">PQresultStatus</span></a></code> for a description of these states.</p>
+</div>
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.EMPTY_QUERY">
+<code class="sig-name descname">EMPTY_QUERY</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.EMPTY_QUERY" title="Permalink to this definition">¶</a></dt>
+<dd><p>The string sent to the server was empty.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.COMMAND_OK">
+<code class="sig-name descname">COMMAND_OK</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.COMMAND_OK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successful completion of a command returning no data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.TUPLES_OK">
+<code class="sig-name descname">TUPLES_OK</code><em class="property"> = 2</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.TUPLES_OK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successful completion of a command returning data (such as a SELECT or SHOW).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.COPY_OUT">
+<code class="sig-name descname">COPY_OUT</code><em class="property"> = 3</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.COPY_OUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy Out (from server) data transfer started.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.COPY_IN">
+<code class="sig-name descname">COPY_IN</code><em class="property"> = 4</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.COPY_IN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy In (to server) data transfer started.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.BAD_RESPONSE">
+<code class="sig-name descname">BAD_RESPONSE</code><em class="property"> = 5</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.BAD_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The server’s response was not understood.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.NONFATAL_ERROR">
+<code class="sig-name descname">NONFATAL_ERROR</code><em class="property"> = 6</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.NONFATAL_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd><p>A nonfatal error (a notice or warning) occurred.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.FATAL_ERROR">
+<code class="sig-name descname">FATAL_ERROR</code><em class="property"> = 7</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.FATAL_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd><p>A fatal error occurred.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.COPY_BOTH">
+<code class="sig-name descname">COPY_BOTH</code><em class="property"> = 8</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.COPY_BOTH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy In/Out (to and from server) data transfer started.</p>
+<p>This feature is currently used only for streaming replication, so this
+status should not occur in ordinary applications.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.ExecStatus.SINGLE_TUPLE">
+<code class="sig-name descname">SINGLE_TUPLE</code><em class="property"> = 9</em><a class="headerlink" href="#psycopg3.pq.ExecStatus.SINGLE_TUPLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The PGresult contains a single result tuple from the current command.</p>
+<p>This status occurs only when single-row mode has been selected for the
+query.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.DiagnosticField">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">DiagnosticField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.DiagnosticField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fields in an error report.</p>
+<p>Available attributes:</p>
+<dl class="py attribute">
+<dt id="psycopg3.pq.DiagnosticField.SEVERITY">
+<code class="sig-name descname">SEVERITY</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SEVERITY" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SEVERITY_NONLOCALIZED">
+<code class="sig-name descname">SEVERITY_NONLOCALIZED</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SEVERITY_NONLOCALIZED" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SQLSTATE">
+<code class="sig-name descname">SQLSTATE</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SQLSTATE" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.MESSAGE_PRIMARY">
+<code class="sig-name descname">MESSAGE_PRIMARY</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.MESSAGE_PRIMARY" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.MESSAGE_DETAIL">
+<code class="sig-name descname">MESSAGE_DETAIL</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.MESSAGE_DETAIL" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.MESSAGE_HINT">
+<code class="sig-name descname">MESSAGE_HINT</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.MESSAGE_HINT" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.STATEMENT_POSITION">
+<code class="sig-name descname">STATEMENT_POSITION</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.STATEMENT_POSITION" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.INTERNAL_POSITION">
+<code class="sig-name descname">INTERNAL_POSITION</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.INTERNAL_POSITION" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.INTERNAL_QUERY">
+<code class="sig-name descname">INTERNAL_QUERY</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.INTERNAL_QUERY" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.CONTEXT">
+<code class="sig-name descname">CONTEXT</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.CONTEXT" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SCHEMA_NAME">
+<code class="sig-name descname">SCHEMA_NAME</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SCHEMA_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.TABLE_NAME">
+<code class="sig-name descname">TABLE_NAME</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.TABLE_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.COLUMN_NAME">
+<code class="sig-name descname">COLUMN_NAME</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.COLUMN_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.DATATYPE_NAME">
+<code class="sig-name descname">DATATYPE_NAME</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.DATATYPE_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.CONSTRAINT_NAME">
+<code class="sig-name descname">CONSTRAINT_NAME</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.CONSTRAINT_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SOURCE_FILE">
+<code class="sig-name descname">SOURCE_FILE</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SOURCE_FILE" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SOURCE_LINE">
+<code class="sig-name descname">SOURCE_LINE</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SOURCE_LINE" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.pq.DiagnosticField.SOURCE_FUNCTION">
+<code class="sig-name descname">SOURCE_FUNCTION</code><a class="headerlink" href="#psycopg3.pq.DiagnosticField.SOURCE_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQRESULTERRORFIELD"><span class="pre">PQresultErrorField</span></a></code> for a description of these values.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="psycopg3.pq.Ping">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.pq.</code><code class="sig-name descname">Ping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.pq.Ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Response from a ping attempt.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-connect.html#LIBPQ-PQPINGPARAMS"><span class="pre">PQpingParams</span></a></code> for a description of these values.</p>
+</div>
+<dl class="py attribute">
+<dt id="psycopg3.pq.Ping.OK">
+<code class="sig-name descname">OK</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.pq.Ping.OK" title="Permalink to this definition">¶</a></dt>
+<dd><p>The server is running and appears to be accepting connections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.Ping.REJECT">
+<code class="sig-name descname">REJECT</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.pq.Ping.REJECT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The server is running but is in a state that disallows connections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.Ping.NO_RESPONSE">
+<code class="sig-name descname">NO_RESPONSE</code><em class="property"> = 2</em><a class="headerlink" href="#psycopg3.pq.Ping.NO_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The server could not be contacted.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="psycopg3.pq.Ping.NO_ATTEMPT">
+<code class="sig-name descname">NO_ATTEMPT</code><em class="property"> = 3</em><a class="headerlink" href="#psycopg3.pq.Ping.NO_ATTEMPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>No attempt was made to contact the server.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</a><ul>
+<li><a class="reference internal" href="#pq-module-implementations"><code class="docutils literal notranslate"><span class="pre">pq</span></code> module implementations</a></li>
+<li><a class="reference internal" href="#module-content">Module content</a></li>
+<li><a class="reference internal" href="#objects">Objects</a></li>
+<li><a class="reference internal" href="#enumerations">Enumerations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="errors.html"
+                        title="previous chapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code> – package exceptions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="from_pg2.html"
+                        title="next chapter">Differences from psycopg2</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pq.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<form class="search" action="search.html" method="get">
+  <input type="text" name="q"
+   placeholder="type to search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="related bottom">
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="errors.html" title="Previous document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code> – package exceptions</a>
+        </li>
+        <li>
+          <a href="from_pg2.html" title="Next document">Differences from psycopg2</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+  <nav id="breadcrumbs">
+    <ul>
+      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
+    </ul>
+  </nav>
+  </div>
+  <footer id="pagefooter">&copy; 2020, Daniele Varrazzo and The Psycopg Team.
+
+  </footer>
+
+  
+  </body>
+</html>
