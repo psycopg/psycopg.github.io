@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=cf59a065">
+    <title>The psycopg3 adaptation system — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h2>The psycopg3 adaptation system</h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2020-11-24
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/psycopg3/"
+          >psycopg3</a>,
+      <a class="tag" href="/articles/tag/development/"
+          >development</a>,
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>
+      
+    
+  </p>
+  
+    <p>The adaptation system between Python objects and PostgreSQL types is at the
+core of <tt class="docutils literal">psycopg2</tt> and <tt class="docutils literal">psycopg3</tt>. The flexibility of the <tt class="docutils literal">psycopg2</tt>
+adaptation system gives <a class="reference external" href="https://www.psycopg.org/docs/usage.html#adaptation-of-python-values-to-sql-types">a good object mapping out-of-the-box</a> and allow
+users to <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">customise it according to any need</a>. Do you need your <tt class="docutils literal">decimal</tt>
+numbers returned as <tt class="docutils literal">float</tt> because you need speed over pennies? Do you want
+to map PostgreSQL Infinity date to the 25th of December 3099? That's certainly
+doable.</p>
+<blockquote>
+</blockquote>
+<p><tt class="docutils literal">psycopg3</tt> adaptation system needs some modification compared to
+<tt class="docutils literal">psycopg2</tt>, because <tt class="docutils literal">psycopg3</tt> uses the &quot;extended query protocol&quot; to send
+query parameters separately from the query. Together with the differences to
+accommodate, there is also a chance to improve over a system that has been at
+work for several years and has shown its shortcomings together with its
+strengths.</p>
+<!-- CUT-HERE -->
+<div class="section" id="server-side-binding">
+<h2>Server-side binding</h2>
+<p>Server-side parameters binding has been a long-time desired feature. So far
+<tt class="docutils literal">psycopg3</tt> has adapted arguments on the client-side:</p>
+<pre class="code python literal-block">
+<span class="c1"># psycopg2</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO tbl (s, n, d) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="s2">&quot;Hel'lo&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)])</span>
+
+<span class="c1"># has arguments adapted and quoted:</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;42&quot;</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;'Hel''lo'&quot;</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;'2020-12-31'::date&quot;</span>
+
+<span class="c1"># merged to the query:</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span> <span class="o">%</span> <span class="n">args</span>
+
+<span class="c1"># and passed as a single string:</span>
+<span class="n">libpq</span><span class="o">.</span><span class="n">PQexec</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO tbl (s, n, d) VALUES (42, 'Hel''lo', '2020-12-31'::date)&quot;</span><span class="p">)</span>
+</pre>
+<p><tt class="docutils literal">psycopg3</tt> end user interface is unchanged, but behind the scene will only
+perform adaptation, not quoting, and will send the arguments separately:</p>
+<pre class="code python literal-block">
+<span class="c1"># psycopg3</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO tbl (s, n, d) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="s2">&quot;Hel'lo&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)])</span>
+
+<span class="c1"># has arguments adapted:</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;42&quot;</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Hel'lo&quot;</span>
+<span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2020-12-31&quot;</span>
+
+<span class="c1"># and passed as separate information:</span>
+<span class="n">libpq</span><span class="o">.</span><span class="n">PQexecParams</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO tbl (s, n, d) VALUES ($1, $2, $3)&quot;</span><span class="p">,</span>  <span class="c1"># Postgres placeholders</span>
+    <span class="p">[</span><span class="s2">&quot;42&quot;</span><span class="p">,</span> <span class="s2">&quot;Hel'lo&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-12-31&quot;</span><span class="p">],</span>                   <span class="c1"># Postgres formats, no quoting</span>
+    <span class="n">oids</span><span class="o">=</span><span class="p">[</span><span class="n">INT8_OID</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">DATE_OID</span><span class="p">])</span>                     <span class="c1"># Type indications if available</span>
+</pre>
+<p>Server-side binding brings better performance, the possibility to use prepared
+statements and binary data, better integration with server-side logging and
+monitoring. Theoretically it also brings better safety against SQL injections,
+but <tt class="docutils literal">psycopg2</tt> does already a good job at <a class="reference external" href="https://www.psycopg.org/docs/usage.html#the-problem-with-the-query-parameters">providing a safe path for
+parameters binding</a>: creating an unsafe query is already harder, in
+<tt class="docutils literal">psycopg2</tt>, than doing things the right way.</p>
+<p>However server-side binding brings a few incompatibilities, such as:</p>
+<ul>
+<li><p class="first">cannot send more than one query at once if parameters are used:</p>
+<pre class="code python literal-block">
+<span class="c1"># Must use separate queries or psycopg3.sql client-side adaptation</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO tbl1 VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO tbl2 VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+</pre>
+</li>
+<li><p class="first">cannot use certain commands such as <tt class="docutils literal">SET</tt> or <tt class="docutils literal">NOTIFY</tt> with parameters:</p>
+<pre class="code python literal-block">
+<span class="c1"># Must use &quot;SELECT set_config('timezone', %s)&quot;</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET timezone to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">timezone</span><span class="p">])</span>
+
+<span class="c1"># Must use &quot;SELECT pg_notify('channel', %s)&quot;</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;NOTIFY channel, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">message</span><span class="p">])</span>
+</pre>
+</li>
+<li><p class="first">cannot use the <tt class="docutils literal">IN <span class="pre">(...)</span></tt> construct:</p>
+<pre class="code python literal-block">
+<span class="c1"># Must use &quot;AND nation = any (%s)&quot;</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;... AND nation in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="s2">&quot;IT&quot;</span><span class="p">,</span> <span class="s2">&quot;FR&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">)])</span>
+</pre>
+</li>
+</ul>
+<p>All in all, most queries will just work, however the few incompatibilities
+require a non-backward-compatible change in version.</p>
+</div>
+<div class="section" id="a-new-adaptation-system">
+<h2>A new adaptation system</h2>
+<p>Embracing the new type of communication requires to change the way Python
+parameters and PostgreSQL data types are adapted. The new system:</p>
+<ul>
+<li><p class="first">cannot use the whole SQL syntax, but must limit to literals. For instance
+the Python list <tt class="docutils literal">[&quot;foo, bar&quot;, &quot;Hel'lo&quot;]</tt> cannot be expressed with
+<tt class="docutils literal"><span class="pre">ARRAY['foo,</span> bar', <span class="pre">'Hel''lo']</span></tt> but must use array literal rules and become
+<tt class="docutils literal">{&quot;foo, <span class="pre">bar&quot;,O'Reilly}</span></tt>.</p>
+</li>
+<li><p class="first">Makes possible to specify type OIDs, in case that useful (<a class="reference external" href="https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/">not always an
+easy choice</a>).</p>
+</li>
+<li><p class="first">Allows using binary types, especially useful for large binary blob, which
+otherwise get bloated by <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">binary escaping</a> and have to traverse the many
+layers of lexing/parsing in the server, each one with its memory copy. This
+can be done by simply using the <tt class="docutils literal">%b</tt> placeholder over <tt class="docutils literal">%s</tt>:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">&quot;INSERT INTO images (name, data) VALUES (</span><span class="si">%s</span><span class="s2">, %b)&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">image_name</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()])</span>
+</pre>
+</li>
+</ul>
+<p>It's also a good chance to review the work that must be done by the client to
+adapt values. <tt class="docutils literal">psycopg2</tt> creates several instances of &quot;adapter&quot; wrappers,
+one for each value adapted. In <tt class="docutils literal">psycopg3</tt> the adaptation objects have a
+different life cycle: choices based on the environment, such as the connection
+encoding, can be made once for each Python type, rather than once per value,
+ending up doing radically less work for each converted object. You can head to
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html">the psycopg3 adaptation documentation</a> for all the details.</p>
+</div>
+<div class="section" id="customising-psycopg3-adaptation">
+<h2>Customising psycopg3 adaptation</h2>
+<p>Customising types adaptation can now be done using <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Dumper">Dumper</a> classes, either
+creating new ones or mapping existing ones on different Python classes to save
+to the database. For instance, the builtin <tt class="docutils literal">DateDumper</tt> converts Python
+dates to PostgreSQL ones. PostgreSQL can handle an &quot;infinity&quot; date, which
+Python cannot: if we wanted to store Python's <tt class="docutils literal">date.max</tt> to PostgreSQL
+infinity we could create a subclass for the dumper, and register it in the
+scope we want to use it, globally or just on a connection or cursor:</p>
+<pre class="code python literal-block">
+<span class="k">class</span> <span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># ('2020-12-31', '9999-12-31')</span>
+
+<span class="n">InfDateDumper</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># ('2020-12-31', 'infinity')</span>
+</pre>
+<p>The system is pretty symmetric and employs similar <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Loader">Loader</a> objects to map OIDs
+to the code responsible for its decoding. For instance, if we wanted to
+reverse the above customisation and map PostgreSQL infinity date to
+<tt class="docutils literal">date.max</tt> (instead of raising an exception) it could be done using a
+subclass of the builtin loader (or using an entirely new object if required):</p>
+<pre class="code python literal-block">
+<span class="k">class</span> <span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '2020-12-31'::date, 'infinity'::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># Raises DataError: Python date doesn't support years after 9999: got infinity</span>
+
+<span class="kn">from</span> <span class="nn">psycopg3.oids</span> <span class="kn">import</span> <span class="n">builtins</span>
+<span class="n">InfDateLoader</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">builtins</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '2020-12-31'::date, 'infinity'::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">9999</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">))</span>
+</pre>
+<p>The customisation automatically applies to recursive types, such as arrays or
+composite types: if the date loader is customised then the date array works as
+expected:</p>
+<pre class="code python literal-block">
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '{2020-12-31,infinity}'::date[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="p">([</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">9999</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)],)</span>
+</pre>
+<p>All in all the new adaptation system provides better performance and easier
+customisation <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">compared to psycopg2</a>. The new adapters are easier to
+compose, for instance to use them in <a class="reference external" href="/articles/2020/11/15/psycopg3-copy/">COPY operations</a>. And if client-side adaptation is still needed (to
+generate dynamically data definition statements, to prepare offline update
+scripts...) the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/sql.html">psycopg3.sql</a> still allows the flexibility of client-side
+query composition.</p>
+</div>
+<div class="section" id="project-sponsorship">
+<h2>Project sponsorship</h2>
+<div class="sponsor docutils container">
+<p>The new COPY support is one of several new features that are being
+designed and implemented in <a class="reference external" href="/psycopg3/">psycopg3</a>. The project is currently <a class="reference external" href="https://github.com/psycopg/psycopg3">under
+active development</a>: if there is enough support it will be possible to
+work at the project full-time and bring it to release swiftly.</p>
+<p>If you use Python and PostgreSQL, and you would like to support the
+creation of the most advanced adapter between the two systems, <a class="reference external" href="https://github.com/sponsors/dvarrazzo/">please
+consider becoming a sponsor</a>. Thank you!</p>
+<iframe src="https://github.com/sponsors/dvarrazzo/button"
+    title="Sponsor the project" style="border: 0"
+    width="116" height="35">
+</iframe></div>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>psycopg2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+    <li>
+      <a href="https://pypi.org/project/psycopg2/">
+        <i class="fa-li fa-lg fa fa-cloud-download" aria-hidden="true"></i>
+        Download</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>psycopg3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2020 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
