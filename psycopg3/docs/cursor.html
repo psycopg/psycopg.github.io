@@ -30,7 +30,7 @@ div.sponsor p {
     </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="psycopg3.adapt – Data adaptation configuration" href="adaptation.html" />
+    <link rel="next" title="Data adaptation configuration" href="adaptation.html" />
     <link rel="prev" title="Connection classes" href="connection.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
@@ -46,7 +46,7 @@ div.sponsor p {
           <a href="connection.html" title="Previous document">Connection classes</a>
         </li>
         <li>
-          <a href="adaptation.html" title="Next document"><code class="docutils literal notranslate"><span class="pre">psycopg3.adapt</span></code> – Data adaptation configuration</a>
+          <a href="adaptation.html" title="Next document">Data adaptation configuration</a>
           &rarr;
         </li>
     </ul>
@@ -139,13 +139,13 @@ to close the cursor automatically when the block is exited.</p>
 <p class="rubric">Methods to send commands</p>
 <dl class="py method">
 <dt id="psycopg3.Cursor.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query or command to the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
-<li><p><strong>vars</strong> (<em>Mapping</em><em>, </em><em>Sequence</em>) – The parameters to pass to the query, if any</p></li>
+<li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any</p></li>
 </ul>
 </dd>
 </dl>
@@ -157,13 +157,13 @@ queries.</p>
 
 <dl class="py method">
 <dt id="psycopg3.Cursor.executemany">
-<code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the same command with a sequence of input data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
-<li><p><strong>vars_seq</strong> (<em>Sequence of Mapping</em><em> or </em><em>Sequence</em>) – The parameters to pass to the query</p></li>
+<li><p><strong>params_seq</strong> (<em>Sequence of Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
 </ul>
 </dd>
 </dl>
@@ -295,12 +295,12 @@ the async quirkness: see <a class="reference internal" href="usage.html#with-sta
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.execute">
-<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.execute" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.executemany">
-<em class="property">async </em><code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">vars_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">executemany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params_seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Args<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -410,7 +410,7 @@ it can be either <code class="xref py py-obj docutils literal notranslate"><span
 <code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a record after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
 <p>The data in the tuple will be converted as configured on the cursor;
-see <span class="xref std std-ref">adaptation</span> for details.</p>
+see <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for details.</p>
 </dd></dl>
 
 </dd></dl>
@@ -466,7 +466,7 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
                         title="previous chapter">Connection classes</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="adaptation.html"
-                        title="next chapter"><code class="docutils literal notranslate"><span class="pre">psycopg3.adapt</span></code> – Data adaptation configuration</a></p>
+                        title="next chapter">Data adaptation configuration</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -493,7 +493,7 @@ its data row by row, using <code class="docutils literal notranslate"><span clas
           <a href="connection.html" title="Previous document">Connection classes</a>
         </li>
         <li>
-          <a href="adaptation.html" title="Next document"><code class="docutils literal notranslate"><span class="pre">psycopg3.adapt</span></code> – Data adaptation configuration</a>
+          <a href="adaptation.html" title="Next document">Data adaptation configuration</a>
           &rarr;
         </li>
     </ul>

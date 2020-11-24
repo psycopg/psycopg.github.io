@@ -91,7 +91,7 @@ div.sponsor p {
 tries to behave as close as possible to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. There are however a few
 differences to be aware of.</p>
 <div class="section" id="server-side-binding">
-<h2>Server-side binding<a class="headerlink" href="#server-side-binding" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Server-side binding<a class="headerlink" href="#server-side-binding" title="Permalink to this headline">¶</a></h2>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> sends the query and the parameters to the server separately,
 instead of merging them client-side. PostgreSQL may behave slightly
 differently in this case, usually throwing an error and suggesting to use an
@@ -121,6 +121,10 @@ the query client-side, using <a class="reference internal" href="sql.html#module
 <p>Sometimes PostgreSQL offers an alternative (e.g. <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">set_config()</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">pg_notify()</span></code>). If no alternative exist you can use <a class="reference internal" href="sql.html#module-psycopg3.sql" title="psycopg3.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code></a>
 to compose the query client-side.</p>
+<p>You cannot use <code class="sql docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> and pass a tuple, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">IN</span> <span class="pre">()</span></code> is an SQL
+construct. You must use <code class="sql docutils literal notranslate"><span class="pre">=</span> <span class="pre">any(%s)</span></code> and pass a list. Note that this also
+works for an empty list, whereas an empty tuple would have resulted in an
+error.</p>
 </div>
 <div class="section" id="different-adaptation-system">
 <h2>Different adaptation system<a class="headerlink" href="#different-adaptation-system" title="Permalink to this headline">¶</a></h2>
@@ -128,7 +132,7 @@ to compose the query client-side.</p>
 server-side parameters adaptation, but also to consider performance,
 flexibility, ease of customization.</p>
 <p>Builtin data types should work as expected; if you have wrapped a custom data
-type you should check the <span class="xref std std-ref">Adaptation</span> topic.</p>
+type you should check the <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> topic.</p>
 </div>
 <div class="section" id="copy-is-no-more-file-based">
 <h2>Copy is no more file-based<a class="headerlink" href="#copy-is-no-more-file-based" title="Permalink to this headline">¶</a></h2>
