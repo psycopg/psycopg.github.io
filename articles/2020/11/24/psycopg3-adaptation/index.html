@@ -80,23 +80,22 @@
   
     <p>The adaptation system between Python objects and PostgreSQL types is at the
 core of <tt class="docutils literal">psycopg2</tt> and <tt class="docutils literal">psycopg3</tt>. The flexibility of the <tt class="docutils literal">psycopg2</tt>
-adaptation system gives <a class="reference external" href="https://www.psycopg.org/docs/usage.html#adaptation-of-python-values-to-sql-types">a good object mapping out-of-the-box</a> and allow
-users to <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">customise it according to any need</a>. Do you need your <tt class="docutils literal">decimal</tt>
+adaptation system provides <a class="reference external" href="https://www.psycopg.org/docs/usage.html#adaptation-of-python-values-to-sql-types">good out-of-the-box object mapping</a> and allows
+users to <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">customise it to suit any need</a>. Do you want your <tt class="docutils literal">decimal</tt>
 numbers returned as <tt class="docutils literal">float</tt> because you need speed over pennies? Do you want
-to map PostgreSQL Infinity date to the 25th of December 3099? That's certainly
-doable.</p>
+to map PostgreSQL Infinity dates to the 25th of December 3099? That's
+certainly doable.</p>
 <blockquote>
 </blockquote>
-<p><tt class="docutils literal">psycopg3</tt> adaptation system needs some modification compared to
+<p>The <tt class="docutils literal">psycopg3</tt> adaptation system needs some modification compared to
 <tt class="docutils literal">psycopg2</tt>, because <tt class="docutils literal">psycopg3</tt> uses the &quot;extended query protocol&quot; to send
-query parameters separately from the query. Together with the differences to
-accommodate, there is also a chance to improve over a system that has been at
-work for several years and has shown its shortcomings together with its
-strengths.</p>
+query parameters separately from the query. Together, with the differences to
+accommodate, there is also a chance to improve a system that has been in use
+for several years and has shown its shortcomings together with its strengths.</p>
 <!-- CUT-HERE -->
 <div class="section" id="server-side-binding">
 <h2>Server-side binding</h2>
-<p>Server-side parameters binding has been a long-time desired feature. So far
+<p>Server-side parameter binding has been a long-time desired feature. So far
 <tt class="docutils literal">psycopg3</tt> has adapted arguments on the client-side:</p>
 <pre class="code python literal-block">
 <span class="c1"># psycopg2</span>
@@ -116,7 +115,7 @@ strengths.</p>
 <span class="n">libpq</span><span class="o">.</span><span class="n">PQexec</span><span class="p">(</span>
     <span class="s2">&quot;INSERT INTO tbl (s, n, d) VALUES (42, 'Hel''lo', '2020-12-31'::date)&quot;</span><span class="p">)</span>
 </pre>
-<p><tt class="docutils literal">psycopg3</tt> end user interface is unchanged, but behind the scene will only
+<p>The <tt class="docutils literal">psycopg3</tt> end user interface is unchanged, but behind the scenes will only
 perform adaptation, not quoting, and will send the arguments separately:</p>
 <pre class="code python literal-block">
 <span class="c1"># psycopg3</span>
@@ -136,11 +135,11 @@ perform adaptation, not quoting, and will send the arguments separately:</p>
     <span class="n">oids</span><span class="o">=</span><span class="p">[</span><span class="n">INT8_OID</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">DATE_OID</span><span class="p">])</span>                     <span class="c1"># Type indications if available</span>
 </pre>
 <p>Server-side binding brings better performance, the possibility to use prepared
-statements and binary data, better integration with server-side logging and
-monitoring. Theoretically it also brings better safety against SQL injections,
-but <tt class="docutils literal">psycopg2</tt> does already a good job at <a class="reference external" href="https://www.psycopg.org/docs/usage.html#the-problem-with-the-query-parameters">providing a safe path for
-parameters binding</a>: creating an unsafe query is already harder, in
-<tt class="docutils literal">psycopg2</tt>, than doing things the right way.</p>
+statements and binary data, as well as better integration with server-side
+logging and monitoring. Theoretically it also brings better safety against SQL
+injections, but <tt class="docutils literal">psycopg2</tt> already does a good job at <a class="reference external" href="https://www.psycopg.org/docs/usage.html#the-problem-with-the-query-parameters">providing a safe path
+for parameter binding</a>: in <tt class="docutils literal">psycopg2</tt>, creating an unsafe query is already
+harder than doing things the right way.</p>
 <p>However server-side binding brings a few incompatibilities, such as:</p>
 <ul>
 <li><p class="first">cannot send more than one query at once if parameters are used:</p>
@@ -178,15 +177,16 @@ parameters and PostgreSQL data types are adapted. The new system:</p>
 <li><p class="first">cannot use the whole SQL syntax, but must limit to literals. For instance
 the Python list <tt class="docutils literal">[&quot;foo, bar&quot;, &quot;Hel'lo&quot;]</tt> cannot be expressed with
 <tt class="docutils literal"><span class="pre">ARRAY['foo,</span> bar', <span class="pre">'Hel''lo']</span></tt> but must use array literal rules and become
-<tt class="docutils literal">{&quot;foo, <span class="pre">bar&quot;,O'Reilly}</span></tt>.</p>
+<tt class="docutils literal">{&quot;foo, <span class="pre">bar&quot;,Hel'lo}</span></tt>.</p>
 </li>
-<li><p class="first">Makes possible to specify type OIDs, in case that useful (<a class="reference external" href="https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/">not always an
+<li><p class="first">Makes possible to specify type OIDs, in case that's useful (<a class="reference external" href="https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/">not always an
 easy choice</a>).</p>
 </li>
-<li><p class="first">Allows using binary types, especially useful for large binary blob, which
-otherwise get bloated by <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">binary escaping</a> and have to traverse the many
-layers of lexing/parsing in the server, each one with its memory copy. This
-can be done by simply using the <tt class="docutils literal">%b</tt> placeholder over <tt class="docutils literal">%s</tt>:</p>
+<li><p class="first">Allows for the use of binary types, which is especially useful for a large
+binary blob, otherwise things become bloated by <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">binary escaping</a> and have
+to traverse the many layers of lexing/parsing in the server, each with its
+own memory copy. This can be done by simply using the <tt class="docutils literal">%b</tt> placeholder
+over <tt class="docutils literal">%s</tt>:</p>
 <pre class="code python literal-block">
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
@@ -197,11 +197,11 @@ can be done by simply using the <tt class="docutils literal">%b</tt> placeholder
 </ul>
 <p>It's also a good chance to review the work that must be done by the client to
 adapt values. <tt class="docutils literal">psycopg2</tt> creates several instances of &quot;adapter&quot; wrappers,
-one for each value adapted. In <tt class="docutils literal">psycopg3</tt> the adaptation objects have a
+one for each value adapted. In <tt class="docutils literal">psycopg3</tt>, the adaptation objects have a
 different life cycle: choices based on the environment, such as the connection
 encoding, can be made once for each Python type, rather than once per value,
-ending up doing radically less work for each converted object. You can head to
-<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html">the psycopg3 adaptation documentation</a> for all the details.</p>
+doing radically less work for each converted object. You can check out the
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html">psycopg3 adaptation documentation</a> for all the details.</p>
 </div>
 <div class="section" id="customising-psycopg3-adaptation">
 <h2>Customising psycopg3 adaptation</h2>
@@ -209,8 +209,8 @@ ending up doing radically less work for each converted object. You can head to
 creating new ones or mapping existing ones on different Python classes to save
 to the database. For instance, the builtin <tt class="docutils literal">DateDumper</tt> converts Python
 dates to PostgreSQL ones. PostgreSQL can handle an &quot;infinity&quot; date, which
-Python cannot: if we wanted to store Python's <tt class="docutils literal">date.max</tt> to PostgreSQL
-infinity we could create a subclass for the dumper, and register it in the
+Python cannot. If we wanted to store Python's <tt class="docutils literal">date.max</tt> to PostgreSQL
+infinity, we could create a subclass for the dumper and register it in the
 scope we want to use it, globally or just on a connection or cursor:</p>
 <pre class="code python literal-block">
 <span class="k">class</span> <span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
@@ -231,7 +231,7 @@ scope we want to use it, globally or just on a connection or cursor:</p>
 <p>The system is pretty symmetric and employs similar <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Loader">Loader</a> objects to map OIDs
 to the code responsible for its decoding. For instance, if we wanted to
 reverse the above customisation and map PostgreSQL infinity date to
-<tt class="docutils literal">date.max</tt> (instead of raising an exception) it could be done using a
+<tt class="docutils literal">date.max</tt> (instead of raising an exception), it could be done using a
 subclass of the builtin loader (or using an entirely new object if required):</p>
 <pre class="code python literal-block">
 <span class="k">class</span> <span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
@@ -259,9 +259,9 @@ expected:</p>
 </pre>
 <p>All in all the new adaptation system provides better performance and easier
 customisation <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">compared to psycopg2</a>. The new adapters are easier to
-compose, for instance to use them in <a class="reference external" href="/articles/2020/11/15/psycopg3-copy/">COPY operations</a>. And if client-side adaptation is still needed (to
+compose, such as using them in <a class="reference external" href="/articles/2020/11/15/psycopg3-copy/">COPY operations</a>. And if client-side adaptation is still needed (to
 generate dynamically data definition statements, to prepare offline update
-scripts...) the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/sql.html">psycopg3.sql</a> still allows the flexibility of client-side
+scripts...) <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/sql.html">psycopg3.sql</a> still allows for the flexibility of client-side
 query composition.</p>
 </div>
 <div class="section" id="project-sponsorship">
