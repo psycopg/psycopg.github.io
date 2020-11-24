@@ -2,13 +2,224 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title type="text">News</title>
   <id>urn:uuid:2c1dc889-18e5-364f-aebe-4eb10b25c80c</id>
-  <updated>2020-11-15T00:00:00Z</updated>
+  <updated>2020-11-24T00:00:00Z</updated>
   <link href="https://www.psycopg.org/articles/" />
   <link href="https://www.psycopg.org/news.xml" rel="self" />
   <author>
     <name></name>
   </author>
   <generator uri="https://github.com/t73fde/lektor-feed" version="20191006.1">Lektor Feed Plugin</generator>
+  <entry xml:base="https://www.psycopg.org/articles/2020/11/24/psycopg3-adaptation/">
+    <title type="text">The psycopg3 adaptation system</title>
+    <id>urn:uuid:1f5955b2-3537-3869-af43-2539656d243f</id>
+    <updated>2020-11-24T00:00:00Z</updated>
+    <link href="https://www.psycopg.org/articles/2020/11/24/psycopg3-adaptation/" />
+    <author>
+      <name>Daniele Varrazzo</name>
+    </author>
+    <content type="html">&lt;p&gt;The adaptation system between Python objects and PostgreSQL types is at the
+core of &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; and &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt;. The flexibility of the &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;
+adaptation system provides &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/usage.html#adaptation-of-python-values-to-sql-types&quot;&gt;good out-of-the-box object mapping&lt;/a&gt; and allows
+users to &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax&quot;&gt;customise it to suit any need&lt;/a&gt;. Do you want your &lt;tt class=&quot;docutils literal&quot;&gt;decimal&lt;/tt&gt;
+numbers returned as &lt;tt class=&quot;docutils literal&quot;&gt;float&lt;/tt&gt; because you need speed over pennies? Do you want
+to map PostgreSQL Infinity dates to the 25th of December 3099? That's
+certainly doable.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; adaptation system needs some modification compared to
+&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;, because &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; uses the &amp;quot;extended query protocol&amp;quot; to send
+query parameters separately from the query. Together, with the differences to
+accommodate, there is also a chance to improve a system that has been in use
+for several years and has shown its shortcomings together with its strengths.&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class=&quot;section&quot; id=&quot;server-side-binding&quot;&gt;
+&lt;h2&gt;Server-side binding&lt;/h2&gt;
+&lt;p&gt;Server-side parameter binding has been a long-time desired feature. So far
+&lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; has adapted arguments on the client-side:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# psycopg2&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO tbl (s, n, d) VALUES (&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hel'lo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# has arguments adapted and quoted:&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;42&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;'Hel''lo'&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;'2020-12-31'::date&amp;quot;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# merged to the query:&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# and passed as a single string:&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;libpq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PQexec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO tbl (s, n, d) VALUES (42, 'Hel''lo', '2020-12-31'::date)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; end user interface is unchanged, but behind the scenes will only
+perform adaptation, not quoting, and will send the arguments separately:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# psycopg3&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO tbl (s, n, d) VALUES (&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hel'lo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# has arguments adapted:&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;42&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hel'lo&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;2020-12-31&amp;quot;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# and passed as separate information:&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;libpq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PQexecParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO tbl (s, n, d) VALUES ($1, $2, $3)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# Postgres placeholders&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;42&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hel'lo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;2020-12-31&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;                   &lt;span class=&quot;c1&quot;&gt;# Postgres formats, no quoting&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;oids&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INT8_OID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DATE_OID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                     &lt;span class=&quot;c1&quot;&gt;# Type indications if available&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Server-side binding brings better performance, the possibility to use prepared
+statements and binary data, as well as better integration with server-side
+logging and monitoring. Theoretically it also brings better safety against SQL
+injections, but &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; already does a good job at &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/usage.html#the-problem-with-the-query-parameters&quot;&gt;providing a safe path
+for parameter binding&lt;/a&gt;: in &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;, creating an unsafe query is already
+harder than doing things the right way.&lt;/p&gt;
+&lt;p&gt;However server-side binding brings a few incompatibilities, such as:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;cannot send more than one query at once if parameters are used:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# Must use separate queries or psycopg3.sql client-side adaptation&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO tbl1 VALUES (&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;); INSERT INTO tbl2 VALUES (&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;cannot use certain commands such as &lt;tt class=&quot;docutils literal&quot;&gt;SET&lt;/tt&gt; or &lt;tt class=&quot;docutils literal&quot;&gt;NOTIFY&lt;/tt&gt; with parameters:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# Must use &amp;quot;SELECT set_config('timezone', %s)&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;SET timezone to &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;timezone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Must use &amp;quot;SELECT pg_notify('channel', %s)&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;NOTIFY channel, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;cannot use the &lt;tt class=&quot;docutils literal&quot;&gt;IN &lt;span class=&quot;pre&quot;&gt;(...)&lt;/span&gt;&lt;/tt&gt; construct:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# Must use &amp;quot;AND nation = any (%s)&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;... AND nation in &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;IT&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;FR&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;DE&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;All in all, most queries will just work, however the few incompatibilities
+require a non-backward-compatible change in version.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;a-new-adaptation-system&quot;&gt;
+&lt;h2&gt;A new adaptation system&lt;/h2&gt;
+&lt;p&gt;Embracing the new type of communication requires to change the way Python
+parameters and PostgreSQL data types are adapted. The new system:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;cannot use the whole SQL syntax, but must limit to literals. For instance
+the Python list &lt;tt class=&quot;docutils literal&quot;&gt;[&amp;quot;foo, bar&amp;quot;, &amp;quot;Hel'lo&amp;quot;]&lt;/tt&gt; cannot be expressed with
+&lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ARRAY['foo,&lt;/span&gt; bar', &lt;span class=&quot;pre&quot;&gt;'Hel''lo']&lt;/span&gt;&lt;/tt&gt; but must use array literal rules and become
+&lt;tt class=&quot;docutils literal&quot;&gt;{&amp;quot;foo, &lt;span class=&quot;pre&quot;&gt;bar&amp;quot;,Hel'lo}&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;Makes possible to specify type OIDs, in case that's useful (&lt;a class=&quot;reference external&quot; href=&quot;https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/&quot;&gt;not always an
+easy choice&lt;/a&gt;).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;Allows for the use of binary types, which is especially useful for a large
+binary blob, otherwise things become bloated by &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/current/datatype-binary.html&quot;&gt;binary escaping&lt;/a&gt; and have
+to traverse the many layers of lexing/parsing in the server, each with its
+own memory copy. This can be done by simply using the &lt;tt class=&quot;docutils literal&quot;&gt;%b&lt;/tt&gt; placeholder
+over &lt;tt class=&quot;docutils literal&quot;&gt;%s&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;rb&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&amp;quot;INSERT INTO images (name, data) VALUES (&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, %b)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It's also a good chance to review the work that must be done by the client to
+adapt values. &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; creates several instances of &amp;quot;adapter&amp;quot; wrappers,
+one for each value adapted. In &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt;, the adaptation objects have a
+different life cycle: choices based on the environment, such as the connection
+encoding, can be made once for each Python type, rather than once per value,
+doing radically less work for each converted object. You can check out the
+&lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html&quot;&gt;psycopg3 adaptation documentation&lt;/a&gt; for all the details.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;customising-psycopg3-adaptation&quot;&gt;
+&lt;h2&gt;Customising psycopg3 adaptation&lt;/h2&gt;
+&lt;p&gt;Customising types adaptation can now be done using &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Dumper&quot;&gt;Dumper&lt;/a&gt; classes, either
+creating new ones or mapping existing ones on different Python classes to save
+to the database. For instance, the builtin &lt;tt class=&quot;docutils literal&quot;&gt;DateDumper&lt;/tt&gt; converts Python
+dates to PostgreSQL ones. PostgreSQL can handle an &amp;quot;infinity&amp;quot; date, which
+Python cannot. If we wanted to store Python's &lt;tt class=&quot;docutils literal&quot;&gt;date.max&lt;/tt&gt; to PostgreSQL
+infinity, we could create a subclass for the dumper and register it in the
+scope we want to use it, globally or just on a connection or cursor:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;InfDateDumper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DateDumper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;infinity&amp;quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;SELECT &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# ('2020-12-31', '9999-12-31')&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;InfDateDumper&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;SELECT &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# ('2020-12-31', 'infinity')&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The system is pretty symmetric and employs similar &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Loader&quot;&gt;Loader&lt;/a&gt; objects to map OIDs
+to the code responsible for its decoding. For instance, if we wanted to
+reverse the above customisation and map PostgreSQL infinity date to
+&lt;tt class=&quot;docutils literal&quot;&gt;date.max&lt;/tt&gt; (instead of raising an exception), it could be done using a
+subclass of the builtin loader (or using an entirely new object if required):&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;InfDateLoader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DateLoader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;infinity&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select '2020-12-31'::date, 'infinity'::date&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Raises DataError: Python date doesn't support years after 9999: got infinity&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg3.oids&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;builtins&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;InfDateLoader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;builtins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;date&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select '2020-12-31'::date, 'infinity'::date&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9999&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The customisation automatically applies to recursive types, such as arrays or
+composite types: if the date loader is customised then the date array works as
+expected:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select '{2020-12-31,infinity}'::date[]&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9999&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;All in all the new adaptation system provides better performance and easier
+customisation &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax&quot;&gt;compared to psycopg2&lt;/a&gt;. The new adapters are easier to
+compose, such as using them in &lt;a class=&quot;reference external&quot; href=&quot;/articles/2020/11/15/psycopg3-copy/&quot;&gt;COPY operations&lt;/a&gt;. And if client-side adaptation is still needed (to
+generate dynamically data definition statements, to prepare offline update
+scripts...) &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/sql.html&quot;&gt;psycopg3.sql&lt;/a&gt; still allows for the flexibility of client-side
+query composition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;project-sponsorship&quot;&gt;
+&lt;h2&gt;Project sponsorship&lt;/h2&gt;
+&lt;div class=&quot;sponsor docutils container&quot;&gt;
+&lt;p&gt;The new adaptation system is one of several new features that are being
+designed and implemented in &lt;a class=&quot;reference external&quot; href=&quot;/psycopg3/&quot;&gt;psycopg3&lt;/a&gt;. The project is currently &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/psycopg/psycopg3&quot;&gt;under
+active development&lt;/a&gt;: if there is enough support it will be possible to
+work at the project full-time and bring it to release swiftly.&lt;/p&gt;
+&lt;p&gt;If you use Python and PostgreSQL, and you would like to support the
+creation of the most advanced adapter between the two systems, &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/sponsors/dvarrazzo/&quot;&gt;please
+consider becoming a sponsor&lt;/a&gt;. Thank you!&lt;/p&gt;
+&lt;iframe src=&quot;https://github.com/sponsors/dvarrazzo/button&quot;
+    title=&quot;Sponsor the project&quot; style=&quot;border: 0&quot;
+    width=&quot;116&quot; height=&quot;35&quot;&gt;
+&lt;/iframe&gt;&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2020/11/15/psycopg3-copy/">
     <title type="text">The new COPY support in psycopg3</title>
     <id>urn:uuid:d4d09cec-6a53-3b9e-b1b8-5d1bfb30070c</id>
