@@ -1,96 +1,162 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="psycopg3.pq – Libpq wrapper module" href="pq.html" /><link rel="prev" title="psycopg3.sql – SQL string composition" href="sql.html" />
 
-<!DOCTYPE html>
+    <meta name="generator" content="sphinx-3.3.1, furo 2020.11.19.beta18"/>
+        <title>psycopg3.errors – package exceptions - psycopg3 UNRELEASED documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?state=f3cc242a2a9013e06168747f">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>psycopg3.errors – package exceptions &#8212; psycopg3 UNRELEASED documentation</title>
-    <style type="text/css" media="screen">
-div.sponsor {
-  background-color: #ffc;
-  border: 2px solid #888;
-  border-radius: 8px;
-  padding: 1em;
-  padding-bottom: 0.25em;
-  margin-top: 1em;
-}
-div.sponsor p {
-  margin: 0.5rem 0;
-}
-    </style>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/better.css" type="text/css" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-19287248-2');
-    </script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="psycopg3.pq – Libpq wrapper module" href="pq.html" />
-    <link rel="prev" title="psycopg3.sql – SQL string composition" href="sql.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-      <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
-  </head><body>
-    <header id="pageheader"><h1><a href="index.html ">
-        psycopg3 UNRELEASED documentation
-    </a></h1></header>
-  <div class="related top">
-  <nav id="rellinks">
-    <ul>
-        <li>
-          &larr;
-          <a href="sql.html" title="Previous document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a>
-        </li>
-        <li>
-          <a href="pq.html" title="Next document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</a>
-          &rarr;
-        </li>
-    </ul>
-  </nav>
-  <nav id="breadcrumbs">
-    <ul>
-      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
-    </ul>
-  </nav>
-  </div>  
 
-    <div class="document">
-    <div class="sponsor">
-      <p>
-      The <a href="https://psycopg.org/psycopg3" target="_blank"
-        >psycopg3 project</a>
-      is currently
-      <a href="https://github.com/psycopg/psycopg3" target="_blank"
-        >under active development</a>.
-      </p>
+<style>
+  :root {
+    --color-code-background: #f0f0f0;
+  --color-code-foreground: black;
+  --admonition-font-size: 1rem;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
 
-      <p>
-      Sponsoring this project will help achieve swift completion and
-      ensure the maintenance of psycopg2, psycopg3 and other related
-      projects.
-      </p>
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f0f0f0;
+  --color-code-foreground: black;
+  --admonition-font-size: 1rem;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
+    <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=f3cc242a2a9013e06168747f">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script defer src="_static/jquery.js"></script>
+    <script defer src="_static/underscore.js"></script>
+    <script defer src="_static/doctools.js"></script>
+    <script defer src="_static/language_data.js"></script>
+    <script defer src="_static/scripts/main.js?state=f3cc242a2a9013e06168747f"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
 
-      <p>
-      If you use Python and PostgreSQL, and you would like to support the
-      creation of the most advanced adapter between the two systems,
-      <a href="https://github.com/sponsors/dvarrazzo/" target="_blank"
-        >please consider becoming a sponsor</a>. Thank you!
-      </p>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
-      <iframe src="https://github.com/sponsors/dvarrazzo/button"
-              title="Sponsor the project" style="border: 0"
-              width="116" height="35">
-      </iframe>
+<div class="announcement">
+  <aside class="announcement-content">
+    <a style="text-decoration: none; color: white;"
+   href="https://github.com/sponsors/dvarrazzo/">
+   <img height="24px" width="24px" src="/img/logo/psycopg-48.png"/>
+    Sponsor psycopg3 on GitHub
+</a>
+
+  </aside>
+</div>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
     </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="psycopg3-errors-package-exceptions">
+    <div class="header-center">
+      <a href="index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/psycopg-100.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/psycopg-100.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder="Search" name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Basic module usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#passing-parameters-to-sql-queries">Passing parameters to SQL queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#transaction-management">Transaction management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#using-copy-to-and-copy-from">Using COPY TO and COPY FROM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#async-operations">Async operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connection.html">Connection classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cursor.html">Cursor classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code> – package exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from psycopg2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="from_pg2.html#what-s-new-in-psycopg3">What’s new in psycopg3</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="psycopg3-errors-package-exceptions">
 <h1><a class="reference internal" href="#module-psycopg3.errors" title="psycopg3.errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code></a> – package exceptions<a class="headerlink" href="#psycopg3-errors-package-exceptions" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-psycopg3.errors"><span id="index-0"></span></span><p>This module exposes objects to represent and examine database errors.</p>
 <dl class="py exception">
@@ -105,9 +171,7 @@ use this to catch all errors with one single <code class="xref py py-obj docutil
 <code class="sig-name descname">diag</code><a class="headerlink" href="#psycopg3.errors.Error.diag" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.errors.Diagnostic" title="psycopg3.errors.Diagnostic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Diagnostic</span></code></a> object to inspect details of the errors from the database.</p>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt id="psycopg3.errors.Diagnostic">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">Diagnostic</code><a class="headerlink" href="#psycopg3.errors.Diagnostic" title="Permalink to this definition">¶</a></dt>
@@ -162,9 +226,7 @@ The attribute value is available only for errors sent by the server:
 not all the fields are available for all the errors and for all the
 server versions.</p>
 </dd></dl>
-
 </dd></dl>
-
 <div class="section" id="dbapi-exceptions">
 <span id="index-1"></span><h2>DBAPI exceptions<a class="headerlink" href="#dbapi-exceptions" title="Permalink to this headline">¶</a></h2>
 <p>In compliance with the DB API, all the exceptions raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>
@@ -187,26 +249,22 @@ derive from the following classes:</p>
 <dd><p>Exception raised for important warnings.</p>
 <p>Defined for DBAPI compatibility, but never raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.InterfaceError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">InterfaceError</code><a class="headerlink" href="#psycopg3.errors.InterfaceError" title="Permalink to this definition">¶</a></dt>
 <dd><p>An error related to the database interface rather than the database itself.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.DatabaseError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">DatabaseError</code><a class="headerlink" href="#psycopg3.errors.DatabaseError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exception raised for errors that are related to the database.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.DataError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">DataError</code><a class="headerlink" href="#psycopg3.errors.DataError" title="Permalink to this definition">¶</a></dt>
 <dd><p>An error caused by problems with the processed data.</p>
 <p>Examples may be division by zero, numeric value out of range, etc.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.OperationalError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">OperationalError</code><a class="headerlink" href="#psycopg3.errors.OperationalError" title="Permalink to this definition">¶</a></dt>
@@ -216,14 +274,12 @@ an unexpected disconnect occurs, the data source name is not found, a
 transaction could not be processed, a memory allocation error occurred
 during processing, etc.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.IntegrityError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">IntegrityError</code><a class="headerlink" href="#psycopg3.errors.IntegrityError" title="Permalink to this definition">¶</a></dt>
 <dd><p>An error caused when the relational integrity of the database is affected.</p>
 <p>An example may be a foreign key check failed.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.InternalError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">InternalError</code><a class="headerlink" href="#psycopg3.errors.InternalError" title="Permalink to this definition">¶</a></dt>
@@ -231,7 +287,6 @@ during processing, etc.</p>
 <p>Examples could be the cursor is not valid anymore, the transaction is out
 of sync, etc.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.ProgrammingError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">ProgrammingError</code><a class="headerlink" href="#psycopg3.errors.ProgrammingError" title="Permalink to this definition">¶</a></dt>
@@ -239,13 +294,11 @@ of sync, etc.</p>
 <p>Examples may be table not found or already exists, syntax error in the SQL
 statement, wrong number of parameters specified, etc.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt id="psycopg3.errors.NotSupportedError">
 <em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">NotSupportedError</code><a class="headerlink" href="#psycopg3.errors.NotSupportedError" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method or database API was used which is not supported by the database,</p>
 </dd></dl>
-
 </div>
 <div class="section" id="sqlstate-exceptions">
 <span id="index-2"></span><h2>SQLSTATE exceptions<a class="headerlink" href="#sqlstate-exceptions" title="Permalink to this headline">¶</a></h2>
@@ -256,7 +309,7 @@ called SQLSTATE (available in the <code class="docutils literal notranslate"><sp
 write idiomatic error handling code according to specific conditions happening
 in the database:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT"</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">LockNotAvailable</span><span class="p">:</span>
     <span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
@@ -272,24 +325,23 @@ refer to the table below for all the classes defined.</p>
 exception</span></a> and expose the <a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a> interface.</p>
 <dl class="py function">
 <dt id="psycopg3.errors.lookup">
-<code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">lookup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sqlstate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Type<span class="p">[</span><a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error">psycopg3.errors.Error</a><span class="p">]</span><a class="headerlink" href="#psycopg3.errors.lookup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">lookup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sqlstate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> → Type<span class="p">[</span><a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error">psycopg3.errors.Error</a><span class="p">]</span><a class="headerlink" href="#psycopg3.errors.lookup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lookup an error code and return its exception class.</p>
 <p>Raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeyError</span></code> if the code is not found.</p>
 <p>Example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">&quot;55P03&quot;</span><span class="p">):</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT"</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"55P03"</span><span class="p">):</span>
     <span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
 </div>
 </dd></dl>
-
 <p>These are all the classes defined and the DBAPI exception they derive from:</p>
-<table class="docutils align-default">
+<div class="table-wrapper"><table class="docutils align-default">
 <colgroup>
-<col style="width: 11%" />
-<col style="width: 61%" />
-<col style="width: 28%" />
+<col style="width: 11%"/>
+<col style="width: 61%"/>
+<col style="width: 28%"/>
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>SQLSTATE</p></th>
@@ -1377,19 +1429,59 @@ exception</span></a> and expose the <a class="reference internal" href="#psycopg
 <td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 
-
-            <div class="clearer"></div>
-          </div>
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="pq.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="sql.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</div>
+                
+              </div>
+            </a>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+
+        <div class="related-information">
+              Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team
+            |
+            <a class="muted-link" href="_sources/errors.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.errors</span></code> – package exceptions</a><ul>
 <li><a class="reference internal" href="#dbapi-exceptions">DBAPI exceptions</a></li>
 <li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a></li>
@@ -1397,53 +1489,13 @@ exception</span></a> and expose the <a class="reference internal" href="#psycopg
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="sql.html"
-                        title="previous chapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="pq.html"
-                        title="next chapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/errors.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<form class="search" action="search.html" method="get">
-  <input type="text" name="q"
-   placeholder="type to search" />
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+          </div>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-  <div class="related bottom">
-  <nav id="rellinks">
-    <ul>
-        <li>
-          &larr;
-          <a href="sql.html" title="Previous document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code> – SQL string composition</a>
-        </li>
-        <li>
-          <a href="pq.html" title="Next document"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.pq</span></code> – Libpq wrapper module</a>
-          &rarr;
-        </li>
-    </ul>
-  </nav>
-  <nav id="breadcrumbs">
-    <ul>
-      <li><a href="index.html">psycopg3 UNRELEASED documentation</a></li> 
-    </ul>
-  </nav>
-  </div>
-  <footer id="pagefooter">&copy; 2020, Daniele Varrazzo and The Psycopg Team.
-
-  </footer>
-
-  
+      
+      
+    </aside>
+  </main>
+</div>
   </body>
 </html>
