@@ -237,9 +237,9 @@ not all the fields are available for all the errors and for all the
 server versions.</p>
 </dd></dl>
 </dd></dl>
-<div class="section" id="dbapi-exceptions">
-<span id="index-1"></span><h2>DBAPI exceptions<a class="headerlink" href="#dbapi-exceptions" title="Permalink to this headline">¶</a></h2>
-<p>In compliance with the DB API, all the exceptions raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>
+<div class="section" id="db-api-exceptions">
+<span id="dbapi-exceptions"></span><span id="index-1"></span><h2>DB-API exceptions<a class="headerlink" href="#db-api-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>In compliance with the DB-API, all the exceptions raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>
 derive from the following classes:</p>
 <pre class="literal-block"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code>
 |__ <a class="reference internal" href="#psycopg3.errors.Warning" title="psycopg3.errors.Warning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Warning</span></code></a>
@@ -311,10 +311,11 @@ statement, wrong number of parameters specified, etc.</p>
 </dd></dl>
 </div>
 <div class="section" id="sqlstate-exceptions">
-<span id="index-2"></span><h2>SQLSTATE exceptions<a class="headerlink" href="#sqlstate-exceptions" title="Permalink to this headline">¶</a></h2>
+<span id="index-2"></span><span id="id1"></span><h2>SQLSTATE exceptions<a class="headerlink" href="#sqlstate-exceptions" title="Permalink to this headline">¶</a></h2>
 <p>Errors coming from a database server (as opposite as ones generated
 client-side, such as connection failed) usually have a 5-letters error code
-called SQLSTATE (available in the <code class="docutils literal notranslate"><span class="pre">diag.sqlstate</span></code> attribute).</p>
+called SQLSTATE (available in the <a class="reference internal" href="#psycopg3.errors.Diagnostic.sqlstate" title="psycopg3.errors.Diagnostic.sqlstate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlstate</span></code></a> attribute of
+<a class="reference internal" href="#psycopg3.errors.Error.diag" title="psycopg3.errors.Error.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.diag</span></code></a>).</p>
 <p><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> exposes a different class for each SQLSTATE value, allowing to
 write idiomatic error handling code according to specific conditions happening
 in the database:</p>
@@ -331,7 +332,7 @@ the documentation</a>, converted to CamelCase: e.g. the error 22012,
 <code class="docutils literal notranslate"><span class="pre">division_by_zero</span></code> is exposed by this module as the class <code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionByZero</span></code>.
 There is a handful of exception, required for disambiguate clashes: please
 refer to the table below for all the classes defined.</p>
-<p>Every exception class is a subclass of one of the <a class="reference external" href="https://www.psycopg.org/docs/module.html#dbapi-exceptions" title="(in Psycopg v2.8)"><span class="xref std std-ref">standard DB-API
+<p>Every exception class is a subclass of one of the <a class="reference internal" href="#dbapi-exceptions"><span class="std std-ref">standard DB-API
 exception</span></a> and expose the <a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a> interface.</p>
 <dl class="py function">
 <dt id="psycopg3.errors.lookup">
@@ -1493,7 +1494,7 @@ exception</span></a> and expose the <a class="reference internal" href="#psycopg
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a><ul>
-<li><a class="reference internal" href="#dbapi-exceptions">DBAPI exceptions</a></li>
+<li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a></li>
 <li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a></li>
 </ul>
 </li>
