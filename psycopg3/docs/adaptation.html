@@ -3,9 +3,9 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Using COPY TO and COPY FROM" href="copy.html" /><link rel="prev" title="Advanced topics" href="advanced/index.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2020.11.19.beta18"/>
+    <meta name="generator" content="sphinx-3.3.1, furo 2020.11.27.beta19"/>
         <title>Data adaptation configuration - psycopg3 UNRELEASED documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?state=793700b1b89d9a2d91bc8d0c">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=4d4607a28768ea509d1701e6fba1bca6c595da19">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -40,13 +40,13 @@
   }
 </style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
     <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
-    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=793700b1b89d9a2d91bc8d0c">
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script defer src="_static/jquery.js"></script>
     <script defer src="_static/underscore.js"></script>
     <script defer src="_static/doctools.js"></script>
     <script defer src="_static/language_data.js"></script>
-    <script defer src="_static/scripts/main.js?state=793700b1b89d9a2d91bc8d0c"></script></head>
+    <script defer src="_static/scripts/main.js?digest=1e13a99a5b478789393b59468e7cadf60869ce3f"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -115,12 +115,14 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo only-light" src="_static/psycopg.svg" alt="Light Logo"/>
     <img class="sidebar-logo only-dark" src="_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
   <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+  
 </a><form class="sidebar-search-container" method="get" action="search.html">
   <input class="sidebar-search" placeholder="Search" name="q">
   <input type="hidden" name="check_keywords" value="yes">
@@ -195,12 +197,19 @@ implementation for several builtin Python and PostgreSQL types.</p>
 <p>Dumpers and loaders can be registered on different scopes: globally, per
 <a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>, per <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>, so that adaptation rules can
 be customised for specific needs within the same application: in order to do
-so you can use the <em>context</em> parameter of <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a> and similar
-methods.</p>
-<p>Dumpers and loaders might need to handle data in text and binary format,
-according to how they are registered (e.g. with <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a> or
-<a class="reference internal" href="#psycopg3.adapt.Dumper.register_binary" title="psycopg3.adapt.Dumper.register_binary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_binary()</span></code></a>). For most types the format is different so there
-will have to be two different classes.</p>
+so you can use the <em>context</em> parameter of <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper.register()</span></code></a> and
+<a class="reference internal" href="#psycopg3.adapt.Loader.register" title="psycopg3.adapt.Loader.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader.register()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code> is a class method on the base class, so if you
+subclass <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code> you should call the <code class="docutils literal notranslate"><span class="pre">.register()</span></code> on the
+class you created.</p>
+</div>
+<p>If the data type has also a distinct binary format which you may want to use
+from psycopg (as documented in <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a>) you may want to implement
+binary loaders and dumpers, whose only difference from text dumper is that
+they must be registered using <code class="docutils literal notranslate"><span class="pre">format=Format.BINARY</span></code> in <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper.register()</span></code></a>
+and <a class="reference internal" href="#psycopg3.adapt.Loader.register" title="psycopg3.adapt.Loader.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader.register()</span></code></a>.</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <ul class="simple">
@@ -245,6 +254,11 @@ value will be returned as a string (or bytes string for binary types).</p>
 <dt id="psycopg3.adapt.Dumper">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.adapt.</code><code class="sig-name descname">Dumper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Python object of the type <em>src</em> to PostgreSQL representation.</p>
+<p>This is an abstract base class: subclasses <em>must</em> implement the <a class="reference internal" href="#psycopg3.adapt.Dumper.dump" title="psycopg3.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a>
+method. They <em>may</em> implement <a class="reference internal" href="#psycopg3.adapt.Dumper.oid" title="psycopg3.adapt.Dumper.oid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oid</span></code></a> (as attribute or property) in order to
+override the oid type oid; if not PostgreSQL will try to infer the type
+from the context, but this may fail in some contexts and may require a
+cast.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -257,7 +271,7 @@ be possible to know the connection encoding or the server date format.</p></li>
 </dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Dumper.dump">
-<code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the object <em>obj</em> to PostgreSQL representation.</p>
 <p>The format returned by dump shouldn’t contain quotes or escaped
 values.</p>
@@ -266,10 +280,15 @@ values.</p>
 <dt id="psycopg3.adapt.Dumper.quote">
 <code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.adapt.Dumper.quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the object <em>obj</em> to escaped representation.</p>
-<p>By default will return the <a class="reference internal" href="#psycopg3.adapt.Dumper.dump" title="psycopg3.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> value quoted and sanitised, so
-that the result can be used to build a SQL string. For instance, the
-method will be used by <a class="reference internal" href="sql.html#psycopg3.sql.Literal" title="psycopg3.sql.Literal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a> to convert a value
-client-side.</p>
+<p>By default return the <a class="reference internal" href="#psycopg3.adapt.Dumper.dump" title="psycopg3.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> value quoted and sanitised, so
+that the result can be used to build a SQL string. This works well
+for most types and you won’t likely have to implement this method in a
+subclass.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>This method will be used by <a class="reference internal" href="sql.html#psycopg3.sql.Literal" title="psycopg3.sql.Literal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a> to convert a
+value client-side.</p>
+</div>
 <p>This method only makes sense for text dumpers; the result of calling
 it on a binary dumper is undefined. It might scratch your car, or burn
 your cake. Don’t tell me I didn’t warn you.</p>
@@ -278,17 +297,24 @@ your cake. Don’t tell me I didn’t warn you.</p>
 <dt id="psycopg3.adapt.Dumper.oid">
 <code class="sig-name descname">oid</code><em class="property"> int</em><a class="headerlink" href="#psycopg3.adapt.Dumper.oid" title="Permalink to this definition">¶</a></dt>
 <dd><p>The oid to pass to the server, if known.</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">todo</p>
+<p>Document how to find type OIDs in a database.</p>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Dumper.register">
-<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Dumper.register" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">Format.TEXT</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Dumper.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure <em>context</em> to use this dumper to convert object of type <em>src</em>.</p>
+<p>You should call this method on the <a class="reference internal" href="#psycopg3.adapt.Dumper" title="psycopg3.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> subclass you create,
+passing the Python type you want to dump as <em>src</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>src</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The type to manage.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>, or <a class="reference internal" href="#psycopg3.adapt.Transformer" title="psycopg3.adapt.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a>) – Where the dumper should be used. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> the dumper
 will be used globally.</p></li>
+<li><p><strong>format</strong> (<a class="reference internal" href="pq.html#psycopg3.pq.Format" title="psycopg3.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></a>) – Register the dumper for text or binary adaptation</p></li>
 </ul>
 </dd>
 </dl>
@@ -297,19 +323,13 @@ will be possible to register it without importing it before. In this
 case it should be the fully qualified name of the object (e.g.
 <code class="docutils literal notranslate"><span class="pre">"uuid.UUID"</span></code>).</p>
 </dd></dl>
-<dl class="py method">
-<dt id="psycopg3.adapt.Dumper.register_binary">
-<em class="property">classmethod </em><code class="sig-name descname">register_binary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Dumper.register_binary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure <em>context</em> to use this dumper for binary format conversion.</p>
-<p>In order to convert a value in binary you can use a <code class="docutils literal notranslate"><span class="pre">%b</span></code> placeholder
-in the query instead of <code class="docutils literal notranslate"><span class="pre">%s</span></code>.</p>
-<p>Parameters as the same as in <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a>.</p>
-</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.adapt.Loader">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.adapt.</code><code class="sig-name descname">Loader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert PostgreSQL objects with OID <em>oid</em> to Python objects.</p>
+<p>This is an abstract base class: subclasses <em>must</em> implement the <a class="reference internal" href="#psycopg3.adapt.Loader.load" title="psycopg3.adapt.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a>
+method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -322,28 +342,25 @@ be possible to know the connection encoding or the server date format.</p></li>
 </dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Loader.load">
-<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em><span class="sig-paren">)</span> → Any<a class="headerlink" href="#psycopg3.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em><span class="sig-paren">)</span> → Any<a class="headerlink" href="#psycopg3.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a PostgreSQL value to a Python object.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Loader.register">
-<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Loader.register" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">Format.TEXT</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Loader.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure <em>context</em> to use this loader to convert values with OID <em>oid</em>.</p>
+<p>You should call this method on the <a class="reference internal" href="#psycopg3.adapt.Loader" title="psycopg3.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> subclass you create,
+passing the OID of the type you want to load as <em>oid</em> parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>oid</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – The PostgreSQL OID to manage.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="connection.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>, <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>, or <a class="reference internal" href="#psycopg3.adapt.Transformer" title="psycopg3.adapt.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a>) – Where the loader should be used. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> the loader
 will be used globally.</p></li>
+<li><p><strong>format</strong> (<a class="reference internal" href="pq.html#psycopg3.pq.Format" title="psycopg3.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></a>) – Register the loader for text or binary adaptation</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-<dl class="py method">
-<dt id="psycopg3.adapt.Loader.register_binary">
-<em class="property">classmethod </em><code class="sig-name descname">register_binary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Loader.register_binary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure <em>context</em> to use this loader to convert binary values.</p>
-<p>Parameters as the same as in <a class="reference internal" href="#psycopg3.adapt.Loader.register" title="psycopg3.adapt.Loader.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a>.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
