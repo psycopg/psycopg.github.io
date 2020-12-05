@@ -237,15 +237,15 @@ requires a comma to create a single element tuple):</p>
 </pre></div>
 </div>
 </li>
-<li><p>The placeholder <em>must not be quoted</em>. Psycopg will add quotes where needed:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES ('</span><span class="si">%s</span><span class="s2">')"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span> <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># correct</span>
+<li><p>The placeholder <em>must not be quoted</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES ('</span><span class="si">%s</span><span class="s2">')"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span> <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>   <span class="c1"># correct</span>
 </pre></div>
 </div>
 </li>
 <li><p>The variables placeholder <em>must always be a</em> <code class="docutils literal notranslate"><span class="pre">%s</span></code>, even if a different
 placeholder (such as a <code class="docutils literal notranslate"><span class="pre">%d</span></code> for integers or <code class="docutils literal notranslate"><span class="pre">%f</span></code> for floats) may look
-more appropriate for tye type. Another placeholder you can use is <code class="docutils literal notranslate"><span class="pre">%b</span></code>, to
+more appropriate for the type. Another placeholder you can use is <code class="docutils literal notranslate"><span class="pre">%b</span></code>, to
 <a class="reference internal" href="#binary-data"><span class="std std-ref">adapt the object to binary type</span></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%d</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># WRONG</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># correct</span>
