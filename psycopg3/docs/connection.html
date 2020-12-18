@@ -292,6 +292,28 @@ ones: you should call <code class="docutils literal notranslate"><span class="pr
 <dd><p>The Python codec name of the connection’s client encoding.</p>
 <p>The property is writable for sync connections, read-only for async
 ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg3.AsyncConnection.set_client_encoding" title="psycopg3.AsyncConnection.set_client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_client_encoding</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
+<p>The value returned is always normalized to the Python codec
+<a class="reference external" href="https://docs.python.org/3/library/codecs.html#codecs.CodecInfo.name" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin9'</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span>
+<span class="s1">'iso8859-15'</span>
+</pre></div>
+</div>
+<p>and it reflects the current connection property, even if it is set
+outside Python:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN1"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span>
+<span class="s1">'iso8859-1'</span>
+</pre></div>
+</div>
+<p>A few PostgreSQL encodings are not available in Python and cannot be
+selected (currently <code class="docutils literal notranslate"><span class="pre">EUC_TW</span></code>, <code class="docutils literal notranslate"><span class="pre">MULE_INTERNAL</span></code>). The PostgreSQL
+<code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> encoding has the special meaning of “no encoding”: see
+<a class="reference internal" href="adapt-types.html#adapt-string"><span class="std std-ref">Strings adaptation</span></a> for details.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">PostgreSQL supported encodings</a>.</p>
+</div>
 </dd></dl>
 <dl class="py attribute">
 <dt id="psycopg3.Connection.info">
