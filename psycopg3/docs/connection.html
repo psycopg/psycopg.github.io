@@ -3,9 +3,9 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Cursor classes" href="cursor.html" /><link rel="prev" title="psycopg3 API" href="api/index.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
+    <meta name="generator" content="sphinx-3.3.1, furo 2020.11.19.beta18"/>
         <title>Connection classes - psycopg3 UNRELEASED documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
+      <link rel="stylesheet" href="_static/styles/furo.css?state=b6ed0a9a1cb9ac48ec540d55">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -40,13 +40,13 @@
   }
 </style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
     <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
-    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=b6ed0a9a1cb9ac48ec540d55">
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script defer src="_static/jquery.js"></script>
     <script defer src="_static/underscore.js"></script>
     <script defer src="_static/doctools.js"></script>
     <script defer src="_static/language_data.js"></script>
-    <script defer src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+    <script defer src="_static/scripts/main.js?state=b6ed0a9a1cb9ac48ec540d55"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -115,14 +115,12 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo only-light" src="_static/psycopg.svg" alt="Light Logo"/>
     <img class="sidebar-logo only-dark" src="_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
   <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
-  
 </a><form class="sidebar-search-container" method="get" action="search.html">
   <input class="sidebar-search" placeholder="Search" name="q">
   <input type="hidden" name="check_keywords" value="yes">
@@ -139,6 +137,7 @@
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
 </ul>
@@ -232,18 +231,24 @@ to close the cursor automatically when the block is exited.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Connection.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Connection.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prepare</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Connection.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query and return a cursor to read its results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
-<li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute.</p></li>
+<li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any.</p></li>
+<li><p><strong>prepare</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – Force (<code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) or disallow (<code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) preparation of
+the query. By default (<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) prepare automatically. See
+<a class="reference internal" href="prepared.html#prepared-statements"><span class="std std-ref">Prepared statements</span></a>.</p></li>
 </ul>
 </dd>
 </dl>
-<p>The cursor is what returned calling <a class="reference internal" href="#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> without parameters. See
-<a class="reference internal" href="params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing queries.</p>
+<p>The cursor is what returned calling <a class="reference internal" href="#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> without parameters. The
+parameters are passed to its <a class="reference internal" href="cursor.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> and the cursor is
+returned.</p>
+<p>See <a class="reference internal" href="params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
+queries.</p>
 </dd></dl>
 <p class="rubric">Transaction management methods</p>
 <p>For details see <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a>.</p>
@@ -319,6 +324,21 @@ selected (currently <code class="docutils literal notranslate"><span class="pre"
 <dt id="psycopg3.Connection.info">
 <code class="sig-name descname">info</code><a class="headerlink" href="#psycopg3.Connection.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
+</dd></dl>
+<dl class="py attribute">
+<dt id="psycopg3.Connection.prepare_threshold">
+<code class="sig-name descname">prepare_threshold</code><em class="property"> = 5</em><a class="headerlink" href="#psycopg3.Connection.prepare_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of times a query is executed before it is prepared.</p>
+<p>If it is set to 0, every query is prepared the first time is executed.
+If it is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, prepared statements are disabled on the
+connection.</p>
+<p>See <a class="reference internal" href="prepared.html#prepared-statements"><span class="std std-ref">Prepared statements</span></a> for details.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt id="psycopg3.Connection.prepared_max">
+<code class="sig-name descname">prepared_max</code><em class="property"> = 100</em><a class="headerlink" href="#psycopg3.Connection.prepared_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum number of prepared statements on the connection.</p>
+<p>If more queries need to be prepared, old ones are <a class="reference external" href="https://www.postgresql.org/docs/current/sql-deallocate.html">deallocated</a>.</p>
 </dd></dl>
 <p class="rubric">Methods you can use to do something cool</p>
 <dl class="py method">
@@ -397,7 +417,7 @@ the async quirkness: see <a class="reference internal" href="async.html#async-wi
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.execute">
-<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">Query</span></em>, <em class="sig-param"><span class="n">params</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Args<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prepare</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.commit">

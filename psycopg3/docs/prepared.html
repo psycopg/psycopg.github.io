@@ -1,11 +1,11 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Getting started with psycopg3" href="basic/index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Using COPY TO and COPY FROM" href="copy.html" /><link rel="prev" title="Data adaptation configuration" href="adaptation.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.11.19.beta18"/>
-        <title>Home - psycopg3 UNRELEASED documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?state=0b4ea95075050a0ef5b5896c">
+        <title>Prepared statements - psycopg3 UNRELEASED documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?state=1c3fc8f8cd71937df39162e1">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -40,13 +40,13 @@
   }
 </style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
     <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
-    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=0b4ea95075050a0ef5b5896c">
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=1c3fc8f8cd71937df39162e1">
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script defer src="_static/jquery.js"></script>
     <script defer src="_static/underscore.js"></script>
     <script defer src="_static/doctools.js"></script>
     <script defer src="_static/language_data.js"></script>
-    <script defer src="_static/scripts/main.js?state=0b4ea95075050a0ef5b5896c"></script></head>
+    <script defer src="_static/scripts/main.js?state=1c3fc8f8cd71937df39162e1"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -103,10 +103,10 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+      <a href="index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
     </div>
     <div class="header-right">
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -114,7 +114,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   <div class="sidebar-logo-container">
     <img class="sidebar-logo only-light" src="_static/psycopg.svg" alt="Light Logo"/>
     <img class="sidebar-logo only-dark" src="_static/psycopg.svg" alt="Dark Logo"/>
@@ -126,7 +126,7 @@
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
+  <ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="basic/index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html">Basic module usage</a></li>
@@ -135,9 +135,9 @@
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transaction management</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
 </ul>
@@ -162,41 +162,39 @@
   <main class="main">
     <div class="content">
       <article role="main">
-        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="psycopg-3-postgresql-database-adapter-for-python">
-<h1>Psycopg 3 – PostgreSQL database adapter for Python<a class="headerlink" href="#psycopg-3-postgresql-database-adapter-for-python" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> is a newly designed <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database adapter for the <a class="reference external" href="https://www.python.org/">Python</a>
-programming language.</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> presents a familiar interface for everyone who has used
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> or any other <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API 2.0</a> database adapter, but allows to use
-more modern PostgreSQL and Python features, such as:</p>
+        <div class="section" id="prepared-statements">
+<span id="index-0"></span><span id="id1"></span><h1>Prepared statements<a class="headerlink" href="#prepared-statements" title="Permalink to this headline">¶</a></h1>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> uses an automatic system to manage <em>prepared statements</em>. When a
+query is prepared, its parsing and planning is stored in the server session,
+so that further executions of the same query on the same connection (even with
+different parameters) are optimised.</p>
+<p>A query is prepared automatically after it is executed more than
+<a class="reference internal" href="connection.html#psycopg3.Connection.prepare_threshold" title="psycopg3.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code></a> times on a connection. <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> will make
+sure that no more than <a class="reference internal" href="connection.html#psycopg3.Connection.prepared_max" title="psycopg3.Connection.prepared_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepared_max</span></code></a> statements are planned: if
+further queries are executed, the least recently used ones are deallocated and
+the associated resources freed.</p>
+<p>Statement preparation can be controlled in several ways:</p>
 <ul class="simple">
-<li><p>Strict Strong Typing</p></li>
-<li><p><a class="reference internal" href="async.html#async"><span class="std std-ref">asynchronous support</span></a></p></li>
-<li><p><a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">server-side parameters binding</span></a></p></li>
-<li><p><a class="reference internal" href="params.html#binary-data"><span class="std std-ref">binary communication</span></a></p></li>
-<li><p><a class="reference internal" href="copy.html#copy"><span class="std std-ref">a great integration of the COPY support</span></a></p></li>
-<li><p><a class="reference internal" href="pq.html#psycopg3-pq"><span class="std std-ref">direct access to the libpq functionalities</span></a></p></li>
+<li><p>You can decide to prepare a query immediately by passing <code class="docutils literal notranslate"><span class="pre">prepare=True</span></code> to
+<a class="reference internal" href="connection.html#psycopg3.Connection.execute" title="psycopg3.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a> or <a class="reference internal" href="cursor.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a>. The query is prepared, if it
+wasn’t already, and executed as prepared from its first use.</p></li>
+<li><p>Conversely, passing <code class="docutils literal notranslate"><span class="pre">prepare=False</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> will avoid to prepare
+the query, regardless of the number of times it is executed. The default of
+the parameter is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, meaning that the query is prepared if the
+conditions described above are met.</p></li>
+<li><p>You can disable the use of prepared statements on a connection by setting
+its <a class="reference internal" href="connection.html#psycopg3.Connection.prepare_threshold" title="psycopg3.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code></a> attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
-<div class="section" id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="basic/index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced topics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/sql-prepare.html">PREPARE</a> PostgreSQL documentation contains plenty of details about
+prepared statements in PostgreSQL.</p>
+<p>Note however that <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> doesn’t use SQL statements such as
+<code class="sql docutils literal notranslate"><span class="pre">PREPARE</span></code> and <code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code>, but protocol level commands such as the
+ones exposed by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-async.html#LIBPQ-PQSENDPREPARE"><span class="pre">PQsendPrepare</span></a></code>, <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-async.html#LIBPQ-PQSENDQUERYPREPARED"><span class="pre">PQsendQueryPrepared</span></a></code>.</p>
 </div>
 </div>
 
@@ -204,22 +202,32 @@ more modern PostgreSQL and Python features, such as:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="basic/index.html">
+          <a class="next-page" href="copy.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></div>
+                <div class="title">Using COPY TO and COPY FROM</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="adaptation.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Data adaptation configuration</div>
+                
+              </div>
+            </a>
         </div>
 
         <div class="related-information">
               Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team
             |
-            <a class="muted-link" href="_sources/index.rst.txt"
+            <a class="muted-link" href="_sources/prepared.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -227,28 +235,8 @@ more modern PostgreSQL and Python features, such as:</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            Contents
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Psycopg 3 – PostgreSQL database adapter for Python</a><ul>
-<li><a class="reference internal" href="#documentation">Documentation</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
