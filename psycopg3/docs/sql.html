@@ -3,9 +3,9 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="errors – package exceptions" href="errors.html" /><link rel="prev" title="Cursor classes" href="cursor.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
+    <meta name="generator" content="sphinx-3.3.1, furo 2020.12.30.beta24"/>
         <title>sql – SQL string composition - psycopg3 UNRELEASED documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -38,14 +38,13 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
-    <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
+</style><link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
     <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script defer src="_static/jquery.js"></script>
-    <script defer src="_static/underscore.js"></script>
-    <script defer src="_static/doctools.js"></script>
-    <script defer src="_static/language_data.js"></script>
+    <script defer="defer" src="_static/jquery.js"></script>
+    <script defer="defer" src="_static/underscore.js"></script>
+    <script defer="defer" src="_static/doctools.js"></script>
+    <script defer="defer" src="_static/language_data.js"></script>
     <script defer src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
   <body dir="">
     
@@ -87,14 +86,15 @@
 
 <div class="announcement">
   <aside class="announcement-content">
-    <a style="text-decoration: none; color: white;"
+     <a style="text-decoration: none; color: white;"
    href="https://github.com/sponsors/dvarrazzo/">
    <img height="24px" width="24px" src="/img/logo/psycopg-48.png"/>
     Sponsor psycopg3 on GitHub
 </a>
-
+ 
   </aside>
 </div>
+
 <div class="page">
   <header class="mobile-header">
     <div class="header-left">
@@ -124,7 +124,7 @@
   <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html">
-  <input class="sidebar-search" placeholder="Search" name="q">
+  <input class="sidebar-search" placeholder=Search name="q">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
@@ -139,6 +139,7 @@
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
 </ul>
@@ -277,7 +278,7 @@ will be a <a class="reference internal" href="#psycopg3.sql.Composed" title="psy
 requested.</p>
 <dl class="py method">
 <dt id="psycopg3.sql.Composable.as_string">
-<code class="sig-name descname">as_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span>BaseConnection<span class="p">, </span>BaseCursor<span class="p">, </span>Transformer<span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.Composable.as_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">as_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>psycopg3.proto.AdaptContext<span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.Composable.as_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the value of the object as string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -475,7 +476,7 @@ an <a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQ
 <h2>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="psycopg3.sql.quote">
-<code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em>, <em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span>BaseConnection<span class="p">, </span>BaseCursor<span class="p">, </span>Transformer<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.quote" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em>, <em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>psycopg3.proto.AdaptContext<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adapt a Python object to a quoted SQL string.</p>
 <p>Use this function only if you absolutely want to convert a Python string to
 an SQL quoted literal to use e.g. to generate batch SQL and you won’t have
