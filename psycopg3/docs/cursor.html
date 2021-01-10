@@ -282,13 +282,13 @@ an exception if used with operations that don’t return result, such as an
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchmany">
-<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → List<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the next <em>size</em> records from the current recordset.</p>
 <p><em>size</em> default to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.arraysize</span></code> if not specified.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchall">
-<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → List<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all the remaining records from the current recordset.</p>
 </dd></dl>
 <dl class="py method">
@@ -377,11 +377,11 @@ the async quirkness: see <a class="reference internal" href="async.html#async-wi
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchmany">
-<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → List<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchall">
-<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → List<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -437,48 +437,80 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple.</p>
 <p>The object is normally returned by <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a>.</p>
 <p>See <a class="reference internal" href="copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for details.</p>
 <dl class="py method">
-<dt id="psycopg3.Copy.read">
-<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.Copy.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a row of data after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
-<p>Return an empty bytes string when the data is finished.</p>
-<p>Instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> you can even iterate on the object to read
-its data row by row, using <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">row</span> <span class="pre">in</span> <span class="pre">copy:</span> <span class="pre">...</span></code>.</p>
+<dt id="psycopg3.Copy.write_row">
+<code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a record to a table after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
+<p>The data in the tuple will be converted as configured on the cursor;
+see <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for details.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Copy.write">
 <code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a block of data after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
-<p>If the COPY is in binary format <em>buffer</em> must be <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>. In text mode
-it can be either <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>.</p>
+<dd><p>Write a block of data to a table after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
+<p>If the <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> is in binary format <em>buffer</em> must be <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>. In
+text mode it can be either <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg3.Copy.write_row">
-<code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.write_row" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a record after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> operation.</p>
-<p>The data in the tuple will be converted as configured on the cursor;
-see <a class="reference internal" href="adaptation.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for details.</p>
+<dt id="psycopg3.Copy.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)">memoryview</a><a class="headerlink" href="#psycopg3.Copy.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an unparsed row after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
+<p>Return an empty string when the data is finished.</p>
+<p>Instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> you can iterate on the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object to
+read its data row by row, using <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">row</span> <span class="pre">in</span> <span class="pre">copy:</span> <span class="pre">...</span></code>.</p>
+</dd></dl>
+<dl class="py method">
+<dt id="psycopg3.Copy.rows">
+<code class="sig-name descname">rows</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Iterator<span class="p">[</span>Tuple<span class="p">[</span>Any<span class="p">, </span><span class="p">…</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Copy.rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate on the result of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation record by record.</p>
+<p>Note that the records returned will be tuples of of unparsed strings or
+bytes, unless data types are specified using <a class="reference internal" href="#psycopg3.Copy.set_types" title="psycopg3.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a>.</p>
+<p>Equivalent of iterating on <a class="reference internal" href="#psycopg3.Copy.read_row" title="psycopg3.Copy.read_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_row()</span></code></a> until it returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd></dl>
+<dl class="py method">
+<dt id="psycopg3.Copy.read_row">
+<code class="sig-name descname">read_row</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Tuple<span class="p">[</span>Any<span class="p">, </span><span class="p">…</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Copy.read_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a parsed row of data from a table after a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
+<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> when the data is finished.</p>
+<p>Note that the records returned will be tuples of unparsed strings or
+bytes, unless data types are specified using <a class="reference internal" href="#psycopg3.Copy.set_types" title="psycopg3.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a>.</p>
+</dd></dl>
+<dl class="py method">
+<dt id="psycopg3.Copy.set_types">
+<code class="sig-name descname">set_types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">types</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Copy.set_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the types expected out of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
+<p>Without setting the types, the data from <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> will be
+returned as unparsed strings or bytes.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.AsyncCopy">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCopy</code><a class="headerlink" href="#psycopg3.AsyncCopy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manage an asynchronous <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation.</p>
-<p>The object is normally returned by <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> <a class="reference internal" href="#psycopg3.AsyncCursor.copy" title="psycopg3.AsyncCursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a>. Its methods are
-the same of the <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object but offering an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>).</p>
+<p>The object is normally returned by <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> <a class="reference internal" href="#psycopg3.AsyncCursor.copy" title="psycopg3.AsyncCursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a>.
+Its methods are similar to the ones of the <a class="reference internal" href="#psycopg3.Copy" title="psycopg3.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object but offering an
+<a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface (<code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>).</p>
 <dl class="py method">
-<dt id="psycopg3.AsyncCopy.read">
-<em class="property">async </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.AsyncCopy.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> you can even iterate on the object to read
-its data row by row, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span> <span class="pre">row</span> <span class="pre">in</span> <span class="pre">copy:</span> <span class="pre">...</span></code>.</p>
-</dd></dl>
+<dt id="psycopg3.AsyncCopy.write_row">
+<em class="property">async </em><code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy.write_row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCopy.write">
 <em class="property">async </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt id="psycopg3.AsyncCopy.write_row">
-<em class="property">async </em><code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCopy.write_row" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.AsyncCopy.read">
+<em class="property">async </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)">memoryview</a><a class="headerlink" href="#psycopg3.AsyncCopy.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> you can iterate on the <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code> object
+to read its data row by row, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span> <span class="pre">row</span> <span class="pre">in</span> <span class="pre">copy:</span> <span class="pre">...</span></code>.</p>
+</dd></dl>
+<dl class="py method">
+<dt id="psycopg3.AsyncCopy.rows">
+<code class="sig-name descname">rows</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → AsyncIterator<span class="p">[</span>Tuple<span class="p">[</span>Any<span class="p">, </span><span class="p">…</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCopy.rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use it as <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span> <span class="pre">record</span> <span class="pre">in</span> <span class="pre">copy.rows():</span></code> …</p>
+</dd></dl>
+<dl class="py method">
+<dt id="psycopg3.AsyncCopy.read_row">
+<em class="property">async </em><code class="sig-name descname">read_row</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Tuple<span class="p">[</span>Any<span class="p">, </span><span class="p">…</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCopy.read_row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </div>
