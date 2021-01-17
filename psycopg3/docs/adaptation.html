@@ -242,7 +242,7 @@ will use the same adaptation rules.</p></li>
 (e.g. looking up the connection encoding) and then call a fast-path operation
 for each value to convert.</p>
 <p>Querying will fail if a Python object for which there isn’t a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code>
-registered (for the right <code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code>) is used as query parameter.
+registered (for the right <a class="reference internal" href="pq.html#psycopg3.pq.Format" title="psycopg3.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></a>) is used as query parameter.
 If the query returns a data type whose OID doesn’t have a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>, the
 value will be returned as a string (or bytes string for binary types).</p>
 </div>
@@ -255,16 +255,23 @@ value will be returned as a string (or bytes string for binary types).</p>
 <dl class="py class">
 <dt id="psycopg3.adapt.Format">
 <em class="property">class </em><code class="sig-prename descclassname">psycopg3.adapt.</code><code class="sig-name descname">Format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.adapt.Format" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enum representing the format of a query argument or return value.</p>
+<dd><p>Enum representing the format wanted for a query argument.</p>
+<p>The value <a class="reference internal" href="#psycopg3.adapt.Format.AUTO" title="psycopg3.adapt.Format.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a> allows psycopg3 to choose the best value for a certain
+value.</p>
+<dl class="py attribute">
+<dt id="psycopg3.adapt.Format.AUTO">
+<code class="sig-name descname">AUTO</code><em class="property"> = 's'</em><a class="headerlink" href="#psycopg3.adapt.Format.AUTO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically chosen (<code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholder).</p>
+</dd></dl>
 <dl class="py attribute">
 <dt id="psycopg3.adapt.Format.TEXT">
-<code class="sig-name descname">TEXT</code><em class="property"> = 0</em><a class="headerlink" href="#psycopg3.adapt.Format.TEXT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Text parameter.</p>
+<code class="sig-name descname">TEXT</code><em class="property"> = 't'</em><a class="headerlink" href="#psycopg3.adapt.Format.TEXT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text parameter (<code class="docutils literal notranslate"><span class="pre">%t</span></code> placeholder).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt id="psycopg3.adapt.Format.BINARY">
-<code class="sig-name descname">BINARY</code><em class="property"> = 1</em><a class="headerlink" href="#psycopg3.adapt.Format.BINARY" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binary parameter.</p>
+<code class="sig-name descname">BINARY</code><em class="property"> = 'b'</em><a class="headerlink" href="#psycopg3.adapt.Format.BINARY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary parameter (<code class="docutils literal notranslate"><span class="pre">%b</span></code> placeholder).</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -289,20 +296,20 @@ be possible to know the connection encoding or the server date format.</p></li>
 </dl>
 <dl class="py attribute">
 <dt id="psycopg3.adapt.Dumper.format">
-<code class="sig-name descname">format</code><em class="property">: <a class="reference internal" href="#psycopg3.adapt.Format" title="psycopg3.adapt.Format">Format</a></em><a class="headerlink" href="#psycopg3.adapt.Dumper.format" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">format</code><em class="property">: pq.Format</em><a class="headerlink" href="#psycopg3.adapt.Dumper.format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The format this class dumps, <a class="reference internal" href="#psycopg3.adapt.Format.TEXT" title="psycopg3.adapt.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a> or <a class="reference internal" href="#psycopg3.adapt.Format.BINARY" title="psycopg3.adapt.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>.
 This is a class attribute.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Dumper.dump">
-<em class="property">abstract </em><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)">bytearray</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)">memoryview</a><span class="p">]</span><a class="headerlink" href="#psycopg3.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the object <em>obj</em> to PostgreSQL representation.</p>
 <p>The format returned by dump shouldn’t contain quotes or escaped
 values.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Dumper.quote">
-<code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="headerlink" href="#psycopg3.adapt.Dumper.quote" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)">bytearray</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)">memoryview</a><span class="p">]</span><a class="headerlink" href="#psycopg3.adapt.Dumper.quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the object <em>obj</em> to escaped representation.</p>
 <p>By default return the <a class="reference internal" href="#psycopg3.adapt.Dumper.dump" title="psycopg3.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> value quoted and sanitised, so
 that the result can be used to build a SQL string. This works well
@@ -371,7 +378,7 @@ This is a class attribute.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.adapt.Loader.load">
-<em class="property">abstract </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em><span class="sig-paren">)</span> → Any<a class="headerlink" href="#psycopg3.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)">bytearray</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)">memoryview</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → Any<a class="headerlink" href="#psycopg3.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a PostgreSQL value to a Python object.</p>
 </dd></dl>
 <dl class="py method">
@@ -435,7 +442,7 @@ state so adapting several values of the same type can be optimised.</p>
         </div>
 
         <div class="related-information">
-              Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team
+              Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team
             |
             <a class="muted-link" href="_sources/adaptation.rst.txt"
                rel="nofollow">

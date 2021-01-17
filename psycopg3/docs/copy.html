@@ -237,20 +237,18 @@ according to the format.</p>
 </div>
 <p>You can improve the results by using <a class="reference internal" href="cursor.html#psycopg3.Copy.set_types" title="psycopg3.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> before reading, but
 you have to specify them yourselves.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3.oids</span> <span class="kn">import</span> <span class="n">builtins</span>
-
-<span class="k">with</span> <span class="n">cur</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY (VALUES (10::int, current_date)) TO STDOUT"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="n">copy</span><span class="o">.</span><span class="n">set_types</span><span class="p">([</span><span class="n">builtins</span><span class="p">[</span><span class="s2">"int4"</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">builtins</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cur</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY (VALUES (10::int, current_date)) TO STDOUT"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">set_types</span><span class="p">([</span><span class="s2">"int4"</span><span class="p">,</span> <span class="s2">"date"</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">rows</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># (10, datetime.date(2046, 12, 24))</span>
 </pre></div>
 </div>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
-<p>Document the <code class="xref py py-obj docutils literal notranslate"><span class="pre">builtins</span></code> register… but more likely do something
-better such as allowing to pass type names, unifying <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeRegistry</span></code> and
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code>, none of which I have documented, so you haven’t seen
-anything… 👀</p>
+<p>Currently only builtin names are recognised; custom types must be
+specified by numeric oid. This wll change after the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeRegistry</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code> get integrated, none of which I have documented, so you
+haven’t seen anything… 👀</p>
 </div>
 </div>
 <div class="section" id="copying-block-by-block">
@@ -321,7 +319,7 @@ asynchronous methods and the differences from its sync <a class="reference inter
         </div>
 
         <div class="related-information">
-              Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team
+              Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team
             |
             <a class="muted-link" href="_sources/copy.rst.txt"
                rel="nofollow">
