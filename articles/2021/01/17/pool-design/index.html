@@ -91,11 +91,11 @@ may need it;</li>
 <li>if more than <tt class="docutils literal">maxconn</tt> connections are requested the client will receive
 an error.</li>
 </ul>
-<p>For <tt class="docutils literal">psycopg3</tt> I would like something better. I have read around looking
-into other pool implementations to figure out what a &quot;better&quot; connection pool
-ought to do (a very well thought one seems <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>, a Java connection
-pool) and these are a few ideas I'd like to work on, here for a feedback
-before I jump into implementing enthusiastically the wrong thing.</p>
+<p>For <tt class="docutils literal">psycopg3</tt> I would like something better. I have read around, looking
+into other pool implementations to figure out what a well designed connection
+pool ought to do (a very well thought one seems the Java <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>) and
+these are a few ideas I'd like to work on: they are here for a feedback,
+before I jump into enthusiastically implementing the wrong thing...</p>
 <!-- CUT-HERE -->
 <div class="section" id="client-interface">
 <h2>Client interface</h2>
@@ -119,9 +119,10 @@ would be:</p>
 <div class="section" id="blocking-behaviour">
 <h3>Blocking behaviour</h3>
 <p>Another important usability point is the behaviour in the face of an exhausted
-pool: the sane behaviour here is to block, with a timeout, so that in the face
-of a spike there is a buffer before requests start to get killed. I would
-expect no crash here:</p>
+pool: the sane behaviour here is to block: not forever, but until either a
+connection is available or until a timeout expires, and only then throw an
+exception, so that in the face of a spike there is a buffer before requests
+start to get killed. I would expect no crash here:</p>
 <pre class="code python literal-block">
 <span class="k">async</span> <span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">work_for_sec</span><span class="p">):</span>
     <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">work_for_sec</span><span class="p">,))</span>
@@ -133,7 +134,7 @@ expect no crash here:</p>
 </pre>
 <p>Which also illustrates that, as many other objects in <tt class="docutils literal">psycopg3</tt>, there
 would be an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">asyncio</a> version of the object and a sync one (which would work
-with normal threads and with eventlet/gevent green threads).</p>
+with normal threads and with Eventlet/gevent green threads).</p>
 </div>
 <div class="section" id="connection-configuration">
 <h3>Connection configuration</h3>
@@ -202,10 +203,13 @@ available create a new one&quot;:</p>
 <pre class="code python literal-block">
 <span class="k">class</span> <span class="nc">Pool</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">getconn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pool</span><span class="p">():</span>
-            <span class="n">newconn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_put_it_in_the_pool_when_done</span><span class="p">(</span><span class="n">newconn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">newconn</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_a_connection_from_the_pool</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">conn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_put_it_in_the_pool_when_done</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">conn</span>
 </pre>
 <p>This <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/blob/dev/documents/Welcome-To-The-Jungle.md">interesting article</a> shows that this might not be the best way to do
 it, especially if the connection time is particularly long compared to the
@@ -221,9 +225,31 @@ following a strategy like:</p>
 <p>If there is a workers infrastructure in place there can me more jobs for them:
 periodically checking for the state of the unused connections in the pool, for
 instance, or closing them if they have been alive more than a configured
-amount of time (30 minutes?) and replacing them with a fresh one (or not
-replacing them in case we have more than <tt class="docutils literal">minconn</tt> connections no more as
-much pressure as when there was a spike.</p>
+amount of time (30 minutes?) and replacing them with a fresh one, (or not
+replacing them in case we have more than <tt class="docutils literal">minconn</tt> connections and a
+previous spike has now passed).</p>
+</div>
+<div class="section" id="what-to-do-in-case-of-connection-failure">
+<h3>What to do in case of connection failure?</h3>
+<p>The pool acts as a shield helping the application to reconnect in case the
+connection with the database is lost. However, when does this behaviour stop
+being sane? If the database is unreachable - maybe misconfigured, maybe moved
+- there is a risk that the application doesn't die, because the pool keeps
+insisting to reconnect, but it doesn't work either, because there is no
+working database connection.</p>
+<p>In my experience with live systems this can be a difficult condition to
+diagnose: several times I have wished that an application, screaming loud on a
+dashboard, instead of trying to stay up complaining quietly in some logging
+stream. On the other hand maybe the state the application holds is precious
+enough that it can be worth to wait a few minutes before crashing and burning.</p>
+<p>A first step towards a sane behaviour could be to die early, on startup, if
+the connection is not working when the first pool population is done: the
+program would fail hard and fast if the database - assumed to be a
+prerequisite - is nowhere to be found.</p>
+<p>What if the database is missing in action during the program lifetime?
+Following connection attempts may be repeated, with an exponential backoff,
+until dying after a few minutes of fruitless attempts (with a <tt class="docutils literal">sys.exit(1)</tt>
+or some other termination function which might be subclassed.</p>
 </div>
 <div class="section" id="connections-usage-pattern">
 <h3>Connections usage pattern</h3>
@@ -234,13 +260,20 @@ uniformly)? Randomly (whatever comes out from whatever hash map used to keep
 the connection)?</p>
 <p>Is there a reason to prefer one way or the other? ISTM that a stack behaviour
 allows a better reuse of prepared statements and an easy implementation of
-the <tt class="docutils literal">max_idle_sec</tt> parameter (get connection from the top of the stack,
-evict idle ones from the bottom).</p>
+the <tt class="docutils literal">max_idle_sec</tt> parameter (get connections from the top of the stack,
+evict idle ones from the bottom). I am sure I haven't thought about this well
+enough though.</p>
 </div>
 </div>
 <div class="section" id="proposed-api">
 <h2>Proposed API</h2>
-<p>Given the behaviour described, the pool's interface might look like:</p>
+<p>Given the behaviour described, the methods available on the pool object might
+look like the ones described here.</p>
+<p>The interface would be implemented in two version: a <tt class="docutils literal">Pool</tt> class
+using normal blocking functions and threads for concurrency (which greenlet
+libraries such as Eventlet or gevent would be able to monkeypatch) and an
+<tt class="docutils literal">AsyncPool</tt> implementation using the usual <tt class="docutils literal">await</tt> and <tt class="docutils literal">async with</tt> on
+blocking methods and using <tt class="docutils literal">asyncio.Task</tt> for concurrency.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal">connection(timeout_sec=None)</tt> method:</dt>
 <dd><p class="first">Open a context block and return a connection from the pool. The connection
@@ -257,6 +290,10 @@ dispose of it and create a new one; if in state of transaction of error
 <strong>roll back the transaction</strong>, consistently with what
 <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/connection.html#psycopg3.Connection.close">Connection.close()</a> does.</p>
 </dd>
+<dt><tt class="docutils literal">close()</tt></dt>
+<dd>Close all the connections in the pool. Further attempts to create a new
+connection will fail immediately with a helpful message (like, &quot;dude,
+what do you want to do, seriously?&quot;)</dd>
 <dt><tt class="docutils literal">configure(conn)</tt>:</dt>
 <dd>Configure a connection before making it available to the pool. The default
 implementation is no-op: subclasses may override it to configure the
@@ -265,6 +302,10 @@ connections; alternatively a <tt class="docutils literal">configure_func</tt> mi
 <dt><tt class="docutils literal">get_info()</tt>:</dt>
 <dd>Return stats about the behaviour of the pool so far (connections open,
 reused, returned...) for monitoring.</dd>
+<dt><tt class="docutils literal">terminate()</tt></dt>
+<dd>Terminate the program, invoked by a pool worker after connection attempts
+have been repeatedly fruitless. It is exposed to allow overriding the
+default behaviour (<cite>sys.exit(1)</cite>) in a subclass.</dd>
 <dt><tt class="docutils literal">get_maintenance_task()</tt>:</dt>
 <dd><p class="first">Get the next maintenance task to perform on the pool. Having them
 available externally would make possible to have full control of when such
@@ -274,21 +315,22 @@ sync behaviour, using no background worker).</p>
 more difficult than it should be.</p>
 </dd>
 </dl>
-<div class="section" id="key-configuration-knobs">
-<h3>Key configuration knobs</h3>
+<div class="section" id="key-configuration-parameters">
+<h3>Key configuration parameters</h3>
+<p>These parameter would be passed to the class constructor.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal">minconn</tt>:</dt>
-<dd>Minimum number of connections to keep open in the pool. If some
-are closed the pool should try to create new ones as quickly as
-possible to replace them. Proposed default: 4 (very defensive, to enable
-pool behaviour but avoid to saturate a server unless configured up).</dd>
+<dd>Minimum number of connections to keep open in the pool. If some are closed
+the pool should try to create new ones as quickly as possible to replace
+them. Proposed default: 4 (very defensive: to enable the pooling behaviour
+but to avoid to saturate a server unless configured up).</dd>
 <dt><tt class="docutils literal">maxconn</tt>:</dt>
-<dd>Maximum number of connections to open at any given time. If
-<tt class="docutils literal">maxconn</tt> By default <tt class="docutils literal">maxconn</tt> == <tt class="docutils literal">minconn</tt>, meaning that no extra
-connection is created in case more client requests arrive. If <tt class="docutils literal">maxconn</tt> &gt;
-<tt class="docutils literal">minconn</tt> the pool can create new connections if demand increases; later
-on the extra <tt class="docutils literal">maxconn</tt> - <tt class="docutils literal">minconn</tt> connections may be closed if deemed
-no more required (default: <tt class="docutils literal">minconn</tt>).</dd>
+<dd>Maximum number of connections to open at any given time. If <tt class="docutils literal">maxconn</tt> ==
+<tt class="docutils literal">minconn</tt> no extra connection is created in case more client requests
+arrive: they will just wait until a connection is made available again. If
+<tt class="docutils literal">maxconn</tt> &gt; <tt class="docutils literal">minconn</tt> the pool can create new connections if the demand
+increases; later the extra connections created may be closed if deemed no
+more required (default: <tt class="docutils literal">minconn</tt>).</dd>
 <dt><tt class="docutils literal">args</tt>, <tt class="docutils literal">kwargs</tt>:</dt>
 <dd>Arguments to pass to the <tt class="docutils literal">connection_factory</tt> to create a new connection
 (default: empty, connect as per <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-envars.html">PG* env vars</a>, like
@@ -306,21 +348,26 @@ name might be passed to the application as an env var.</dd>
 <dd>Default timeout before raising an exception if a connection
 cannot be served. It may be overridden by
 <tt class="docutils literal"><span class="pre">Pool.connection(timeout_sec=...)</span></tt> (default: 30 sec).</dd>
-<dt><tt class="docutils literal">max_idle_sec</tt>:</dt>
-<dd>Time a connection can sit idle in the pool before being removed. Only
-connections above <tt class="docutils literal">minconn</tt> are removed, if <tt class="docutils literal">maxconn</tt> allows to create
-them.</dd>
 <dt><tt class="docutils literal">max_lifetime_sec</tt>:</dt>
 <dd>Maximum time a connection should be kept in the pool
 and used. After such time, when the connection is not in use, it can be
 closed and replaced by a new one (default: 30 minutes - 10% random factor to
 avoid mass evictions).</dd>
+<dt><tt class="docutils literal">max_idle_sec</tt>:</dt>
+<dd>Time a connection can sit idle in the pool before being removed. Only
+connections above <tt class="docutils literal">minconn</tt> are removed, if <tt class="docutils literal">maxconn</tt> allows to create
+them (default: 10 min + 10% random).</dd>
+<dt><tt class="docutils literal">terminate_after_sec</tt>:</dt>
+<dd>Number of seconds to wait for a reconnection attempt before giving up and
+terminate the program, calling <tt class="docutils literal">Pool.terminate()</tt> (default: 5 min,
+starting from 1sec ± 10%, doubled up until the precise threshold, then
+kaputt).</dd>
 <dt><tt class="docutils literal">num_workers</tt>:</dt>
-<dd>Number of background workers to perform maintenance tasks. If no worker is
-desired the dynamic characteristics of the pool are downgraded (creating a
-new connection will be demanded to the requesting task). Background jobs
-might be executed by the application calling <tt class="docutils literal">get_maintenance_task()</tt>
-(default: 3).</dd>
+<dd>Number of background workers to perform maintenance tasks. If set to 0 the
+dynamic characteristics of the pool might be downgraded (e.g. creating a new
+connection will happen in the requesting thread, blocking it for the time it
+takes). Background jobs might be executed by the application calling
+<tt class="docutils literal">get_maintenance_task()</tt> (default: 3).</dd>
 </dl>
 </div>
 </div>
