@@ -118,6 +118,47 @@ list</a> psycopg&#64;postgresql.org.</p>
   <h1>Latest articles</h1>
   <div class="article">
   
+    <h2><a href="/articles/2021/01/17/pool-design/">Designing a connection pool for psycopg3</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2021-01-17
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/"
+          >psycopg3</a>,
+      <a class="tag" href="/"
+          >development</a>
+      
+    
+  </p>
+  
+    <p>The <a class="reference external" href="https://www.psycopg.org/docs/pool.html">psycopg2 pool</a> is a pretty simple object, little more than... a pool of
+open connections, and I think it falls short in several ways:</p>
+<ul class="simple">
+<li>the top usability problem is the fact that it cannot be used as context
+manager;</li>
+<li>if a connection is broken it is not noticed it until it is used by a client;</li>
+<li>if <tt class="docutils literal">minconn</tt> connections are already taken, a new one is created and
+disposed of as soon as finished using, regardless of whether other clients
+may need it;</li>
+<li>if more than <tt class="docutils literal">maxconn</tt> connections are requested the client will receive
+an error.</li>
+</ul>
+<p>For <tt class="docutils literal">psycopg3</tt> I would like something better. I have read around, looking
+into other pool implementations to figure out what a well designed connection
+pool ought to do (a very well thought one seems the Java <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>) and
+these are a few ideas I'd like to work on: they are here for a feedback,
+before I jump into enthusiastically implementing the wrong thing...</p>
+
+    
+    <p class="read-more"><a href="/articles/2021/01/17/pool-design/">Read more...</a></p>
+    
+  
+  </div>
+
+  <div class="article">
+  
     <h2><a href="/articles/2020/11/24/psycopg3-adaptation/">The psycopg3 adaptation system</a></h2>
   
   <p class="header">
@@ -192,31 +233,6 @@ programs producing data and pushing it efficiently to the database using the
 
     
     <p class="read-more"><a href="/articles/2020/11/15/psycopg3-copy/">Read more...</a></p>
-    
-  
-  </div>
-
-  <div class="article">
-  
-    <h2><a href="/articles/2020/09/06/psycopg-286-released/">Psycopg 2.8.6 released</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2020-09-06
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/"
-          >news</a>,
-      <a class="tag" href="/"
-          >release</a>
-      
-    
-  </p>
-  
-    <p>Psycopg 2.8.6 has been released.</p>
-
-    
-    <p class="read-more"><a href="/articles/2020/09/06/psycopg-286-released/">Read more...</a></p>
     
   
   </div>

@@ -2,13 +2,320 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title type="text">Articles</title>
   <id>urn:uuid:2c1dc889-18e5-364f-aebe-4eb10b25c80c</id>
-  <updated>2020-11-24T00:00:00Z</updated>
+  <updated>2021-01-17T00:00:00Z</updated>
   <link href="https://www.psycopg.org/articles/" />
   <link href="https://www.psycopg.org/articles.xml" rel="self" />
   <author>
     <name></name>
   </author>
   <generator uri="https://github.com/t73fde/lektor-feed" version="20191006.1">Lektor Feed Plugin</generator>
+  <entry xml:base="https://www.psycopg.org/articles/2021/01/17/pool-design/">
+    <title type="text">Designing a connection pool for psycopg3</title>
+    <id>urn:uuid:97b222d5-e78e-3e80-a276-32098f6dccdd</id>
+    <updated>2021-01-17T00:00:00Z</updated>
+    <link href="https://www.psycopg.org/articles/2021/01/17/pool-design/" />
+    <author>
+      <name>Daniele Varrazzo</name>
+    </author>
+    <content type="html">&lt;p&gt;The &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/pool.html&quot;&gt;psycopg2 pool&lt;/a&gt; is a pretty simple object, little more than... a pool of
+open connections, and I think it falls short in several ways:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;the top usability problem is the fact that it cannot be used as context
+manager;&lt;/li&gt;
+&lt;li&gt;if a connection is broken it is not noticed it until it is used by a client;&lt;/li&gt;
+&lt;li&gt;if &lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt; connections are already taken, a new one is created and
+disposed of as soon as finished using, regardless of whether other clients
+may need it;&lt;/li&gt;
+&lt;li&gt;if more than &lt;tt class=&quot;docutils literal&quot;&gt;maxconn&lt;/tt&gt; connections are requested the client will receive
+an error.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; I would like something better. I have read around, looking
+into other pool implementations to figure out what a well designed connection
+pool ought to do (a very well thought one seems the Java &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/brettwooldridge/HikariCP&quot;&gt;HikariCP&lt;/a&gt;) and
+these are a few ideas I'd like to work on: they are here for a feedback,
+before I jump into enthusiastically implementing the wrong thing...&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class=&quot;section&quot; id=&quot;client-interface&quot;&gt;
+&lt;h2&gt;Client interface&lt;/h2&gt;
+&lt;div class=&quot;section&quot; id=&quot;context-manager&quot;&gt;
+&lt;h3&gt;Context manager&lt;/h3&gt;
+&lt;p&gt;In modern Python it is expected that resources are handled by a context
+manager, so the canonical way to use a pooled connection should be:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;...&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;consume_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchall&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Note that, because there is a &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/connection.html#psycopg3.Connection.execute&quot;&gt;Connection.execute()&lt;/a&gt; method, the minimal use
+would be:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DML_QUERY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;blocking-behaviour&quot;&gt;
+&lt;h3&gt;Blocking behaviour&lt;/h3&gt;
+&lt;p&gt;Another important usability point is the behaviour in the face of an exhausted
+pool: the sane behaviour here is to block: not forever, but until either a
+connection is available or until a timeout expires, and only then throw an
+exception, so that in the face of a spike there is a buffer before requests
+start to get killed. I would expect no crash here:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;worker&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;work_for_sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select pg_sleep(&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;work_for_sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,))&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AsyncPool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connection_timeout_sec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;create_task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;worker&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;work_for_sec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Which also illustrates that, as many other objects in &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt;, there
+would be an &lt;a class=&quot;reference external&quot; href=&quot;https://docs.python.org/3/library/asyncio.html&quot;&gt;asyncio&lt;/a&gt; version of the object and a sync one (which would work
+with normal threads and with Eventlet/gevent green threads).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;connection-configuration&quot;&gt;
+&lt;h3&gt;Connection configuration&lt;/h3&gt;
+&lt;p&gt;There should be a way to configure a Python connection, for instance to
+register adapters, before it is available to the application. Is subclassing
+the best way to do it? Someone might find more useful to choose dynamically
+what configuration to use.&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;c1&quot;&gt;# Subclassing:&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyPool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;psycopg3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;MyAdapter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MyPool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Configuring:&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;my_configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;MyAdapter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configure_func&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;my_configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;exclusive-connections&quot;&gt;
+&lt;h3&gt;Exclusive connections?&lt;/h3&gt;
+&lt;p&gt;Should there be a way to create an exclusive connection? Sometimes I need
+one, in an otherwise pooled application, e.g. to receive notifications:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;listen_notifications&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exclusive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;autocommit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;True&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;handle_notification&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;But I don't think there is such need if the connection parameters are made
+available on the pool:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pool_maxconn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;db_dsn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,))&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;listen_notifications&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;autocommit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;True&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notifies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;handle_notification&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;notify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;which leaves to the user the choice between what connection class to use,
+how to configure it, etc. So that's probably not so useful.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;internal-behaviour&quot;&gt;
+&lt;h2&gt;Internal behaviour&lt;/h2&gt;
+&lt;div class=&quot;section&quot; id=&quot;pool-worker&quot;&gt;
+&lt;h3&gt;Pool worker&lt;/h3&gt;
+&lt;p&gt;If we desire the pool to be a fast provider of connection, not slowing down
+the application operations, certain things should happen behind the scene:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;do we have a spike, so we need more connections?&lt;/li&gt;
+&lt;li&gt;do we have a moment of calm, so we can do with less connections?&lt;/li&gt;
+&lt;li&gt;are the connections in the pool still sane?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A trivial behaviour would be something like &amp;quot;if there are no connections
+available create a new one&amp;quot;:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getconn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_get_a_connection_from_the_pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_put_it_in_the_pool_when_done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/brettwooldridge/HikariCP/blob/dev/documents/Welcome-To-The-Jungle.md&quot;&gt;interesting article&lt;/a&gt; shows that this might not be the best way to do
+it, especially if the connection time is particularly long compared to the
+processing time. Growing the pool could be demanded to a background worker,
+following a strategy like:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getconn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;worker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_a_new_connection_and_put_it_in_the_pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wait_for_a_connection_from_the_pool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;If there is a workers infrastructure in place there can me more jobs for them:
+periodically checking for the state of the unused connections in the pool, for
+instance, or closing them if they have been alive more than a configured
+amount of time (30 minutes?) and replacing them with a fresh one, (or not
+replacing them in case we have more than &lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt; connections and a
+previous spike has now passed).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-to-do-in-case-of-connection-failure&quot;&gt;
+&lt;h3&gt;What to do in case of connection failure?&lt;/h3&gt;
+&lt;p&gt;The pool acts as a shield helping the application to reconnect in case the
+connection with the database is lost. However, when does this behaviour stop
+being sane? If the database is unreachable - maybe misconfigured, maybe moved
+- there is a risk that the application doesn't die, because the pool keeps
+insisting to reconnect, but it doesn't work either, because there is no
+working database connection.&lt;/p&gt;
+&lt;p&gt;In my experience with live systems this can be a difficult condition to
+diagnose: several times I have wished that an application, screaming loud on a
+dashboard, instead of trying to stay up complaining quietly in some logging
+stream. On the other hand maybe the state the application holds is precious
+enough that it can be worth to wait a few minutes before crashing and burning.&lt;/p&gt;
+&lt;p&gt;A first step towards a sane behaviour could be to die early, on startup, if
+the connection is not working when the first pool population is done: the
+program would fail hard and fast if the database - assumed to be a
+prerequisite - is nowhere to be found.&lt;/p&gt;
+&lt;p&gt;What if the database is missing in action during the program lifetime?
+Following connection attempts may be repeated, with an exponential backoff,
+until dying after a few minutes of fruitless attempts (with a &lt;tt class=&quot;docutils literal&quot;&gt;sys.exit(1)&lt;/tt&gt;
+or some other termination function which might be subclassed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;connections-usage-pattern&quot;&gt;
+&lt;h3&gt;Connections usage pattern&lt;/h3&gt;
+&lt;p&gt;In which order should the connections in the pool be used? As a stack (put
+back a connection on top of the stack, it will be the next one to use)? As a
+queue (put back the connection at the bottom of the queue, try to use them
+uniformly)? Randomly (whatever comes out from whatever hash map used to keep
+the connection)?&lt;/p&gt;
+&lt;p&gt;Is there a reason to prefer one way or the other? ISTM that a stack behaviour
+allows a better reuse of prepared statements and an easy implementation of
+the &lt;tt class=&quot;docutils literal&quot;&gt;max_idle_sec&lt;/tt&gt; parameter (get connections from the top of the stack,
+evict idle ones from the bottom). I am sure I haven't thought about this well
+enough though.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;proposed-api&quot;&gt;
+&lt;h2&gt;Proposed API&lt;/h2&gt;
+&lt;p&gt;Given the behaviour described, the methods available on the pool object might
+look like the ones described here.&lt;/p&gt;
+&lt;p&gt;The interface would be implemented in two version: a &lt;tt class=&quot;docutils literal&quot;&gt;Pool&lt;/tt&gt; class
+using normal blocking functions and threads for concurrency (which greenlet
+libraries such as Eventlet or gevent would be able to monkeypatch) and an
+&lt;tt class=&quot;docutils literal&quot;&gt;AsyncPool&lt;/tt&gt; implementation using the usual &lt;tt class=&quot;docutils literal&quot;&gt;await&lt;/tt&gt; and &lt;tt class=&quot;docutils literal&quot;&gt;async with&lt;/tt&gt; on
+blocking methods and using &lt;tt class=&quot;docutils literal&quot;&gt;asyncio.Task&lt;/tt&gt; for concurrency.&lt;/p&gt;
+&lt;dl class=&quot;docutils&quot;&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;connection(timeout_sec=None)&lt;/tt&gt; method:&lt;/dt&gt;
+&lt;dd&gt;&lt;p class=&quot;first&quot;&gt;Open a context block and return a connection from the pool. The connection
+is returned to the pool at the end of the block.&lt;/p&gt;
+&lt;p class=&quot;last&quot;&gt;On block exit, if a transaction is open, &lt;strong&gt;commit or roll back&lt;/strong&gt; an open
+transaction, according to whether an exception has been raised in the
+block, consistently with what the &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/transactions.html#transaction-blocks&quot;&gt;connection block&lt;/a&gt; does.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;getconn(timeout_sec)&lt;/tt&gt;, &lt;tt class=&quot;docutils literal&quot;&gt;putconn(conn)&lt;/tt&gt; methods:&lt;/dt&gt;
+&lt;dd&gt;&lt;p class=&quot;first&quot;&gt;Obtain a connection from the pool and return it. To use if, for some
+reason, the context manager cannot be used.&lt;/p&gt;
+&lt;p class=&quot;last&quot;&gt;On &lt;tt class=&quot;docutils literal&quot;&gt;putconn()&lt;/tt&gt; check the state of the connection: if it is broken
+dispose of it and create a new one; if in state of transaction of error
+&lt;strong&gt;roll back the transaction&lt;/strong&gt;, consistently with what
+&lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/connection.html#psycopg3.Connection.close&quot;&gt;Connection.close()&lt;/a&gt; does.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;close()&lt;/tt&gt;&lt;/dt&gt;
+&lt;dd&gt;Close all the connections in the pool. Further attempts to create a new
+connection will fail immediately with a helpful message (like, &amp;quot;dude,
+what do you want to do, seriously?&amp;quot;)&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;configure(conn)&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Configure a connection before making it available to the pool. The default
+implementation is no-op: subclasses may override it to configure the
+connections; alternatively a &lt;tt class=&quot;docutils literal&quot;&gt;configure_func&lt;/tt&gt; might be passed to the
+&lt;tt class=&quot;docutils literal&quot;&gt;Pool&lt;/tt&gt; constructor.&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;get_info()&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Return stats about the behaviour of the pool so far (connections open,
+reused, returned...) for monitoring.&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;terminate()&lt;/tt&gt;&lt;/dt&gt;
+&lt;dd&gt;Terminate the program, invoked by a pool worker after connection attempts
+have been repeatedly fruitless. It is exposed to allow overriding the
+default behaviour (&lt;cite&gt;sys.exit(1)&lt;/cite&gt;) in a subclass.&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;get_maintenance_task()&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;&lt;p class=&quot;first&quot;&gt;Get the next maintenance task to perform on the pool. Having them
+available externally would make possible to have full control of when such
+tasks are executed (useful for testing or to provide some sort of
+sync behaviour, using no background worker).&lt;/p&gt;
+&lt;p class=&quot;last&quot;&gt;Experimental idea: will drop it if it would make the pool implementation
+more difficult than it should be.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;div class=&quot;section&quot; id=&quot;key-configuration-parameters&quot;&gt;
+&lt;h3&gt;Key configuration parameters&lt;/h3&gt;
+&lt;p&gt;These parameter would be passed to the class constructor.&lt;/p&gt;
+&lt;dl class=&quot;docutils&quot;&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Minimum number of connections to keep open in the pool. If some are closed
+the pool should try to create new ones as quickly as possible to replace
+them. Proposed default: 4 (very defensive: to enable the pooling behaviour
+but to avoid to saturate a server unless configured up).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;maxconn&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Maximum number of connections to open at any given time. If &lt;tt class=&quot;docutils literal&quot;&gt;maxconn&lt;/tt&gt; ==
+&lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt; no extra connection is created in case more client requests
+arrive: they will just wait until a connection is made available again. If
+&lt;tt class=&quot;docutils literal&quot;&gt;maxconn&lt;/tt&gt; &amp;gt; &lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt; the pool can create new connections if the demand
+increases; later the extra connections created may be closed if deemed no
+more required (default: &lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt;).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;args&lt;/tt&gt;, &lt;tt class=&quot;docutils literal&quot;&gt;kwargs&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Arguments to pass to the &lt;tt class=&quot;docutils literal&quot;&gt;connection_factory&lt;/tt&gt; to create a new connection
+(default: empty, connect as per &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/current/libpq-envars.html&quot;&gt;PG* env vars&lt;/a&gt;, like
+&lt;tt class=&quot;docutils literal&quot;&gt;psycopg3.connect()&lt;/tt&gt;).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;connection_factory&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;The connection class to create (default: &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/connection.html#psycopg3.Connection&quot;&gt;Connection&lt;/a&gt; for &lt;tt class=&quot;docutils literal&quot;&gt;Pool&lt;/tt&gt;,
+&lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/connection.html#psycopg3.AsyncConnection&quot;&gt;AsyncConnection&lt;/a&gt; for &lt;tt class=&quot;docutils literal&quot;&gt;AsyncPool&lt;/tt&gt;).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;configure_function&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;A function to configure the connection after its creation and before making
+it available to the pool. Alternative to subclassing the &lt;tt class=&quot;docutils literal&quot;&gt;Pool&lt;/tt&gt; class to
+configure &lt;tt class=&quot;docutils literal&quot;&gt;Pool.configure()&lt;/tt&gt;. It can be a callable taking a connection as
+parameter, or the dotted name of such callable, so that e.g. the function
+name might be passed to the application as an env var.&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;timeout_sec&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Default timeout before raising an exception if a connection
+cannot be served. It may be overridden by
+&lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Pool.connection(timeout_sec=...)&lt;/span&gt;&lt;/tt&gt; (default: 30 sec).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;max_lifetime_sec&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Maximum time a connection should be kept in the pool
+and used. After such time, when the connection is not in use, it can be
+closed and replaced by a new one (default: 30 minutes - 10% random factor to
+avoid mass evictions).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;max_idle_sec&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Time a connection can sit idle in the pool before being removed. Only
+connections above &lt;tt class=&quot;docutils literal&quot;&gt;minconn&lt;/tt&gt; are removed, if &lt;tt class=&quot;docutils literal&quot;&gt;maxconn&lt;/tt&gt; allows to create
+them (default: 10 min + 10% random).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;terminate_after_sec&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Number of seconds to wait for a reconnection attempt before giving up and
+terminate the program, calling &lt;tt class=&quot;docutils literal&quot;&gt;Pool.terminate()&lt;/tt&gt; (default: 5 min,
+starting from 1sec ± 10%, doubled up until the precise threshold, then
+kaputt).&lt;/dd&gt;
+&lt;dt&gt;&lt;tt class=&quot;docutils literal&quot;&gt;num_workers&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;Number of background workers to perform maintenance tasks. If set to 0 the
+dynamic characteristics of the pool might be downgraded (e.g. creating a new
+connection will happen in the requesting thread, blocking it for the time it
+takes). Background jobs might be executed by the application calling
+&lt;tt class=&quot;docutils literal&quot;&gt;get_maintenance_task()&lt;/tt&gt; (default: 3).&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;thoughts&quot;&gt;
+&lt;h2&gt;Thoughts?&lt;/h2&gt;
+&lt;p&gt;Please let me know what you think your Best Ever Connection Pool for psycopg3
+should do. Thank you very much!&lt;/p&gt;
+&lt;/div&gt;
+</content>
+  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2020/11/24/psycopg3-adaptation/">
     <title type="text">The psycopg3 adaptation system</title>
     <id>urn:uuid:1f5955b2-3537-3869-af43-2539656d243f</id>
@@ -2179,32 +2486,6 @@ will raise a warning if called.&lt;/li&gt;
 &lt;div class=&quot;line&quot;&gt;federico&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;
-</content>
-  </entry>
-  <entry xml:base="https://www.psycopg.org/articles/2010/05/17/psycopg-221-released/">
-    <title type="text">Psycopg 2.2.1 released</title>
-    <id>urn:uuid:567fdca1-60be-3327-85b1-bbe19d6d14e5</id>
-    <updated>2010-05-17T00:00:00Z</updated>
-    <link href="https://www.psycopg.org/articles/2010/05/17/psycopg-221-released/" />
-    <author>
-      <name>Federico Di Gregorio</name>
-    </author>
-    <content type="html">&lt;p&gt;Hi *,&lt;/p&gt;
-&lt;p&gt;repeat with me:&lt;/p&gt;
-&lt;pre class=&quot;code python literal-block&quot;&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xrange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Always check it build on windows!&amp;quot;&lt;/span&gt;
-&lt;/pre&gt;
-&lt;p&gt;but thank to Jason Erickson here is 2.2.1 that DO build on windows. :)
-No excerpt this time, it's a single liner, but here are the URLs:&lt;/p&gt;
-&lt;ul class=&quot;simple&quot;&gt;
-&lt;li&gt;&lt;a class=&quot;reference external&quot; href=&quot;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.1.tar.gz&quot;&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.1.tar.gz&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&quot;reference external&quot; href=&quot;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.1.tar.gz.asc&quot;&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.1.tar.gz.asc&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;line-block&quot;&gt;
-&lt;div class=&quot;line&quot;&gt;Have fun,&lt;/div&gt;
-&lt;div class=&quot;line&quot;&gt;federico&lt;/div&gt;
 &lt;/div&gt;
 </content>
   </entry>
