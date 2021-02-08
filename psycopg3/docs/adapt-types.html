@@ -149,7 +149,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cursor.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – Libpq wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -278,7 +279,7 @@ types:</p>
 </tr>
 <tr class="row-even"><td><p>Anything™</p></td>
 <td><p><code class="sql docutils literal notranslate"><span class="pre">json</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-json"><span class="std std-ref">TODO adaptation</span></a></p></td>
+<td><p><a class="reference internal" href="#adapt-json"><span class="std std-ref">JSON adaptation</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UUID</span></code></a></p></td>
 <td><p><code class="sql docutils literal notranslate"><span class="pre">uuid</span></code></p></td>
@@ -418,13 +419,49 @@ or images) you should probably use the binary format to pass and return
 values, otherwise binary data will undergo <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">ASCII escaping</a>, taking some CPU
 time and more bandwidth. See <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details.</p>
 </div>
+<div class="section" id="json-adaptation">
+<span id="adapt-json"></span><h2>JSON adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> can map between Python objects and PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-json.html">json/jsonb
+types</a>, allowing to customise the load and dump function used.</p>
+<p>Because several Python objects could be considered JSON (dicts, lists,
+scalars, even date/time if using a dumps function customised to use them),
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> requires you to wrap what you want to dump as JSON into a wrapper:
+either <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycogp3.types.Json</span></code> or <a class="reference internal" href="types.html#psycopg3.types.Jsonb" title="psycopg3.types.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3.types</span> <span class="kn">import</span> <span class="n">Jsonb</span>
+
+<span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"foo"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"bar"</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"insert into mytable values (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>By default <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> uses the standard library <a class="reference external" href="https://docs.python.org/3/library/json.html#json.dumps">json.dumps()</a> and
+<a class="reference external" href="https://docs.python.org/3/library/json.html#json.loads">json.loads()</a> functions to serialize and de-serialize Python objects to
+JSON. If you want to customise globally how serialization happens, for
+instance changing serialization parameters or using a different JSON library,
+you can specify your own functions using the <a class="reference internal" href="types.html#psycopg3.types.set_json_dumps" title="psycopg3.types.set_json_dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types.set_json_dumps()</span></code></a>
+and <a class="reference internal" href="types.html#psycopg3.types.set_json_loads" title="psycopg3.types.set_json_loads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_loads()</span></code></a> functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">psycopg3.types</span> <span class="kn">import</span> <span class="n">Jsonb</span><span class="p">,</span> <span class="n">set_json_dumps</span><span class="p">,</span> <span class="n">set_json_loads</span>
+<span class="kn">import</span> <span class="nn">ujson</span>
+
+<span class="c1"># Use a faster dump function</span>
+<span class="n">set_json_dumps</span><span class="p">(</span><span class="n">ujson</span><span class="o">.</span><span class="n">dumps</span><span class="p">)</span>
+
+<span class="c1"># Return floating point values as Decimal</span>
+<span class="n">set_json_loads</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span> <span class="n">parse_float</span><span class="o">=</span><span class="n">Decimal</span><span class="p">))</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">({</span><span class="s2">"value"</span><span class="p">:</span> <span class="mf">123.45</span><span class="p">})])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># {'value': Decimal('123.45')}</span>
+</pre></div>
+</div>
+<p>If you need a more precise customisation, such as per-connection instead of
+global, you can subclass and register the JSON adapters in the right context:
+see <a class="reference internal" href="types.html#json-adapters"><span class="std std-ref">JSON adapters</span></a>.</p>
+</div>
 <div class="section" id="todo-adaptation">
-<span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-json"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><span id="adapt-date"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
+<span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><span id="adapt-date"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <p>Document the other types</p>
-<p>Document that empty array don’t roundtrip in text mode and require
-a cast in binary to be used in any context.</p>
 </div>
 </div>
 </div>
@@ -483,6 +520,7 @@ a cast in binary to be used in any context.</p>
 <li><a class="reference internal" href="#numbers-adaptation">Numbers adaptation</a></li>
 <li><a class="reference internal" href="#strings-adaptation">Strings adaptation</a></li>
 <li><a class="reference internal" href="#binary-adaptation">Binary adaptation</a></li>
+<li><a class="reference internal" href="#json-adaptation">JSON adaptation</a></li>
 <li><a class="reference internal" href="#todo-adaptation">TODO adaptation</a></li>
 </ul>
 </li>

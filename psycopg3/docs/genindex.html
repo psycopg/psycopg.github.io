@@ -148,7 +148,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cursor.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – Libpq wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -353,6 +354,8 @@
 </li>
         <li><a href="sql.html#psycopg3.sql.Composed">Composed (class in psycopg3.sql)</a>
 </li>
+        <li><a href="types.html#psycopg3.types.CompositeInfo">CompositeInfo (class in psycopg3.types)</a>
+</li>
         <li><a href="connection.html#psycopg3.AsyncConnection.connect">connect() (psycopg3.AsyncConnection class method)</a>
 
         <ul>
@@ -551,6 +554,10 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.ExecStatus.FATAL_ERROR">FATAL_ERROR (psycopg3.pq.ExecStatus attribute)</a>
 </li>
+        <li><a href="types.html#psycopg3.types.TypeInfo.fetch">fetch() (psycopg3.types.TypeInfo class method)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.TypeInfo.fetch_async">fetch_async() (psycopg3.types.TypeInfo class method)</a>
+</li>
         <li><a href="cursor.html#psycopg3.AsyncCursor.fetchall">fetchall() (psycopg3.AsyncCursor method)</a>
 
         <ul>
@@ -605,6 +612,12 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pq.html#psycopg3.pq.PGconn.get_cancel">get_cancel() (psycopg3.pq.PGconn method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="types.html#psycopg3.types.JsonDumper.get_dumps">get_dumps() (psycopg3.types.JsonDumper method)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonLoader.get_loads">get_loads() (psycopg3.types.JsonLoader method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -667,6 +680,28 @@
           <li><a href="sql.html#psycopg3.sql.SQL.join">(psycopg3.sql.SQL method)</a>
 </li>
         </ul></li>
+        <li><a href="types.html#psycopg3.types.Json">Json (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.Jsonb">Jsonb (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonbBinaryDumper">JsonbBinaryDumper (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonbBinaryLoader">JsonbBinaryLoader (class in psycopg3.types)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="types.html#psycopg3.types.JsonbDumper">JsonbDumper (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonBinaryDumper">JsonBinaryDumper (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonBinaryLoader">JsonBinaryLoader (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonbLoader">JsonbLoader (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonDumper">JsonDumper (class in psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.JsonLoader">JsonLoader (class in psycopg3.types)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -732,6 +767,8 @@
           <li><a href="pq.html#module-psycopg3.pq">psycopg3.pq</a>
 </li>
           <li><a href="sql.html#module-psycopg3.sql">psycopg3.sql</a>
+</li>
+          <li><a href="types.html#module-psycopg3.types">psycopg3.types</a>
 </li>
         </ul></li>
     </ul></td>
@@ -848,10 +885,10 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.PollingStatus">PollingStatus (class in psycopg3.pq)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="cursor.html#psycopg3.Column.precision">precision() (psycopg3.Column property)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="connection.html#psycopg3.Connection.prepare_threshold">prepare_threshold (psycopg3.Connection attribute)</a>
 </li>
         <li><a href="prepared.html#index-0">Prepared statements</a>
@@ -886,6 +923,13 @@
 
         <ul>
           <li><a href="sql.html#module-psycopg3.sql">module</a>
+</li>
+        </ul></li>
+        <li>
+    psycopg3.types
+
+        <ul>
+          <li><a href="types.html#module-psycopg3.types">module</a>
 </li>
         </ul></li>
         <li><a href="pq.html#index-1">PSYCOPG3_IMPL</a>, <a href="pq.html#index-2">[1]</a>
@@ -923,6 +967,8 @@
   <h2>R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="types.html#psycopg3.types.RangeInfo">RangeInfo (class in psycopg3.types)</a>
+</li>
         <li><a href="cursor.html#psycopg3.AsyncCopy.read">read() (psycopg3.AsyncCopy method)</a>
 
         <ul>
@@ -942,11 +988,17 @@
         <ul>
           <li><a href="adaptation.html#psycopg3.adapt.Loader.register">(psycopg3.adapt.Loader class method)</a>
 </li>
-        </ul></li>
-        <li><a href="pq.html#psycopg3.pq.Ping.REJECT">REJECT (psycopg3.pq.Ping attribute)</a>
+          <li><a href="types.html#psycopg3.types.CompositeInfo.register">(psycopg3.types.CompositeInfo method)</a>
 </li>
+          <li><a href="types.html#psycopg3.types.RangeInfo.register">(psycopg3.types.RangeInfo method)</a>
+</li>
+          <li><a href="types.html#psycopg3.types.TypeInfo.register">(psycopg3.types.TypeInfo method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pq.html#psycopg3.pq.Ping.REJECT">REJECT (psycopg3.pq.Ping attribute)</a>
+</li>
         <li><a href="connection.html#psycopg3.Connection.remove_notice_handler">remove_notice_handler() (psycopg3.Connection method)</a>
 </li>
         <li><a href="connection.html#psycopg3.Connection.remove_notify_handler">remove_notify_handler() (psycopg3.Connection method)</a>
@@ -989,6 +1041,10 @@
 </li>
         <li><a href="connection.html#psycopg3.AsyncConnection.set_client_encoding">set_client_encoding() (psycopg3.AsyncConnection method)</a>
 </li>
+        <li><a href="types.html#psycopg3.types.set_json_dumps">set_json_dumps() (in module psycopg3.types)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.set_json_loads">set_json_loads() (in module psycopg3.types)</a>
+</li>
         <li><a href="cursor.html#psycopg3.Copy.set_types">set_types() (psycopg3.Copy method)</a>
 </li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.severity">severity (psycopg3.errors.Diagnostic attribute)</a>
@@ -1007,10 +1063,10 @@
 </li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.source_function">source_function (psycopg3.errors.Diagnostic attribute)</a>
 </li>
-        <li><a href="pq.html#psycopg3.pq.DiagnosticField.SOURCE_FUNCTION">SOURCE_FUNCTION (psycopg3.pq.DiagnosticField attribute)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pq.html#psycopg3.pq.DiagnosticField.SOURCE_FUNCTION">SOURCE_FUNCTION (psycopg3.pq.DiagnosticField attribute)</a>
+</li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.source_line">source_line (psycopg3.errors.Diagnostic attribute)</a>
 </li>
         <li><a href="pq.html#psycopg3.pq.DiagnosticField.SOURCE_LINE">SOURCE_LINE (psycopg3.pq.DiagnosticField attribute)</a>
@@ -1095,6 +1151,8 @@
         <li><a href="pq.html#psycopg3.pq.ExecStatus.TUPLES_OK">TUPLES_OK (psycopg3.pq.ExecStatus attribute)</a>
 </li>
         <li><a href="cursor.html#psycopg3.Column.type_code">type_code() (psycopg3.Column property)</a>
+</li>
+        <li><a href="types.html#psycopg3.types.TypeInfo">TypeInfo (class in psycopg3.types)</a>
 </li>
     </ul></td>
   </tr></table>

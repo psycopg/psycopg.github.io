@@ -149,7 +149,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cursor.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – Libpq wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -180,19 +181,24 @@ PostgreSQL please look at <a class="reference internal" href="params.html#query-
 described in this page is useful if you intend to <em>customise</em> the
 adaptation rules.</p>
 </div>
-<p>The <a class="reference internal" href="#psycopg3.adapt.Dumper" title="psycopg3.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> is the base object to perform conversion from a Python object to
-a <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> string understood by PostgreSQL. The string returned <em>shouldn’t be
-quoted</em>: the value will be passed to the database using functions such as
-<code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS"><span class="pre">PQexecParams</span></a><span class="pre">()</span></code> so quoting and quotes escaping is not necessary.</p>
-<p>The <a class="reference internal" href="#psycopg3.adapt.Loader" title="psycopg3.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> is the base object to perform the opposite operation: to read a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> string from PostgreSQL and create a Python object.</p>
+<ul class="simple">
+<li><p>The <a class="reference internal" href="types.html#psycopg3.types.TypeInfo" title="psycopg3.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> object allows to query type information from
+a database, which can be used by the adapters: for instance to make them
+able to decode arrays of base types or composite types.</p></li>
+<li><p>The <a class="reference internal" href="#psycopg3.adapt.Dumper" title="psycopg3.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> is the base object to perform conversion from a Python object
+to a <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> string understood by PostgreSQL. The string returned
+<em>shouldn’t be quoted</em>: the value will be passed to the database using
+functions such as <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS"><span class="pre">PQexecParams</span></a><span class="pre">()</span></code> so quoting and quotes escaping is not
+necessary.</p></li>
+<li><p>The <a class="reference internal" href="#psycopg3.adapt.Loader" title="psycopg3.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> is the base object to perform the opposite operation: to read a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code> string from PostgreSQL and create a Python object.</p></li>
+</ul>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code> are abstract classes: concrete classes must implement
 the <a class="reference internal" href="#psycopg3.adapt.Dumper.dump" title="psycopg3.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> and <a class="reference internal" href="#psycopg3.adapt.Loader.load" title="psycopg3.adapt.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> methods. <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> provides
 implementation for several builtin Python and PostgreSQL types.</p>
-<div class="admonition-todo admonition">
-<p class="admonition-title">TODO</p>
-<p>Document the builtin adapters, where are they?</p>
-</div>
+<p>Psycopg provides adapters for several builtin types, which can be used as the
+base to build more complex ones: they all live in the <a class="reference internal" href="types.html#module-psycopg3.types" title="psycopg3.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types</span></code></a>
+package.</p>
 <div class="section" id="dumpers-and-loaders-configuration">
 <h2>Dumpers and loaders configuration<a class="headerlink" href="#dumpers-and-loaders-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Dumpers and loaders can be registered on different scopes: globally, per
@@ -230,8 +236,11 @@ right instance.</p>
 inheriting all the changes made to the global configuration, the current
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>.</p></li>
 <li><p>For every Python type passed as query argument, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will
-instantiate a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code>. All the objects of the same type will be converted
-by the same dumper.</p></li>
+instantiate a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code>. Usually all the objects of the same type will be
+converted by the same dumper; certain dumpers may be used in more than one
+instance, because the same Python type maps to more than one PostgreSQL type
+(for instance, a Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> might be better dumped as a PostgreSQL
+<code class="sql docutils literal notranslate"><span class="pre">integer</span></code>, <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>, <code class="sql docutils literal notranslate"><span class="pre">smallint</span></code> according to its value).</p></li>
 <li><p>For every OID returned by the query, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will instantiate a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>. All the values with the same OID will be converted by the same
 loader.</p></li>
