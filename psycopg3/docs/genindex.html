@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -224,6 +225,8 @@
 </li>
         </ul></li>
         <li><a href="async.html#index-0">asyncio</a>
+</li>
+        <li><a href="cursor.html#psycopg3.AsyncServerCursor">AsyncServerCursor (class in psycopg3)</a>
 </li>
         <li><a href="connection.html#psycopg3.AsyncTransaction">AsyncTransaction (class in psycopg3)</a>
 </li>
@@ -318,6 +321,13 @@
           <li><a href="sql.html#index-0">Binding</a>
 </li>
         </ul></li>
+        <li>
+    Client-side
+
+        <ul>
+          <li><a href="cursors.html#index-1">Cursor</a>
+</li>
+        </ul></li>
         <li><a href="connection.html#psycopg3.Connection.client_encoding">client_encoding (psycopg3.Connection attribute)</a>
 </li>
         <li><a href="connection.html#psycopg3.AsyncConnection.close">close() (psycopg3.AsyncConnection method)</a>
@@ -325,9 +335,13 @@
         <ul>
           <li><a href="cursor.html#psycopg3.AsyncCursor.close">(psycopg3.AsyncCursor method)</a>
 </li>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.close">(psycopg3.AsyncServerCursor method)</a>
+</li>
           <li><a href="connection.html#psycopg3.Connection.close">(psycopg3.Connection method)</a>
 </li>
           <li><a href="cursor.html#psycopg3.Cursor.close">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.close">(psycopg3.ServerCursor method)</a>
 </li>
         </ul></li>
         <li><a href="connection.html#psycopg3.Connection.closed">closed (psycopg3.Connection attribute)</a>
@@ -407,6 +421,16 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.ExecStatus.COPY_OUT">COPY_OUT (psycopg3.pq.ExecStatus attribute)</a>
 </li>
+        <li><a href="cursors.html#index-0">Cursor</a>
+
+        <ul>
+          <li><a href="cursors.html#index-1">Client-side</a>
+</li>
+          <li><a href="cursors.html#index-2">Named</a>
+</li>
+          <li><a href="cursors.html#index-2">Server-side</a>
+</li>
+        </ul></li>
         <li><a href="cursor.html#psycopg3.Cursor">Cursor (class in psycopg3)</a>
 </li>
         <li><a href="connection.html#psycopg3.AsyncConnection.cursor">cursor() (psycopg3.AsyncConnection method)</a>
@@ -513,8 +537,6 @@
           <li><a href="usage.html#index-0">Usage</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     Exceptions
 
@@ -524,6 +546,8 @@
           <li><a href="errors.html#index-2">PostgreSQL</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pq.html#psycopg3.pq.ExecStatus">ExecStatus (class in psycopg3.pq)</a>
 </li>
         <li><a href="connection.html#psycopg3.AsyncConnection.execute">execute() (psycopg3.AsyncConnection method)</a>
@@ -531,15 +555,23 @@
         <ul>
           <li><a href="cursor.html#psycopg3.AsyncCursor.execute">(psycopg3.AsyncCursor method)</a>
 </li>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.execute">(psycopg3.AsyncServerCursor method)</a>
+</li>
           <li><a href="connection.html#psycopg3.Connection.execute">(psycopg3.Connection method)</a>
 </li>
           <li><a href="cursor.html#psycopg3.Cursor.execute">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.execute">(psycopg3.ServerCursor method)</a>
 </li>
         </ul></li>
         <li><a href="cursor.html#psycopg3.AsyncCursor.executemany">executemany() (psycopg3.AsyncCursor method)</a>
 
         <ul>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.executemany">(psycopg3.AsyncServerCursor method)</a>
+</li>
           <li><a href="cursor.html#psycopg3.Cursor.executemany">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.executemany">(psycopg3.ServerCursor method)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -561,23 +593,35 @@
         <li><a href="cursor.html#psycopg3.AsyncCursor.fetchall">fetchall() (psycopg3.AsyncCursor method)</a>
 
         <ul>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.fetchall">(psycopg3.AsyncServerCursor method)</a>
+</li>
           <li><a href="cursor.html#psycopg3.Cursor.fetchall">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.fetchall">(psycopg3.ServerCursor method)</a>
 </li>
         </ul></li>
         <li><a href="cursor.html#psycopg3.AsyncCursor.fetchmany">fetchmany() (psycopg3.AsyncCursor method)</a>
 
         <ul>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.fetchmany">(psycopg3.AsyncServerCursor method)</a>
+</li>
           <li><a href="cursor.html#psycopg3.Cursor.fetchmany">(psycopg3.Cursor method)</a>
 </li>
-        </ul></li>
-        <li><a href="cursor.html#psycopg3.AsyncCursor.fetchone">fetchone() (psycopg3.AsyncCursor method)</a>
-
-        <ul>
-          <li><a href="cursor.html#psycopg3.Cursor.fetchone">(psycopg3.Cursor method)</a>
+          <li><a href="cursor.html#psycopg3.ServerCursor.fetchmany">(psycopg3.ServerCursor method)</a>
 </li>
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="cursor.html#psycopg3.AsyncCursor.fetchone">fetchone() (psycopg3.AsyncCursor method)</a>
+
+        <ul>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.fetchone">(psycopg3.AsyncServerCursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.Cursor.fetchone">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.fetchone">(psycopg3.ServerCursor method)</a>
+</li>
+        </ul></li>
         <li>
     Float
 
@@ -646,10 +690,10 @@
           <li><a href="adapt-types.html#index-2">Adaptation</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="errors.html#psycopg3.errors.IntegrityError">IntegrityError</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="errors.html#psycopg3.errors.InterfaceError">InterfaceError</a>
 </li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.internal_position">internal_position (psycopg3.errors.Diagnostic attribute)</a>
@@ -665,6 +709,8 @@
         <li><a href="errors.html#psycopg3.errors.InternalError">InternalError</a>
 </li>
         <li><a href="pq.html#psycopg3.pq.TransactionStatus.INTRANS">INTRANS (psycopg3.pq.TransactionStatus attribute)</a>
+</li>
+        <li><a href="cursor.html#psycopg3.ServerCursor.itersize">itersize (psycopg3.ServerCursor attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -779,8 +825,17 @@
   <h2>N</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="cursor.html#psycopg3.ServerCursor.name">name (psycopg3.ServerCursor attribute)</a>
+</li>
         <li><a href="cursor.html#psycopg3.Column.name">name() (psycopg3.Column property)</a>
 </li>
+        <li>
+    Named
+
+        <ul>
+          <li><a href="cursors.html#index-2">Cursor</a>
+</li>
+        </ul></li>
         <li><a href="cursor.html#psycopg3.Cursor.nextset">nextset() (psycopg3.Cursor method)</a>
 </li>
         <li><a href="pq.html#psycopg3.pq.Ping.NO_ATTEMPT">NO_ATTEMPT (psycopg3.pq.Ping attribute)</a>
@@ -789,6 +844,8 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.ExecStatus.NONFATAL_ERROR">NONFATAL_ERROR (psycopg3.pq.ExecStatus attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     Notifications
 
@@ -796,8 +853,6 @@
           <li><a href="async.html#index-2">Asynchronous</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="connection.html#psycopg3.AsyncConnection.notifies">notifies() (psycopg3.AsyncConnection method)</a>
 
         <ul>
@@ -885,10 +940,12 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.PollingStatus">PollingStatus (class in psycopg3.pq)</a>
 </li>
-        <li><a href="cursor.html#psycopg3.Column.precision">precision() (psycopg3.Column property)</a>
+        <li><a href="cursors.html#index-2">Portal</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="cursor.html#psycopg3.Column.precision">precision() (psycopg3.Column property)</a>
+</li>
         <li><a href="connection.html#psycopg3.Connection.prepare_threshold">prepare_threshold (psycopg3.Connection attribute)</a>
 </li>
         <li><a href="prepared.html#index-0">Prepared statements</a>
@@ -1013,6 +1070,8 @@
         </ul></li>
         <li><a href="cursor.html#psycopg3.Cursor.rowcount">rowcount (psycopg3.Cursor attribute)</a>
 </li>
+        <li><a href="cursor.html#psycopg3.Cursor.rownumber">rownumber (psycopg3.Cursor attribute)</a>
+</li>
         <li><a href="cursor.html#psycopg3.AsyncCopy.rows">rows() (psycopg3.AsyncCopy method)</a>
 
         <ul>
@@ -1035,7 +1094,26 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.DiagnosticField.SCHEMA_NAME">SCHEMA_NAME (psycopg3.pq.DiagnosticField attribute)</a>
 </li>
+        <li><a href="cursor.html#psycopg3.AsyncCursor.scroll">scroll() (psycopg3.AsyncCursor method)</a>
+
+        <ul>
+          <li><a href="cursor.html#psycopg3.AsyncServerCursor.scroll">(psycopg3.AsyncServerCursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.Cursor.scroll">(psycopg3.Cursor method)</a>
+</li>
+          <li><a href="cursor.html#psycopg3.ServerCursor.scroll">(psycopg3.ServerCursor method)</a>
+</li>
+        </ul></li>
         <li><a href="params.html#index-1">Security</a>
+</li>
+        <li>
+    Server-side
+
+        <ul>
+          <li><a href="cursors.html#index-2">Cursor</a>
+</li>
+        </ul></li>
+        <li><a href="cursor.html#psycopg3.ServerCursor">ServerCursor (class in psycopg3)</a>
 </li>
         <li><a href="connection.html#psycopg3.AsyncConnection.set_autocommit">set_autocommit() (psycopg3.AsyncConnection method)</a>
 </li>
@@ -1057,14 +1135,14 @@
 </li>
         <li><a href="pq.html#psycopg3.pq.ExecStatus.SINGLE_TUPLE">SINGLE_TUPLE (psycopg3.pq.ExecStatus attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.source_file">source_file (psycopg3.errors.Diagnostic attribute)</a>
 </li>
         <li><a href="pq.html#psycopg3.pq.DiagnosticField.SOURCE_FILE">SOURCE_FILE (psycopg3.pq.DiagnosticField attribute)</a>
 </li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.source_function">source_function (psycopg3.errors.Diagnostic attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pq.html#psycopg3.pq.DiagnosticField.SOURCE_FUNCTION">SOURCE_FUNCTION (psycopg3.pq.DiagnosticField attribute)</a>
 </li>
         <li><a href="errors.html#psycopg3.errors.Diagnostic.source_line">source_line (psycopg3.errors.Diagnostic attribute)</a>

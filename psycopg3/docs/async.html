@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="psycopg3 API" href="api/index.html" /><link rel="prev" title="Using COPY TO and COPY FROM" href="copy.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Cursor types" href="cursors.html" /><link rel="prev" title="Using COPY TO and COPY FROM" href="copy.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.12.30.beta24"/>
         <title>Async operations - psycopg3 UNRELEASED documentation</title>
@@ -142,6 +142,7 @@
 <li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Async operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -177,7 +178,7 @@ ones: in order to use them you will only have to scatter the <code class="docuti
 here and there.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
         <span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">acur</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">acur</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="s2">"INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
             <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">"abc'def"</span><span class="p">))</span>
@@ -188,8 +189,8 @@ here and there.</p>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="with-async-connections-and-cursors">
-<span id="async-with"></span><span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections and cursors<a class="headerlink" href="#with-async-connections-and-cursors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="with-async-connections">
+<span id="async-with"></span><span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this headline">¶</a></h2>
 <p>As seen in <a class="reference internal" href="usage.html#usage"><span class="std std-ref">the basic usage</span></a>, connections and cursors can act as
 context managers, so you can run:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -199,7 +200,7 @@ context managers, so you can run:</p>
 <span class="c1"># the transaction is committed, the connection closed</span>
 </pre></div>
 </div>
-<p>For asynchronous connections and cursor it’s <em>almost</em> what you’d expect, but
+<p>For asynchronous connections it’s <em>almost</em> what you’d expect, but
 not quite. Please note that <a class="reference internal" href="connection.html#psycopg3.Connection.connect" title="psycopg3.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and <a class="reference internal" href="connection.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a>
 <em>don’t return a context</em>: they are both factory methods which return <em>an
 object which can be used as a context</em>. That’s because there are several use
@@ -209,18 +210,20 @@ required.</p>
 two steps instead, as in</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
 <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="p">:</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-    <span class="k">async</span> <span class="k">with</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>which can be condensed as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>…but no less than that: you still need to do the double async thing.</p>
+<p>The <a class="reference internal" href="connection.html#psycopg3.AsyncConnection.cursor" title="psycopg3.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> function is not marked as <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> (it never
+performs I/O), so you don’t need an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it and you can use the normal
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> context manager.</p>
 </div>
 <div class="section" id="asynchronous-notifications">
 <span id="async-notify"></span><span id="index-2"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
@@ -292,12 +295,12 @@ received immediately, but only during a connection operation, such as a query.</
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="api/index.html">
+          <a class="next-page" href="cursors.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</div>
+                <div class="title">Cursor types</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -338,7 +341,7 @@ received immediately, but only during a connection operation, such as a query.</
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Async operations</a><ul>
-<li><a class="reference internal" href="#with-async-connections-and-cursors"><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections and cursors</a></li>
+<li><a class="reference internal" href="#with-async-connections"><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
 </ul>
 </li>

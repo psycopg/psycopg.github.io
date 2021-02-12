@@ -142,6 +142,7 @@
 <li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -224,8 +225,13 @@ close the connection automatically when the block is exited.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Connection.cursor">
-<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor">Cursor</a><a class="headerlink" href="#psycopg3.Connection.cursor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> to send commands and queries to the connection.</p>
+<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.Cursor" title="psycopg3.Cursor">psycopg3.Cursor</a><a class="headerlink" href="#psycopg3.Connection.cursor" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.ServerCursor" title="psycopg3.ServerCursor">psycopg3.ServerCursor</a></dt>
+<dd><p>Return a new cursor to send commands and queries to the connection.</p>
+<p>Calling the method without a <em>name</em> creates a client-side cursor,
+specifying a <em>name</em> creates a server-side cursor. See
+<a class="reference internal" href="cursors.html#cursor-types"><span class="std std-ref">Cursor types</span></a> for the details.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can use <a class="reference internal" href="usage.html#usage"><span class="std std-ref">with conn.cursor(): …</span></a>
@@ -409,18 +415,19 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 <p class="admonition-title">Note</p>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the connection
 automatically when the block is exited, but be careful about
-the async quirkness: see <a class="reference internal" href="async.html#async-with"><span class="std std-ref">with async connections and cursors</span></a> for details.</p>
+the async quirkness: see <a class="reference internal" href="async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
 </div>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncConnection.cursor">
-<em class="property">async </em><code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncConnection.cursor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor">psycopg3.AsyncCursor</a><a class="headerlink" href="#psycopg3.AsyncConnection.cursor" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursor.html#psycopg3.AsyncServerCursor" title="psycopg3.AsyncServerCursor">psycopg3.AsyncServerCursor</a></dt>
 <dd><p>Return a new <a class="reference internal" href="cursor.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> to send commands and queries to the connection.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the cursor
-automatically when the block is exited, but be careful about
-the async quirkness: see <a class="reference internal" href="async.html#async-with"><span class="std std-ref">with async connections and cursors</span></a> for details.</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">conn.cursor()</span> <span class="pre">as</span> <span class="pre">cur:</span> <span class="pre">...</span></code> to
+close the cursor automatically when the block is exited.</p>
 </div>
 </dd></dl>
 <dl class="py method">
