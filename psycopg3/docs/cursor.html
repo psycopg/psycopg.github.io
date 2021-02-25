@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="sql – SQL string composition" href="sql.html" /><link rel="prev" title="Connection classes" href="connection.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2020.12.30.beta24"/>
+    <meta name="generator" content="sphinx-3.3.1, furo 2021.02.21.beta25"/>
         <title>Cursor classes - psycopg3 UNRELEASED documentation</title>
       <link rel="stylesheet" href="_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
     <link rel="stylesheet" href="_static/pygments.css">
@@ -39,13 +39,7 @@
   
   }
 </style><link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
-    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script defer="defer" src="_static/jquery.js"></script>
-    <script defer="defer" src="_static/underscore.js"></script>
-    <script defer="defer" src="_static/doctools.js"></script>
-    <script defer="defer" src="_static/language_data.js"></script>
-    <script defer src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -138,6 +132,7 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="row-factories.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
@@ -309,19 +304,19 @@ an exception if used with operations that don’t return result, such as an
 </div>
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchone">
-<code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the next record from the current recordset.</p>
 <p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> the recordset is finished.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchmany">
-<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the next <em>size</em> records from the current recordset.</p>
 <p><em>size</em> default to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.arraysize</span></code> if not specified.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.Cursor.fetchall">
-<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.Cursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all the remaining records from the current recordset.</p>
 </dd></dl>
 <dl class="py method">
@@ -343,8 +338,9 @@ set. In this case the position will not change.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt id="psycopg3.Cursor.pgresult">
-<code class="sig-name descname">pgresult</code><a class="headerlink" href="#psycopg3.Cursor.pgresult" title="Permalink to this definition">¶</a></dt>
-<dd><p>The <a class="reference internal" href="pq.html#psycopg3.pq.PGresult" title="psycopg3.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a> exposed by the cursor.</p>
+<code class="sig-name descname">pgresult</code><em class="property">: Optional<span class="p">[</span><a class="reference internal" href="pq.html#psycopg3.pq.PGresult" title="psycopg3.pq.PGresult">psycopg3.pq.PGresult</a><span class="p">]</span></em><a class="headerlink" href="#psycopg3.Cursor.pgresult" title="Permalink to this definition">¶</a></dt>
+<dd><p>The result returned by the last query and currently exposed by the
+cursor, if available, else <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 <p class="rubric">Information about the data</p>
 <dl class="py attribute">
@@ -447,15 +443,15 @@ in details all the parameters.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.ServerCursor.fetchone">
-<code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.ServerCursor.fetchmany">
-<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.ServerCursor.fetchall">
-<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><p>These methods use the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-fetch.html">FETCH</a> SQL statement to retrieve some of the
 records from the cursor’s current position.</p>
 <div class="admonition note">
@@ -535,15 +531,15 @@ cursor automatically when the block is exited.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchone">
-<em class="property">async </em><code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchone" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchmany">
-<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → List<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.fetchall">
-<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → List<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncCursor.scroll">
@@ -585,15 +581,15 @@ the <a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncServerCursor.fetchone">
-<em class="property">async </em><code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchone" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchone</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Optional<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncServerCursor.fetchmany">
-<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt id="psycopg3.AsyncServerCursor.fetchall">
-<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Sequence<span class="p">[</span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> → Sequence<span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can also iterate on the cursor using <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span> <span class="pre">record</span>
@@ -810,5 +806,10 @@ to read its data row by row, using <code class="docutils literal notranslate"><s
     </aside>
   </main>
 </div>
-  </body>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
 </html>
