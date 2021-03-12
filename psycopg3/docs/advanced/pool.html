@@ -202,13 +202,14 @@ expired. If this behaviour is not desirable you should call the
 until the pool is full or will throw a <a class="reference internal" href="../api/pool.html#psycopg3.pool.PoolTimeout" title="psycopg3.pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> if the pool isn’t ready
 within an allocated time.</p>
 <p>The pool background workers create connections according to the parameters
-<em>conninfo</em>, <em>kwargs</em>, <em>connection_class</em> passed to the pool constructor. Once
-a connection is created it is also passed to the <em>configure()</em> callback, if
-provided, after which it is put in the pool (or passed to a client requesting
-it, if someone is already knocking at the door). If a connection expires (it
-passes <em>max_lifetime</em>), or is returned to the pool in broken state, or is
-found closed by <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.check" title="psycopg3.pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a>, then it is disposed of and a new
-connection attempt is started in background.</p>
+<em>conninfo</em>, <em>kwargs</em>, <em>connection_class</em> passed to <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool" title="psycopg3.pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>
+constructor. Once a connection is created it is also passed to the
+<em>configure()</em> callback, if provided, after which it is put in the pool (or
+passed to a client requesting it, if someone is already knocking at the door).
+If a connection expires (it passes <em>max_lifetime</em>), or is returned to the pool
+in broken state, or is found closed by <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.check" title="psycopg3.pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a>, then the
+pool will dispose of it and will start a new connection attempt in the
+background.</p>
 <p>When the pool is no more to be used, you should call the
 <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.close" title="psycopg3.pool.ConnectionPool.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> method (unless the <code class="docutils literal notranslate"><span class="pre">with</span></code> syntax was used). If the
 pool is a module-level object it may be unclear how to do so. Missing a call
@@ -219,7 +220,7 @@ program.</p>
 </div>
 <div class="section" id="using-connections-from-the-pool">
 <h2>Using connections from the pool<a class="headerlink" href="#using-connections-from-the-pool" title="Permalink to this headline">¶</a></h2>
-<p>The pool can be used to request connection from multiple threads - it is
+<p>The pool can be used to request connections from multiple threads - it is
 hardly useful otherwise! If more connections than the ones available in the
 pool are requested, the requesting threads are queued and are served a
 connection as soon as one is available again: either because another client
@@ -241,9 +242,9 @@ execution without being slowed down.</p>
 </div>
 <div class="section" id="pool-connection-and-sizing">
 <h2>Pool connection and sizing<a class="headerlink" href="#pool-connection-and-sizing" title="Permalink to this headline">¶</a></h2>
-<p>A pool can have a fixed size (specifying no <em>maxconn</em> or <em>maxconn</em> =
-<em>minconn</em>) or a dynamic size (when <em>maxconn</em> &gt; <em>minconn</em>). In both cases, as
-soon as the pool is created, it will try to acquire <em>minconn</em> connections in
+<p>A pool can have a fixed size (specifying no <em>max_size</em> or <em>max_size</em> =
+<em>min_size</em>) or a dynamic size (when <em>max_size</em> &gt; <em>min_size</em>). In both cases, as
+soon as the pool is created, it will try to acquire <em>min_size</em> connections in
 background.</p>
 <p>If an attempt to create a connection fails, a new attempt will be made soon
 after, using an exponential backoff to increase the time between attempts,
@@ -252,15 +253,15 @@ will call the <em>reconnect_failed()</em> function, if provided to the pool, and
 start a new connection attempt. You can use this function either to send
 alerts or to interrupt the program and allow the rest of your infrastructure
 to restart it.</p>
-<p>If more than <em>minconn</em> connections are requested concurrently, new ones are
-created, up to <em>maxconn</em>. Note that the connections are always created by the
+<p>If more than <em>min_size</em> connections are requested concurrently, new ones are
+created, up to <em>max_size</em>. Note that the connections are always created by the
 background workers, not by the thread asking the connection: if a client
 requires a new connection, and a previous client terminates its job before the
 new connection is ready, the waiting client will be served the existing
 connection. This is especially useful in scenarios where the time to connect
 is longer than the time the connection is used (see <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/blob/dev/documents/Welcome-To-The-Jungle.md">this analysis</a>, for
 instance).</p>
-<p>If a pool grows above <em>minconn</em>, but its usage decreases afterwards, a number
+<p>If a pool grows above <em>min_size</em>, but its usage decreases afterwards, a number
 of connections are eventually closed: one each the <em>max_idle</em> time specified
 in the pool constructor.</p>
 <div class="section" id="what-s-the-right-size-for-the-pool">
@@ -284,10 +285,10 @@ return and a new connection will be created.</p>
 client.</p>
 </div>
 <p>Why not? Because doing so would require an extra network roundtrip: we want to
-save you from its latency. Before getting too angry about it, think that the
-connection can be lost any moment while your program is using it. As your
+save you from its latency. Before getting too angry about it, just think that
+the connection can be lost any moment while your program is using it. As your
 program should be already able to cope with a loss of a connection during its
-process it should be able to tolerate to be served a broken connection:
+process, it should be able to tolerate to be served a broken connection:
 unpleasant but not the end of the world.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -296,7 +297,7 @@ pool.</p>
 </div>
 <p>Does the pool keep a watchful eye on the quality of the connections inside it?
 No, it doesn’t. Why not? Because you will do it for us! Your program is only
-a big ruse to make sure the connections are kept alive…</p>
+a big ruse to make sure the connections are still alive…</p>
 <p>Not (entirely) trolling: if you are using a connection pool, we assume that
 you are using and returning connections at a good pace. If the pool had to
 check for the quality of a broken connection before your program notices it,
@@ -337,21 +338,21 @@ may not be returned.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pool_min</span></code></p></td>
-<td><p>Current value for <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.minconn" title="psycopg3.pool.ConnectionPool.minconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minconn</span></code></a></p></td>
+<td><p>Current value for <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.min_size" title="psycopg3.pool.ConnectionPool.min_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_size</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pool_max</span></code></p></td>
-<td><p>Current value for <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.maxconn" title="psycopg3.pool.ConnectionPool.maxconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maxconn</span></code></a></p></td>
+<td><p>Current value for <a class="reference internal" href="../api/pool.html#psycopg3.pool.ConnectionPool.max_size" title="psycopg3.pool.ConnectionPool.max_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_size</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pool_size</span></code></p></td>
-<td><p>Current number of connections in the pool, given,
-being prepared</p></td>
+<td><p>Number of connections currently managed by the pool
+(in the pool, given to clients, being prepared)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pool_available</span></code></p></td>
 <td><p>Number of connections currently idle in the pool</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">queue_length</span></code></p></td>
-<td><p>Number of client in the queue waiting for a
-connection</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requests_waiting</span></code></p></td>
+<td><p>Number of requests currently waiting in a queue to
+receive a connection</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">usage_ms</span></code></p></td>
 <td><p>Total usage time of the connections outside the pool</p></td>
@@ -366,8 +367,9 @@ immediately available in the pool</p></td>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requests_wait_ms</span></code></p></td>
 <td><p>Total time in the queue for the clients waiting</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">requests_timeouts</span></code></p></td>
-<td><p>Number of waiting clients whose request timed out</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">requests_errors</span></code></p></td>
+<td><p>Number of connection requests resulting in an error
+(timeouts, queue full…)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">returns_bad</span></code></p></td>
 <td><p>Number of connections returned to the pool in a bad

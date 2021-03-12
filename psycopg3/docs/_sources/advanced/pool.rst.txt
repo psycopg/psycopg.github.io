@@ -47,13 +47,14 @@ until the pool is full or will throw a `PoolTimeout` if the pool isn't ready
 within an allocated time.
 
 The pool background workers create connections according to the parameters
-*conninfo*, *kwargs*, *connection_class* passed to the pool constructor. Once
-a connection is created it is also passed to the *configure()* callback, if
-provided, after which it is put in the pool (or passed to a client requesting
-it, if someone is already knocking at the door). If a connection expires (it
-passes *max_lifetime*), or is returned to the pool in broken state, or is
-found closed by `~ConnectionPool.check()`, then it is disposed of and a new
-connection attempt is started in background.
+*conninfo*, *kwargs*, *connection_class* passed to `ConnectionPool`
+constructor. Once a connection is created it is also passed to the
+*configure()* callback, if provided, after which it is put in the pool (or
+passed to a client requesting it, if someone is already knocking at the door).
+If a connection expires (it passes *max_lifetime*), or is returned to the pool
+in broken state, or is found closed by `~ConnectionPool.check()`, then the
+pool will dispose of it and will start a new connection attempt in the
+background.
 
 When the pool is no more to be used, you should call the
 `~ConnectionPool.close()` method (unless the ``with`` syntax was used). If the
@@ -67,7 +68,7 @@ program.
 Using connections from the pool
 -------------------------------
 
-The pool can be used to request connection from multiple threads - it is
+The pool can be used to request connections from multiple threads - it is
 hardly useful otherwise! If more connections than the ones available in the
 pool are requested, the requesting threads are queued and are served a
 connection as soon as one is available again: either because another client
@@ -92,9 +93,9 @@ execution without being slowed down.
 Pool connection and sizing
 --------------------------
 
-A pool can have a fixed size (specifying no *maxconn* or *maxconn* =
-*minconn*) or a dynamic size (when *maxconn* > *minconn*). In both cases, as
-soon as the pool is created, it will try to acquire *minconn* connections in
+A pool can have a fixed size (specifying no *max_size* or *max_size* =
+*min_size*) or a dynamic size (when *max_size* > *min_size*). In both cases, as
+soon as the pool is created, it will try to acquire *min_size* connections in
 background.
 
 If an attempt to create a connection fails, a new attempt will be made soon
@@ -105,8 +106,8 @@ start a new connection attempt. You can use this function either to send
 alerts or to interrupt the program and allow the rest of your infrastructure
 to restart it.
 
-If more than *minconn* connections are requested concurrently, new ones are
-created, up to *maxconn*. Note that the connections are always created by the
+If more than *min_size* connections are requested concurrently, new ones are
+created, up to *max_size*. Note that the connections are always created by the
 background workers, not by the thread asking the connection: if a client
 requires a new connection, and a previous client terminates its job before the
 new connection is ready, the waiting client will be served the existing
@@ -117,7 +118,7 @@ instance).
 .. __: https://github.com/brettwooldridge/HikariCP/blob/dev/documents/
        Welcome-To-The-Jungle.md
 
-If a pool grows above *minconn*, but its usage decreases afterwards, a number
+If a pool grows above *min_size*, but its usage decreases afterwards, a number
 of connections are eventually closed: one each the *max_idle* time specified
 in the pool constructor.
 
@@ -149,10 +150,10 @@ return and a new connection will be created.
     client.
 
 Why not? Because doing so would require an extra network roundtrip: we want to
-save you from its latency. Before getting too angry about it, think that the
-connection can be lost any moment while your program is using it. As your
+save you from its latency. Before getting too angry about it, just think that
+the connection can be lost any moment while your program is using it. As your
 program should be already able to cope with a loss of a connection during its
-process it should be able to tolerate to be served a broken connection:
+process, it should be able to tolerate to be served a broken connection:
 unpleasant but not the end of the world.
 
 .. warning::
@@ -162,7 +163,7 @@ unpleasant but not the end of the world.
 
 Does the pool keep a watchful eye on the quality of the connections inside it?
 No, it doesn't. Why not? Because you will do it for us! Your program is only
-a big ruse to make sure the connections are kept alive...
+a big ruse to make sure the connections are still alive...
 
 Not (entirely) trolling: if you are using a connection pool, we assume that
 you are using and returning connections at a good pace. If the pool had to
@@ -208,19 +209,20 @@ may not be returned.
 ======================= =====================================================
 Metric                  Meaning
 ======================= =====================================================
- ``pool_min``           Current value for `~ConnectionPool.minconn`
- ``pool_max``           Current value for `~ConnectionPool.maxconn`
- ``pool_size``          Current number of connections in the pool, given,
-                        being prepared
+ ``pool_min``           Current value for `~ConnectionPool.min_size`
+ ``pool_max``           Current value for `~ConnectionPool.max_size`
+ ``pool_size``          Number of connections currently managed by the pool
+                        (in the pool, given to clients, being prepared)
  ``pool_available``     Number of connections currently idle in the pool
- ``queue_length``       Number of client in the queue waiting for a
-                        connection
+ ``requests_waiting``   Number of requests currently waiting in a queue to
+                        receive a connection
  ``usage_ms``           Total usage time of the connections outside the pool
  ``requests_num``       Number of connections requested to the pool
  ``requests_queued``    Number of requests queued because a connection wasn't
                         immediately available in the pool
  ``requests_wait_ms``   Total time in the queue for the clients waiting
- ``requests_timeouts``  Number of waiting clients whose request timed out
+ ``requests_errors``    Number of connection requests resulting in an error
+                        (timeouts, queue full...)
  ``returns_bad``        Number of connections returned to the pool in a bad
                         state
  ``connections_num``    Number of connection attempts made by the pool to the
