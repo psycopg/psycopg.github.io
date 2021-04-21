@@ -266,7 +266,7 @@ pass them to the query:</p>
 </div>
 <dl class="py class">
 <dt id="psycopg3.sql.Composable">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Composable</code><a class="headerlink" href="#psycopg3.sql.Composable" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Composable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Composable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for objects that can be used to compose an SQL string.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code> objects can be passed directly to
 <a class="reference internal" href="cursors.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>, <a class="reference internal" href="cursors.html#psycopg3.Cursor.executemany" title="psycopg3.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,
@@ -278,18 +278,21 @@ will be a <a class="reference internal" href="#psycopg3.sql.Composed" title="psy
 requested.</p>
 <dl class="py method">
 <dt id="psycopg3.sql.Composable.as_string">
-<code class="sig-name descname">as_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>psycopg3.proto.AdaptContext<span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.Composable.as_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">as_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Composable.as_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the value of the object as string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>context</strong> (<a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/cursor.html#cursor" title="(in Psycopg v2.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a>) – the context to evaluate the string into.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.sql.SQL">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">SQL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.SQL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">SQL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.SQL" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> representing a snippet of SQL statement.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL</span></code> exposes <a class="reference internal" href="#psycopg3.sql.SQL.join" title="psycopg3.sql.SQL.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join()</span></code></a> and <a class="reference internal" href="#psycopg3.sql.SQL.format" title="psycopg3.sql.SQL.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format()</span></code></a> methods useful to create a template
 where to merge variable parts of a query (for instance field or table
@@ -309,14 +312,14 @@ parts.</p>
 </div>
 <dl class="py method">
 <dt id="psycopg3.sql.SQL.format">
-<code class="sig-name descname">format</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg3.sql.Composed" title="psycopg3.sql.Composed">psycopg3.sql.Composed</a><a class="headerlink" href="#psycopg3.sql.SQL.format" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">format</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.SQL.format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> objects into a template.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> – parameters to replace to numbered (<code class="docutils literal notranslate"><span class="pre">{0}</span></code>, <code class="docutils literal notranslate"><span class="pre">{1}</span></code>) or
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – parameters to replace to numbered (<code class="docutils literal notranslate"><span class="pre">{0}</span></code>, <code class="docutils literal notranslate"><span class="pre">{1}</span></code>) or
 auto-numbered (<code class="docutils literal notranslate"><span class="pre">{}</span></code>) placeholders</p></li>
-<li><p><strong>kwargs</strong> – parameters to replace to named (<code class="docutils literal notranslate"><span class="pre">{name}</span></code>) placeholders</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – parameters to replace to named (<code class="docutils literal notranslate"><span class="pre">{name}</span></code>) placeholders</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -351,7 +354,7 @@ according to SQL rules.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg3.sql.SQL.join">
-<code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span><a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable">psycopg3.sql.Composable</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg3.sql.Composed" title="psycopg3.sql.Composed">psycopg3.sql.Composed</a><a class="headerlink" href="#psycopg3.sql.SQL.join" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.SQL.join" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join a sequence of <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,11 +371,16 @@ argument for this method.</p>
 <span class="go">"foo", "bar", "baz"</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.sql.Composed" title="psycopg3.sql.Composed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Composed</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.sql.Identifier">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Identifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">strings</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Identifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Identifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">strings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Identifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> representing an SQL identifier or a dot-separated sequence.</p>
 <p>Identifiers usually represent names of database objects, such as tables or
 fields. PostgreSQL identifiers follow <a class="reference external" href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS">different rules</a> than SQL string
@@ -398,7 +406,7 @@ i.e. a dot-separated sequence of identifiers.</p>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.sql.Literal">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Literal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Literal" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Literal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Literal" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> representing an SQL value to include in a query.</p>
 <p>Usually you will want to include placeholders in the query and pass values
 as <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> arguments. If however you really really need to
@@ -416,7 +424,7 @@ rules</span></a> for Python objects.</p>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.sql.Placeholder">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Placeholder</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">format: psycopg3.adapt.Format = &lt;Format.AUTO: 's'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Placeholder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Placeholder</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">format=&lt;Format.AUTO: 's'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Placeholder" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> representing a placeholder for query parameters.</p>
 <p>If the name is specified, generate a named placeholder (e.g. <code class="docutils literal notranslate"><span class="pre">%(name)s</span></code>,
 <code class="docutils literal notranslate"><span class="pre">%(name)b</span></code>), otherwise generate a positional placeholder (e.g. <code class="docutils literal notranslate"><span class="pre">%s</span></code>,
@@ -442,7 +450,7 @@ arguments.</p>
 </dd></dl>
 <dl class="py class">
 <dt id="psycopg3.sql.Composed">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Composed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Composed" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">Composed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Composed" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg3.sql.Composable" title="psycopg3.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> object made of a sequence of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code>.</p>
 <p>The object is usually created using <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code> operators and methods.
 However it is possible to create a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code> directly specifying a
@@ -459,7 +467,7 @@ be wrapped in a <a class="reference internal" href="#psycopg3.sql.Literal" title
 instance).</p>
 <dl class="py method">
 <dt id="psycopg3.sql.Composed.join">
-<code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">joiner</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQL">SQL</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg3.sql.Composed" title="psycopg3.sql.Composed">psycopg3.sql.Composed</a><a class="headerlink" href="#psycopg3.sql.Composed.join" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">joiner</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.Composed.join" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code> interposing the <em>joiner</em> with the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code> items.</p>
 <p>The <em>joiner</em> must be a <a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL</span></code></a> or a string which will be interpreted as
 an <a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL</span></code></a>.</p>
@@ -469,6 +477,11 @@ an <a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQ
 <span class="go">"foo", "bar"</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.sql.Composed" title="psycopg3.sql.Composed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Composed</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </div>
@@ -476,7 +489,7 @@ an <a class="reference internal" href="#psycopg3.sql.SQL" title="psycopg3.sql.SQ
 <h2>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="psycopg3.sql.quote">
-<code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></em>, <em class="sig-param"><span class="n">context</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>psycopg3.proto.AdaptContext<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="headerlink" href="#psycopg3.sql.quote" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">psycopg3.sql.</code><code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.sql.quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adapt a Python object to a quoted SQL string.</p>
 <p>Use this function only if you absolutely want to convert a Python string to
 an SQL quoted literal to use e.g. to generate batch SQL and you won’t have
@@ -484,6 +497,11 @@ a connection avaliable when you will need to use it.</p>
 <p>This function is relatively inefficient, because it doesn’t cache the
 adaptation rules. If you pass a <em>context</em> you can adapt the adaptation
 rules used, otherwise only global rules are used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py data">
 <dt id="psycopg3.sql.NULL">
