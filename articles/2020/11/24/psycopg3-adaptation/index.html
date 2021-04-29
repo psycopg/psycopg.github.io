@@ -204,11 +204,11 @@ one for each value adapted. In <tt class="docutils literal">psycopg3</tt>, the a
 different life cycle: choices based on the environment, such as the connection
 encoding, can be made once for each Python type, rather than once per value,
 doing radically less work for each converted object. You can check out the
-<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html">psycopg3 adaptation documentation</a> for all the details.</p>
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/adapt.html">psycopg3 adaptation documentation</a> for all the details.</p>
 </div>
 <div class="section" id="customising-psycopg3-adaptation">
 <h2>Customising psycopg3 adaptation</h2>
-<p>Customising types adaptation can now be done using <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Dumper">Dumper</a> classes, either
+<p>Customising types adaptation can now be done using <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/adapt.html#psycopg3.adapt.Dumper">Dumper</a> classes, either
 creating new ones or mapping existing ones on different Python classes to save
 to the database. For instance, the builtin <tt class="docutils literal">DateDumper</tt> converts Python
 dates to PostgreSQL ones. PostgreSQL can handle an &quot;infinity&quot; date, which
@@ -231,7 +231,7 @@ scope we want to use it, globally or just on a connection or cursor:</p>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># ('2020-12-31', 'infinity')</span>
 </pre>
-<p>The system is pretty symmetric and employs similar <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Loader">Loader</a> objects to map OIDs
+<p>The system is pretty symmetric and employs similar <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/adapt.html#psycopg3.adapt.Loader">Loader</a> objects to map OIDs
 to the code responsible for its decoding. For instance, if we wanted to
 reverse the above customisation and map PostgreSQL infinity date to
 <tt class="docutils literal">date.max</tt> (instead of raising an exception), it could be done using a

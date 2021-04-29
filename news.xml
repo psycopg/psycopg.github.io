@@ -140,11 +140,11 @@ one for each value adapted. In &lt;tt class=&quot;docutils literal&quot;&gt;psyc
 different life cycle: choices based on the environment, such as the connection
 encoding, can be made once for each Python type, rather than once per value,
 doing radically less work for each converted object. You can check out the
-&lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html&quot;&gt;psycopg3 adaptation documentation&lt;/a&gt; for all the details.&lt;/p&gt;
+&lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/advanced/adapt.html&quot;&gt;psycopg3 adaptation documentation&lt;/a&gt; for all the details.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;section&quot; id=&quot;customising-psycopg3-adaptation&quot;&gt;
 &lt;h2&gt;Customising psycopg3 adaptation&lt;/h2&gt;
-&lt;p&gt;Customising types adaptation can now be done using &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Dumper&quot;&gt;Dumper&lt;/a&gt; classes, either
+&lt;p&gt;Customising types adaptation can now be done using &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/advanced/adapt.html#psycopg3.adapt.Dumper&quot;&gt;Dumper&lt;/a&gt; classes, either
 creating new ones or mapping existing ones on different Python classes to save
 to the database. For instance, the builtin &lt;tt class=&quot;docutils literal&quot;&gt;DateDumper&lt;/tt&gt; converts Python
 dates to PostgreSQL ones. PostgreSQL can handle an &amp;quot;infinity&amp;quot; date, which
@@ -167,7 +167,7 @@ scope we want to use it, globally or just on a connection or cursor:&lt;/p&gt;
 &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;SELECT &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2020&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fetchone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;# ('2020-12-31', 'infinity')&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;The system is pretty symmetric and employs similar &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/adaptation.html#psycopg3.adapt.Loader&quot;&gt;Loader&lt;/a&gt; objects to map OIDs
+&lt;p&gt;The system is pretty symmetric and employs similar &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/advanced/adapt.html#psycopg3.adapt.Loader&quot;&gt;Loader&lt;/a&gt; objects to map OIDs
 to the code responsible for its decoding. For instance, if we wanted to
 reverse the above customisation and map PostgreSQL infinity date to
 &lt;tt class=&quot;docutils literal&quot;&gt;date.max&lt;/tt&gt; (instead of raising an exception), it could be done using a
