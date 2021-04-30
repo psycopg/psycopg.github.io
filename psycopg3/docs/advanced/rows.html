@@ -170,23 +170,65 @@
         <div class="section" id="row-factories">
 <span id="index-0"></span><span id="id1"></span><h1>Row factories<a class="headerlink" href="#row-factories" title="Permalink to this headline">¶</a></h1>
 <p>Cursor’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*</span></code> methods return tuples of column values by default. This can
-be changed to adapt the needs of the programmer by using custom row factories.</p>
-<p>A row factory is a callable that accepts a cursor object and returns another
-callable accepting a <code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code> tuple and returning a row in the desired form.
-This can be implemented as a class, for instance:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DictRowFactory</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
+be changed to adapt the needs of the programmer by using custom <em>row
+factories</em>.</p>
+<p>A row factory (formally implemented by the <a class="reference internal" href="#psycopg3.rows.RowFactory" title="psycopg3.rows.RowFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code></a>
+protocol) is a callable that accepts a <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> object and returns another
+callable (formally the <a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> protocol) accepting a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code> tuple and returning a row in the desired form.</p>
+<dl class="py class">
+<dt id="psycopg3.rows.RowMaker">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.rows.</code><code class="sig-name descname">RowMaker</code><a class="headerlink" href="#psycopg3.rows.RowMaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callable protocol taking a sequence of value and returning an object.</p>
+<p>The sequence of value is what is returned from a database query, already
+adapted to the right Python types. The return value is the object that your
+program would like to receive: by default (<a class="reference internal" href="#psycopg3.rows.tuple_row" title="psycopg3.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row()</span></code></a>) it is a simple
+tuple, but it may be any type of object.</p>
+<p>Typically, <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> functions are returned by <a class="reference internal" href="#psycopg3.rows.RowFactory" title="psycopg3.rows.RowFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code></a>.</p>
+<dl class="py method">
+<dt id="psycopg3.rows.RowMaker.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> → Row<a class="headerlink" href="#psycopg3.rows.RowMaker.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sequence of values from the database to a finished object.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt id="psycopg3.rows.RowFactory">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.rows.</code><code class="sig-name descname">RowFactory</code><a class="headerlink" href="#psycopg3.rows.RowFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callable protocol taking a <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> and returning a <a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a>.</p>
+<p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> is typically called when a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> receives a result.
+This way it can inspect the cursor state (for instance the
+<a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.description" title="psycopg3.Cursor.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a> attribute) and help a <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> to create
+a complete object.</p>
+<p>For instance the <a class="reference internal" href="#psycopg3.rows.dict_row" title="psycopg3.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row()</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> uses the names of the column to
+define the dictionary key and returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> function which would
+use the values to create a dictionary for each record.</p>
+<dl class="py method">
+<dt id="psycopg3.rows.RowFactory.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span><span class="p">:</span> <span class="n">AnyCursor<span class="p">[</span>Row<span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker">RowMaker</a><span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg3.rows.RowFactory.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inspect the result on a cursor and return a <a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> to convert rows.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnyCursor</span></code> may be either a <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> or an
+<a class="reference internal" href="../api/cursors.html#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
+</dd></dl>
+</dd></dl>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> objects can be implemented as a class, for instance:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">psycopg3</span> <span class="kn">import</span> <span class="n">AnyCursor</span>
+
+<span class="k">class</span> <span class="nc">DictRowFactory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">:</span> <span class="n">AnyCursor</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or as a plain function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dict_row_factory</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dict_row_factory</span><span class="p">(</span>
+    <span class="n">cursor</span><span class="p">:</span> <span class="n">AnyCursor</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">make_row</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">make_row</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">make_row</span>
@@ -213,10 +255,18 @@ passing another value at <a class="reference internal" href="../api/connections.
 <dd><p>Row factory to represent rows as simple tuples.</p>
 <p>This is the default factory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>, …]]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cursor</strong> (<em>AnyCursor</em><em>[</em><em>TupleRow</em><em>]</em>) – The cursor where the rows are read.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a>[<a class="reference internal" href="#psycopg3.rows.TupleRow" title="psycopg3.rows.TupleRow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TupleRow</span></code></a>]</p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py data">
+<dt id="psycopg3.rows.TupleRow">
+<code class="sig-prename descclassname">psycopg3.rows.</code><code class="sig-name descname">TupleRow</code><em class="property"> = typing.Tuple[typing.Any, ...]</em><a class="headerlink" href="#psycopg3.rows.TupleRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>An alias for the type returned by <a class="reference internal" href="#psycopg3.rows.tuple_row" title="psycopg3.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row()</span></code></a> (i.e. a tuple of any content).</p>
 </dd></dl>
 <dl class="py function">
 <dt id="psycopg3.rows.dict_row">
@@ -225,21 +275,121 @@ passing another value at <a class="reference internal" href="../api/connections.
 <p>Note that this is not compatible with the DBAPI, which expects the records
 to be sequences.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cursor</strong> (<em>AnyCursor</em><em>[</em><em>DictRow</em><em>]</em>) – The cursor where the rows are read.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a>[<a class="reference internal" href="#psycopg3.rows.DictRow" title="psycopg3.rows.DictRow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DictRow</span></code></a>]</p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py data">
+<dt id="psycopg3.rows.DictRow">
+<code class="sig-prename descclassname">psycopg3.rows.</code><code class="sig-name descname">DictRow</code><em class="property"> = typing.Dict[str, typing.Any]</em><a class="headerlink" href="#psycopg3.rows.DictRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>An alias for the type returned by <a class="reference internal" href="#psycopg3.rows.dict_row" title="psycopg3.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row()</span></code></a></p>
+<p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">DictRow</span></code> is a dictionary with keys as string and any value returned by the
+database.</p>
 </dd></dl>
 <dl class="py function">
 <dt id="psycopg3.rows.namedtuple_row">
 <code class="sig-prename descclassname">psycopg3.rows.</code><code class="sig-name descname">namedtuple_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.rows.namedtuple_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Row factory to represent rows as <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NamedTuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></a>]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cursor</strong> (<em>AnyCursor</em><em>[</em><em>NamedTuple</em><em>]</em>) – The cursor where the rows are read.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#psycopg3.rows.RowMaker" title="psycopg3.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTuple</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
+</div>
+<div class="section" id="use-with-a-static-analyzer">
+<h2>Use with a static analyzer<a class="headerlink" href="#use-with-a-static-analyzer" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../api/connections.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> classes are <a class="reference external" href="https://mypy.readthedocs.io/en/stable/generics.html">generic
+types</a>: the parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> is passed by the <code class="docutils literal notranslate"><span class="pre">row_factory</span></code> argument (of
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> and the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> method) and it
+controls what type of record is returned by the fetch methods of the cursors.
+The default <a class="reference internal" href="#psycopg3.rows.tuple_row" title="psycopg3.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row()</span></code></a> returns a generic tuple as return type (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Tuple[Any,</span>
+<span class="pre">...]</span></code>). This information can be used for type checking using a static analyzer
+such as <a class="reference external" href="https://mypy.readthedocs.io/">Mypy</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="c1"># conn type is psycopg3.Connection[Tuple[Any, ...]]</span>
+
+<span class="n">dconn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
+<span class="c1"># dconn type is psycopg3.Connection[Dict[str, Any]]</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="c1"># cur type is psycopg3.Cursor[Tuple[Any, ...]]</span>
+
+<span class="n">dcur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
+<span class="n">dcur</span> <span class="o">=</span> <span class="n">dconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="c1"># dcur type is psycopg3.Cursor[Dict[str, Any]] in both cases</span>
+
+<span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># rec type is Optional[Tuple[Any, ...]]</span>
+
+<span class="n">drec</span> <span class="o">=</span> <span class="n">dcur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># drec type is Optional[Dict[str, Any]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-returning-records-as-pydantic-models">
+<h2>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Permalink to this headline">¶</a></h2>
+<p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
+Pydantic model factory the code can be checked statically using Mypy and
+querying the database will raise an exception if the resultset is not
+compatible with the model.</p>
+<p>The following example can be checked with <code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span></code> without reporting
+any issue. Pydantic will also raise a runtime error in case the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonFactory</span></code> is used with a query that returns incompatible data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span> <span class="nn">psycopg3</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">first_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">last_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dob</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">PersonFactory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cur</span><span class="p">:</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AnyCursor</span><span class="p">[</span><span class="n">Person</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Person</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="n">values</span><span class="p">)))</span>
+
+<span class="k">def</span> <span class="nf">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">PersonFactory</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="sd">"""</span>
+<span class="sd">        select id, first_name, last_name, dob</span>
+<span class="sd">        from (values</span>
+<span class="sd">            (1, 'John', 'Doe', '2000-01-01'::date),</span>
+<span class="sd">            (2, 'Jane', 'White', NULL)</span>
+<span class="sd">        ) as data (id, first_name, last_name, dob)</span>
+<span class="sd">        where id = %(id)s;</span>
+<span class="sd">        """</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rec</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"person </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rec</span>
+
+<span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born in </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born"</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -294,6 +444,8 @@ to be sequences.</p>
             <ul>
 <li><a class="reference internal" href="#">Row factories</a><ul>
 <li><a class="reference internal" href="#available-row-factories">Available row factories</a></li>
+<li><a class="reference internal" href="#use-with-a-static-analyzer">Use with a static analyzer</a></li>
+<li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
 </ul>
 </li>
 </ul>

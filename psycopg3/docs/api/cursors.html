@@ -184,7 +184,7 @@ uncommitted data.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class<a class="headerlink" href="#the-cursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.Cursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Cursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory=&lt;function tuple_row&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">Cursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.Cursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#cursor-objects">DBAPI-compliant interface</a>. It is what the
 classic <a class="reference internal" href="connections.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> method returns. <a class="reference internal" href="connections.html#psycopg3.AsyncConnection.cursor" title="psycopg3.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a>
 will create instead <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> objects, which have the same set of
@@ -220,7 +220,7 @@ to close the cursor automatically when the block is exited.</p>
 <dd><p>Execute a query or command to the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cursor</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cursor</span></code></a>[~Row]</p>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
@@ -321,7 +321,7 @@ an exception if used with operations that don’t return result, such as an
 </div>
 <dl class="py attribute">
 <dt id="psycopg3.Cursor.row_factory">
-<code class="sig-name descname">row_factory</code><em class="property">: proto.RowFactory</em><a class="headerlink" href="#psycopg3.Cursor.row_factory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">row_factory</code><em class="property">: <a class="reference internal" href="../advanced/rows.html#psycopg3.rows.RowFactory" title="psycopg3.rows.RowFactory">rows.RowFactory</a><span class="p">[</span>Row<span class="p">]</span></em><a class="headerlink" href="#psycopg3.Cursor.row_factory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writable attribute to control how result rows are formed.</p>
 <p>The property affects the objects returned by the <a class="reference internal" href="#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>,
 <a class="reference internal" href="#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a> methods. The default
@@ -428,7 +428,7 @@ parameters), the parameters will <em>not</em> be merged to the query: see
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code> class<a class="headerlink" href="#the-servercursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.ServerCursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">ServerCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">name</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory=&lt;function tuple_row&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.ServerCursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">ServerCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">name</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.ServerCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class also implements a <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#cursor-objects">DBAPI-compliant interface</a>. It is created
 by <a class="reference internal" href="connections.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> specifying the <em>name</em> parameter. Using this
 object results in the creation of an equivalent PostgreSQL cursor in the
@@ -462,7 +462,7 @@ the end of the block.</p>
 <dd><p>Open a cursor to execute a query to the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.ServerCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServerCursor</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.ServerCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServerCursor</span></code></a>[~Row]</p>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
@@ -511,7 +511,7 @@ in details all the parameters.</p>
 <code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[~Row]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[~Row]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -520,7 +520,7 @@ in details all the parameters.</p>
 <code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.ServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[~Row]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[~Row]</p>
 </dd>
 </dl>
 <p>These methods use the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-fetch.html">FETCH</a> SQL statement to retrieve some of the
@@ -556,7 +556,7 @@ when it happens, but it might rather stop at the cursor boundary.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class<a class="headerlink" href="#the-asynccursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.AsyncCursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory=&lt;function tuple_row&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a DBAPI-inspired interface, with all the blocking
 methods implemented as coroutines. Unless specified otherwise,
 non-blocking methods are shared with the <a class="reference internal" href="#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> class.</p>
@@ -580,7 +580,7 @@ cursor automatically when the block is exited.</p>
 <em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">prepare</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncCursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>[~Row]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -662,7 +662,7 @@ on the async cursor results.</p>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class<a class="headerlink" href="#the-asyncservercursor-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="psycopg3.AsyncServerCursor">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncServerCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">name</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory=&lt;function tuple_row&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncServerCursor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.</code><code class="sig-name descname">AsyncServerCursor</code><span class="sig-paren">(</span><em class="sig-param">connection</em>, <em class="sig-param">name</em>, <em class="sig-param">*</em>, <em class="sig-param">format=&lt;Format.TEXT: 0&gt;</em>, <em class="sig-param">row_factory</em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncServerCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a DBAPI-inspired interface as the <a class="reference internal" href="#psycopg3.AsyncCursor" title="psycopg3.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>
 does, but wraps a server-side cursor like the <a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> class. It is
 created by <a class="reference internal" href="connections.html#psycopg3.AsyncConnection.cursor" title="psycopg3.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> specifying the <em>name</em> parameter.</p>
@@ -682,7 +682,7 @@ the <a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.
 <em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">scrollable</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.execute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.AsyncServerCursor" title="psycopg3.AsyncServerCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg3.AsyncServerCursor" title="psycopg3.AsyncServerCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a>[~Row]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,7 +709,7 @@ the <a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.
 <em class="property">async </em><code class="sig-name descname">fetchmany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchmany" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[~Row]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[~Row]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -718,7 +718,7 @@ the <a class="reference internal" href="#psycopg3.ServerCursor" title="psycopg3.
 <em class="property">async </em><code class="sig-name descname">fetchall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg3.AsyncServerCursor.fetchall" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[~Row]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[~Row]</p>
 </dd>
 </dl>
 <div class="admonition note">
