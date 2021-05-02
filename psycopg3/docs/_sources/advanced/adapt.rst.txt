@@ -57,9 +57,56 @@ configuration.
     subclass `!Dumper` or `!Loader` you should call the ``.register()`` on the
     class you created.
 
+
+Example: handling inifity date
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Suppose you want to work with the "infinity" date which is available in
+PostgreSQL but not handled by Python:
+
+.. code:: python
+
+    >>> conn.execute("'infinity'::date").fetchone()
+    Traceback (most recent call last):
+       ...
+    psycopg3.DataError: Python date doesn't support years after 9999: got infinity
+
+One possibility would be to store Python's `datetime.date.max` to PostgreSQL
+infinity. For this, let's create a subclass for the dumper and the loader and
+register them in the working scope (globally or just on a connection or
+cursor):
+
+.. code:: python
+
+    from datetime import date
+
+    from psycopg3.oids import postgres_types as builtins
+    from psycopg3.types import DateLoader, DateDumper
+
+    class InfDateDumper(DateDumper):
+        def dump(self, obj):
+            if obj == date.max:
+                return b"infinity"
+            else:
+                return super().dump(obj)
+
+    class InfDateLoader(DateLoader):
+        def load(self, data):
+            if data == b"infinity":
+                return date.max
+            else:
+                return super().load(data)
+
+    InfDateDumper.register(date, cur)
+    InfDateLoader.register(builtins["date"].oid, cur)
+
+    cur.execute("SELECT %s::text, %s::text", [date(2020, 12, 31), date.max]).fetchone()
+    # ('2020-12-31', 'infinity')
+    cur.execute("select '2020-12-31'::date, 'infinity'::date").fetchone()
+    # (datetime.date(2020, 12, 31), datetime.date(9999, 12, 31))
+
 .. admonition:: TODO
 
-    - Example: infinity date customisation
     - Example: numeric to float
 
 
@@ -84,6 +131,11 @@ right instance.
   instance, because the same Python type maps to more than one PostgreSQL type
   (for instance, a Python `int` might be better dumped as a PostgreSQL
   :sql:`integer`, :sql:`bigint`, :sql:`smallint` according to its value).
+
+- According to the placeholder used (``%s``, ``%b``, ``%t``), psycopg3 may
+  pick a binary or a text dumper. When using the ``%s`` "`~Format.AUTO`"
+  format, if the same type has both a text and a binary dumper registered, the
+  last one registered (using `Dumper.register()`) will be selected.
 
 - For every OID returned by the query, the `!Transformer` will instantiate a
   `!Loader`. All the values with the same OID will be converted by the same
@@ -168,6 +220,11 @@ Objects involved in types adaptation
 
         You should call this method on the `Dumper` subclass you create,
         passing the Python type you want to dump as *cls*.
+
+        If two dumpers of different `format` are registered for the same type,
+        the last one registered will be chosen by default when the query
+        doesn't specify a format (i.e. when the value is used with a ``%s``
+        "`~Format.AUTO`" placeholder).
 
         :param cls: The type to manage.
         :type cls: `!type` or `!str`

@@ -214,12 +214,54 @@ configuration.</p>
 subclass <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code> you should call the <code class="docutils literal notranslate"><span class="pre">.register()</span></code> on the
 class you created.</p>
 </div>
+<div class="section" id="example-handling-inifity-date">
+<h3>Example: handling inifity date<a class="headerlink" href="#example-handling-inifity-date" title="Permalink to this headline">¶</a></h3>
+<p>Suppose you want to work with the “infinity” date which is available in
+PostgreSQL but not handled by Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+   <span class="c">...</span>
+<span class="gr">psycopg3.DataError</span>: <span class="n">Python date doesn't support years after 9999: got infinity</span>
+</pre></div>
+</div>
+<p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> to PostgreSQL
+infinity. For this, let’s create a subclass for the dumper and the loader and
+register them in the working scope (globally or just on a connection or
+cursor):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+
+<span class="kn">from</span> <span class="nn">psycopg3.oids</span> <span class="kn">import</span> <span class="n">postgres_types</span> <span class="k">as</span> <span class="n">builtins</span>
+<span class="kn">from</span> <span class="nn">psycopg3.types</span> <span class="kn">import</span> <span class="n">DateLoader</span><span class="p">,</span> <span class="n">DateDumper</span>
+
+<span class="k">class</span> <span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">"infinity"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"infinity"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">InfDateDumper</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+<span class="n">InfDateLoader</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">builtins</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text"</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># ('2020-12-31', 'infinity')</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2020-12-31'::date, 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># (datetime.date(2020, 12, 31), datetime.date(9999, 12, 31))</span>
+</pre></div>
+</div>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <ul class="simple">
-<li><p>Example: infinity date customisation</p></li>
 <li><p>Example: numeric to float</p></li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="dumpers-and-loaders-life-cycle">
@@ -240,6 +282,10 @@ converted by the same dumper; certain dumpers may be used in more than one
 instance, because the same Python type maps to more than one PostgreSQL type
 (for instance, a Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> might be better dumped as a PostgreSQL
 <code class="sql docutils literal notranslate"><span class="pre">integer</span></code>, <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>, <code class="sql docutils literal notranslate"><span class="pre">smallint</span></code> according to its value).</p></li>
+<li><p>According to the placeholder used (<code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%b</span></code>, <code class="docutils literal notranslate"><span class="pre">%t</span></code>), psycopg3 may
+pick a binary or a text dumper. When using the <code class="docutils literal notranslate"><span class="pre">%s</span></code> “<a class="reference internal" href="#psycopg3.adapt.Format.AUTO" title="psycopg3.adapt.Format.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>”
+format, if the same type has both a text and a binary dumper registered, the
+last one registered (using <a class="reference internal" href="#psycopg3.adapt.Dumper.register" title="psycopg3.adapt.Dumper.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper.register()</span></code></a>) will be selected.</p></li>
 <li><p>For every OID returned by the query, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will instantiate a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>. All the values with the same OID will be converted by the same
 loader.</p></li>
@@ -362,6 +408,10 @@ your cake. Don’t tell me I didn’t warn you.</p>
 </dl>
 <p>You should call this method on the <a class="reference internal" href="#psycopg3.adapt.Dumper" title="psycopg3.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> subclass you create,
 passing the Python type you want to dump as <em>cls</em>.</p>
+<p>If two dumpers of different <a class="reference internal" href="#psycopg3.adapt.Dumper.format" title="psycopg3.adapt.Dumper.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a> are registered for the same type,
+the last one registered will be chosen by default when the query
+doesn’t specify a format (i.e. when the value is used with a <code class="docutils literal notranslate"><span class="pre">%s</span></code>
+“<a class="reference internal" href="#psycopg3.adapt.Format.AUTO" title="psycopg3.adapt.Format.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>” placeholder).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -498,7 +548,10 @@ state so adapting several values of the same type can be optimised.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Data adaptation configuration</a><ul>
-<li><a class="reference internal" href="#dumpers-and-loaders-configuration">Dumpers and loaders configuration</a></li>
+<li><a class="reference internal" href="#dumpers-and-loaders-configuration">Dumpers and loaders configuration</a><ul>
+<li><a class="reference internal" href="#example-handling-inifity-date">Example: handling inifity date</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#dumpers-and-loaders-life-cycle">Dumpers and loaders life cycle</a></li>
 <li><a class="reference internal" href="#objects-involved-in-types-adaptation">Objects involved in types adaptation</a></li>
 </ul>
