@@ -751,6 +751,20 @@ use an autocommit connection.</p>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code>: for instance it is possible to have read-only transactions or
 change the isolation level. See the <a class="reference internal" href="connection.html#connection.set_session" title="connection.set_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_session()</span></code></a> method for all
 the details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When multiple statements are executed in the same query, separated by
+semicolon, PostgreSQL wraps them in a transaction. This means that
+statements which cannot run in a transaction must be executed separately:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This doesn&#39;t work</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP DATABASE foo; DROP DATABASE bar;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">If you are wondering why the above works in <strong class="program">psql</strong>, that’s
+because <strong class="program">psql</strong> parses the queries and splits them on semicolon
+before sending them. <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> doesn’t parse the query, so these
+statements must be executed on their own.</p>
+</div>
 <div class="section" id="with-statement">
 <span id="index-15"></span><h3><code class="docutils literal notranslate"><span class="pre">with</span></code> statement<a class="headerlink" href="#with-statement" title="Permalink to this headline">¶</a></h3>
 <p>Starting from version 2.5, psycopg2’s connections and cursors are <em>context

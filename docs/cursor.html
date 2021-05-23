@@ -159,7 +159,7 @@ object on which the cursor was created.</p>
 <dt id="cursor.name">
 <code class="descname">name</code><a class="headerlink" href="#cursor.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read-only attribute containing the name of the cursor if it was
-creates as named cursor by <a class="reference internal" href="connection.html#connection.cursor" title="connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection.cursor()</span></code></a>, or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if
+created as named cursor by <a class="reference internal" href="connection.html#connection.cursor" title="connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection.cursor()</span></code></a>, or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if
 it is a client side cursor.  See <a class="reference internal" href="usage.html#server-side-cursors"><span class="std std-ref">Server side cursors</span></a>.</p>
 <div class="dbapi-extension admonition">
 <p class="first admonition-title">DB API extension</p>
@@ -258,6 +258,13 @@ return value may be implemented, but for now the function returns None.</p>
 available through the standard <a class="reference internal" href="#fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code></a> methods.</p>
 <div class="versionchanged">
 <p><span class="versionmodified">Changed in version 2.7: </span>added support for named arguments.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="xref py py-obj docutils literal notranslate"><span class="pre">callproc()</span></code> can only be used with PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/sql-createfunction.html">functions</a>, not
+with the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-createprocedure.html">procedures</a> introduced in PostgreSQL 11, which require
+the <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> statement to run. Please use a normal
+<a class="reference internal" href="#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> to run them.</p>
 </div>
 </dd></dl>
 

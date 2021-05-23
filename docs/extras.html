@@ -604,7 +604,9 @@ discarded on the server.</p>
 <p>If the <em>reply</em> or <em>force</em> parameters are not set, this method will
 just update internal structures without sending the feedback message
 to the server. The library sends feedback message automatically
-when <em>status_interval</em> timeout is reached.</p>
+when <em>status_interval</em> timeout is reached. For this to work, you must
+call <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.send_feedback" title="psycopg2.extras.ReplicationCursor.send_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_feedback()</span></code></a> on the same Cursor that you called <a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication" title="psycopg2.extras.ReplicationCursor.start_replication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_replication()</span></code></a>
+on (the one in <code class="xref py py-obj docutils literal notranslate"><span class="pre">message.cursor</span></code>) or your feedback will be lost.</p>
 <div class="versionchanged">
 <p><span class="versionmodified">Changed in version 2.8.3: </span>added the <em>force</em> parameter.</p>
 </div>

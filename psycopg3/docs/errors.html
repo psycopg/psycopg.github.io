@@ -1,0 +1,1514 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="types – types mapping and adaptation" href="types.html" /><link rel="prev" title="sql – SQL string composition" href="sql.html" />
+
+    <meta name="generator" content="sphinx-3.3.1, furo 2020.11.19.beta18"/>
+        <title>errors – package exceptions - psycopg3 UNRELEASED documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?state=dab20f324401441365f92b2a">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 1rem;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 1rem;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
+    <link rel="stylesheet" type="text/css" href="_static/psycopg.css" />
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?state=dab20f324401441365f92b2a">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script defer src="_static/jquery.js"></script>
+    <script defer src="_static/underscore.js"></script>
+    <script defer src="_static/doctools.js"></script>
+    <script defer src="_static/language_data.js"></script>
+    <script defer src="_static/scripts/main.js?state=dab20f324401441365f92b2a"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+    <a style="text-decoration: none; color: white;"
+   href="https://github.com/sponsors/dvarrazzo/">
+   <img height="24px" width="24px" src="/img/logo/psycopg-48.png"/>
+    Sponsor psycopg3 on GitHub
+</a>
+
+  </aside>
+</div>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/psycopg.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/psycopg.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder="Search" name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="basic/index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html">Basic module usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adapt-types.html">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transaction management</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="row-factories.html">Row factories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adaptation.html">Data adaptation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepared.html">Prepared statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async.html">Async operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="connection.html">Connection classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cursor.html">Cursor classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="errors-package-exceptions">
+<h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions<a class="headerlink" href="#errors-package-exceptions" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-psycopg3.errors"><span id="index-0"></span></span><p>This module exposes objects to represent and examine database errors.</p>
+<dl class="py exception">
+<dt id="psycopg3.errors.Error">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">Error</code><a class="headerlink" href="#psycopg3.errors.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base exception for all the errors psycopg3 will raise.</p>
+<p>Exception that is the base class of all other error exceptions. You can
+use this to catch all errors with one single <code class="xref py py-obj docutils literal notranslate"><span class="pre">except</span></code> statement.</p>
+<p>This exception is guaranteed to be picklable.</p>
+<dl class="py attribute">
+<dt id="psycopg3.errors.Error.diag">
+<code class="sig-name descname">diag</code><a class="headerlink" href="#psycopg3.errors.Error.diag" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#psycopg3.errors.Diagnostic" title="psycopg3.errors.Diagnostic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Diagnostic</span></code></a> object to inspect details of the errors from the database.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt id="psycopg3.errors.Diagnostic">
+<em class="property">class </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">Diagnostic</code><a class="headerlink" href="#psycopg3.errors.Diagnostic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Details from a database error report.</p>
+<p>The object is returned by the <a class="reference internal" href="#psycopg3.errors.Error.diag" title="psycopg3.errors.Error.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.diag</span></code></a> attribute and is passed to the
+callback functions registered with
+<a class="reference internal" href="connection.html#psycopg3.Connection.add_notice_handler" title="psycopg3.Connection.add_notice_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notice_handler()</span></code></a>.</p>
+<p>All the information available from the <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQRESULTERRORFIELD"><span class="pre">PQresultErrorField</span></a><span class="pre">()</span></code> function
+are exposed as attributes by the object. For instance the <code class="xref py py-obj docutils literal notranslate"><span class="pre">severity</span></code>
+attribute returns the <code class="xref py py-obj docutils literal notranslate"><span class="pre">PG_DIAG_SEVERITY</span></code> code. Please refer to the
+PostgreSQL documentation for the meaning of all the attributes.</p>
+<p>The attributes available are:</p>
+<dl class="py attribute">
+<dt id="psycopg3.errors.Diagnostic.column_name">
+<code class="sig-name descname">column_name</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.column_name" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.constraint_name">
+<code class="sig-name descname">constraint_name</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.constraint_name" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.context">
+<code class="sig-name descname">context</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.context" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.datatype_name">
+<code class="sig-name descname">datatype_name</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.datatype_name" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.internal_position">
+<code class="sig-name descname">internal_position</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.internal_position" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.internal_query">
+<code class="sig-name descname">internal_query</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.internal_query" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.message_detail">
+<code class="sig-name descname">message_detail</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.message_detail" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.message_hint">
+<code class="sig-name descname">message_hint</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.message_hint" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.message_primary">
+<code class="sig-name descname">message_primary</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.message_primary" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.schema_name">
+<code class="sig-name descname">schema_name</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.schema_name" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.severity">
+<code class="sig-name descname">severity</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.severity" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.severity_nonlocalized">
+<code class="sig-name descname">severity_nonlocalized</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.severity_nonlocalized" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.source_file">
+<code class="sig-name descname">source_file</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.source_file" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.source_function">
+<code class="sig-name descname">source_function</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.source_function" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.source_line">
+<code class="sig-name descname">source_line</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.source_line" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.sqlstate">
+<code class="sig-name descname">sqlstate</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.sqlstate" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.statement_position">
+<code class="sig-name descname">statement_position</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.statement_position" title="Permalink to this definition">¶</a></dt>
+<dt id="psycopg3.errors.Diagnostic.table_name">
+<code class="sig-name descname">table_name</code><a class="headerlink" href="#psycopg3.errors.Diagnostic.table_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string with the error field if available; <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if not available.
+The attribute value is available only for errors sent by the server:
+not all the fields are available for all the errors and for all the
+server versions.</p>
+</dd></dl>
+</dd></dl>
+<div class="section" id="db-api-exceptions">
+<span id="dbapi-exceptions"></span><span id="index-1"></span><h2>DB-API exceptions<a class="headerlink" href="#db-api-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>In compliance with the DB-API, all the exceptions raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>
+derive from the following classes:</p>
+<pre class="literal-block"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code>
+|__ <a class="reference internal" href="#psycopg3.errors.Warning" title="psycopg3.errors.Warning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Warning</span></code></a>
+|__ <a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a>
+    |__ <a class="reference internal" href="#psycopg3.errors.InterfaceError" title="psycopg3.errors.InterfaceError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InterfaceError</span></code></a>
+    |__ <a class="reference internal" href="#psycopg3.errors.DatabaseError" title="psycopg3.errors.DatabaseError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.DataError" title="psycopg3.errors.DataError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.OperationalError" title="psycopg3.errors.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.IntegrityError" title="psycopg3.errors.IntegrityError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.InternalError" title="psycopg3.errors.InternalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.ProgrammingError" title="psycopg3.errors.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a>
+        |__ <a class="reference internal" href="#psycopg3.errors.NotSupportedError" title="psycopg3.errors.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a></pre>
+<p>These classes are also exposed by the <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> module.</p>
+<dl class="py exception">
+<dt id="psycopg3.errors.Warning">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">Warning</code><a class="headerlink" href="#psycopg3.errors.Warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception raised for important warnings.</p>
+<p>Defined for DBAPI compatibility, but never raised by <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code>.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.InterfaceError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">InterfaceError</code><a class="headerlink" href="#psycopg3.errors.InterfaceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error related to the database interface rather than the database itself.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.DatabaseError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">DatabaseError</code><a class="headerlink" href="#psycopg3.errors.DatabaseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception raised for errors that are related to the database.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.DataError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">DataError</code><a class="headerlink" href="#psycopg3.errors.DataError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error caused by problems with the processed data.</p>
+<p>Examples may be division by zero, numeric value out of range, etc.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.OperationalError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">OperationalError</code><a class="headerlink" href="#psycopg3.errors.OperationalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error related to the database’s operation.</p>
+<p>These errors are not necessarily under the control of the programmer, e.g.
+an unexpected disconnect occurs, the data source name is not found, a
+transaction could not be processed, a memory allocation error occurred
+during processing, etc.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.IntegrityError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">IntegrityError</code><a class="headerlink" href="#psycopg3.errors.IntegrityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error caused when the relational integrity of the database is affected.</p>
+<p>An example may be a foreign key check failed.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.InternalError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">InternalError</code><a class="headerlink" href="#psycopg3.errors.InternalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error generated when the database encounters an internal error,</p>
+<p>Examples could be the cursor is not valid anymore, the transaction is out
+of sync, etc.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.ProgrammingError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">ProgrammingError</code><a class="headerlink" href="#psycopg3.errors.ProgrammingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception raised for programming errors</p>
+<p>Examples may be table not found or already exists, syntax error in the SQL
+statement, wrong number of parameters specified, etc.</p>
+</dd></dl>
+<dl class="py exception">
+<dt id="psycopg3.errors.NotSupportedError">
+<em class="property">exception </em><code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">NotSupportedError</code><a class="headerlink" href="#psycopg3.errors.NotSupportedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A method or database API was used which is not supported by the database,</p>
+</dd></dl>
+</div>
+<div class="section" id="sqlstate-exceptions">
+<span id="index-2"></span><span id="id1"></span><h2>SQLSTATE exceptions<a class="headerlink" href="#sqlstate-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Errors coming from a database server (as opposite as ones generated
+client-side, such as connection failed) usually have a 5-letters error code
+called SQLSTATE (available in the <a class="reference internal" href="#psycopg3.errors.Diagnostic.sqlstate" title="psycopg3.errors.Diagnostic.sqlstate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlstate</span></code></a> attribute of
+<a class="reference internal" href="#psycopg3.errors.Error.diag" title="psycopg3.errors.Error.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.diag</span></code></a>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> exposes a different class for each SQLSTATE value, allowing to
+write idiomatic error handling code according to specific conditions happening
+in the database:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT"</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">LockNotAvailable</span><span class="p">:</span>
+    <span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>The exception names are generated from the PostgreSQL source code and includes
+classes for every error defined by PostgreSQL in versions between 9.6 and 13.
+Every class in the module is named after what referred as “condition name” <a class="reference external" href="https://www.postgresql.org/docs/current/errcodes-appendix.html#ERRCODES-TABLE">in
+the documentation</a>, converted to CamelCase: e.g. the error 22012,
+<code class="docutils literal notranslate"><span class="pre">division_by_zero</span></code> is exposed by this module as the class <code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionByZero</span></code>.
+There is a handful of exception, required for disambiguate clashes: please
+refer to the table below for all the classes defined.</p>
+<p>Every exception class is a subclass of one of the <a class="reference internal" href="#dbapi-exceptions"><span class="std std-ref">standard DB-API
+exception</span></a> and expose the <a class="reference internal" href="#psycopg3.errors.Error" title="psycopg3.errors.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a> interface.</p>
+<dl class="py function">
+<dt id="psycopg3.errors.lookup">
+<code class="sig-prename descclassname">psycopg3.errors.</code><code class="sig-name descname">lookup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sqlstate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> → Type<span class="p">[</span>psycopg3.Error<span class="p">]</span><a class="headerlink" href="#psycopg3.errors.lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lookup an error code and return its exception class.</p>
+<p>Raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeyError</span></code> if the code is not found.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT"</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"55P03"</span><span class="p">):</span>
+    <span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</dd></dl>
+<p>These are all the classes defined and the DBAPI exception they derive from:</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 11%"/>
+<col style="width: 61%"/>
+<col style="width: 28%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SQLSTATE</p></th>
+<th class="head"><p>Exception</p></th>
+<th class="head"><p>Base exception</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="3"><p><strong>Class 02</strong>: Class 02 - No Data (this is also a warning class per the SQL standard)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">02000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoData</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">02001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoAdditionalDynamicResultSetsReturned</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 03</strong>: Class 03 - SQL Statement Not Yet Complete</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">03000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlStatementNotYetComplete</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 08</strong>: Class 08 - Connection Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">08000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">08001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlclientUnableToEstablishSqlconnection</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">08003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionDoesNotExist</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">08004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlserverRejectedEstablishmentOfSqlconnection</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">08006</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionFailure</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">08007</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransactionResolutionUnknown</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">08P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 09</strong>: Class 09 - Triggered Action Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">09000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggeredActionException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 0A</strong>: Class 0A - Feature Not Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0A000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FeatureNotSupported</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 0B</strong>: Class 0B - Invalid Transaction Initiation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0B000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTransactionInitiation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 0F</strong>: Class 0F - Locator Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0F000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LocatorException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0F001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidLocatorSpecification</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 0L</strong>: Class 0L - Invalid Grantor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0L000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidGrantor</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0LP01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidGrantOperation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 0P</strong>: Class 0P - Invalid Role Specification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0P000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidRoleSpecification</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 0Z</strong>: Class 0Z - Diagnostics Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0Z000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DiagnosticsException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0Z002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StackedDiagnosticsAccessedWithoutActiveHandler</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 20</strong>: Class 20 - Case Not Found</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">20000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CaseNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 21</strong>: Class 21 - Cardinality Violation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">21000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CardinalityViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 22</strong>: Class 22 - Data Exception</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StringDataRightTruncation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullValueNoIndicatorParameter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NumericValueOutOfRange</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullValueNotAllowed</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22005</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorInAssignment</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22007</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidDatetimeFormat</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22008</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatetimeFieldOverflow</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22009</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTimeZoneDisplacementValue</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200B</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">EscapeCharacterConflict</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2200C</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidUseOfEscapeCharacter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200D</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidEscapeOctet</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2200F</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZeroLengthCharacterString</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200G</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MostSpecificTypeMismatch</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2200H</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SequenceGeneratorLimitExceeded</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200L</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotAnXmlDocument</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2200M</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidXmlDocument</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200N</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidXmlContent</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2200S</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidXmlComment</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2200T</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidXmlProcessingInstruction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22010</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidIndicatorParameterValue</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22011</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SubstringError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22012</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionByZero</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22013</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidPrecedingOrFollowingSize</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22014</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForNtileFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22015</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntervalFieldOverflow</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22016</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForNthValueFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22018</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCharacterValueForCast</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22019</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidEscapeCharacter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2201B</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidRegularExpression</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2201E</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForLogarithm</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2201F</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForPowerFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2201G</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForWidthBucketFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2201W</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidRowCountInLimitClause</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2201X</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidRowCountInResultOffsetClause</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22021</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CharacterNotInRepertoire</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22022</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndicatorOverflow</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22023</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidParameterValue</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22024</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnterminatedCString</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22025</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidEscapeSequence</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22026</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StringDataLengthMismatch</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22027</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrimError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2202E</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArraySubscriptError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2202G</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTablesampleRepeat</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2202H</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTablesampleArgument</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22030</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateJsonObjectKeyValue</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22031</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidArgumentForSqlJsonDatetimeFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22032</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidJsonText</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22033</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSqlJsonSubscript</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22034</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoreThanOneSqlJsonItem</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22035</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoSqlJsonItem</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22036</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonNumericSqlJsonItem</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22037</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonUniqueKeysInAJsonObject</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22038</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingletonSqlJsonItemRequired</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22039</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlJsonArrayNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2203A</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlJsonMemberNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2203B</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlJsonNumberNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2203C</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlJsonObjectNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2203D</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyJsonArrayElements</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2203E</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyJsonObjectMembers</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2203F</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlJsonScalarRequired</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FloatingPointException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTextRepresentation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidBinaryRepresentation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22P04</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BadCopyFileFormat</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">22P05</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UntranslatableCharacter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">22P06</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonstandardUseOfEscapeCharacter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 23</strong>: Class 23 - Integrity Constraint Violation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">23000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityConstraintViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">23001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RestrictViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">23502</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotNullViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">23503</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ForeignKeyViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">23505</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniqueViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">23514</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CheckViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">23P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExclusionViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrityError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 24</strong>: Class 24 - Invalid Cursor State</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">24000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCursorState</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 25</strong>: Class 25 - Invalid Transaction State</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTransactionState</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActiveSqlTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BranchTransactionAlreadyActive</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InappropriateAccessModeForBranchTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InappropriateIsolationLevelForBranchTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25005</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoActiveSqlTransactionForBranchTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25006</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReadOnlySqlTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25007</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SchemaAndDataStatementMixingNotSupported</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25008</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldCursorRequiresSameIsolationLevel</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoActiveSqlTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">25P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InFailedSqlTransaction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">25P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdleInTransactionSessionTimeout</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 26</strong>: Class 26 - Invalid SQL Statement Name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">26000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSqlStatementName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 27</strong>: Class 27 - Triggered Data Change Violation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">27000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggeredDataChangeViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 28</strong>: Class 28 - Invalid Authorization Specification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">28000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidAuthorizationSpecification</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">28P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidPassword</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 2B</strong>: Class 2B - Dependent Privilege Descriptors Still Exist</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2B000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DependentPrivilegeDescriptorsStillExist</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2BP01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DependentObjectsStillExist</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 2D</strong>: Class 2D - Invalid Transaction Termination</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2D000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTransactionTermination</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 2F</strong>: Class 2F - SQL Routine Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2F000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SqlRoutineException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2F002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModifyingSqlDataNotPermitted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2F003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProhibitedSqlStatementAttempted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">2F004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReadingSqlDataNotPermitted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2F005</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionExecutedNoReturnStatement</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 34</strong>: Class 34 - Invalid Cursor Name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">34000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCursorName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 38</strong>: Class 38 - External Routine Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">38000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalRoutineException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">38001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContainingSqlNotPermitted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">38002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModifyingSqlDataNotPermittedExt</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">38003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProhibitedSqlStatementAttemptedExt</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">38004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReadingSqlDataNotPermittedExt</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 39</strong>: Class 39 - External Routine Invocation Exception</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">39000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalRoutineInvocationException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">39001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSqlstateReturned</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">39004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullValueNotAllowedExt</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">39P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggerProtocolViolated</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">39P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SrfProtocolViolated</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">39P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventTriggerProtocolViolated</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 3B</strong>: Class 3B - Savepoint Exception</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">3B000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SavepointException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3B001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSavepointSpecification</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 3D</strong>: Class 3D - Invalid Catalog Name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3D000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCatalogName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 3F</strong>: Class 3F - Invalid Schema Name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3F000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSchemaName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 40</strong>: Class 40 - Transaction Rollback</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">40000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransactionRollback</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">40001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SerializationFailure</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">40002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransactionIntegrityConstraintViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">40003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatementCompletionUnknown</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">40P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeadlockDetected</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 42</strong>: Class 42 - Syntax Error or Access Rule Violation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SyntaxErrorOrAccessRuleViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42501</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InsufficientPrivilege</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42601</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SyntaxError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42602</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42611</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidColumnDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42622</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NameTooLong</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42701</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateColumn</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42702</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AmbiguousColumn</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42703</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedColumn</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42704</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedObject</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42710</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateObject</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42712</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateAlias</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42723</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42725</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AmbiguousFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42803</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroupingError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42804</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatatypeMismatch</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42809</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">WrongObjectType</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42830</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidForeignKey</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42846</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CannotCoerce</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42883</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedFunction</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">428C9</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedAlways</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42939</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReservedName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedTable</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedParameter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateCursor</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P04</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateDatabase</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P05</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicatePreparedStatement</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P06</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateSchema</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P07</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateTable</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P08</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AmbiguousParameter</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P09</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AmbiguousAlias</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P10</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidColumnReference</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P11</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCursorDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P12</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidDatabaseDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P13</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidFunctionDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P14</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidPreparedStatementDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P15</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSchemaDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P16</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidTableDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P17</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidObjectDefinition</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P18</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndeterminateDatatype</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P19</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidRecursion</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P20</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindowingError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">42P21</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CollationMismatch</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">42P22</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndeterminateCollation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 44</strong>: Class 44 - WITH CHECK OPTION Violation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">44000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">WithCheckOptionViolation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 53</strong>: Class 53 - Insufficient Resources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">53000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InsufficientResources</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">53100</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DiskFull</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">53200</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutOfMemory</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">53300</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyConnections</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">53400</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigurationLimitExceeded</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 54</strong>: Class 54 - Program Limit Exceeded</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">54000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgramLimitExceeded</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">54001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatementTooComplex</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">54011</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyColumns</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">54023</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyArguments</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 55</strong>: Class 55 - Object Not In Prerequisite State</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">55000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObjectNotInPrerequisiteState</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">55006</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObjectInUse</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">55P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CantChangeRuntimeParam</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">55P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LockNotAvailable</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">55P04</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsafeNewEnumValueUsage</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 57</strong>: Class 57 - Operator Intervention</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">57000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperatorIntervention</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">57014</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueryCanceled</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">57P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdminShutdown</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">57P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrashShutdown</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">57P03</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CannotConnectNow</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">57P04</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseDropped</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class 58</strong>: Class 58 - System Error (errors external to PostgreSQL itself)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">58000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SystemError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">58030</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IoError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">58P01</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndefinedFile</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">58P02</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DuplicateFile</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class 72</strong>: Class 72 - Snapshot Failure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">72000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SnapshotTooOld</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Class F0</strong>: Class F0 - Configuration File Error</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">F0000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigFileError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">F0001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LockFileExists</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class HV</strong>: Class HV - Foreign Data Wrapper Error (SQL/MED)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwOutOfMemory</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwDynamicParameterValueNeeded</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidDataType</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV005</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwColumnNameNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV006</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidDataTypeDescriptors</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV007</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidColumnName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV008</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidColumnNumber</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV009</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidUseOfNullPointer</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00A</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidStringFormat</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00B</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidHandle</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00C</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidOptionIndex</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00D</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidOptionName</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00J</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwOptionNameNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00K</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwReplyHandle</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00L</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwUnableToCreateExecution</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00M</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwUnableToCreateReply</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00N</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwUnableToEstablishConnection</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00P</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwNoSchemas</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV00Q</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwSchemaNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV00R</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwTableNotFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV010</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwFunctionSequenceError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV014</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwTooManyHandles</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV021</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInconsistentDescriptorInformation</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV024</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidAttributeValue</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HV090</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidStringLengthOrBufferLength</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HV091</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FdwInvalidDescriptorFieldIdentifier</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class P0</strong>: Class P0 - PL/pgSQL Error</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P0000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlpgsqlError</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">P0001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RaiseException</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P0002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoDataFound</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">P0003</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TooManyRows</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P0004</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AssertFailure</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Class XX</strong>: Class XX - Internal Error</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">XX000</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError_</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">XX001</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCorrupted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">XX002</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndexCorrupted</span></code></p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="types.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="sql.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team
+            |
+            <a class="muted-link" href="_sources/errors.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a><ul>
+<li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a></li>
+<li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>
