@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
     <link rel="stylesheet" href="/css/psycopg.css?h=62eb2992">
-    <title>Cancelling PostgreSQL statements from Python — Psycopg</title>
+    <title>Psycopg 2.9 released — Psycopg</title>
   </head>
   <body>
     <header>
@@ -40,10 +40,10 @@
           <li class="nav-item">
             <a class="nav-link" href="/install/">Install</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item active">
             <a class="nav-link" href="/articles/tag/news/">News</a>
           </li>
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
           </li>
           <li class="nav-item">
@@ -64,57 +64,53 @@
   
   <div class="article">
   
-    <h1>Cancelling PostgreSQL statements from Python</h1>
+    <h1>Psycopg 2.9 released</h1>
   
   <p class="header">
-    Posted by Daniele Varrazzo on 2014-07-20
+    Posted by Daniele Varrazzo on 2021-06-16
     
       <br />
       Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="/articles/tag/release/"
+          >release</a>
       
     
   </p>
   
-    <p>Cancelling a long running query from Python is not something that happens automatically: the libpq doesn't react to Python signals so the only way to stop a query is to run a <tt class="docutils literal">pg_cancel_backend</tt> from another process. Killing the Python process won't cancel the query: it will run until completion and then rolled back. This makes working wth long-running query from the Python interpreter somewhat frustrating.</p>
+    <p>Psycopg 2.9 has been released!</p>
+<p>This is a relatively small release compared to previous major releases.
+However the creation of the packages took a lot of effort. The previously used
+CI system now has reduced support for free software projects - it was decided
+that package building should be moved to GitHub Actions.</p>
+<p>Packaging has also become more complex because of the evolution of the Python
+packaging standards and the need to support multiple architectures (Intel,
+ARM, PPC...).</p>
+<p>Maintaining a project such as Psycopg requires a lot of effort. For this
+reason, we are extremely grateful to all our <a class="reference external" href="https://www.psycopg.org/sponsors/">sponsors</a> who are enabling the
+maintenance and development of Psycopg. Thank you very much! <span class="raw-html"><i
+class="fa fa-heart"></i></span></p>
 <!-- CUT-HERE -->
-<p>Using psycopg in <a class="reference external" href="/docs/advanced.html#support-for-coroutine-libraries">green mode</a> moves the waiting from the libpq C code to Python: this gives Python some chance of interaction: it is possible for instance to catch a ctrl-c and send a cancel request:</p>
-<pre class="code python literal-block">
-<span class="kn">from</span> <span class="nn">select</span> <span class="kn">import</span> <span class="n">select</span>
-<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">POLL_OK</span><span class="p">,</span> <span class="n">POLL_READ</span><span class="p">,</span> <span class="n">POLL_WRITE</span>
-
-<span class="k">def</span> <span class="nf">wait_select_inter</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
-    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_OK</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_READ</span><span class="p">:</span>
-                <span class="n">select</span><span class="p">([</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[],</span> <span class="p">[])</span>
-            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_WRITE</span><span class="p">:</span>
-                <span class="n">select</span><span class="p">([],</span> <span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">conn</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">(</span>
-                    <span class="s2">&quot;bad state from poll: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">state</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="n">conn</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-            <span class="c1"># the loop will be broken by a server error</span>
-            <span class="k">continue</span>
-
-<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">set_wait_callback</span><span class="p">(</span><span class="n">wait_select_inter</span><span class="p">)</span>
-</pre>
-<p>An interactive session would look like:</p>
-<pre class="code pycon literal-block">
-<span class="n"></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(10)&quot;</span><span class="p">)</span>
-<span class="go">^C
-</span><span class="gt">Traceback (most recent call last):
-</span>  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-<span class="gr">QueryCanceledError</span>: <span class="n">canceling statement due to user request</span>
-</pre>
-<p>The connection is now in error state, but a <tt class="docutils literal">cnn.rollback()</tt> would make it working again.</p>
+<p>What’s new in psycopg 2.9</p>
+<ul class="simple">
+<li><tt class="docutils literal">with connection</tt> starts a transaction on autocommit transactions too (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/941">ticket #941</a>).</li>
+<li>Timezones with fractional minutes are supported on Python 3.7 and following (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1272">ticket #1272</a>).</li>
+<li>Escape table and column names in <tt class="docutils literal">copy_from()</tt> and <tt class="docutils literal">copy_to()</tt>.</li>
+<li>Connection exceptions with sqlstate 08XXX reclassified as <tt class="docutils literal">OperationalError</tt> (a subclass of the previously used <tt class="docutils literal">DatabaseError</tt>) (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1148">ticket #1148</a>).</li>
+<li>Include library dirs required from libpq to work around MacOS build problems (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1200">ticket #1200</a>).</li>
+</ul>
+<p>Other changes:</p>
+<ul class="simple">
+<li>Dropped support for Python 2.7, 3.4, 3.5 (<a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1198">ticket #1198</a>, <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1000">ticket #1000</a>, <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1197">ticket #1197</a>).</li>
+<li>Dropped support for <tt class="docutils literal">mx.DateTime</tt>.</li>
+<li>Use <tt class="docutils literal">datetime.timezone</tt> objects by default in <tt class="docutils literal">datetime</tt> objects instead of <tt class="docutils literal">FixedOffsetTimezone</tt>.</li>
+<li>The <tt class="docutils literal">psycopg2.tz</tt> module is deprecated and scheduled to be dropped in the next major release.</li>
+<li>Provide <a class="reference external" href="http://www.python.org/dev/peps/pep-0599">PEP 599</a> wheels packages (<tt class="docutils literal">manylinux2014</tt> tag) for <tt class="docutils literal">i686</tt> and <tt class="docutils literal">x86_64</tt> platforms.</li>
+<li>Provide <a class="reference external" href="http://www.python.org/dev/peps/pep-0600">PEP 600</a> wheels packages (<tt class="docutils literal">manylinux_2_24</tt> tag) for <tt class="docutils literal">aarch64</tt> and <tt class="docutils literal">ppc64le</tt> platforms.</li>
+<li>Wheel package compiled against OpenSSL 1.1.1k and PostgreSQL 13.3.</li>
+<li>Build system for Linux/MacOS binary packages moved to GitHub Actions.</li>
+</ul>
 
   
   </div>
