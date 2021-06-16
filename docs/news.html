@@ -6,7 +6,7 @@
   <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Release notes &#8212; Psycopg 2.8.7.dev0 documentation</title>
+    <title>Release notes &#8212; Psycopg 2.9 documentation</title>
     <link rel="stylesheet" href="_static/better.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
@@ -28,7 +28,7 @@
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
   </head><body>
     <header id="pageheader"><h1><a href="index.html ">
-        Psycopg 2.8.7.dev0 documentation
+        Psycopg 2.9 documentation
     </a></h1></header>
   <div class="related top">
   <nav id="rellinks">
@@ -59,6 +59,37 @@
 <span id="index-0"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="current-release">
 <h2>Current release<a class="headerlink" href="#current-release" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="what-s-new-in-psycopg-2-9">
+<h2>What’s new in psycopg 2.9<a class="headerlink" href="#what-s-new-in-psycopg-2-9" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">connection</span></code> starts a transaction on autocommit transactions too
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/941">#941</a>).</li>
+<li>Timezones with fractional minutes are supported on Python 3.7 and following
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1272">#1272</a>).</li>
+<li>Escape table and column names in <a class="reference internal" href="cursor.html#cursor.copy_from" title="cursor.copy_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_from()</span></code></a> and
+<a class="reference internal" href="cursor.html#cursor.copy_to" title="cursor.copy_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_to()</span></code></a>.</li>
+<li>Connection exceptions with sqlstate <code class="docutils literal notranslate"><span class="pre">08XXX</span></code> reclassified as
+<a class="reference internal" href="module.html#psycopg2.OperationalError" title="psycopg2.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a> (a subclass of the previously used
+<a class="reference internal" href="module.html#psycopg2.DatabaseError" title="psycopg2.DatabaseError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseError</span></code></a>) (ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1148">#1148</a>).</li>
+<li>Include library dirs required from libpq to work around MacOS build problems
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1200">#1200</a>).</li>
+</ul>
+<p>Other changes:</p>
+<ul class="simple">
+<li>Dropped support for Python 2.7, 3.4, 3.5 (tickets <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1198">#1198</a>, <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1000">#1000</a>, <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1197">#1197</a>).</li>
+<li>Dropped support for mx.DateTime.</li>
+<li>Use <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timezone" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.timezone</span></code></a> objects by default in datetime objects instead of
+<a class="reference internal" href="tz.html#psycopg2.tz.FixedOffsetTimezone" title="psycopg2.tz.FixedOffsetTimezone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedOffsetTimezone</span></code></a>.</li>
+<li>The <a class="reference internal" href="tz.html#module-psycopg2.tz" title="psycopg2.tz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.tz</span></code></a> module is deprecated and scheduled to be dropped in the
+next major release.</li>
+<li>Provide <span class="target" id="index-1"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0599"><strong>PEP 599</strong></a> wheels packages (manylinux2014 tag) for i686 and x86_64
+platforms.</li>
+<li>Provide <span class="target" id="index-2"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0600"><strong>PEP 600</strong></a> wheels packages (manylinux_2_24 tag) for aarch64 and
+ppc64le platforms.</li>
+<li>Wheel package compiled against OpenSSL 1.1.1k and PostgreSQL 13.3.</li>
+<li>Build system for Linux/MacOS binary packages moved to GitHub action.</li>
+</ul>
 <div class="section" id="what-s-new-in-psycopg-2-8-7">
 <h3>What’s new in psycopg 2.8.7<a class="headerlink" href="#what-s-new-in-psycopg-2-8-7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -74,7 +105,7 @@
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1101">#1101</a>).</li>
 <li>Fixed search of mxDateTime headers in virtualenvs (ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/996">#996</a>).</li>
 <li>Added missing values from errorcodes (ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1133">#1133</a>).</li>
-<li><a class="reference internal" href="cursor.html#cursor.query" title="cursor.query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.query</span></code></a> reports the query of the last <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> opearation too
+<li><a class="reference internal" href="cursor.html#cursor.query" title="cursor.query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.query</span></code></a> reports the query of the last <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation too
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/1141">#1141</a>).</li>
 <li><a class="reference internal" href="errorcodes.html#module-psycopg2.errorcodes" title="psycopg2.errorcodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorcodes</span></code></a> map and <a class="reference internal" href="errors.html#module-psycopg2.errors" title="psycopg2.errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code></a> classes updated to
 PostgreSQL 13.</li>
@@ -1417,7 +1448,8 @@ still missing; python 2.3 datetime needs to be written).</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Release notes</a><ul>
-<li><a class="reference internal" href="#current-release">Current release</a><ul>
+<li><a class="reference internal" href="#current-release">Current release</a></li>
+<li><a class="reference internal" href="#what-s-new-in-psycopg-2-9">What’s new in psycopg 2.9</a><ul>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-2-8-7">What’s new in psycopg 2.8.7</a></li>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-2-8-6">What’s new in psycopg 2.8.6</a></li>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-2-8-5">What’s new in psycopg 2.8.5</a></li>
@@ -1549,7 +1581,7 @@ still missing; python 2.3 datetime needs to be written).</li>
     </ul>
   </nav>
   </div>
-  <footer id="pagefooter">&copy; 2001-2020, Federico Di Gregorio, Daniele Varrazzo, The Psycopg Team.
+  <footer id="pagefooter">&copy; 2001-2021, Federico Di Gregorio, Daniele Varrazzo, The Psycopg Team.
 
   </footer>
 
