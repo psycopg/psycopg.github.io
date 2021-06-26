@@ -425,8 +425,8 @@ types</a>, allowing to customise the load and dump function used.</p>
 <p>Because several Python objects could be considered JSON (dicts, lists,
 scalars, even date/time if using a dumps function customised to use them),
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> requires you to wrap what you want to dump as JSON into a wrapper:
-either <a class="reference internal" href="../api/types.html#psycopg3.types.Json" title="psycopg3.types.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types.Json</span></code></a> or <a class="reference internal" href="../api/types.html#psycopg3.types.Jsonb" title="psycopg3.types.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3.types</span> <span class="kn">import</span> <span class="n">Jsonb</span>
+either <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types.Json</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span>
 
 <span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"foo"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"bar"</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"insert into mytable values (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
@@ -436,10 +436,11 @@ either <a class="reference internal" href="../api/types.html#psycopg3.types.Json
 <a class="reference external" href="https://docs.python.org/3/library/json.html#json.loads">json.loads()</a> functions to serialize and de-serialize Python objects to
 JSON. If you want to customise globally how serialization happens, for
 instance changing serialization parameters or using a different JSON library,
-you can specify your own functions using the <a class="reference internal" href="../api/types.html#psycopg3.types.set_json_dumps" title="psycopg3.types.set_json_dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types.set_json_dumps()</span></code></a>
-and <a class="reference internal" href="../api/types.html#psycopg3.types.set_json_loads" title="psycopg3.types.set_json_loads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_loads()</span></code></a> functions.</p>
+you can specify your own functions using the
+<a class="reference internal" href="../api/types.html#psycopg3.types.json.set_json_dumps" title="psycopg3.types.json.set_json_dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.types.json.set_json_dumps()</span></code></a> and
+<a class="reference internal" href="../api/types.html#psycopg3.types.json.set_json_loads" title="psycopg3.types.json.set_json_loads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_loads()</span></code></a> functions.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">psycopg3.types</span> <span class="kn">import</span> <span class="n">Jsonb</span><span class="p">,</span> <span class="n">set_json_dumps</span><span class="p">,</span> <span class="n">set_json_loads</span>
+<span class="kn">from</span> <span class="nn">psycopg3.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span><span class="p">,</span> <span class="n">set_json_dumps</span><span class="p">,</span> <span class="n">set_json_loads</span>
 <span class="kn">import</span> <span class="nn">ujson</span>
 
 <span class="c1"># Use a faster dump function</span>
