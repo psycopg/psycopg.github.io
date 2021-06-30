@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Advanced topics" href="../advanced/index.html" /><link rel="prev" title="Adaptation between Python and PostgreSQL types" href="adapt.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
-        <title>Transaction management - psycopg3 UNRELEASED documentation</title>
+        <title>Transaction management - psycopg UNRELEASED documentation</title>
       <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
     <link rel="stylesheet" href="../_static/pygments.css">
     
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg UNRELEASED documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -116,7 +116,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+  <span class="sidebar-brand-text">psycopg UNRELEASED documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html">
   <input class="sidebar-search" placeholder=Search name="q">
@@ -124,7 +124,7 @@
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Getting started with Psycopg 3</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
@@ -142,7 +142,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../advanced/prepare.html">Prepared statements</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
@@ -169,11 +169,11 @@
         </label>
         <span class="target" id="index-0"></span><span class="target" id="index-1"></span><div class="section" id="transaction-management">
 <span id="transactions"></span><span id="index-2"></span><h1>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> has a behaviour that may result surprising compared to
+<p>Psycopg has a behaviour that may result surprising compared to
 <strong class="program">psql</strong>: by default, any database operation will start a new
 transaction. As a consequence, changes made by any cursor of the connection
-will not be visible until <a class="reference internal" href="../api/connections.html#psycopg3.Connection.commit" title="psycopg3.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> is called, and will be
-discarded by <a class="reference internal" href="../api/connections.html#psycopg3.Connection.rollback" title="psycopg3.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a>. The following operation on the same
+will not be visible until <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> is called, and will be
+discarded by <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a>. The following operation on the same
 connection will start a new transaction.</p>
 <p>If a database operation fails, the server will refuse further commands, until
 a <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> is called.</p>
@@ -187,8 +187,8 @@ failed</strong> and the database session is in a state of error. You need to cal
 </div>
 <div class="section" id="autocommit-transactions">
 <span id="autocommit"></span><h2>Autocommit transactions<a class="headerlink" href="#autocommit-transactions" title="Permalink to this headline">¶</a></h2>
-<p>The manual commit requirement can be suspended using <a class="reference internal" href="../api/connections.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
-either as connection attribute or as <a class="reference internal" href="../api/connections.html#psycopg3.Connection.connect" title="psycopg3.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
+<p>The manual commit requirement can be suspended using <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
+either as connection attribute or as <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
 parameter. This may be required to run operations that cannot be executed
 inside a transaction, such as <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on <a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
@@ -199,13 +199,13 @@ long-running programs, if no further action is taken, the session will
 remain <em>idle in transaction</em>, an undesirable condition for several
 reasons (locks are held by the session, tables bloat…). For long lived
 scripts, either make sure to terminate a transaction as soon as possible or
-use an <a class="reference internal" href="../api/connections.html#psycopg3.Connection.autocommit" title="psycopg3.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> connection.</p>
+use an <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> connection.</p>
 </div>
 </div>
 <div class="section" id="transaction-blocks">
 <span id="transaction-block"></span><h2>Transaction blocks<a class="headerlink" href="#transaction-blocks" title="Permalink to this headline">¶</a></h2>
 <p>A more transparent way to make sure that transactions are finalised at the
-right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg3.Connection.transaction" title="psycopg3.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
+right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
 transaction block. When the block is entered a transaction is started; when
 leaving the block the transaction is committed, or it is rolled back if an
 exception is raised inside the block.</p>
@@ -257,14 +257,14 @@ outside the block: in the example it is intercepted by the <code class="docutils
 loop can complete. The outermost block is unaffected (unless other errors
 happen there).</p>
 <p>You can also write code to explicitly roll back any currently active
-transaction block, by raising the <a class="reference internal" href="../api/connections.html#psycopg3.Rollback" title="psycopg3.Rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rollback</span></code></a> exception. The exception “jumps”
+transaction block, by raising the <a class="reference internal" href="../api/connections.html#psycopg.Rollback" title="psycopg.Rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rollback</span></code></a> exception. The exception “jumps”
 to the end of a transaction block, rolling back its transaction but allowing
 the program execution to continue from there. By default the exception rolls
 back the innermost transaction block, but any current block can be specified
 as the target. In the following example, an hypothetical <code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelCommand</span></code>
 may stop the processing and cancel any operation previously performed,
 but not entirely committed yet.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg3</span> <span class="kn">import</span> <span class="n">Rollback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Rollback</span>
 
 <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">outer_tx</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">():</span>

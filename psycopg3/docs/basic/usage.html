@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Passing parameters to SQL queries" href="params.html" /><link rel="prev" title="Installation" href="install.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
-        <title>Basic module usage - psycopg3 UNRELEASED documentation</title>
+        <title>Basic module usage - psycopg UNRELEASED documentation</title>
       <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
     <link rel="stylesheet" href="../_static/pygments.css">
     
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg UNRELEASED documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -116,7 +116,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+  <span class="sidebar-brand-text">psycopg UNRELEASED documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html">
   <input class="sidebar-search" placeholder=Search name="q">
@@ -124,7 +124,7 @@
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Getting started with Psycopg 3</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
@@ -142,7 +142,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../advanced/prepare.html">Prepared statements</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
@@ -172,13 +172,13 @@
 <p>The basic Psycopg usage is common to all the database adapters implementing
 the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API</a> protocol. Other database adapters, such as the builtin
 <a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#module-sqlite3" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlite3</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/module.html#module-psycopg2" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>, have roughly the same pattern of interaction.</p>
-<div class="section" id="main-objects-in-psycopg3">
-<span id="usage"></span><span id="index-0"></span><h2>Main objects in <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code><a class="headerlink" href="#main-objects-in-psycopg3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="main-objects-in-psycopg-3">
+<span id="usage"></span><span id="index-0"></span><h2>Main objects in Psycopg 3<a class="headerlink" href="#main-objects-in-psycopg-3" title="Permalink to this headline">¶</a></h2>
 <p>Here is an interactive session showing some of the basic commands:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg3</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg</span>
 
 <span class="c1"># Connect to an existing database</span>
-<span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 
     <span class="c1"># Open a cursor to perform database operations</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
@@ -214,23 +214,23 @@ the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249
 <p>In the example you can see some of the main objects and methods and how they
 relate to each other:</p>
 <ul class="simple">
-<li><p>The function <a class="reference internal" href="../api/connections.html#psycopg3.Connection.connect" title="psycopg3.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> creates a new database session and
-returns a new <a class="reference internal" href="../api/connections.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> instance. <a class="reference internal" href="../api/connections.html#psycopg3.AsyncConnection.connect" title="psycopg3.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
+<li><p>The function <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> creates a new database session and
+returns a new <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> instance. <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
 creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
-<li><p>The <a class="reference internal" href="../api/connections.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
+<li><p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
 <ul>
-<li><p>create new <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="../api/connections.html#psycopg3.Connection.cursor" title="psycopg3.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
+<li><p>create new <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
 execute database commands and queries,</p></li>
-<li><p>terminate transactions using the methods <a class="reference internal" href="../api/connections.html#psycopg3.Connection.commit" title="psycopg3.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or
-<a class="reference internal" href="../api/connections.html#psycopg3.Connection.rollback" title="psycopg3.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p></li>
+<li><p>terminate transactions using the methods <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p></li>
 </ul>
 </li>
-<li><p>The class <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor" title="psycopg3.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> allows interaction with the database:</p>
+<li><p>The class <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> allows interaction with the database:</p>
 <ul>
-<li><p>send commands to the database using methods such as <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
-and <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.executemany" title="psycopg3.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,</p></li>
+<li><p>send commands to the database using methods such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
+and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>,</p></li>
 <li><p>retrieve data from the database, iterating on the cursor or using methods
-such as <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.fetchone" title="psycopg3.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.fetchmany" title="psycopg3.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg3.Cursor.fetchall" title="psycopg3.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
+such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchmany" title="psycopg.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
 </ul>
 </li>
 <li><p>Using these objects as context managers (i.e. using <code class="docutils literal notranslate"><span class="pre">with</span></code>) will make sure
@@ -249,8 +249,8 @@ to close them and free their resources at the end of the block (notice that
 </div>
 <div class="section" id="connection-context">
 <span id="with-connection"></span><span id="index-1"></span><h2>Connection context<a class="headerlink" href="#connection-context" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> <a class="reference internal" href="../api/connections.html#psycopg3.Connection" title="psycopg3.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<p>Psycopg 3 <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="o">...</span> <span class="c1"># use the connection</span>
 
 <span class="c1"># the connection is now closed</span>
@@ -259,7 +259,7 @@ to close them and free their resources at the end of the block (notice that
 <p>When the block is exited, if there is a transaction open, it will be
 committed. If an exception is raised within the block the transaction is
 rolled back. In either case the connection is closed.</p>
-<p><a class="reference internal" href="../api/connections.html#psycopg3.AsyncConnection" title="psycopg3.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
+<p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
 but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
 </div>
 </div>
@@ -314,7 +314,7 @@ but be careful about its quirkiness: see <a class="reference internal" href="../
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Basic module usage</a><ul>
-<li><a class="reference internal" href="#main-objects-in-psycopg3">Main objects in <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a></li>
+<li><a class="reference internal" href="#main-objects-in-psycopg-3">Main objects in Psycopg 3</a></li>
 <li><a class="reference internal" href="#connection-context">Connection context</a></li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="pq – libpq wrapper module" href="api/pq.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
-        <title>Differences from psycopg2 - psycopg3 UNRELEASED documentation</title>
+        <title>Differences from psycopg2 - psycopg UNRELEASED documentation</title>
       <link rel="stylesheet" href="_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
     <link rel="stylesheet" href="_static/pygments.css">
     
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">psycopg3 UNRELEASED documentation</div></a>
+      <a href="index.html"><div class="brand">psycopg UNRELEASED documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -116,7 +116,7 @@
     <img class="sidebar-logo only-dark" src="_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg3 UNRELEASED documentation</span>
+  <span class="sidebar-brand-text">psycopg UNRELEASED documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html">
   <input class="sidebar-search" placeholder=Search name="q">
@@ -124,7 +124,7 @@
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1 has-children"><a class="reference internal" href="basic/index.html">Getting started with <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="basic/index.html">Getting started with Psycopg 3</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="basic/install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/params.html">Passing parameters to SQL queries</a></li>
@@ -142,7 +142,7 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced/prepare.html">Prepared statements</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html"><code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/cursors.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
@@ -169,12 +169,12 @@
         </label>
         <div class="section" id="differences-from-psycopg2">
 <span id="index-0"></span><h1>Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> uses the common DBAPI structure of many other database adapter and
+<p>Psycopg 3 uses the common DBAPI structure of many other database adapter and
 tries to behave as close as possible to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. There are however a few
 differences to be aware of.</p>
 <div class="section" id="server-side-binding">
 <span id="id1"></span><h2>Server-side binding<a class="headerlink" href="#server-side-binding" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3</span></code> sends the query and the parameters to the server separately,
+<p>Psycopg 3 sends the query and the parameters to the server separately,
 instead of merging them client-side. PostgreSQL may behave slightly
 differently in this case, usually throwing an error and suggesting to use an
 explicit cast.</p>
@@ -192,16 +192,16 @@ explicit cast.</p>
 <p>PostgreSQL will also reject the execution of several queries at once
 (separated by semicolon), if they contain parameters. If parameters are used
 you should use distinct <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> calls; otherwise you may consider merging
-the query client-side, using <a class="reference internal" href="api/sql.html#module-psycopg3.sql" title="psycopg3.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code></a> module.</p>
+the query client-side, using <a class="reference internal" href="api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module.</p>
 <p>Certain commands cannot be used with server-side binding, for instance
 <code class="sql docutils literal notranslate"><span class="pre">SET</span></code> or <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET timezone TO </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"utc"</span><span class="p">])</span>
 <span class="gp">...</span>
-<span class="go">psycopg3.errors.SyntaxError: syntax error at or near "$1"</span>
+<span class="go">psycopg.errors.SyntaxError: syntax error at or near "$1"</span>
 </pre></div>
 </div>
 <p>Sometimes PostgreSQL offers an alternative (e.g. <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">set_config()</span></code>,
-<code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">pg_notify()</span></code>). If no alternative exist you can use <a class="reference internal" href="api/sql.html#module-psycopg3.sql" title="psycopg3.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg3.sql</span></code></a>
+<code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">pg_notify()</span></code>). If no alternative exist you can use <a class="reference internal" href="api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a>
 to compose the query client-side.</p>
 <p>You cannot use <code class="sql docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> and pass a tuple, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">IN</span> <span class="pre">()</span></code> is an SQL
 construct. You must use <code class="sql docutils literal notranslate"><span class="pre">=</span> <span class="pre">any(%s)</span></code> and pass a list. Note that this also
@@ -221,7 +221,7 @@ type you should check the <a class="reference internal" href="advanced/adapt.htm
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> exposes <a class="reference external" href="https://www.psycopg.org/docs/usage.html#copy" title="(in Psycopg v2.9)"><span class="xref std std-ref">a few copy methods</span></a> to interact with
 PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>. The interface doesn’t make easy to load
 dynamically-generated data to the database.</p>
-<p>There is now a single <a class="reference internal" href="api/cursors.html#psycopg3.Cursor.copy" title="psycopg3.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a> method, which is similar to
+<p>There is now a single <a class="reference internal" href="api/cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a> method, which is similar to
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_expert()</span></code> in accepting a free-form <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> command and
 returns an object to read/write data, block-wise or record-wise. The different
 usage pattern also enables <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> to be used in async interactions.</p>
@@ -240,11 +240,11 @@ resources, such as files.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.callproc()</span></code> is not implemented. The method has a simplistic
 semantic which doesn’t account for PostgreSQL positional parameters,
 procedures, set-returning functions. Use a normal
-<a class="reference internal" href="api/cursors.html#psycopg3.Cursor.execute" title="psycopg3.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> with <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">function_name(...)</span></code> or
+<a class="reference internal" href="api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> with <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">function_name(...)</span></code> or
 <code class="sql docutils literal notranslate"><span class="pre">CALL</span> <span class="pre">procedure_name(...)</span></code> instead.</p>
 </div>
-<div class="section" id="what-s-new-in-psycopg3">
-<h2>What’s new in psycopg3<a class="headerlink" href="#what-s-new-in-psycopg3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-s-new-in-psycopg-3">
+<h2>What’s new in Psycopg 3<a class="headerlink" href="#what-s-new-in-psycopg-3" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <p>to be completed</p>
@@ -305,7 +305,7 @@ array of any supported type are dealt with automatically.</p></li>
 <li><a class="reference internal" href="#copy-is-no-more-file-based">Copy is no more file-based</a></li>
 <li><a class="reference internal" href="#with-connection"><code class="docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
 <li><a class="reference internal" href="#callproc-is-gone"><code class="docutils literal notranslate"><span class="pre">callproc()</span></code> is gone</a></li>
-<li><a class="reference internal" href="#what-s-new-in-psycopg3">What’s new in psycopg3</a></li>
+<li><a class="reference internal" href="#what-s-new-in-psycopg-3">What’s new in Psycopg 3</a></li>
 </ul>
 </li>
 </ul>
