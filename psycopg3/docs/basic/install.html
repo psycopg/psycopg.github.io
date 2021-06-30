@@ -171,34 +171,49 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installing-the-development-state">
 <h2>Installing the development state<a class="headerlink" href="#installing-the-development-state" title="Permalink to this headline">¶</a></h2>
-<p>Psycopg 3 packages have not been released yet, but you can try it out
-already by installing it <a class="reference external" href="https://github.com/psycopg/psycopg">from the GitHub project</a>:</p>
+<p>Psycopg 3 packages have not been released on the PyPI index yet: you can try
+it out by installing it <a class="reference external" href="https://github.com/psycopg/psycopg">from the GitHub project</a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install git+https://github.com/psycopg/psycopg.git#subdirectory<span class="o">=</span>psycopg
 $ python3
 &gt;&gt;&gt; import psycopg
 </pre></div>
 </div>
+<p>or from <a class="reference external" href="https://test.pypi.org/project/psycopg/">the TestPyPI index</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">i</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">test</span><span class="o">.</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="n">psycopg</span>
+</pre></div>
 </div>
-<div class="section" id="binary-installation">
-<span id="binary-install"></span><h2>Binary installation<a class="headerlink" href="#binary-installation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Psycopg 3 is still in a development phase: packages haven’t been
 released yet on PyPI.</p>
 <p>Please refer to <a class="reference external" href="https://github.com/psycopg/psycopg#readme">the README</a> for the current installation state, and
 please know that things may change.</p>
-<p>The following is how it will be <em>supposed</em> to work, once it is released…</p>
 </div>
+</div>
+<div class="section" id="binary-installation">
+<span id="binary-install"></span><h2>Binary installation<a class="headerlink" href="#binary-installation" title="Permalink to this headline">¶</a></h2>
 <p>The quickest way to start developing with Psycopg 3 is to install the binary
 packages by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg</span><span class="p">[</span><span class="n">binary</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>This will install a self-contained package with all the libraries needed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Add the following options to pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">i</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">test</span><span class="o">.</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>to install the Psycopg from TestPyPI, before the final packages are
+uploaded on PyPI.</p>
+</div>
+<p>This will install a self-contained package with all the libraries needed.
+You will need pip &gt;= 20.3 at least: please run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">pip</span></code> to update
+it beforehand.</p>
 <p>The above package should work in most situations. It <strong>will not work</strong> in
-some though:</p>
+some cases though:</p>
 <ul class="simple">
-<li><p>the <code class="docutils literal notranslate"><span class="pre">binary</span></code> package doesn’t work on Alpine Linux;</p></li>
+<li><p>you need a glibc-based Linux distribution: the <code class="docutils literal notranslate"><span class="pre">binary</span></code> package doesn’t
+work on Alpine Linux for instance;</p></li>
 <li><p>you have a newly released Python or Mac Os X version for which binary
 packages are not ready yet.</p></li>
 </ul>
@@ -209,14 +224,17 @@ packages are not ready yet.</p></li>
 module usage</span></a> to learn how it works.</p>
 <p>You can come back here if you the above method didn’t work and you need a
 way to install Psycopg 3 past the basic one.</p>
+<p>For further information about the differences between the packages see
+<a class="reference internal" href="../api/pq.html#pq-impl"><span class="std std-ref">pq module implementations</span></a>.</p>
 </div>
 </div>
 <div class="section" id="local-installation">
-<span id="id4"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this headline">¶</a></h2>
 <p>A “Local installation” means obtaining a performing and maintainable library.
 The library will include a performing C module and will be bound to the system
 libraries (<code class="docutils literal notranslate"><span class="pre">libpq</span></code>, <code class="docutils literal notranslate"><span class="pre">libssl</span></code>…) so that system upgrade of libraries will
-upgrade the libraries used by Psycopg 3 too.</p>
+upgrade the libraries used by Psycopg 3 too. This is the preferred way to
+install Psycopg for a production site.</p>
 <p>In order to perform a local installation you need some prerequisites:</p>
 <ul class="simple">
 <li><p>a C compiler,</p></li>
@@ -231,25 +249,55 @@ try this and follow the <a class="reference internal" href="#binary-installation
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Add the following options to pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">i</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">test</span><span class="o">.</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>to install the Psycopg from TestPyPI, before the final packages are
+uploaded on PyPI.</p>
+</div>
 </div>
 <div class="section" id="pure-python-installation">
-<span id="id5"></span><h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this headline">¶</a></h2>
 <p>If you simply install:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg</span>
 </pre></div>
 </div>
 <p>without <code class="docutils literal notranslate"><span class="pre">[c]</span></code> or <code class="docutils literal notranslate"><span class="pre">[binary]</span></code> extras you will obtain a pure Python
 implementation. This is particularly handy to debug and hack, but it still
-requires the system libpq to operate (which will be used dynamically via
+requires the system libpq to operate (which will be imported dynamically via
 <a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>).</p>
 <p>In order to use the pure Python installation you will need the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>
 installed in the system: for instance on Debian system you will probably
 need:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libpq5</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">libpq5</span>
 </pre></div>
 </div>
 <p>If you are not able to fulfill this requirement please follow the <a class="reference internal" href="#binary-installation">binary
 installation</a>.</p>
+</div>
+<div class="section" id="handling-dependencies">
+<h2>Handling dependencies<a class="headerlink" href="#handling-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>If you need to specify your project dependencies (for instance in a
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file, <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> dependencies…)
+you should probably specify one of the following:</p>
+<ul class="simple">
+<li><p>If your project is a library, add a dependency on <code class="docutils literal notranslate"><span class="pre">psycopg</span></code>. This will
+make sure that your library will have the <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> package with the right
+interface and leaves the possibility of choosing a specific implementation
+to the end user of your library.</p></li>
+<li><p>If your project if a final application (e.g. a service running on a server)
+you can require a specific implementation, for instance <code class="docutils literal notranslate"><span class="pre">psycopg[c]</span></code>,
+after you have made sure that the prerequisites are met (e.g. the depending
+libraries and tools are installed in the host machine).</p></li>
+</ul>
+<p>In both cases you can specify which version of Psycopg to use using
+<a class="reference external" href="https://pip.pypa.io/en/stable/cli/pip_install/#requirement-specifiers">requirement specifiers</a>.</p>
+<p>If you want to make sure that a specific implementation is used you can
+specify the <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_IMPL</span></code> environment variable: importing the library
+will fail if the implementation specified is not available. See <a class="reference internal" href="../api/pq.html#pq-impl"><span class="std std-ref">pq module implementations</span></a>.</p>
 </div>
 <div class="section" id="psycopg-3-and-the-libpq">
 <h2>Psycopg 3 and the <code class="docutils literal notranslate"><span class="pre">libpq</span></code><a class="headerlink" href="#psycopg-3-and-the-libpq" title="Permalink to this headline">¶</a></h2>
@@ -315,6 +363,7 @@ choices</p>
 <li><a class="reference internal" href="#binary-installation">Binary installation</a></li>
 <li><a class="reference internal" href="#local-installation">Local installation</a></li>
 <li><a class="reference internal" href="#pure-python-installation">Pure Python installation</a></li>
+<li><a class="reference internal" href="#handling-dependencies">Handling dependencies</a></li>
 <li><a class="reference internal" href="#psycopg-3-and-the-libpq">Psycopg 3 and the <code class="docutils literal notranslate"><span class="pre">libpq</span></code></a></li>
 </ul>
 </li>
