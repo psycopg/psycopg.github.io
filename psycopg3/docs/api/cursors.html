@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="sql – SQL string composition" href="sql.html" /><link rel="prev" title="Connection classes" href="connections.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
-        <title>Cursor classes - psycopg UNRELEASED documentation</title>
+        <title>Cursor classes - psycopg 3.0.dev0 documentation</title>
       <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
     <link rel="stylesheet" href="../_static/pygments.css">
     
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg UNRELEASED documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.0.dev0 documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -116,7 +116,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg UNRELEASED documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.0.dev0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html">
   <input class="sidebar-search" placeholder=Search name="q">
@@ -130,11 +130,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../basic/params.html">Passing parameters to SQL queries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/adapt.html">Adaptation between Python and PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/transactions.html">Transaction management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/copy.html">Using COPY TO and COPY FROM</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/async.html">Async operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/pool.html">Connection pools</a></li>
@@ -143,12 +143,15 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Psycopg 3 API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="module.html">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connections.html">Connection classes</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pool</span></code> – Connection pool implementations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adapt.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abc.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc</span></code> – Psycopg abstract classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
 </ul>
 </li>
@@ -274,7 +277,7 @@ queries.</p>
 <p class="admonition-title">Note</p>
 <p>it must be called as <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">cur.copy()</span> <span class="pre">as</span> <span class="pre">copy:</span> <span class="pre">...</span></code></p>
 </div>
-<p>See <a class="reference internal" href="../advanced/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for information about <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>.</p>
+<p>See <a class="reference internal" href="../basic/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for information about <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>.</p>
 </dd></dl>
 <dl class="py method">
 <dt id="psycopg.Cursor.stream">
@@ -781,7 +784,7 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple.</p>
 <em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">Copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manage a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation.</p>
 <p>The object is normally returned by <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a>.</p>
-<p>See <a class="reference internal" href="../advanced/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for details.</p>
+<p>See <a class="reference internal" href="../basic/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for details.</p>
 <dl class="py method">
 <dt id="psycopg.Copy.write_row">
 <code class="sig-name descname">write_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Copy.write_row" title="Permalink to this definition">¶</a></dt>

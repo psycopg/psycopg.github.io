@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Passing parameters to SQL queries" href="params.html" /><link rel="prev" title="Installation" href="install.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
-        <title>Basic module usage - psycopg UNRELEASED documentation</title>
+        <title>Basic module usage - psycopg 3.0.dev0 documentation</title>
       <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
     <link rel="stylesheet" href="../_static/pygments.css">
     
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg UNRELEASED documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.0.dev0 documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -116,7 +116,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg UNRELEASED documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.0.dev0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html">
   <input class="sidebar-search" placeholder=Search name="q">
@@ -130,11 +130,11 @@
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="adapt.html">Adaptation between Python and PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transaction management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/async.html">Async operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/pool.html">Connection pools</a></li>
@@ -143,12 +143,15 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/module.html">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – package exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/pool.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pool</span></code> – Connection pool implementations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – types mapping and adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/adapt.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/abc.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc</span></code> – Psycopg abstract classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
 </ul>
 </li>
@@ -248,6 +251,48 @@ to close them and free their resources at the end of the block (notice that
 </ul>
 </div>
 </div>
+<div class="section" id="shortcuts">
+<h2>Shortcuts<a class="headerlink" href="#shortcuts" title="Permalink to this headline">¶</a></h2>
+<p>The pattern above is familiar to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> users. However, Psycopg 3 also
+exposes a few simple extensions which make the above pattern leaner:</p>
+<ul>
+<li><p>the <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> objects exposes a <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method,
+equivalent to creating a cursor, calling its <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method, and
+returning it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># is equivalent to:</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> method returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>. This means that you can chain
+a fetch operation, such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="o">...</span>
+
+<span class="c1"># is equivalent to:</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Using them together, in simple cases, you can go from creating a connection to
+using a result in a single expression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select now()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="c1"># 2042-07-12 18:15:10.706497+01:00</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="connection-context">
 <span id="with-connection"></span><span id="index-1"></span><h2>Connection context<a class="headerlink" href="#connection-context" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg 3 <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
@@ -316,6 +361,7 @@ but be careful about its quirkiness: see <a class="reference internal" href="../
             <ul>
 <li><a class="reference internal" href="#">Basic module usage</a><ul>
 <li><a class="reference internal" href="#main-objects-in-psycopg-3">Main objects in Psycopg 3</a></li>
+<li><a class="reference internal" href="#shortcuts">Shortcuts</a></li>
 <li><a class="reference internal" href="#connection-context">Connection context</a></li>
 </ul>
 </li>
