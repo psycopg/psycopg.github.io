@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Transaction management" href="transactions.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Transaction management" href="transactions.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Adaptation between Python and PostgreSQL types - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="adaptation-between-python-and-postgresql-types">
+        <section id="adaptation-between-python-and-postgresql-types">
 <span id="types-adaptation"></span><span id="index-0"></span><h1>Adaptation between Python and PostgreSQL types<a class="headerlink" href="#adaptation-between-python-and-postgresql-types" title="Permalink to this headline">¶</a></h1>
 <p>Many standard Python types are adapted into SQL and returned as Python
 objects when a query is executed.</p>
@@ -299,7 +300,7 @@ objects</p></td>
 </tr>
 </tbody>
 </table></div>
-<div class="section" id="booleans-adaptation">
+<section id="booleans-adaptation">
 <span id="adapt-bool"></span><span id="index-1"></span><h2>Booleans adaptation<a class="headerlink" href="#booleans-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> values <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> are converted to the equivalent
 <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-boolean.html">PostgreSQL boolean type</a>:</p>
@@ -307,8 +308,8 @@ objects</p></td>
 <span class="go"># equivalent to "SELECT true, false"</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="numbers-adaptation">
+</section>
+<section id="numbers-adaptation">
 <span id="adapt-numbers"></span><span id="index-2"></span><h2>Numbers adaptation<a class="headerlink" href="#numbers-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> (a.k.a.
 <code class="sql docutils literal notranslate"><span class="pre">int8</span></code>). Note that this could create some problems:</p>
@@ -354,8 +355,8 @@ This of course may imply a loss of precision.</p>
 <li><p><a class="reference external" href="https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/">Musings about numeric adaptation choices</a></p></li>
 </ul>
 </div>
-</div>
-<div class="section" id="strings-adaptation">
+</section>
+<section id="strings-adaptation">
 <span id="adapt-string"></span><span id="index-3"></span><h2>Strings adaptation<a class="headerlink" href="#strings-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> is converted to PostgreSQL string syntax, and PostgreSQL types
 such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
@@ -406,8 +407,8 @@ retrieve it as bytes, leaving other strings unaltered: see <a class="reference i
 <p>Note that PostgreSQL text cannot contain the <code class="docutils literal notranslate"><span class="pre">0x00</span></code> byte. If you need to
 store Python strings that may contain binary zeros you should use a
 <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> field.</p>
-</div>
-<div class="section" id="binary-adaptation">
+</section>
+<section id="binary-adaptation">
 <span id="adapt-binary"></span><span id="index-4"></span><h2>Binary adaptation<a class="headerlink" href="#binary-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>Python types representing binary objects (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytearray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoryview</span></code></a>)
 are converted by default to <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> fields. By default data received is
@@ -421,8 +422,8 @@ arrays/composite</p>
 or images) you should probably use the binary format to pass and return
 values, otherwise binary data will undergo <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">ASCII escaping</a>, taking some CPU
 time and more bandwidth. See <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details.</p>
-</div>
-<div class="section" id="json-adaptation">
+</section>
+<section id="json-adaptation">
 <span id="adapt-json"></span><h2>JSON adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg can map between Python objects and PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-json.html">json/jsonb
 types</a>, allowing to customise the load and dump function used.</p>
@@ -477,15 +478,15 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
 <span class="c1"># will insert: {'uuid': '0a40799d-3980-4c65-8315-2956b18ab0e1'}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="todo-adaptation">
+</section>
+<section id="todo-adaptation">
 <span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><span id="adapt-date"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <p>Document the other types</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -554,11 +555,10 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

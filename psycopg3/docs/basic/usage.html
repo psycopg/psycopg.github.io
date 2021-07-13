@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Passing parameters to SQL queries" href="params.html" /><link rel="prev" title="Installation" href="install.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Passing parameters to SQL queries" href="params.html" /><link rel="prev" title="Installation" href="install.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Basic module usage - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,12 +171,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="basic-module-usage">
+        <section id="basic-module-usage">
 <span id="module-usage"></span><h1>Basic module usage<a class="headerlink" href="#basic-module-usage" title="Permalink to this headline">¶</a></h1>
 <p>The basic Psycopg usage is common to all the database adapters implementing
 the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API</a> protocol. Other database adapters, such as the builtin
 <a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#module-sqlite3" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlite3</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/module.html#module-psycopg2" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>, have roughly the same pattern of interaction.</p>
-<div class="section" id="main-objects-in-psycopg-3">
+<section id="main-objects-in-psycopg-3">
 <span id="usage"></span><span id="index-0"></span><h2>Main objects in Psycopg 3<a class="headerlink" href="#main-objects-in-psycopg-3" title="Permalink to this headline">¶</a></h2>
 <p>Here is an interactive session showing some of the basic commands:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: the module name is psycopg, not psycopg3</span>
@@ -250,8 +251,8 @@ to close them and free their resources at the end of the block (notice that
 <li><p><a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a>.</p></li>
 </ul>
 </div>
-</div>
-<div class="section" id="shortcuts">
+</section>
+<section id="shortcuts">
 <h2>Shortcuts<a class="headerlink" href="#shortcuts" title="Permalink to this headline">¶</a></h2>
 <p>The pattern above is familiar to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> users. However, Psycopg 3 also
 exposes a few simple extensions which make the above pattern leaner:</p>
@@ -292,8 +293,8 @@ using a result in a single expression:</p>
 <span class="c1"># 2042-07-12 18:15:10.706497+01:00</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="connection-context">
+</section>
+<section id="connection-context">
 <span id="with-connection"></span><span id="index-1"></span><h2>Connection context<a class="headerlink" href="#connection-context" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg 3 <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -307,8 +308,8 @@ committed. If an exception is raised within the block the transaction is
 rolled back. In either case the connection is closed.</p>
 <p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
 but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -374,11 +375,10 @@ but be careful about its quirkiness: see <a class="reference internal" href="../
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

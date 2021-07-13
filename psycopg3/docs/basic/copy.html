@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="More advanced topics" href="../advanced/index.html" /><link rel="prev" title="Transaction management" href="transactions.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="More advanced topics" href="../advanced/index.html" /><link rel="prev" title="Transaction management" href="transactions.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Using COPY TO and COPY FROM - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="using-copy-to-and-copy-from">
+        <section id="using-copy-to-and-copy-from">
 <span id="copy"></span><span id="index-0"></span><h1>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h1>
 <p>Psycopg allows to operate with <a class="reference external" href="https://www.postgresql.org/docs/current/sql-copy.html">PostgreSQL COPY protocol</a>. <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> is
 one of the most efficient ways to load data into the database (and to modify
@@ -194,7 +195,7 @@ resulting <a class="reference internal" href="../api/cursors.html#psycopg.Copy" 
 connection is in autocommit, at the end of the COPY operation you will still
 have to commit the pending changes and you can still roll them back. See
 <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a> for details.</p>
-<div class="section" id="writing-data-row-by-row">
+<section id="writing-data-row-by-row">
 <h2>Writing data row-by-row<a class="headerlink" href="#writing-data-row-by-row" title="Permalink to this headline">¶</a></h2>
 <p>Using a copy operation you can load data into the database from any Python
 iterable (a list of tuple, or any iterable of sequences): the Python values
@@ -223,8 +224,8 @@ object to an <code class="sql docutils literal notranslate"><span class="pre">in
 the default <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> will use the <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> aka <code class="sql docutils literal notranslate"><span class="pre">int8</span></code>
 format. You can work around the problem by registering the right binary dumper
 on the cursor or using the right data wrapper (see <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>).</p>
-</div>
-<div class="section" id="reading-data-row-by-row">
+</section>
+<section id="reading-data-row-by-row">
 <h2>Reading data row-by-row<a class="headerlink" href="#reading-data-row-by-row" title="Permalink to this headline">¶</a></h2>
 <p>You can also do the opposite, reading rows out of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">TO</span> <span class="pre">STDOUT</span></code>
 operation, by iterating on <a class="reference internal" href="../api/cursors.html#psycopg.Copy.rows" title="psycopg.Copy.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows()</span></code></a>. However this is not something you
@@ -246,8 +247,8 @@ you have to specify them yourselves.</p>
         <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># (10, datetime.date(2046, 12, 24))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="copying-block-by-block">
+</section>
+<section id="copying-block-by-block">
 <h2>Copying block-by-block<a class="headerlink" href="#copying-block-by-block" title="Permalink to this headline">¶</a></h2>
 <p>If data is already formatted in a way suitable for copy (for instance because
 it is coming from a file resulting from a previous <code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation) it can
@@ -271,8 +272,8 @@ produce a stream of <code class="xref py py-obj docutils literal notranslate"><s
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="asynchronous-copy-support">
+</section>
+<section id="asynchronous-copy-support">
 <h2>Asynchronous copy support<a class="headerlink" href="#asynchronous-copy-support" title="Permalink to this headline">¶</a></h2>
 <p>Asynchronous operations are supported using the same patterns as above, using
 the objects obtained by an <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an
@@ -285,8 +286,8 @@ a fully-async copy operation could be:</p>
 </div>
 <p>The <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCopy" title="psycopg.AsyncCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code></a> object documentation describe the signature of the
 asynchronous methods and the differences from its sync <a class="reference internal" href="../api/cursors.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> counterpart.</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -353,11 +354,10 @@ asynchronous methods and the differences from its sync <a class="reference inter
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

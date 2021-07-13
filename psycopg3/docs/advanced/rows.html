@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Connection pools" href="pool.html" /><link rel="prev" title="Cursor types" href="cursors.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Connection pools" href="pool.html" /><link rel="prev" title="Cursor types" href="cursors.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Row factories - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="row-factories">
+        <section id="row-factories">
 <span id="index-0"></span><span id="id1"></span><h1>Row factories<a class="headerlink" href="#row-factories" title="Permalink to this headline">¶</a></h1>
 <p>Cursor’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*</span></code> methods return tuples of column values by default. This can
 be changed to adapt the needs of the programmer by using custom <em>row
@@ -180,8 +181,8 @@ protocol) is a callable that accepts a <a class="reference internal" href="../ap
 callable (formally the <a class="reference internal" href="#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> protocol) accepting a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code> tuple and returning a row in the desired form.</p>
 <dl class="py class">
-<dt id="psycopg.rows.RowMaker">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">RowMaker</code><a class="headerlink" href="#psycopg.rows.RowMaker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.RowMaker">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">RowMaker</span></span><a class="headerlink" href="#psycopg.rows.RowMaker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callable protocol taking a sequence of value and returning an object.</p>
 <p>The sequence of value is what is returned from a database query, already
 adapted to the right Python types. The return value is the object that your
@@ -189,14 +190,14 @@ program would like to receive: by default (<a class="reference internal" href="#
 tuple, but it may be any type of object.</p>
 <p>Typically, <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> functions are returned by <a class="reference internal" href="#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code></a>.</p>
 <dl class="py method">
-<dt id="psycopg.rows.RowMaker.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> → Row<a class="headerlink" href="#psycopg.rows.RowMaker.__call__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.RowMaker.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Row</span></span></span><a class="headerlink" href="#psycopg.rows.RowMaker.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a sequence of values from the database to a finished object.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.rows.RowFactory">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">RowFactory</code><a class="headerlink" href="#psycopg.rows.RowFactory" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.RowFactory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">RowFactory</span></span><a class="headerlink" href="#psycopg.rows.RowFactory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callable protocol taking a <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> and returning a <a class="reference internal" href="#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a>.</p>
 <p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> is typically called when a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> receives a result.
 This way it can inspect the cursor state (for instance the
@@ -206,8 +207,8 @@ a complete object.</p>
 define the dictionary key and returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> function which would
 use the values to create a dictionary for each record.</p>
 <dl class="py method">
-<dt id="psycopg.rows.RowFactory.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span><span class="p">:</span> <span class="n">AnyCursor<span class="p">[</span>Row<span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker">RowMaker</a><span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg.rows.RowFactory.__call__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.RowFactory.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">AnyCursor</span><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><span class="pre">RowMaker</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.rows.RowFactory.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inspect the result on a cursor and return a <a class="reference internal" href="#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> to convert rows.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnyCursor</span></code> may be either a <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> or an
 <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
@@ -249,12 +250,12 @@ use the values to create a dictionary for each record.</p>
 <p>Later usages of <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> override earlier definitions; for instance,
 the <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> specified at <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.connect()</span></code></a> can be overridden by
 passing another value at <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a>.</p>
-<div class="section" id="available-row-factories">
+<section id="available-row-factories">
 <h2>Available row factories<a class="headerlink" href="#available-row-factories" title="Permalink to this headline">¶</a></h2>
 <p>The module <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code> provides the implementation for a few row factories:</p>
 <dl class="py function">
-<dt id="psycopg.rows.tuple_row">
-<code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">tuple_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.tuple_row" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.tuple_row">
+<span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">tuple_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.tuple_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Row factory to represent rows as simple tuples.</p>
 <p>This is the default factory.</p>
 <dl class="field-list simple">
@@ -267,13 +268,14 @@ passing another value at <a class="reference internal" href="../api/connections.
 </dl>
 </dd></dl>
 <dl class="py data">
-<dt id="psycopg.rows.TupleRow">
-<code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">TupleRow</code><em class="property"> = typing.Tuple[typing.Any, ...]</em><a class="headerlink" href="#psycopg.rows.TupleRow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.TupleRow">
+<span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">TupleRow</span></span><a class="headerlink" href="#psycopg.rows.TupleRow" title="Permalink to this definition">¶</a></dt>
 <dd><p>An alias for the type returned by <a class="reference internal" href="#psycopg.rows.tuple_row" title="psycopg.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row()</span></code></a> (i.e. a tuple of any content).</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code></a>, …]</p>
 </dd></dl>
 <dl class="py function">
-<dt id="psycopg.rows.dict_row">
-<code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">dict_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.dict_row" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.dict_row">
+<span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">dict_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.dict_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Row factory to represent rows as dicts.</p>
 <p>Note that this is not compatible with the DBAPI, which expects the records
 to be sequences.</p>
@@ -287,15 +289,16 @@ to be sequences.</p>
 </dl>
 </dd></dl>
 <dl class="py data">
-<dt id="psycopg.rows.DictRow">
-<code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">DictRow</code><em class="property"> = typing.Dict[str, typing.Any]</em><a class="headerlink" href="#psycopg.rows.DictRow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.DictRow">
+<span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">DictRow</span></span><a class="headerlink" href="#psycopg.rows.DictRow" title="Permalink to this definition">¶</a></dt>
 <dd><p>An alias for the type returned by <a class="reference internal" href="#psycopg.rows.dict_row" title="psycopg.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row()</span></code></a></p>
 <p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">DictRow</span></code> is a dictionary with keys as string and any value returned by the
 database.</p>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
 </dd></dl>
 <dl class="py function">
-<dt id="psycopg.rows.namedtuple_row">
-<code class="sig-prename descclassname">psycopg.rows.</code><code class="sig-name descname">namedtuple_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.namedtuple_row" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.rows.namedtuple_row">
+<span class="sig-prename descclassname"><span class="pre">psycopg.rows.</span></span><span class="sig-name descname"><span class="pre">namedtuple_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.rows.namedtuple_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Row factory to represent rows as <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -306,8 +309,8 @@ database.</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-<div class="section" id="use-with-a-static-analyzer">
+</section>
+<section id="use-with-a-static-analyzer">
 <h2>Use with a static analyzer<a class="headerlink" href="#use-with-a-static-analyzer" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> classes are <a class="reference external" href="https://mypy.readthedocs.io/en/stable/generics.html">generic
 types</a>: the parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> is passed by the <code class="docutils literal notranslate"><span class="pre">row_factory</span></code> argument (of
@@ -336,8 +339,8 @@ such as <a class="reference external" href="https://mypy.readthedocs.io/">Mypy</
 <span class="c1"># drec type is Optional[Dict[str, Any]]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="example-returning-records-as-pydantic-models">
+</section>
+<section id="example-returning-records-as-pydantic-models">
 <h2>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Permalink to this headline">¶</a></h2>
 <p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
 Pydantic model factory the code can be checked statically using Mypy and
@@ -393,8 +396,8 @@ any issue. Pydantic will also raise a runtime error in case the
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born"</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -460,11 +463,10 @@ any issue. Pydantic will also raise a runtime error in case the
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Data adaptation configuration" href="adapt.html" /><link rel="prev" title="Row factories" href="rows.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Data adaptation configuration" href="adapt.html" /><link rel="prev" title="Row factories" href="rows.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Connection pools - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="connection-pools">
+        <section id="connection-pools">
 <span id="id1"></span><h1>Connection pools<a class="headerlink" href="#connection-pools" title="Permalink to this headline">¶</a></h1>
 <p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Connection_pool">connection pool</a> is an object managing a set of connections and allowing
 their use to functions needing one. Because the time to establish a new
@@ -179,7 +180,7 @@ latency of a program operations.</p>
 <p>This page explains a few basic concepts of Psycopg connection pool’s
 behaviour. Please refer to the <a class="reference internal" href="../api/pool.html#psycopg.pool.ConnectionPool" title="psycopg.pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> object API for details about
 the pool operations.</p>
-<div class="section" id="pool-life-cycle">
+<section id="pool-life-cycle">
 <h2>Pool life cycle<a class="headerlink" href="#pool-life-cycle" title="Permalink to this headline">¶</a></h2>
 <p>A typical way to use the pool is to create a single instance of it, as a
 global object, and to use this object in the rest of the program, allowing
@@ -221,8 +222,8 @@ to <code class="xref py py-obj docutils literal notranslate"><span class="pre">c
 warnings printed. However, if you think that’s sloppy, you can use the
 <a class="reference external" href="https://docs.python.org/3/library/atexit.html#module-atexit" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atexit</span></code></a> module to have the <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method called at the end of the
 program.</p>
-</div>
-<div class="section" id="using-connections-from-the-pool">
+</section>
+<section id="using-connections-from-the-pool">
 <h2>Using connections from the pool<a class="headerlink" href="#using-connections-from-the-pool" title="Permalink to this headline">¶</a></h2>
 <p>The pool can be used to request connections from multiple threads - it is
 hardly useful otherwise! If more connections than the ones available in the
@@ -243,8 +244,8 @@ specified in the pool constructor, it is called on the connection before
 returning it to the pool. Note that the <em>reset()</em> function is called in a
 worker thread, so that the thread which used the connection can keep its
 execution without being slowed down.</p>
-</div>
-<div class="section" id="pool-connection-and-sizing">
+</section>
+<section id="pool-connection-and-sizing">
 <h2>Pool connection and sizing<a class="headerlink" href="#pool-connection-and-sizing" title="Permalink to this headline">¶</a></h2>
 <p>A pool can have a fixed size (specifying no <em>max_size</em> or <em>max_size</em> =
 <em>min_size</em>) or a dynamic size (when <em>max_size</em> &gt; <em>min_size</em>). In both cases, as
@@ -268,7 +269,7 @@ instance).</p>
 <p>If a pool grows above <em>min_size</em>, but its usage decreases afterwards, a number
 of connections are eventually closed: one each the <em>max_idle</em> time specified
 in the pool constructor.</p>
-<div class="section" id="what-s-the-right-size-for-the-pool">
+<section id="what-s-the-right-size-for-the-pool">
 <h3>What’s the right size for the pool<a class="headerlink" href="#what-s-the-right-size-for-the-pool" title="Permalink to this headline">¶</a></h3>
 <p>Big question. Who knows. However, probably not as large as you imagine. Please
 take a look at <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">this this analysis</a> for some ideas.</p>
@@ -276,9 +277,9 @@ take a look at <a class="reference external" href="https://github.com/brettwoold
 <a class="reference internal" href="../api/pool.html#psycopg.pool.ConnectionPool.get_stats" title="psycopg.pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> method and monitor the behaviour of your
 program, eventually adjusting the size of the pool using the
 <a class="reference internal" href="../api/pool.html#psycopg.pool.ConnectionPool.resize" title="psycopg.pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
-</div>
-</div>
-<div class="section" id="connections-quality">
+</section>
+</section>
+<section id="connections-quality">
 <h2>Connections quality<a class="headerlink" href="#connections-quality" title="Permalink to this headline">¶</a></h2>
 <p>The state of the connection is verified when a connection is returned to the
 pool: if a connection is broken during its usage it will be discarded on
@@ -320,8 +321,8 @@ already a connection from the pool, but no other thread should be served a
 broken connection, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code> would empty the pool and refill it with
 working connections, as soon as they are available.</p>
 <p>Faster than you can say poll. Or pool.</p>
-</div>
-<div class="section" id="pool-stats">
+</section>
+<section id="pool-stats">
 <span id="id5"></span><h2>Pool stats<a class="headerlink" href="#pool-stats" title="Permalink to this headline">¶</a></h2>
 <p>The pool can return information about its usage using the methods
 <a class="reference internal" href="../api/pool.html#psycopg.pool.ConnectionPool.get_stats" title="psycopg.pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> or <a class="reference internal" href="../api/pool.html#psycopg.pool.ConnectionPool.pop_stats" title="psycopg.pool.ConnectionPool.pop_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_stats()</span></code></a>. Both methods
@@ -396,8 +397,8 @@ server</p></td>
 </tr>
 </tbody>
 </table></div>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -468,11 +469,10 @@ server</p></td>
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

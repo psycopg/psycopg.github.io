@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Cursor classes" href="cursors.html" /><link rel="prev" title="The psycopg module" href="module.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Cursor classes" href="cursors.html" /><link rel="prev" title="The psycopg module" href="module.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Connection classes - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="connection-classes">
+        <section id="connection-classes">
 <h1>Connection classes<a class="headerlink" href="#connection-classes" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> classes are the main wrappers for a
 PostgreSQL database session. You can imagine them similar to a <strong class="program">psql</strong>
@@ -179,11 +180,11 @@ session.</p>
 usually handles a transaction automatically: other sessions will not be able
 to see the changes until you have committed them, more or less explicitly.
 Take a look to <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transaction management</span></a> for the details.</p>
-<div class="section" id="the-connection-class">
+<section id="the-connection-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> class<a class="headerlink" href="#the-connection-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="psycopg.Connection">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">Connection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgconn</span></em>, <em class="sig-param"><span class="n">row_factory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pgconn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for a connection to the database.</p>
 <p>This class implements a <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#connection-objects">DBAPI-compliant interface</a>. It is what you want
 to use if you write a “classic”, blocking program (eventually using
@@ -193,10 +194,10 @@ you might want to use <a class="reference internal" href="#psycopg.AsyncConnecti
 transaction will be committed (or rolled back, in case of exception) and
 the connection will be closed.</p>
 <dl class="py method">
-<dt id="psycopg.Connection.connect">
-<em class="property">classmethod </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conninfo</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">"''"</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory">psycopg.rows.RowFactory</a><span class="p">[</span>Row<span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection">Connection</a><span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg.Connection.connect" title="Permalink to this definition">¶</a></dt>
-<dt>
-<em class="property">classmethod </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conninfo</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">"''"</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection">Connection</a><span class="p">[</span>TupleRow<span class="p">]</span></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.connect">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autocommit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'False'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><span class="pre">psycopg.rows.RowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">psycopg.rows.Row</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.Connection.connect" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autocommit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'False'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">TupleRow</span><span class="p"><span class="pre">]</span></span></span></span></dt>
 <dd><p>Connect to a database server and return a new <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -228,8 +229,8 @@ to create fetching data (default:
 </div>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.close">
-<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.close" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the database connection.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -238,24 +239,24 @@ close the connection automatically when the block is exited.</p>
 </div>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.closed">
-<code class="sig-name descname">closed</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#psycopg.Connection.closed" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.closed">
+<span class="sig-name descname"><span class="pre">closed</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></em><a class="headerlink" href="#psycopg.Connection.closed" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the connection is closed.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.broken">
-<code class="sig-name descname">broken</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#psycopg.Connection.broken" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.broken">
+<span class="sig-name descname"><span class="pre">broken</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></em><a class="headerlink" href="#psycopg.Connection.broken" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the connection was interrupted.</p>
 <p>A broken connection is always <a class="reference internal" href="#psycopg.Connection.closed" title="psycopg.Connection.closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closed</span></code></a>, but wasn’t closed in a clean
 way, such as using <a class="reference internal" href="#psycopg.Connection.close" title="psycopg.Connection.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> or a <code class="docutils literal notranslate"><span class="pre">with</span></code> block.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.cursor">
-<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>RowFactory<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor">Cursor</a><a class="headerlink" href="#psycopg.Connection.cursor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.cursor">
+<span class="sig-name descname"><span class="pre">cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">RowFactory</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><span class="pre">Cursor</span></a></span></span><a class="headerlink" href="#psycopg.Connection.cursor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>RowFactory<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursors.html#psycopg.ServerCursor" title="psycopg.ServerCursor">ServerCursor</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">RowFactory</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="cursors.html#psycopg.ServerCursor" title="psycopg.ServerCursor"><span class="pre">ServerCursor</span></a></span></span></dt>
 <dd><p>Return a new cursor to send commands and queries to the connection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -278,8 +279,8 @@ to close the cursor automatically when the block is exited.</p>
 </div>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">prepare</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.execute" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query and return a cursor to read its results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -302,26 +303,26 @@ returned.</p>
 queries.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.row_factory">
-<code class="sig-name descname">row_factory</code><em class="property">: <a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory">rows.RowFactory</a><span class="p">[</span>Row<span class="p">]</span></em><a class="headerlink" href="#psycopg.Connection.row_factory" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.row_factory">
+<span class="sig-name descname"><span class="pre">row_factory</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><span class="pre">rows.RowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Connection.row_factory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writable attribute to control how result rows are formed.</p>
 <p>See <a class="reference internal" href="../advanced/rows.html#row-factories"><span class="std std-ref">Row factories</span></a> for details.</p>
 </dd></dl>
 <p class="rubric">Transaction management methods</p>
 <p>For details see <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transaction management</span></a>.</p>
 <dl class="py method">
-<dt id="psycopg.Connection.commit">
-<code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.commit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.commit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Commit any pending transaction to the database.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.rollback">
-<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.rollback" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.rollback">
+<span class="sig-name descname"><span class="pre">rollback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.rollback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Roll back to the start of any pending transaction.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.transaction">
-<code class="sig-name descname">transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">savepoint_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.transaction" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.transaction">
+<span class="sig-name descname"><span class="pre">transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savepoint_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rollback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start a context block with a new transaction or nested transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -344,16 +345,16 @@ block even if there were no error (e.g. to try a no-op process).</p></li>
 or <a class="reference internal" href="#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.autocommit">
-<code class="sig-name descname">autocommit</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#psycopg.Connection.autocommit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.autocommit">
+<span class="sig-name descname"><span class="pre">autocommit</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></em><a class="headerlink" href="#psycopg.Connection.autocommit" title="Permalink to this definition">¶</a></dt>
 <dd><p>The autocommit state of the connection.</p>
 <p>The property is writable for sync connections, read-only for async
 ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg.AsyncConnection.set_autocommit" title="psycopg.AsyncConnection.set_autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_autocommit</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
 </dd></dl>
 <p class="rubric">Checking and configuring the connection state</p>
 <dl class="py attribute">
-<dt id="psycopg.Connection.client_encoding">
-<code class="sig-name descname">client_encoding</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.Connection.client_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.client_encoding">
+<span class="sig-name descname"><span class="pre">client_encoding</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.Connection.client_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Python codec name of the connection’s client encoding.</p>
 <p>The property is writable for sync connections, read-only for async
 ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg.AsyncConnection.set_client_encoding" title="psycopg.AsyncConnection.set_client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_client_encoding</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
@@ -381,13 +382,13 @@ selected (currently <code class="docutils literal notranslate"><span class="pre"
 </div>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.info">
-<code class="sig-name descname">info</code><em class="property">: <a class="reference internal" href="#psycopg.ConnectionInfo" title="psycopg.ConnectionInfo">ConnectionInfo</a></em><a class="headerlink" href="#psycopg.Connection.info" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.info">
+<span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#psycopg.ConnectionInfo" title="psycopg.ConnectionInfo"><span class="pre">ConnectionInfo</span></a></em><a class="headerlink" href="#psycopg.Connection.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#psycopg.ConnectionInfo" title="psycopg.ConnectionInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionInfo</span></code></a> attribute to inspect connection properties.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.fileno">
-<code class="sig-name descname">fileno</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.fileno" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.fileno">
+<span class="sig-name descname"><span class="pre">fileno</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.fileno" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the file descriptor of the connection.</p>
 <p>This function allows to use the connection as file-like object in
 functions waiting for readiness, such as the ones defined in the
@@ -399,8 +400,8 @@ functions waiting for readiness, such as the ones defined in the
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.prepare_threshold">
-<code class="sig-name descname">prepare_threshold</code><em class="property">: Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></em><a class="headerlink" href="#psycopg.Connection.prepare_threshold" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.prepare_threshold">
+<span class="sig-name descname"><span class="pre">prepare_threshold</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Connection.prepare_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of times a query is executed before it is prepared.</p>
 <ul class="simple">
 <li><p>If it is set to 0, every query is prepared the first time is
@@ -412,21 +413,21 @@ connection.</p></li>
 <p>See <a class="reference internal" href="../advanced/prepare.html#prepared-statements"><span class="std std-ref">Prepared statements</span></a> for details.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Connection.prepared_max">
-<code class="sig-name descname">prepared_max</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.Connection.prepared_max" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.prepared_max">
+<span class="sig-name descname"><span class="pre">prepared_max</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.Connection.prepared_max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximum number of prepared statements on the connection.</p>
 <p>Default value: 100</p>
 <p>If more queries need to be prepared, old ones are <a class="reference external" href="https://www.postgresql.org/docs/current/sql-deallocate.html">deallocated</a>.</p>
 </dd></dl>
 <p class="rubric">Methods you can use to do something cool</p>
 <dl class="py method">
-<dt id="psycopg.Connection.cancel">
-<code class="sig-name descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.cancel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.cancel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cancel the current operation on the connection.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.notifies">
-<code class="sig-name descname">notifies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.notifies" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.notifies">
+<span class="sig-name descname"><span class="pre">notifies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.notifies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield <a class="reference internal" href="#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a> objects as soon as they are received from the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -438,8 +439,8 @@ any sessions in the database generates a <code class="sql docutils literal notra
 listened channels.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.add_notify_handler">
-<code class="sig-name descname">add_notify_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.add_notify_handler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.add_notify_handler">
+<span class="sig-name descname"><span class="pre">add_notify_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.add_notify_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a callable to be invoked whenever a notification is received.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -448,14 +449,14 @@ listened channels.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.remove_notify_handler">
-<code class="sig-name descname">remove_notify_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.remove_notify_handler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.remove_notify_handler">
+<span class="sig-name descname"><span class="pre">remove_notify_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.remove_notify_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister a notification callable previously registered.</p>
 </dd></dl>
 <p>See <a class="reference internal" href="../advanced/async.html#async-notify"><span class="std std-ref">Asynchronous notifications</span></a> for details.</p>
 <dl class="py method">
-<dt id="psycopg.Connection.add_notice_handler">
-<code class="sig-name descname">add_notice_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.add_notice_handler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.add_notice_handler">
+<span class="sig-name descname"><span class="pre">add_notice_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.add_notice_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a callable to be invoked when a notice message is received.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -465,17 +466,17 @@ object containing all the details about the notice.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.Connection.remove_notice_handler">
-<code class="sig-name descname">remove_notice_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.remove_notice_handler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Connection.remove_notice_handler">
+<span class="sig-name descname"><span class="pre">remove_notice_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.remove_notice_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister a notice message callable previously registered.</p>
 </dd></dl>
 </dd></dl>
-</div>
-<div class="section" id="the-asyncconnection-class">
+</section>
+<section id="the-asyncconnection-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> class<a class="headerlink" href="#the-asyncconnection-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="psycopg.AsyncConnection">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">AsyncConnection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgconn</span></em>, <em class="sig-param"><span class="n">row_factory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pgconn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Asynchronous wrapper for a connection to the database.</p>
 <p>This class implements a DBAPI-inspired interface, with all the blocking
 methods implemented as coroutines. Unless specified otherwise,
@@ -483,10 +484,10 @@ non-blocking methods are shared with the <a class="reference internal" href="#ps
 <p>The following methods have the same behaviour of the matching <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>
 methods, but should be called using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword.</p>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.connect">
-<em class="property">async classmethod </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conninfo</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">"''"</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory">psycopg.rows.RowFactory</a><span class="p">[</span>Row<span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection">AsyncConnection</a><span class="p">[</span>Row<span class="p">]</span><a class="headerlink" href="#psycopg.AsyncConnection.connect" title="Permalink to this definition">¶</a></dt>
-<dt>
-<em class="property">async classmethod </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conninfo</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">"''"</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">'False'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> → <a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection">AsyncConnection</a><span class="p">[</span>TupleRow<span class="p">]</span></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.connect">
+<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autocommit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'False'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../advanced/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><span class="pre">psycopg.rows.RowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">psycopg.rows.Row</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.AsyncConnection.connect" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autocommit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'False'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">TupleRow</span><span class="p"><span class="pre">]</span></span></span></span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
@@ -494,8 +495,8 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.close">
-<em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.close" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.close">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.close" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> to close the connection
@@ -504,12 +505,12 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 </div>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.cursor">
-<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>RowFactory<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor">AsyncCursor</a><a class="headerlink" href="#psycopg.AsyncConnection.cursor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.cursor">
+<span class="sig-name descname"><span class="pre">cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">RowFactory</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><span class="pre">AsyncCursor</span></a></span></span><a class="headerlink" href="#psycopg.AsyncConnection.cursor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname">cursor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">binary</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">row_factory</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>RowFactory<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> → <a class="reference internal" href="cursors.html#psycopg.AsyncServerCursor" title="psycopg.AsyncServerCursor">AsyncServerCursor</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">RowFactory</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="cursors.html#psycopg.AsyncServerCursor" title="psycopg.AsyncServerCursor"><span class="pre">AsyncServerCursor</span></a></span></span></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">conn.cursor()</span> <span class="pre">as</span> <span class="pre">cur:</span> <span class="pre">...</span></code> to
@@ -517,8 +518,8 @@ close the cursor automatically when the block is exited.</p>
 </div>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.execute">
-<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">prepare</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.execute">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>[~Row]</p>
@@ -526,16 +527,16 @@ close the cursor automatically when the block is exited.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.commit">
-<em class="property">async </em><code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.commit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.commit">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.commit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.rollback">
-<em class="property">async </em><code class="sig-name descname">rollback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.rollback" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.rollback">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">rollback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.rollback" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.transaction">
-<code class="sig-name descname">transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">savepoint_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.transaction" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.transaction">
+<span class="sig-name descname"><span class="pre">transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savepoint_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rollback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start a context block with a new transaction or nested transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -548,8 +549,8 @@ close the cursor automatically when the block is exited.</p>
 </div>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.notifies">
-<code class="sig-name descname">notifies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.notifies" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.notifies">
+<span class="sig-name descname"><span class="pre">notifies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.notifies" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.AsyncIterator" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncIterator</span></code></a>[<a class="reference internal" href="#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-class docutils literal notranslate"><span class="pre">Notify</span></code></a>]</p>
@@ -557,48 +558,48 @@ close the cursor automatically when the block is exited.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.set_client_encoding">
-<em class="property">async </em><code class="sig-name descname">set_client_encoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_client_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.set_client_encoding">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">set_client_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_client_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Async version of the <a class="reference internal" href="#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code></a> setter.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.AsyncConnection.set_autocommit">
-<em class="property">async </em><code class="sig-name descname">set_autocommit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_autocommit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.set_autocommit">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">set_autocommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_autocommit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Async version of the <a class="reference internal" href="#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> setter.</p>
 </dd></dl>
 </dd></dl>
-</div>
-<div class="section" id="connection-support-objects">
+</section>
+<section id="connection-support-objects">
 <h2>Connection support objects<a class="headerlink" href="#connection-support-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="psycopg.Notify">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">Notify</code><a class="headerlink" href="#psycopg.Notify" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Notify">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Notify</span></span><a class="headerlink" href="#psycopg.Notify" title="Permalink to this definition">¶</a></dt>
 <dd><p>An asynchronous notification received from the database.</p>
 <p>The object is usually returned by <a class="reference internal" href="#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies()</span></code></a>.</p>
 <dl class="py attribute">
-<dt id="psycopg.Notify.channel">
-<code class="sig-name descname">channel</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.Notify.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the channel on which the notification was received.</p>
+<dt class="sig sig-object py" id="psycopg.Notify.channel">
+<span class="sig-name descname"><span class="pre">channel</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.Notify.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Notify.payload">
-<code class="sig-name descname">payload</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.Notify.payload" title="Permalink to this definition">¶</a></dt>
-<dd><p>The message attached to the notification.</p>
+<dt class="sig sig-object py" id="psycopg.Notify.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.Notify.payload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Notify.pid">
-<code class="sig-name descname">pid</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.Notify.pid" title="Permalink to this definition">¶</a></dt>
-<dd><p>The PID of the backend process which sent the notification.</p>
+<dt class="sig sig-object py" id="psycopg.Notify.pid">
+<span class="sig-name descname"><span class="pre">pid</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.Notify.pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.ConnectionInfo">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">ConnectionInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pgconn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">ConnectionInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pgconn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allow access to information about the connection.</p>
 <p>The object is usually returned by <a class="reference internal" href="#psycopg.Connection.info" title="psycopg.Connection.info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info</span></code></a>.</p>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.status">
-<code class="sig-name descname">status</code><em class="property">: <a class="reference internal" href="pq.html#psycopg.pq.ConnStatus" title="psycopg.pq.ConnStatus">pq.ConnStatus</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="pq.html#psycopg.pq.ConnStatus" title="psycopg.pq.ConnStatus"><span class="pre">pq.ConnStatus</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.status" title="Permalink to this definition">¶</a></dt>
 <dd><p>The status of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQSTATUS"><span class="pre">PQstatus</span></a></code>.</p>
 <p>The status can be one of a number of values. However, only two of
 these are seen outside of an asynchronous connection procedure:
@@ -608,8 +609,8 @@ so until <a class="reference internal" href="#psycopg.Connection.close" title="p
 result in the status changing to <code class="xref py py-obj docutils literal notranslate"><span class="pre">BAD</span></code> prematurely.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.transaction_status">
-<code class="sig-name descname">transaction_status</code><em class="property">: <a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus" title="psycopg.pq.TransactionStatus">pq.TransactionStatus</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.transaction_status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.transaction_status">
+<span class="sig-name descname"><span class="pre">transaction_status</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus" title="psycopg.pq.TransactionStatus"><span class="pre">pq.TransactionStatus</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.transaction_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>The current in-transaction status of the server.
 See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQTRANSACTIONSTATUS"><span class="pre">PQtransactionStatus</span></a></code>.</p>
 <p>The status can be <a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus.IDLE" title="psycopg.pq.TransactionStatus.IDLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IDLE</span></code></a> (currently idle),
@@ -621,8 +622,8 @@ is bad. <code class="xref py py-obj docutils literal notranslate"><span class="p
 server and not yet completed.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.server_version">
-<code class="sig-name descname">server_version</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.server_version" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.server_version">
+<span class="sig-name descname"><span class="pre">server_version</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.server_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>An integer representing the server version. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQSERVERVERSION"><span class="pre">PQserverVersion</span></a><span class="pre">()</span></code>.</p>
 <p>The number is formed by converting the major, minor, and revision
 numbers into two-decimal-digit numbers and appending them together.
@@ -631,20 +632,20 @@ of digits is always 00. For example, version 9.3.5 will be returned as
 90305, version 10.2 as 100002.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.backend_pid">
-<code class="sig-name descname">backend_pid</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.backend_pid" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.backend_pid">
+<span class="sig-name descname"><span class="pre">backend_pid</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.backend_pid" title="Permalink to this definition">¶</a></dt>
 <dd><p>The process ID (PID) of the backend process handling this connection.
 See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQBACKENDPID"><span class="pre">PQbackendPID</span></a></code>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.error_message">
-<code class="sig-name descname">error_message</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.error_message" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.error_message">
+<span class="sig-name descname"><span class="pre">error_message</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.error_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>The error message most recently generated by an operation on the connection.
 See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQERRORMESSAGE"><span class="pre">PQerrorMessage</span></a></code>.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.ConnectionInfo.get_parameters">
-<code class="sig-name descname">get_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.get_parameters">
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo.get_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the connection parameters values.</p>
 <p>Return all the parameters set to a non-default value, which might come
 either from the connection string or from environment variables. Don’t
@@ -656,54 +657,54 @@ report the password (you can read it using the <a class="reference internal" hre
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.timezone">
-<code class="sig-name descname">timezone</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)">datetime.tzinfo</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.timezone" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.timezone">
+<span class="sig-name descname"><span class="pre">timezone</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><span class="pre">datetime.tzinfo</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.timezone" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Python timezone info of the connection’s timezone.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.host">
-<code class="sig-name descname">host</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.host" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.host">
+<span class="sig-name descname"><span class="pre">host</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.host" title="Permalink to this definition">¶</a></dt>
 <dd><p>The server host name of the active connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQHOST"><span class="pre">PQhost</span></a></code>.</p>
 <p>This can be a host name, an IP address, or a directory path if the
 connection is via Unix socket. (The path case can be distinguished
 because it will always be an absolute path, beginning with <code class="docutils literal notranslate"><span class="pre">/</span></code>.)</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.hostaddr">
-<code class="sig-name descname">hostaddr</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.hostaddr" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.hostaddr">
+<span class="sig-name descname"><span class="pre">hostaddr</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.hostaddr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The server IP address of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQHOSTADDR"><span class="pre">PQhostaddr</span></a></code>.</p>
 <p>Only available if the libpq used is at least from PostgreSQL 12.
 Raise <a class="reference internal" href="errors.html#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a> otherwise.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.port">
-<code class="sig-name descname">port</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.port" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.port">
+<span class="sig-name descname"><span class="pre">port</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.port" title="Permalink to this definition">¶</a></dt>
 <dd><p>The port of the active connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQPORT"><span class="pre">PQport</span></a></code>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.dbname">
-<code class="sig-name descname">dbname</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.dbname" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.dbname">
+<span class="sig-name descname"><span class="pre">dbname</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.dbname" title="Permalink to this definition">¶</a></dt>
 <dd><p>The database name of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQDB"><span class="pre">PQdb</span></a></code>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.user">
-<code class="sig-name descname">user</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.user" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.user">
+<span class="sig-name descname"><span class="pre">user</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.user" title="Permalink to this definition">¶</a></dt>
 <dd><p>The user name of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQUSER"><span class="pre">PQuser</span></a></code>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.password">
-<code class="sig-name descname">password</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.password" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.password">
+<span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.password" title="Permalink to this definition">¶</a></dt>
 <dd><p>The password of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQPASS"><span class="pre">PQpass</span></a></code>.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.options">
-<code class="sig-name descname">options</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.options" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.options">
+<span class="sig-name descname"><span class="pre">options</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>The command-line options passed in the connection request.
 See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQOPTIONS"><span class="pre">PQoptions</span></a></code>.</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.ConnectionInfo.parameter_status">
-<code class="sig-name descname">parameter_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo.parameter_status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.parameter_status">
+<span class="sig-name descname"><span class="pre">parameter_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ConnectionInfo.parameter_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a parameter setting of the connection.</p>
 <p>Return <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is the parameter is unknown.</p>
 <dl class="field-list simple">
@@ -716,39 +717,39 @@ See <code class="docutils literal notranslate"><a class="reference external" hre
 all the available parameters.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.ConnectionInfo.protocol_version">
-<code class="sig-name descname">protocol_version</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#psycopg.ConnectionInfo.protocol_version" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.protocol_version">
+<span class="sig-name descname"><span class="pre">protocol_version</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.protocol_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>The frontend/backend protocol currently used. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQPROTOCOLVERSION"><span class="pre">PQprotocolVersion</span></a></code>.</p>
 </dd></dl>
 </dd></dl>
 <p class="rubric">Objects involved in <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transaction management</span></a></p>
 <dl class="py class">
-<dt id="psycopg.Transaction">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">Transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Transaction" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Transaction">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepoint_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rollback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to handle a transaction block.</p>
 <dl class="py attribute">
-<dt id="psycopg.Transaction.savepoint_name">
-<code class="sig-name descname">savepoint_name</code><em class="property">: Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></em><a class="headerlink" href="#psycopg.Transaction.savepoint_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Transaction.savepoint_name">
+<span class="sig-name descname"><span class="pre">savepoint_name</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Transaction.savepoint_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the savepoint; <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if handling the main transaction.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.Transaction.connection">
-<code class="sig-name descname">connection</code><em class="property">: <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection">Connection</a><span class="p">[</span>Any<span class="p">]</span></em><a class="headerlink" href="#psycopg.Transaction.connection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Transaction.connection">
+<span class="sig-name descname"><span class="pre">connection</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Transaction.connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>The connection the object is managing.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.AsyncTransaction">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">AsyncTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection</span></em>, <em class="sig-param"><span class="n">savepoint_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force_rollback</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncTransaction" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncTransaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepoint_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rollback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="#psycopg.AsyncConnection.transaction" title="psycopg.AsyncConnection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a> to handle a transaction block.</p>
 <dl class="py attribute">
-<dt id="psycopg.AsyncTransaction.connection">
-<code class="sig-name descname">connection</code><em class="property">: <a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection">AsyncConnection</a><span class="p">[</span>Any<span class="p">]</span></em><a class="headerlink" href="#psycopg.AsyncTransaction.connection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.connection">
+<span class="sig-name descname"><span class="pre">connection</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.AsyncTransaction.connection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py exception">
-<dt id="psycopg.Rollback">
-<em class="property">exception </em><code class="sig-prename descclassname">psycopg.</code><code class="sig-name descname">Rollback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transaction</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Rollback" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.Rollback">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Rollback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Rollback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exit the current <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> context immediately and rollback any changes
 made within this context.</p>
 <p>If a transaction context is specified in the constructor, rollback
@@ -764,8 +765,8 @@ the <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Tra
 program will continue after the <em>tx</em> block.</p></li>
 </ul>
 </dd></dl>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -831,11 +832,10 @@ program will continue after the <em>tx</em> block.</p></li>
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

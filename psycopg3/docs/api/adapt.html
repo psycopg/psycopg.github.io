@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="types – Types information and adapters" href="types.html" /><link rel="prev" title="pool – Connection pool implementations" href="pool.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="types – Types information and adapters" href="types.html" /><link rel="prev" title="pool – Connection pool implementations" href="pool.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>adapt – Types adaptation - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,7 +171,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="module-psycopg.adapt">
+        <section id="module-psycopg.adapt">
 <span id="adapt-types-adaptation"></span><h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation<a class="headerlink" href="#module-psycopg.adapt" title="Permalink to this headline">¶</a></h1>
 <p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt</span></code> module exposes a set of objects useful for the
 configuration of <em>data adaptation</em>, which is the conversion of Python objects
@@ -180,18 +181,18 @@ if you need to change the default way that Psycopg converts between types or
 if you want to adapt custom data types and objects. You don’t need this object
 in the normal use of Psycopg.</p>
 <p>See <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for an overview of the Psycopg adaptation system.</p>
-<div class="section" id="dumpers-and-loaders">
+<section id="dumpers-and-loaders">
 <h2>Dumpers and loaders<a class="headerlink" href="#dumpers-and-loaders" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="psycopg.adapt.Dumper">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.adapt.</code><code class="sig-name descname">Dumper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">Dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Python object of the type <em>cls</em> to PostgreSQL representation.</p>
 <p>This is an abstract base class: subclasses <em>must</em> at least implement the
 <a class="reference internal" href="#psycopg.adapt.Dumper.dump" title="psycopg.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method and specify the <a class="reference external" href="https://docs.python.org/3/library/functions.html#format" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>.</p>
 <p>The class implements the <a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> protocol.</p>
 <dl class="py method">
-<dt id="psycopg.adapt.Dumper.dump">
-<em class="property">abstract </em><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper.dump">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the object <em>obj</em> to PostgreSQL representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -200,8 +201,8 @@ in the normal use of Psycopg.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.Dumper.quote">
-<code class="sig-name descname">quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.quote" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper.quote">
+<span class="sig-name descname"><span class="pre">quote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>By default return the <a class="reference internal" href="#psycopg.adapt.Dumper.dump" title="psycopg.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> value quoted and sanitised, so
 that the result can be used to build a SQL string. This works well
 for most types and you won’t likely have to implement this method in a
@@ -213,8 +214,8 @@ subclass.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.Dumper.get_key">
-<code class="sig-name descname">get_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">format</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.get_key" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper.get_key">
+<span class="sig-name descname"><span class="pre">get_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.get_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implementation of the <a class="reference internal" href="abc.html#psycopg.abc.Dumper.get_key" title="psycopg.abc.Dumper.get_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key()</span></code></a> member of the
 <a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> protocol. Look at its definition for details.</p>
 <p>This implementation returns the <em>cls</em> passed in the constructor.
@@ -228,8 +229,8 @@ should override this class.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.Dumper.upgrade">
-<code class="sig-name descname">upgrade</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">format</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.upgrade" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper.upgrade">
+<span class="sig-name descname"><span class="pre">upgrade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.upgrade" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implementation of the <a class="reference internal" href="abc.html#psycopg.abc.Dumper.upgrade" title="psycopg.abc.Dumper.upgrade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade()</span></code></a> member of the
 <a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> protocol. Look at its definition for details.</p>
 <p>This implementation just returns <em>self</em>. If a subclass implements
@@ -242,15 +243,15 @@ should override this class.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.adapt.Loader">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.adapt.</code><code class="sig-name descname">Loader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Loader">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">Loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert PostgreSQL objects with OID <em>oid</em> to Python objects.</p>
 <p>This is an abstract base class: subclasses <em>must</em> at least implement the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code> method and specify a <a class="reference external" href="https://docs.python.org/3/library/functions.html#format" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>.</p>
 <p>The class implements the <a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> protocol.</p>
 <dl class="py method">
-<dt id="psycopg.adapt.Loader.load">
-<em class="property">abstract </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Loader.load">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a PostgreSQL value to a Python object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -259,34 +260,31 @@ should override this class.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-</div>
-<div class="section" id="other-objects-used-in-adaptations">
+</section>
+<section id="other-objects-used-in-adaptations">
 <h2>Other objects used in adaptations<a class="headerlink" href="#other-objects-used-in-adaptations" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="psycopg.adapt.PyFormat">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.adapt.</code><code class="sig-name descname">PyFormat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.PyFormat" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.PyFormat">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">PyFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.PyFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enum representing the format wanted for a query argument.</p>
 <p>The value <a class="reference internal" href="#psycopg.adapt.PyFormat.AUTO" title="psycopg.adapt.PyFormat.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a> allows psycopg to choose the best value for a certain
 value.</p>
 <dl class="py attribute">
-<dt id="psycopg.adapt.PyFormat.AUTO">
-<code class="sig-name descname">AUTO</code><em class="property"> = 's'</em><a class="headerlink" href="#psycopg.adapt.PyFormat.AUTO" title="Permalink to this definition">¶</a></dt>
-<dd><p>Automatically chosen (<code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholder).</p>
-</dd></dl>
+<dt class="sig sig-object py" id="psycopg.adapt.PyFormat.AUTO">
+<span class="sig-name descname"><span class="pre">AUTO</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'s'</span></em><a class="headerlink" href="#psycopg.adapt.PyFormat.AUTO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.adapt.PyFormat.TEXT">
-<code class="sig-name descname">TEXT</code><em class="property"> = 't'</em><a class="headerlink" href="#psycopg.adapt.PyFormat.TEXT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Text parameter (<code class="docutils literal notranslate"><span class="pre">%t</span></code> placeholder).</p>
-</dd></dl>
+<dt class="sig sig-object py" id="psycopg.adapt.PyFormat.TEXT">
+<span class="sig-name descname"><span class="pre">TEXT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'t'</span></em><a class="headerlink" href="#psycopg.adapt.PyFormat.TEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.adapt.PyFormat.BINARY">
-<code class="sig-name descname">BINARY</code><em class="property"> = 'b'</em><a class="headerlink" href="#psycopg.adapt.PyFormat.BINARY" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binary parameter (<code class="docutils literal notranslate"><span class="pre">%b</span></code> placeholder).</p>
-</dd></dl>
+<dt class="sig sig-object py" id="psycopg.adapt.PyFormat.BINARY">
+<span class="sig-name descname"><span class="pre">BINARY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'b'</span></em><a class="headerlink" href="#psycopg.adapt.PyFormat.BINARY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.adapt.AdaptersMap">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.adapt.</code><code class="sig-name descname">AdaptersMap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">AdaptersMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Establish how types should be converted between Python and PostgreSQL in
 an <a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code> maps Python types to <a class="reference internal" href="#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> classes to
@@ -311,8 +309,8 @@ Copies are copy-on-write: if the maps are updated make a copy. This way
 extending e.g. global map by a connection or a connection map from a cursor
 is cheap: a copy is made only on customisation.</p>
 <dl class="py method">
-<dt id="psycopg.adapt.AdaptersMap.register_dumper">
-<code class="sig-name descname">register_dumper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">dumper</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_dumper" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.register_dumper">
+<span class="sig-name descname"><span class="pre">register_dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the context to use <em>dumper</em> to convert object of type <em>cls</em>.</p>
 <p>If two dumpers with different <code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code> are registered for the
 same type, the last one registered will be chosen when the query
@@ -332,8 +330,8 @@ case it should be the fully qualified name of the object (e.g.
 <code class="docutils literal notranslate"><span class="pre">"uuid.UUID"</span></code>).</p>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.AdaptersMap.register_loader">
-<code class="sig-name descname">register_loader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">loader</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_loader" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.register_loader">
+<span class="sig-name descname"><span class="pre">register_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the context to use <em>loader</em> to convert data of oid <em>oid</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -347,8 +345,8 @@ case it should be the fully qualified name of the object (e.g.
 looked up in the <a class="reference internal" href="#psycopg.adapt.AdaptersMap.types" title="psycopg.adapt.AdaptersMap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a> registry. `</p>
 </dd></dl>
 <dl class="py attribute">
-<dt id="psycopg.adapt.AdaptersMap.types">
-<code class="sig-name descname">types</code><a class="headerlink" href="#psycopg.adapt.AdaptersMap.types" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.types">
+<span class="sig-name descname"><span class="pre">types</span></span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.types" title="Permalink to this definition">¶</a></dt>
 <dd><p>The object where to look up for types information (such as the mapping
 between type names and oids in the specified context).</p>
 <dl class="field-list simple">
@@ -358,8 +356,8 @@ between type names and oids in the specified context).</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.AdaptersMap.get_dumper">
-<code class="sig-name descname">get_dumper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">format</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_dumper" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.get_dumper">
+<span class="sig-name descname"><span class="pre">get_dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dumper class for the given type and format.</p>
 <p>Raise ProgrammingError if a class is not available.</p>
 <dl class="field-list simple">
@@ -369,8 +367,8 @@ between type names and oids in the specified context).</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.adapt.AdaptersMap.get_loader">
-<code class="sig-name descname">get_loader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">format</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_loader" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.get_loader">
+<span class="sig-name descname"><span class="pre">get_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the loader class for the given oid and format.</p>
 <p>Return None if not found.</p>
 <dl class="field-list simple">
@@ -381,8 +379,8 @@ between type names and oids in the specified context).</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.adapt.Transformer">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.adapt.</code><code class="sig-name descname">Transformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Transformer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.adapt.Transformer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">Transformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object that can adapt efficiently between Python and PostgreSQL.</p>
 <p>The life cycle of the object is the query, so it is assumed that attributes
 such as the server version or the connection encoding will not change. The
@@ -394,8 +392,8 @@ optimised.</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -460,11 +458,10 @@ optimised.</p>
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

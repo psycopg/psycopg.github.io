@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="abc – Psycopg abstract classes" href="abc.html" /><link rel="prev" title="adapt – Types adaptation" href="adapt.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="abc – Psycopg abstract classes" href="abc.html" /><link rel="prev" title="adapt – Types adaptation" href="adapt.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>types – Types information and adapters - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,12 +171,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="module-psycopg.types">
+        <section id="module-psycopg.types">
 <span id="types-types-information-and-adapters"></span><span id="psycopg-types"></span><h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters<a class="headerlink" href="#module-psycopg.types" title="Permalink to this headline">¶</a></h1>
 <p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types</span></code> package exposes the concrete implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>
 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code> to manage builtin objects, together with objects to describe
 PostgreSQL types and wrappers to help or customise the types conversion.</p>
-<div class="section" id="types-information">
+<section id="types-information">
 <h2>Types information<a class="headerlink" href="#types-information" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> object describes simple information about a PostgreSQL data
 type, such as its name, oid and array oid. The class can be used to query a
@@ -211,8 +212,8 @@ types to PostgreSQL types and back.</p>
 </pre></div>
 </div>
 <dl class="py class">
-<dt id="psycopg.types.TypeInfo">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.</code><code class="sig-name descname">TypeInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">array_oid</span></em>, <em class="sig-param"><span class="n">alt_name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">','</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.TypeInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.</span></span><span class="sig-name descname"><span class="pre">TypeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hold information about a PostgreSQL base type.</p>
 <p>The class allows to:</p>
 <ul class="simple">
@@ -220,8 +221,8 @@ types to PostgreSQL types and back.</p>
 <li><p>configure a composite type adaptation using <a class="reference internal" href="#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a></p></li>
 </ul>
 <dl class="py method">
-<dt id="psycopg.types.TypeInfo.fetch">
-<em class="property">classmethod </em><code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.TypeInfo.fetch">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query a system catalog to read information about a type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -241,8 +242,8 @@ name.</p></li>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.types.TypeInfo.fetch_async">
-<em class="property">async classmethod </em><code class="sig-name descname">fetch_async</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch_async" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.TypeInfo.fetch_async">
+<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch_async" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query a system catalog to read information about a type.</p>
 <p>Similar to <a class="reference internal" href="#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> but can use an asynchronous connection.</p>
 <dl class="field-list simple">
@@ -252,8 +253,8 @@ name.</p></li>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="psycopg.types.TypeInfo.register">
-<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.register" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.TypeInfo.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
 <p>The <em>context</em> can be a <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>.
 Specifying no context will register the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> globally.</p>
@@ -265,20 +266,20 @@ Python is demanded to a <code class="xref py py-obj docutils literal notranslate
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.types.TypesRegistry">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.</code><code class="sig-name descname">TypesRegistry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.TypesRegistry">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.</span></span><span class="sig-name descname"><span class="pre">TypesRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the information about types in a database.</p>
 </dd></dl>
 <p>The following <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses allow to fetch more specialised
 information from certain class of PostgreSQL types and to create more
 specialised adapters configurations.</p>
 <dl class="py class">
-<dt id="psycopg.types.composite.CompositeInfo">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.composite.</code><code class="sig-name descname">CompositeInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">array_oid</span></em>, <em class="sig-param"><span class="n">field_names</span></em>, <em class="sig-param"><span class="n">field_types</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.composite.CompositeInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.composite.</span></span><span class="sig-name descname"><span class="pre">CompositeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manage information about a composite type.</p>
 <dl class="py method">
-<dt id="psycopg.types.composite.CompositeInfo.register">
-<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">factory</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo.register" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.composite.CompositeInfo.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
 <p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo.register()</span></code> will also register a specialised
 loader to fetch the composite type as a Python named tuple, or a
@@ -286,12 +287,12 @@ custom object if <em>factory</em> is specified.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
-<dt id="psycopg.types.range.RangeInfo">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.range.</code><code class="sig-name descname">RangeInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">oid</span></em>, <em class="sig-param"><span class="n">array_oid</span></em>, <em class="sig-param"><span class="n">subtype_oid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.range.RangeInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.range.</span></span><span class="sig-name descname"><span class="pre">RangeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype_oid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manage information about a range type.</p>
 <dl class="py method">
-<dt id="psycopg.types.range.RangeInfo.register">
-<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo.register" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.range.RangeInfo.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
 <p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo.register()</span></code> will also register a specialised loaders
 and dumpers. For instance, if you create a PostgreSQL range on the
@@ -303,8 +304,8 @@ if you dump a <code class="xref py py-obj docutils literal notranslate"><span cl
 correct oid for your <code class="sql docutils literal notranslate"><span class="pre">inetrange</span></code> type.</p>
 </dd></dl>
 </dd></dl>
-</div>
-<div class="section" id="objects-wrappers">
+</section>
+<section id="objects-wrappers">
 <h2>Objects wrappers<a class="headerlink" href="#objects-wrappers" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
@@ -314,25 +315,25 @@ correct oid for your <code class="sql docutils literal notranslate"><span class=
 <li><p>Range</p></li>
 </ul>
 </div>
-</div>
-<div class="section" id="json-adapters">
+</section>
+<section id="json-adapters">
 <span id="id1"></span><h2>JSON adapters<a class="headerlink" href="#json-adapters" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="../basic/adapt.html#adapt-json"><span class="std std-ref">JSON adaptation</span></a> for details.</p>
 <dl class="py class">
-<dt id="psycopg.types.json.Json">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.json.</code><code class="sig-name descname">Json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">dumps</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.Json" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.json.Json">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.json.</span></span><span class="sig-name descname"><span class="pre">Json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.Json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py class">
-<dt id="psycopg.types.json.Jsonb">
-<em class="property">class </em><code class="sig-prename descclassname">psycopg.types.json.</code><code class="sig-name descname">Jsonb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">dumps</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.Jsonb" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.json.Jsonb">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.json.</span></span><span class="sig-name descname"><span class="pre">Jsonb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.Jsonb" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <p>Wrappers to signal to convert <em>obj</em> to a json or jsonb PostgreSQL value.</p>
 <p>Any object supported by the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">dumps()</span></code> function can be wrapped.</p>
 <p>If a <em>dumps</em> function is passed to the wrapper, use it to dump the wrapped
 object. Otherwise use the function specified by <a class="reference internal" href="#psycopg.types.json.set_json_dumps" title="psycopg.types.json.set_json_dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_dumps()</span></code></a>.</p>
 <dl class="py function">
-<dt id="psycopg.types.json.set_json_dumps">
-<code class="sig-prename descclassname">psycopg.types.json.</code><code class="sig-name descname">set_json_dumps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dumps</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.set_json_dumps" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.json.set_json_dumps">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.json.</span></span><span class="sig-name descname"><span class="pre">set_json_dumps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dumps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.set_json_dumps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the JSON serialisation function to store JSON objects in the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -349,8 +350,8 @@ it to use a different JSON library or to use customised arguments.</p>
 of the one set by this function.</p>
 </dd></dl>
 <dl class="py function">
-<dt id="psycopg.types.json.set_json_loads">
-<code class="sig-prename descclassname">psycopg.types.json.</code><code class="sig-name descname">set_json_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loads</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.set_json_loads" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="psycopg.types.json.set_json_loads">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.json.</span></span><span class="sig-name descname"><span class="pre">set_json_loads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.json.set_json_loads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the JSON parsing function to fetch JSON objects from the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -364,8 +365,8 @@ globally.</p></li>
 <p>By default loading JSON uses the builtin <a class="reference external" href="https://docs.python.org/3/library/json.html#json.loads" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json.loads</span></code></a>. You can override
 it to use a different JSON library or to use customised arguments.</p>
 </dd></dl>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -431,11 +432,10 @@ it to use a different JSON library or to use customised arguments.</p>
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>

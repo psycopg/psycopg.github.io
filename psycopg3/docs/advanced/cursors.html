@@ -2,12 +2,15 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Row factories" href="rows.html" /><link rel="prev" title="Async operations" href="async.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Row factories" href="rows.html" /><link rel="prev" title="Async operations" href="async.html" />
 
-    <meta name="generator" content="sphinx-3.3.1, furo 2021.06.18.beta36"/>
+    <meta name="generator" content="sphinx-4.1.0, furo 2021.07.05.beta38"/>
         <title>Cursor types - psycopg 3.0.dev0 documentation</title>
-      <link rel="stylesheet" href="../_static/styles/furo.css?digest=9b17055c4366e8b2949c66d6a9d8b0efe4dbaa60">
-    <link rel="stylesheet" href="../_static/pygments.css">
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
 
 
@@ -38,9 +41,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
-    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=ee12cdd73c4bbac24afec78d92c4afd7c2d8ea7f"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -170,12 +171,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="cursor-types">
+        <section id="cursor-types">
 <span id="index-0"></span><span id="id1"></span><h1>Cursor types<a class="headerlink" href="#cursor-types" title="Permalink to this headline">¶</a></h1>
 <p>Psycopg can manage kinds of “cursors” which differ in where the state of a
 query being processed is stored: <a class="reference internal" href="#client-side-cursors"><span class="std std-ref">Client-side cursors</span></a> and
 <a class="reference internal" href="#server-side-cursors"><span class="std std-ref">Server-side cursors</span></a>.</p>
-<div class="section" id="client-side-cursors">
+<section id="client-side-cursors">
 <span id="index-1"></span><span id="id2"></span><h2>Client-side cursors<a class="headerlink" href="#client-side-cursors" title="Permalink to this headline">¶</a></h2>
 <p>Client-side cursors are what Psycopg uses in its normal querying process.
 They are implemented by the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> classes. In such
@@ -191,8 +192,8 @@ results are already in the client memory, iterating its rows is very quick.</p>
 transmitted completely to the client (with a time proportional to its size)
 and the client needs enough memory to hold it, so it is only suitable for
 reasonably small result sets.</p>
-</div>
-<div class="section" id="server-side-cursors">
+</section>
+<section id="server-side-cursors">
 <span id="index-2"></span><span id="id3"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
 <p>PostgreSQL has also its own concept of <em>cursor</em> (sometimes also called
 <em>portal</em>). When a database cursor is created, the query is not necessarily
@@ -220,8 +221,8 @@ result is needed.</p>
 commands such as <a class="reference external" href="https://www.postgresql.org/docs/current/sql-declare.html">DECLARE</a>, <a class="reference external" href="https://www.postgresql.org/docs/current/sql-fetch.html">FETCH</a>, <a class="reference external" href="https://www.postgresql.org/docs/current/sql-move.html">MOVE</a>. The PostgreSQL documentation
 gives a good idea of what is possible to do with them.</p>
 </div>
-</div>
-<div class="section" id="stealing-an-existing-cursor">
+</section>
+<section id="stealing-an-existing-cursor">
 <span id="cursor-steal"></span><h2>“Stealing” an existing cursor<a class="headerlink" href="#stealing-an-existing-cursor" title="Permalink to this headline">¶</a></h2>
 <p>A Psycopg <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> can be also used to consume a cursor that the
 <code class="sql docutils literal notranslate"><span class="pre">DECLARE</span></code> generated by its <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method can produce.</p>
@@ -247,8 +248,8 @@ fetch methods, omitting to call <a class="reference internal" href="../api/curso
     <span class="c1"># do something with record</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -314,11 +315,10 @@ fetch methods, omitting to call <a class="reference internal" href="../api/curso
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="../_static/scripts/main.js"></script>
+    </body>
 </html>
