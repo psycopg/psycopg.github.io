@@ -53,6 +53,41 @@ returned.
     when a query is executed.
 
 
+Example: PostgreSQL numeric to Python float
+-------------------------------------------
+
+Normally PostgreSQL :sql:`numeric` values are converted to Python
+`~decimal.Decimal` instances, because both the types allow fixed-precision
+arithmetic and are not subject to rounding.
+
+Sometimes, however, you may want to perform floating-point math on
+:sql:`numeric` values, and `!Decimal` may get in the way (maybe because it is
+slower, or maybe because mixing `!float` and `!Decimal` values causes Python
+errors).
+
+If you are fine with the potential loss of precision and you simply want to
+receive :sql:`numeric` values as Python `!float`, you can register on
+:sql:`numeric` the same `Loader` class used to load
+:sql:`float4`\/:sql:`float8` values. Because the PostgreSQL textual
+representation of both floats and decimal is the same, the two loaders are
+compatible.
+
+.. code:: python
+
+    conn = psycopg.connect()
+
+    conn.execute("select 123.45").fetchone()[0]
+    # Decimal('123.45')
+
+    conn.adapters.register_loader("numeric", psycopg.types.numeric.FloatLoader)
+
+    conn.execute("select 123.45").fetchone()[0]
+    # 123.45
+
+In this example the customised adaptation takes effect only on the connection
+`!conn` and on any cursor created from it, not on other connections.
+
+
 Example: handling infinity date
 -------------------------------
 
@@ -102,14 +137,6 @@ cursor):
     # (datetime.date(2020, 12, 31), datetime.date(9999, 12, 31))
 
 
-Example: PostgreSQL numeric to Python float
--------------------------------------------
-
-.. admonition:: TODO
-
-    Write it
-
-
 Dumpers and loaders life cycle
 ------------------------------
 
@@ -127,10 +154,7 @@ and dispatching the values to convert to the right instance.
 
 - For every Python type passed as query argument, the `!Transformer` will
   instantiate a `!Dumper`. Usually all the objects of the same type will be
-  converted by the same dumper; certain dumpers may be used in more than one
-  instance, because the same Python type maps to more than one PostgreSQL type
-  (for instance, a Python `int` might be better dumped as a PostgreSQL
-  :sql:`integer`, :sql:`bigint`, :sql:`smallint` according to its value).
+  converted by the same dumper instance.
 
 - According to the placeholder used (``%s``, ``%b``, ``%t``), Psycopg may pick
   a binary or a text dumper. When using the ``%s`` "`~PyFormat.AUTO`" format,
@@ -142,11 +166,14 @@ and dispatching the values to convert to the right instance.
   the objects it contains, whether to use an :sql:`integer` or :sql:`bigint`
   depends on the number size...) In these cases the mechanism provided by
   `~psycopg.abc.Dumper.get_key()` and `~psycopg.abc.Dumper.upgrade()` is
-  used.
+  used to create more specific dumpers.
+
+- The query is executed. Upon successful request, the result is received as a
+  `~psycopg.pq.PGresult`.
 
 - For every OID returned by the query, the `!Transformer` will instantiate a
   `!Loader`. All the values with the same OID will be converted by the same
-  loader.
+  loader instance.
 
 - Recursive types (e.g. Python lists, PostgreSQL arrays and composite types)
   will use the same adaptation rules.

@@ -182,11 +182,11 @@ PostgreSQL types and wrappers to help or customise the types conversion.</p>
 type, such as its name, oid and array oid. The class can be used to query a
 database for custom data types: this allows for instance to load automatically
 arrays of a custom type, once a loader for the base type has been registered.</p>
-<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object doesn’t instruct Psycopg to convert a PostgreSQL
-type into a Python type: this is the role of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>. However it can extend
-the behaviour of the adapters: if you create a loader for <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code>, using
-<a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> you will be able to manage seamlessly arrays of <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code> or ranges
-and composite types using it as a subtypes.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object doesn’t instruct Psycopg to convert a PostgreSQL type
+into a Python type: this is the role of a <a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a>. However it
+can extend the behaviour of the adapters: if you create a loader for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code>, using <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> you will be able to manage seamlessly arrays of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code> or ranges and composite types using it as a subtype.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> describes about how to convert from Python
@@ -205,7 +205,7 @@ types to PostgreSQL types and back.</p>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="c1"># parse the data and return a MyType instance</span>
 
-<span class="n">MyTypeLoader</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"mytype"</span><span class="p">,</span> <span class="n">MyTypeLoader</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select mytypearray from mytable"</span><span class="p">):</span>
     <span class="c1"># records will return lists of MyType instances</span>
@@ -228,7 +228,7 @@ types to PostgreSQL types and back.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>conn</strong> (<a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><em>Connection</em></a><em>[</em><em>Any</em><em>]</em>) – the connection to query</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ForwardRef" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForwardRef</span></code></a>]) – the name of the type to query. It can include a schema
+<li><p><strong>name</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <a class="reference internal" href="sql.html#psycopg.sql.Identifier" title="psycopg.sql.Identifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Identifier</span></code></a>) – the name of the type to query. It can include a schema
 name.</p></li>
 </ul>
 </dd>
