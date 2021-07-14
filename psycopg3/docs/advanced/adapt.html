@@ -195,9 +195,9 @@ configuration. Connections obtain an adapters map from the global map
 exposed as <a class="reference internal" href="../api/module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a>: changing the content of this object will
 affect every connection created afterwards.</p>
 <img alt="../_images/adapt.svg" class="align-center" src="../_images/adapt.svg"/></li>
-<li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code> attribute are <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> instances, and contain the
+<li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code> attributes are <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> instances, and contain the
 mapping from Python types and <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> classes, and from
-PostgreSQL oids to <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> classes. Changing this mapping
+PostgreSQL OIDs to <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> classes. Changing this mapping
 (e.g. writing and registering your own adapters, or using a different
 configuration of builtin adapters) affects how types are converted between
 Python and PostgreSQL.</p>
@@ -296,25 +296,29 @@ cursor):</p>
 in the queries to follow, in the context where they have been registered.</p>
 <p>When a query is performed on a <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>, a
 <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Transformer" title="psycopg.adapt.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a> object is created as a local context to manage
-conversions during the query, instantiating the required dumpers and loaders
-and dispatching the values to convert to the right instance.</p>
+adaptation during the query, instantiating the required dumpers and loaders
+and dispatching the values to perform the wanted conversions from Python to
+Postgres and back.</p>
 <ul class="simple">
 <li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> copies the adapters configuration from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>,
 thus inheriting all the changes made to the global <a class="reference internal" href="../api/module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a>
 configuration, the current <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>.</p></li>
 <li><p>For every Python type passed as query argument, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will
 instantiate a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code>. Usually all the objects of the same type will be
-converted by the same dumper instance.</p></li>
-<li><p>According to the placeholder used (<code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%b</span></code>, <code class="docutils literal notranslate"><span class="pre">%t</span></code>), Psycopg may pick
-a binary or a text dumper. When using the <code class="docutils literal notranslate"><span class="pre">%s</span></code> “<a class="reference internal" href="../api/adapt.html#psycopg.adapt.PyFormat.AUTO" title="psycopg.adapt.PyFormat.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>” format,
-if the same type has both a text and a binary dumper registered, the last
-one registered by <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap.register_dumper" title="psycopg.adapt.AdaptersMap.register_dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_dumper()</span></code></a> will be used.</p></li>
-<li><p>Sometimes, just the Python type is not enough to infer the best PostgreSQL
-type to use (for instance the PostgreSQL type of a Python list depends on
-the objects it contains, whether to use an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> or <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>
-depends on the number size…) In these cases the mechanism provided by
-<a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.get_key" title="psycopg.abc.Dumper.get_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key()</span></code></a> and <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.upgrade" title="psycopg.abc.Dumper.upgrade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade()</span></code></a> is
-used to create more specific dumpers.</p></li>
+converted by the same dumper instance.</p>
+<ul>
+<li><p>According to the placeholder used (<code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%b</span></code>, <code class="docutils literal notranslate"><span class="pre">%t</span></code>), Psycopg may
+pick a binary or a text dumper. When using the <code class="docutils literal notranslate"><span class="pre">%s</span></code> “<a class="reference internal" href="../api/adapt.html#psycopg.adapt.PyFormat.AUTO" title="psycopg.adapt.PyFormat.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>”
+format, if the same type has both a text and a binary dumper registered,
+the last one registered by <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap.register_dumper" title="psycopg.adapt.AdaptersMap.register_dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_dumper()</span></code></a> will be used.</p></li>
+<li><p>Sometimes, just looking at the Python type is not enough to decide the
+best PostgreSQL type to use (for instance the PostgreSQL type of a Python
+list depends on the objects it contains, whether to use an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code>
+or <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> depends on the number size…) In these cases the
+mechanism provided by <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.get_key" title="psycopg.abc.Dumper.get_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key()</span></code></a> and
+<a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.upgrade" title="psycopg.abc.Dumper.upgrade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade()</span></code></a> is used to create more specific dumpers.</p></li>
+</ul>
+</li>
 <li><p>The query is executed. Upon successful request, the result is received as a
 <a class="reference internal" href="../api/pq.html#psycopg.pq.PGresult" title="psycopg.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a>.</p></li>
 <li><p>For every OID returned by the query, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will instantiate a
