@@ -198,7 +198,7 @@ types to PostgreSQL types and back.</p>
 <span class="n">t</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"mytype"</span><span class="p">)</span>
 <span class="n">t</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select mytypearray from mytable"</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT mytypearray FROM mytable"</span><span class="p">):</span>
     <span class="c1"># records will return lists of "mytype" as string</span>
 
 <span class="k">class</span> <span class="nc">MyTypeLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
@@ -207,7 +207,7 @@ types to PostgreSQL types and back.</p>
 
 <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"mytype"</span><span class="p">,</span> <span class="n">MyTypeLoader</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select mytypearray from mytable"</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT mytypearray FROM mytable"</span><span class="p">):</span>
     <span class="c1"># records will return lists of MyType instances</span>
 </pre></div>
 </div>
@@ -215,11 +215,6 @@ types to PostgreSQL types and back.</p>
 <dt class="sig sig-object py" id="psycopg.types.TypeInfo">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.</span></span><span class="sig-name descname"><span class="pre">TypeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hold information about a PostgreSQL base type.</p>
-<p>The class allows to:</p>
-<ul class="simple">
-<li><p>read information about a range type using <a class="reference internal" href="#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> and <a class="reference internal" href="#psycopg.types.TypeInfo.fetch_async" title="psycopg.types.TypeInfo.fetch_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch_async()</span></code></a></p></li>
-<li><p>configure a composite type adaptation using <a class="reference internal" href="#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a></p></li>
-</ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.types.TypeInfo.fetch">
 <em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch" title="Permalink to this definition">¶</a></dt>

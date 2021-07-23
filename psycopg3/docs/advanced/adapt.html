@@ -234,12 +234,12 @@ representation of both floats and decimal is the same, the two loaders are
 compatible.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Decimal('123.45')</span>
 
 <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"numeric"</span><span class="p">,</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">numeric</span><span class="o">.</span><span class="n">FloatLoader</span><span class="p">)</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># 123.45</span>
 </pre></div>
 </div>
@@ -285,7 +285,7 @@ cursor):</p>
 
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text"</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># ('2020-12-31', 'infinity')</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2020-12-31'::date, 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2020-12-31'::date, 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># (datetime.date(2020, 12, 31), datetime.date(9999, 12, 31))</span>
 </pre></div>
 </div>

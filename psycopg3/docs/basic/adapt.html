@@ -320,15 +320,15 @@ arrival…) you should convert them to <a class="reference external" href="https
 <li><p>Certain PostgreSQL functions and operators, such a <code class="sql docutils literal notranslate"><span class="pre">date</span> <span class="pre">+</span> <span class="pre">int</span></code>
 expect an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> (aka <code class="sql docutils literal notranslate"><span class="pre">int4</span></code>): passing them a <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>
 may cause an error:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="c1"># UndefinedFunction: operator does not exist: date + bigint</span>
 </pre></div>
 </div>
 <p>In this case you should add an <code class="sql docutils literal notranslate"><span class="pre">::int</span></code> cast to your query or use the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Int4</span></code> wrapper:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select current_date + </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Int4</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Int4</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
 </pre></div>
 </div>
 <div class="admonition-todo admonition">
@@ -362,9 +362,9 @@ This of course may imply a loss of precision.</p>
 such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">"insert into strtest (id, data) values (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+    <span class="s2">"INSERT INTO strtest (id, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
     <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Crème Brûlée at 4.99€"</span><span class="p">))</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select data from strtest where id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="s1">'Crème Brûlée at 4.99€'</span>
 </pre></div>
 </div>
@@ -381,12 +381,12 @@ encoding/decoding errors:</p>
 <span class="c1"># The Latin-9 encoding can manage some European accented letters</span>
 <span class="c1"># and the Euro symbol</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin9'</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select data from strtest where id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="s1">'Crème Brûlée at 4.99€'</span>
 
 <span class="c1"># The Latin-1 encoding doesn't have a representation for the Euro symbol</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin1'</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select data from strtest where id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Traceback (most recent call last)</span>
 <span class="c1"># ...</span>
 <span class="c1"># UntranslatableCharacter: character with byte sequence 0xe2 0x82 0xac</span>
@@ -398,7 +398,7 @@ Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code></a> <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">"ascii"</span></code>) will disable decoding of the data
 coming from the database, which will be returned as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s2">"ascii"</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select data from strtest where id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="sa">b</span><span class="s1">'Cr</span><span class="se">\xc3\xa8</span><span class="s1">me Br</span><span class="se">\xc3\xbb</span><span class="s1">l</span><span class="se">\xc3\xa9</span><span class="s1">e at 4.99</span><span class="se">\xe2\x82\xac</span><span class="s1">'</span>
 </pre></div>
 </div>
@@ -434,7 +434,7 @@ either <a class="reference internal" href="../api/types.html#psycopg.types.json.
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span>
 
 <span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"foo"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"bar"</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"insert into mytable values (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>By default Psycopg uses the standard library <a class="reference external" href="https://docs.python.org/3/library/json.html#json.dumps" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json.dumps</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/json.html#json.loads" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json.loads</span></code></a>
@@ -454,7 +454,7 @@ to a specific context (connection or cursor).</p>
 <span class="c1"># Return floating point values as Decimal, just in one connection</span>
 <span class="n">set_json_loads</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span> <span class="n">parse_float</span><span class="o">=</span><span class="n">Decimal</span><span class="p">),</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">({</span><span class="s2">"value"</span><span class="p">:</span> <span class="mf">123.45</span><span class="p">})])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">({</span><span class="s2">"value"</span><span class="p">:</span> <span class="mf">123.45</span><span class="p">})])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># {'value': Decimal('123.45')}</span>
 </pre></div>
 </div>
@@ -474,7 +474,7 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
 
 <span class="n">uuid_dumps</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">UUIDEncoder</span><span class="p">)</span>
 <span class="n">obj</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"uuid"</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()}</span>
-<span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"insert into objs values </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dumps</span><span class="o">=</span><span class="n">uuid_dumps</span><span class="p">)])</span>
+<span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO objs VALUES </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dumps</span><span class="o">=</span><span class="n">uuid_dumps</span><span class="p">)])</span>
 <span class="c1"># will insert: {'uuid': '0a40799d-3980-4c65-8315-2956b18ab0e1'}</span>
 </pre></div>
 </div>

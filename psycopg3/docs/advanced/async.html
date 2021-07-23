@@ -285,7 +285,7 @@ received immediately, but only during a connection operation, such as a query.</
 <span class="c1"># =# notify mychan, 'hey';</span>
 <span class="c1"># NOTIFY</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
 <span class="c1"># got this: Notify(channel='mychan', payload='hey', pid=961823)</span>
 <span class="c1"># (1,)</span>
 </pre></div>
@@ -319,7 +319,7 @@ something else to do too.</p>
 
     <span class="c1"># Activity detected. Is the connection still ok?</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 1"</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
         <span class="c1"># You were disconnected: do something useful such as panicking</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"we lost our database!"</span><span class="p">)</span>
@@ -342,7 +342,7 @@ something similar using <a class="reference external" href="https://docs.python.
 
     <span class="c1"># Activity detected. Is the connection still ok?</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 1"</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
         <span class="c1"># Guess what happened</span>
         <span class="o">...</span>

@@ -182,14 +182,14 @@ differences to be aware of.</p>
 instead of merging them client-side. PostgreSQL may behave slightly
 differently in this case, usually throwing an error and suggesting to use an
 explicit cast.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '[10,20,30]'::jsonb -&gt; 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># returns (20,)</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># raises an exception:</span>
 <span class="c1"># UndefinedFunction: operator does not exist: jsonb -&gt; numeric</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># returns (20,)</span>
 </pre></div>
 </div>
