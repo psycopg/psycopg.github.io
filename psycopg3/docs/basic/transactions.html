@@ -187,7 +187,7 @@ a <code class="xref py py-obj docutils literal notranslate"><span class="pre">ro
 <em>InFailedSqlTransaction: current transaction is aborted, commands ignored
 until end of transaction block</em>, it means that <strong>a previous operation
 failed</strong> and the database session is in a state of error. You need to call
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> if you want to keep on using the same connection.</p>
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> if you want to keep on using the same connection.</p>
 </div>
 <section id="autocommit-transactions">
 <span id="autocommit"></span><h2>Autocommit transactions<a class="headerlink" href="#autocommit-transactions" title="Permalink to this headline">¶</a></h2>
@@ -282,6 +282,34 @@ but not entirely committed yet.</p>
 </pre></div>
 </div>
 </section>
+<section id="transaction-characteristics">
+<span id="id3"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this headline">¶</a></h2>
+<p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
+handles. They affect the transactions started implicitly by non-autocommit
+transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
+both autocommit and non-autocommit transactions. Leaving these parameters to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> will leave the behaviour to the server’s default (which is controlled
+by server settings such as <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION">default_transaction_isolation</a>).</p>
+<p>In order to set these parameters you can use the connection attributes
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.isolation_level" title="psycopg.Connection.isolation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isolation_level</span></code></a>, <a class="reference internal" href="../api/connections.html#psycopg.Connection.read_only" title="psycopg.Connection.read_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_only</span></code></a>,
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.deferrable" title="psycopg.Connection.deferrable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deferrable</span></code></a>. For async connections you must use the equivalent
+<a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.set_isolation_level" title="psycopg.AsyncConnection.set_isolation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_isolation_level()</span></code></a> method and similar. The parameters
+can only be changed if there isn’t a transaction already active on the
+connection.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Applications running at <a class="reference internal" href="../api/connections.html#psycopg.IsolationLevel.REPEATABLE_READ" title="psycopg.IsolationLevel.REPEATABLE_READ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPEATABLE_READ</span></code></a> or
+<a class="reference internal" href="../api/connections.html#psycopg.IsolationLevel.SERIALIZABLE" title="psycopg.IsolationLevel.SERIALIZABLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SERIALIZABLE</span></code></a> isolation level are exposed to serialization
+failures. <a class="reference external" href="https://www.postgresql.org/docs/current/transaction-iso.html#XACT-REPEATABLE-READ">In certain concurrent update cases</a>, PostgreSQL will raise an
+exception looking like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SerializationFailure</span><span class="p">:</span> <span class="n">could</span> <span class="ow">not</span> <span class="n">serialize</span> <span class="n">access</span>
+<span class="n">due</span> <span class="n">to</span> <span class="n">concurrent</span> <span class="n">update</span>
+</pre></div>
+</div>
+<p>In this case the application must be prepared to repeat the operation that
+caused the exception.</p>
+</div>
+</section>
 </section>
 
       </article>
@@ -336,6 +364,7 @@ but not entirely committed yet.</p>
 <li><a class="reference internal" href="#">Transaction management</a><ul>
 <li><a class="reference internal" href="#autocommit-transactions">Autocommit transactions</a></li>
 <li><a class="reference internal" href="#transaction-blocks">Transaction blocks</a></li>
+<li><a class="reference internal" href="#transaction-characteristics">Transaction characteristics</a></li>
 </ul>
 </li>
 </ul>

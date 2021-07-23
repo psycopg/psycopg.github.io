@@ -58,15 +58,24 @@ The `!Connection` class
 
     .. automethod:: close
 
-        .. note:: You can use :ref:`with connect(): ...<with-connection>` to
-            close the connection automatically when the block is exited.
+        .. note::
+
+            You can use::
+
+                with psycopg.connect() as conn:
+                    ...
+
+            to close the connection automatically when the block is exited.
+            See :ref:`with-connection`.
 
     .. autoattribute:: closed
     .. autoattribute:: broken
 
-
-    .. method:: cursor(*, binary: bool = False, row_factory: Optional[RowFactory] = None) -> Cursor
-    .. method:: cursor(name: str, *, binary: bool = False, row_factory: Optional[RowFactory] = None) -> ServerCursor
+    .. method:: cursor(*, binary: bool = False, \
+           row_factory: Optional[RowFactory] = None) -> Cursor
+    .. method:: cursor(name: str, *, binary: bool = False, \
+            row_factory: Optional[RowFactory] = None, \
+            scrollable: Optional[bool] = None, withhold: bool = False) -> ServerCursor
         :noindex:
 
         Return a new cursor to send commands and queries to the connection.
@@ -79,9 +88,34 @@ The `!Connection` class
                        loader. See :ref:`binary-data` for details.
         :param row_factory: If specified override the `row_factory` set on the
                             connection. See :ref:`row-factories` for details.
+        :param scrollable: Specify the `~ServerCursor.scrollable` property of
+                           the server-side cursor created.
+        :param withhold: Specify the `~ServerCursor.withhold` property of
+                         the server-side cursor created.
+        :return: A cursor of the class specified by `cursor_factory` (or
+                 `server_cursor_factory` if *name* is specified).
 
-        .. note:: You can use :ref:`with conn.cursor(): ...<usage>`
+        .. note::
+
+            You can use::
+
+                with conn.cursor() as cur:
+                    ...
+
             to close the cursor automatically when the block is exited.
+
+    .. autoattribute:: cursor_factory
+
+        The type, of factory function, returned by `cursor()` and `execute()`.
+
+        Default is `psycopg.Cursor`.
+
+    .. autoattribute:: server_cursor_factory
+
+        The type, of factory function, returned by `cursor()` when a name is
+        specified.
+
+        Default is `psycopg.ServerCursor`.
 
     .. automethod:: execute(query, params=None, prepare=None) -> Cursor
 
@@ -112,7 +146,18 @@ The `!Connection` class
     .. automethod:: rollback
     .. automethod:: transaction
 
-        .. note:: It must be called as ``with conn.transaction() as tx: ...``
+        .. note::
+
+            The method must be called with a syntax such as::
+
+                with conn.transaction():
+                    ...
+
+                with conn.transaction() as tx:
+                    ...
+
+            The latter is useful if you need to interact with the
+            `Transaction` object. See :ref:`transaction-block` for details.
 
         Inside a transaction block it will not be possible to call `commit()`
         or `rollback()`.
@@ -120,8 +165,36 @@ The `!Connection` class
     .. autoattribute:: autocommit
 
         The property is writable for sync connections, read-only for async
-        ones: you should call ``await`` `~AsyncConnection.set_autocommit`\
+        ones: you should call ``await`` `~AsyncConnection.set_autocommit`
         :samp:`({value})` instead.
+
+    The following three properties control the characteristics of new
+    transactions. See :ref:`transaction-characteristics` for detils.
+
+    .. autoattribute:: isolation_level
+
+        `!None` means use the default set in the default_transaction_isolation__
+        configuration parameter of the server.
+
+        .. __: https://www.postgresql.org/docs/current/runtime-config-client.html
+               #GUC-DEFAULT-TRANSACTION-ISOLATION
+
+    .. autoattribute:: read_only
+
+        `!None` means use the default set in the default_transaction_read_only__
+        configuration parameter of the server.
+
+        .. __: https://www.postgresql.org/docs/current/runtime-config-client.html
+               #GUC-DEFAULT-TRANSACTION-READ-ONLY
+
+    .. autoattribute:: deferrable
+
+        `!None` means use the default set in the default_transaction_deferrable__
+        configuration parameter of the server.
+
+        .. __: https://www.postgresql.org/docs/current/runtime-config-client.html
+               #GUC-DEFAULT-TRANSACTION-DEFERRABLE
+
 
     .. rubric:: Checking and configuring the connection state
 
@@ -218,12 +291,29 @@ The `!AsyncConnection` class
             automatically when the block is exited, but be careful about
             the async quirkness: see :ref:`async-with` for details.
 
-    .. method:: cursor(*, binary: bool = False, row_factory: Optional[RowFactory] = None) -> AsyncCursor
-    .. method:: cursor(name: str, *, binary: bool = False, row_factory: Optional[RowFactory] = None) -> AsyncServerCursor
+    .. method:: cursor(*, binary: bool = False, \
+            row_factory: Optional[RowFactory] = None) -> AsyncCursor
+    .. method:: cursor(name: str, *, binary: bool = False, \
+            row_factory: Optional[RowFactory] = None, \
+            scrollable: Optional[bool] = None, withhold: bool = False) -> AsyncServerCursor
         :noindex:
 
-        .. note:: You can use ``async with conn.cursor() as cur: ...`` to
-            close the cursor automatically when the block is exited.
+        .. note::
+
+            You can use::
+
+                async with conn.cursor() as cur:
+                    ...
+
+            to close the cursor automatically when the block is exited.
+
+    .. autoattribute:: cursor_factory
+
+        Default is `psycopg.AsyncCursor`.
+
+    .. autoattribute:: server_cursor_factory
+
+        Default is `psycopg.AsyncServerCursor`.
 
     .. automethod:: execute(query, params=None, prepare=None) -> AsyncCursor
     .. automethod:: commit
@@ -231,11 +321,19 @@ The `!AsyncConnection` class
 
     .. automethod:: transaction
 
-        .. note:: It must be called as ``async with conn.transaction() as tx: ...``.
+        .. note::
+
+            It must be called as::
+
+                async with conn.transaction() as tx:
+                    ...
 
     .. automethod:: notifies
     .. automethod:: set_client_encoding
     .. automethod:: set_autocommit
+    .. automethod:: set_isolation_level
+    .. automethod:: set_read_only
+    .. automethod:: set_deferrable
 
 
 Connection support objects
@@ -302,6 +400,16 @@ Connection support objects
 
 
 .. rubric:: Objects involved in :ref:`transactions`
+
+.. autoclass:: IsolationLevel
+    :members:
+
+    The value is usually used with the `Connection.isolation_level` property.
+
+    Check the PostgreSQL documentation for a description of the effects of the
+    different `levels of transaction isolation`__.
+
+    .. __: https://www.postgresql.org/docs/current/transaction-iso.html
 
 .. autoclass:: Transaction()
 
