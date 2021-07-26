@@ -189,8 +189,7 @@ derive from the following classes:</p>
         |__ <a class="reference internal" href="#psycopg.InternalError" title="psycopg.InternalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></a>
         |__ <a class="reference internal" href="#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a>
         |__ <a class="reference internal" href="#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a></pre>
-<p>These classes are exposed both by the Psycopg and the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.errors</span></code>
-module.</p>
+<p>These classes are exposed both by this module and the root <a class="reference internal" href="module.html#module-psycopg" title="psycopg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code></a> module.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="psycopg.Error">
 <em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Error" title="Permalink to this definition">¶</a></dt>
@@ -202,6 +201,13 @@ use this to catch all errors with one single <code class="xref py py-obj docutil
 <dt class="sig sig-object py" id="psycopg.Error.diag">
 <span class="sig-name descname"><span class="pre">diag</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#psycopg.errors.Diagnostic" title="psycopg.errors.Diagnostic"><span class="pre">errors.Diagnostic</span></a></em><a class="headerlink" href="#psycopg.Error.diag" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">Diagnostic</span></code> object to inspect details of the errors from the database.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Error.sqlstate">
+<span class="sig-name descname"><span class="pre">sqlstate</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#psycopg.Error.sqlstate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The code of the error, if defined.</p>
+<p>This is a class attribute defined for all the
+<a class="reference internal" href="#sqlstate-exceptions"><span class="std std-ref">SQLSTATE exceptions</span></a> classed, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for the base classes.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py exception">
@@ -262,7 +268,7 @@ statement, wrong number of parameters specified, etc.</p>
 </dd></dl>
 </section>
 <section id="error-diagnostics">
-<span id="sqlstate-exceptions"></span><span id="index-2"></span><h2>Error diagnostics<a class="headerlink" href="#error-diagnostics" title="Permalink to this headline">¶</a></h2>
+<span id="index-2"></span><h2>Error diagnostics<a class="headerlink" href="#error-diagnostics" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.errors.Diagnostic">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.errors.</span></span><span class="sig-name descname"><span class="pre">Diagnostic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.errors.Diagnostic" title="Permalink to this definition">¶</a></dt>
@@ -319,8 +325,8 @@ server versions.</p>
 </dd></dl>
 </dd></dl>
 </section>
-<section id="id1">
-<h2>SQLSTATE exceptions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<section id="sqlstate-exceptions">
+<span id="id1"></span><h2>SQLSTATE exceptions<a class="headerlink" href="#sqlstate-exceptions" title="Permalink to this headline">¶</a></h2>
 <p>Errors coming from a database server (as opposite as ones generated
 client-side, such as connection failed) usually have a 5-letters error code
 called SQLSTATE (available in the <a class="reference internal" href="#psycopg.errors.Diagnostic.sqlstate" title="psycopg.errors.Diagnostic.sqlstate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlstate</span></code></a> attribute of the
@@ -346,16 +352,19 @@ exception</span></a> and expose the <code class="xref py py-obj docutils literal
 <dl class="py function">
 <dt class="sig sig-object py" id="psycopg.errors.lookup">
 <span class="sig-prename descclassname"><span class="pre">psycopg.errors.</span></span><span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sqlstate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.errors.lookup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lookup an error code and return its exception class.</p>
+<dd><p>Lookup an error code or <a class="reference external" href="https://www.postgresql.org/docs/current/errcodes-appendix.html#ERRCODES-TABLE">constant name</a> and return its exception class.</p>
 <p>Raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeyError</span></code> if the code is not found.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="#psycopg.Error" title="psycopg.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">Error</span></code></a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
+<p>Example: if you have code using constant names or sql codes you can use
+them to look up the exception class.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LOCK TABLE mytable IN ACCESS EXCLUSIVE MODE NOWAIT"</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"UNDEFINED_TABLE"</span><span class="p">):</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"55P03"</span><span class="p">):</span>
     <span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
@@ -1510,7 +1519,7 @@ exception</span></a> and expose the <code class="xref py py-obj docutils literal
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a><ul>
 <li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a></li>
 <li><a class="reference internal" href="#error-diagnostics">Error diagnostics</a></li>
-<li><a class="reference internal" href="#id1">SQLSTATE exceptions</a></li>
+<li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a></li>
 </ul>
 </li>
 </ul>
