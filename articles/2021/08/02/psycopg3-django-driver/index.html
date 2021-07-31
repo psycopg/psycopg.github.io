@@ -241,6 +241,72 @@ parameters:</p>
 that works for both versions: it's just the <tt class="docutils literal">import</tt> statement that needs
 to be changed.</p>
 </div>
+<div class="section" id="group-by-order-by-with-parameters">
+<h2>GROUP BY/ORDER BY with parameters</h2>
+<p>Another unexpected problem manifested with tests failing with a message like
+&quot;column <em>name</em> must appear in the GROUP BY clause or be used in an aggregate
+function&quot;. This type of error appeared in tests leveraging <a class="reference external" href="https://docs.djangoproject.com/en/3.2/topics/db/aggregation/#topics-db-aggregation">Django ORM
+aggregation features</a>, when the aggregation keys contain parameters.</p>
+<p>For example, if you want to count your people by grouping them by the first
+two letters of their name, you may use a query such as:</p>
+<pre class="literal-block">
+SELECT left(name, 2) AS prefix, count(*) AS number
+FROM people
+GROUP BY left(name, 2)
+ORDER BY left(name, 2)
+</pre>
+<p>If the &quot;2&quot; is actually a parameter, Django ends up composing and executing a
+query like:</p>
+<pre class="code python literal-block">
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;
+    SELECT left(name, </span><span class="si">%s</span><span class="s2">) AS prefix, count(*) AS number
+    FROM people
+    GROUP BY left(name, </span><span class="si">%s</span><span class="s2">)
+    ORDER BY left(name, </span><span class="si">%s</span><span class="s2">)
+    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre>
+<p>If composed by the client, this query presents no problem, because the server
+query parser can clearly see the same expression in the output column and in
+the group/order predicates. However, moving to use server-side parameters, the
+query would be transformed to:</p>
+<pre class="literal-block">
+SELECT left(name, $1) AS prefix, count(*) AS number
+FROM people
+GROUP BY left(name, $2)
+ORDER BY left(name, $3)
+</pre>
+<p>This query could be executed only if the three parameters are the same, but at
+parsing time the server cannot make sure this will be the case, failing with
+the error above.</p>
+<p>If this query was under someone's control, it could be easily rewritten using
+named parameters instead of positional ones. I would personally write:</p>
+<pre class="code python literal-block">
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;
+    SELECT left(name, </span><span class="si">%(len)s</span><span class="s2">) AS prefix, count(*) AS number
+    FROM people
+    GROUP BY left(name, </span><span class="si">%(len)s</span><span class="s2">)
+    ORDER BY left(name, </span><span class="si">%(len)s</span><span class="s2">)
+    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+</pre>
+<p>which is transformed in a query with a single <tt class="docutils literal">$1</tt> placeholder used three
+times, and parsed successfully. Unfortunately Django only uses positional
+placeholders throughout its entire codebase and switching to a parameters
+mapping would be a very invasive change. A more localised change is to use
+column aliases: the same query can be rewritten as:</p>
+<pre class="literal-block">
+SELECT left(name, %s) AS prefix, count(*) AS number
+FROM people
+GROUP BY 1
+ORDER BY 1
+</pre>
+<p>where &quot;1&quot; refers to the first output column. It is not a particularly loved
+syntax but it turns out useful here.</p>
+<p>Probably not every database supports this syntax, so, in the <a class="reference external" href="https://github.com/dvarrazzo/django/commit/597b2fcd9b3154bcdcb6946c73d38e62b5ca48e7">proposed Django
+changeset</a>, new feature parameters can be used to signal that the feature is
+accepted by specific databases, and currently enabled only for PostgreSQL.</p>
+</div>
 <div class="section" id="a-different-package-organisation">
 <h2>A different package organisation</h2>
 <p>This is less mysterious to understand. The <tt class="docutils literal">psycopg2</tt> package has a bit of a
