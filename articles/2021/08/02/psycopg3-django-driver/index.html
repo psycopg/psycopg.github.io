@@ -103,13 +103,13 @@ pass the entire Django test suite!</p>
 <p>The implementation of the Django backend actually started several months ago,
 but it can be seen, from the test progression above, that its development had
 been suspended for several months. The problem, in the first attempts, was
-that too much of the Django code was in the need for being adapted: this was a
-sign telling that the changes needed to use the new adapter were too invasive
-and that the same type of difficulties would have been met by everyone trying
-to replace Psycopg 2 for Psycopg 3. Back to the design board then, but
-hopefully the resulting adapter will behave without surprise and will not
-force to change every query in your program (which would have been a deal
-breaker in most of the non-trivial projects).</p>
+that too much of the Django code was in need of being adapted: this was a sign
+that the changes needed to use the new adapter were too invasive and that the
+same type of difficulties would have been met by everyone trying to replace
+Psycopg 2 with Psycopg 3. Back to the design board then, but hopefully the
+resulting adapter will behave mostly as you might expect and will not force
+users to change every query in their program (which would have been a deal
+breaker for most non-trivial projects).</p>
 <p>The backend cannot be used with the current Django version: <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support">a few
 modifications</a> to the Django codebase are needed in order to use it. These
 changes will be proposed to the Django project: if the Django maintainer
@@ -117,18 +117,18 @@ will accept them, the driver should be usable starting from one of the next
 Django releases.</p>
 <p>The aim of this article is to take a look at some of these modifications, to
 understand where the behaviour of Psycopg 3 diverges from its well known
-predecessor, and how to work around the differences.</p>
+predecessor and how to work around the differences.</p>
 <div class="section" id="server-side-parameters-binding">
 <h2>Server-side parameters binding</h2>
-<p>Many of the changes are the consequence of using server-side binding for the
+<p>Many of these changes are the consequence of using server-side binding for the
 query parameters (using the libpq <a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS">PQexecParams()</a> function), instead of
 merging the arguments to the query on the client-side and using the simpler
 <a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXEC">PQexec()</a> function.</p>
 <p>In the <tt class="docutils literal">PQexec()</tt> case, the Postgres query parser has access to the literal
-values in the context where they are used, and it looks like it is able to use
-this information in ways we don't appreciate... until we lose them. Do you
+values in the context where they are used and it looks like it is able to use
+this information in ways we don't appreciate...until we lose them. Do you
 think that <tt class="docutils literal">text</tt> is the best PostgreSQL data type to convert Python strings
-to? I wish it was so simple. An experiment using the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html">psycopg.pq</a> objects,
+to? I wish it was so simple. Below is an experiment with the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html">psycopg.pq</a> objects,
 the low level libpq wrapper that Psycopg 3 exposes:</p>
 <pre class="code pycon literal-block">
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.postgres</span> <span class="kn">import</span> <span class="n">types</span>
@@ -149,12 +149,12 @@ the low level libpq wrapper that Psycopg 3 exposes:</p>
 # HINT:  You will need to rewrite or cast the expression.</span>
 </pre>
 <p>Specifying the <tt class="docutils literal">text</tt> Postgres type is an exessivelly strict type
-indication: in most cases Postgres will not be able to convert automatically
+indication: in most cases, Postgres will not be able to automatically convert
 the value to the required type.</p>
 <p>When we use a literal <tt class="docutils literal"><span class="pre">'{}'</span></tt> in the query, we are specifying an <em>untyped
 literal</em>. <a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS">Postgres docs</a> say that we can do the same using 0 as type OID for
-the parameter (see the <tt class="docutils literal">paramTypes[]</tt> description). But it turns out not to
-be always the case. For instance:</p>
+the parameter (see the <tt class="docutils literal">paramTypes[]</tt> description). But it seems this isn't
+always the case. For instance:</p>
 <pre class="code pycon literal-block">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execue</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
 <span class="go"># ...becomes...
@@ -168,16 +168,16 @@ be always the case. For instance:</p>
 </pre>
 <p>This problem doesn't happen with every function: it seems to be only a problem
 with &quot;variadic&quot; functions, such as <tt class="docutils literal">concat()</tt> or <tt class="docutils literal">json_build_object()</tt>. As
-sporadic as it is, it doesn't seem like there is an universally correct way of
+sporadic as it is, it doesn't seem like there is a universally correct way of
 mapping Python types to PostgreSQL type OIDs: we can try to get it right <em>most
-of the cases</em> (so, by default, Psycopg 3 dumps Python strings using the OID 0)
-but places where this isn't right do exist... And they exist in Django, of
+of the time</em> (so, by default, Psycopg 3 dumps Python strings using the OID 0),
+but places where this isn't right do exist...and they exist in Django, of
 course.</p>
 <p>There are two different ways to work around the problem, both have their
 merit and one might be easier to use than the other in different contexts.</p>
 <ul>
 <li><p class="first">Add a cast to the placeholder: specifying <tt class="docutils literal"><span class="pre">%s::text</span></tt> (or other types) in
-your query it is possible to disambiguate the type where &quot;unknown&quot; doesn't
+your query, it is possible to disambiguate the type where &quot;unknown&quot; doesn't
 work:</p>
 <pre class="code pycon literal-block">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execue</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
@@ -211,8 +211,8 @@ handle it using a different dumper.</p>
 case</a>.</p>
 </li>
 </ul>
-<p>Note that both the solutions make the queries compatible both with Psycopg 2
-and 3: the <tt class="docutils literal"><span class="pre">%s::text</span></tt> casts are no problem in <tt class="docutils literal">psycopg2</tt> queries, and
+<p>Note that both the solutions make the queries compatible with Psycopg 2
+and 3: the <tt class="docutils literal"><span class="pre">%s::text</span></tt> casts are no problem in <tt class="docutils literal">psycopg2</tt> queries and
 <tt class="docutils literal">psycopg2</tt> is smart enough to notice that <tt class="docutils literal">Text</tt> is a <tt class="docutils literal">str</tt> subclass and
 to apply the same conversion rules used for the vanilla strings.</p>
 </div>
@@ -237,8 +237,8 @@ parameters:</p>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
 <span class="gp">... </span><span class="p">)</span>
 </pre>
-<p>A similar module is <a class="reference external" href="https://www.psycopg.org/docs/sql.html">available in psycopg2 too</a>, so it is easy to write code
-working for both the version: pretty much only the <tt class="docutils literal">import</tt> statement needs
+<p>A similar module is <a class="reference external" href="https://www.psycopg.org/docs/sql.html">available in psycopg2 too</a> so it is easy to write code
+that works for both versions: it's just the <tt class="docutils literal">import</tt> statement that needs
 to be changed.</p>
 </div>
 <div class="section" id="a-different-package-organisation">
@@ -246,7 +246,7 @@ to be changed.</p>
 <p>This is less mysterious to understand. The <tt class="docutils literal">psycopg2</tt> package has a bit of a
 chaotic organisation, with a couple of kitchen-sink modules (<tt class="docutils literal">extensions</tt>
 and <tt class="docutils literal">extras</tt>) containing a bit of everything: cursor subclasses, extra data
-types, utility functions, symbolic constants... Starting from Psycopg 3 the
+types, utility functions, symbolic constants...starting from Psycopg 3, the
 package is organised in a more rational way and <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/">separated in different
 modules and sub-packages</a>.</p>
 <p>The bulk of the changes required to use Psycopg 3 from Django is just not to
@@ -268,14 +268,14 @@ adoption for users who have experience, and codebases, in <tt class="docutils li
 experience of the Django backend porting shows that most of the adjustments
 required fall in these categories:</p>
 <ul class="simple">
-<li>different package organisation;</li>
-<li>over/under-specified types, which can be tweaked via casts and data
-wrappers;</li>
-<li>inability to use server-side parameters, which can be worked around with
-client-side query composition.</li>
+<li>Different package organisation</li>
+<li>Over/under-specified types, which can be tweaked via casts and data
+wrappers</li>
+<li>Inability to use server-side parameters, which can be worked around with
+client-side query composition</li>
 </ul>
 <p>Hopefully now you know how to address these problems in case you are thinking
-to use Psycopg 3 in your next or current project!</p>
+of using Psycopg 3 in your next or current project!</p>
 </div>
 
   
