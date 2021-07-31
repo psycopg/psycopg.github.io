@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=09ddafbb">
+    <title>Building a Django driver for Psycopg 3 — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sponsors/">Sponsors</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h1>Building a Django driver for Psycopg 3</h1>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2021-08-02
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/psycopg3/"
+          >psycopg3</a>,
+      <a class="tag" href="/articles/tag/development/"
+          >development</a>,
+      <a class="tag" href="/articles/tag/recipe/"
+          >recipe</a>
+      
+    
+  </p>
+  
+    <p>One of the goals of the <a class="reference external" href="https://www.psycopg.org/psycopg3/">Psycopg 3 project</a> is to make easy to port code
+developed from Psycopg 2. For this reason the creation of a Django backend
+(the module you specify in the settings as your <a class="reference external" href="https://docs.djangoproject.com/en/3.2/ref/settings/#databases">database ENGINE</a>) was
+a project with a double goal:</p>
+<ul class="simple">
+<li>A Django driver is a way to make Psycopg 3 useful from the start, with the
+possibility of dropping it in a project transparently and have available,
+when needed the new features offered (for instance the superior <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/copy.html">COPY
+support</a>).</li>
+<li>The difficulty of introducing Psycopg 3 in the Django codebase and the type
+of changes required are indicative of the type of problems that could be
+found porting other projects.</li>
+</ul>
+<p>...and it's done! A few days ago, the new <a class="reference external" href="https://github.com/dvarrazzo/django-psycopg3-backend">Psycopg 3 Django backend</a> could
+pass the entire Django test suite!</p>
+<!-- CUT-HERE -->
+<div class="figure">
+<img alt="test-logs.png" src="test-logs.png" style="width: 700px;" />
+</div>
+<p>The implementation of the Django backend actually started several months ago,
+but it can be seen, from the test progression above, that its development had
+been suspended for several months. The problem, in the first attempts, was
+that too much of the Django code was in the need for being adapted: this was a
+sign telling that the changes needed to use the new adapter were too invasive
+and that the same type of difficulties would have been met by everyone trying
+to replace Psycopg 2 for Psycopg 3. Back to the design board then, but
+hopefully the resulting adapter will behave without surprise and will not
+force to change every query in your program (which would have been a deal
+breaker in most of the non-trivial projects).</p>
+<p>The backend cannot be used with the current Django version: <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support">a few
+modifications</a> to the Django codebase are needed in order to use it. These
+changes will be proposed to the Django project: if the Django maintainer
+will accept them, the driver should be usable starting from one of the next
+Django releases.</p>
+<p>The aim of this article is to take a look at some of these modifications, to
+understand where the behaviour of Psycopg 3 diverges from its well known
+predecessor, and how to work around the differences.</p>
+<div class="section" id="server-side-parameters-binding">
+<h2>Server-side parameters binding</h2>
+<p>Many of the changes are the consequence of using server-side binding for the
+query parameters (using the libpq <a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS">PQexecParams()</a> function), instead of
+merging the arguments to the query on the client-side and using the simpler
+<a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXEC">PQexec()</a> function.</p>
+<p>In the <tt class="docutils literal">PQexec()</tt> case, the Postgres query parser has access to the literal
+values in the context where they are used, and it looks like it is able to use
+this information in ways we don't appreciate... until we lose them. Do you
+think that <tt class="docutils literal">text</tt> is the best PostgreSQL data type to convert Python strings
+to? I wish it was so simple. An experiment using the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html">psycopg.pq</a> objects,
+the low level libpq wrapper that Psycopg 3 exposes:</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.postgres</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table testjson (id serial primary key, data jsonb)&quot;</span><span class="p">)</span>
+<span class="go"># &lt;psycopg.Cursor [COMMAND_OK] [INTRANS] (database=piro) at 0x7f92d43d7b80&gt;
+
+# Note: $1, $2... are the low level Postgres placeholders.
+# In a normal Psycopg query you would use classic '%s'.
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;insert into testjson (data) values ($1)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span>
+<span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92cec70a90&gt;
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
+<span class="go"># ERROR:  column &quot;data&quot; is of type jsonb but expression is of type text
+# LINE 1: insert into testjson (data) values ($1)
+#                                             ^
+# HINT:  You will need to rewrite or cast the expression.</span>
+</pre>
+<p>Specifying the <tt class="docutils literal">text</tt> Postgres type is an exessivelly strict type
+indication: in most cases Postgres will not be able to convert automatically
+the value to the required type.</p>
+<p>When we use a literal <tt class="docutils literal"><span class="pre">'{}'</span></tt> in the query, we are specifying an <em>untyped
+literal</em>. <a class="reference external" href="https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS">Postgres docs</a> say that we can do the same using 0 as type OID for
+the parameter (see the <tt class="docutils literal">paramTypes[]</tt> description). But it turns out not to
+be always the case. For instance:</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execue</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+<span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92d43db4d0&gt;
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
+<span class="go"># ERROR:  could not determine data type of parameter $1</span>
+</pre>
+<p>This problem doesn't happen with every function: it seems to be only a problem
+with &quot;variadic&quot; functions, such as <tt class="docutils literal">concat()</tt> or <tt class="docutils literal">json_build_object()</tt>. As
+sporadic as it is, it doesn't seem like there is an universally correct way of
+mapping Python types to PostgreSQL type OIDs: we can try to get it right <em>most
+of the cases</em> (so, by default, Psycopg 3 dumps Python strings using the OID 0)
+but places where this isn't right do exist... And they exist in Django, of
+course.</p>
+<p>There are two different ways to work around the problem, both have their
+merit and one might be easier to use than the other in different contexts.</p>
+<ul>
+<li><p class="first">Add a cast to the placeholder: specifying <tt class="docutils literal"><span class="pre">%s::text</span></tt> (or other types) in
+your query it is possible to disambiguate the type where &quot;unknown&quot; doesn't
+work:</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execue</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+<span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1::text, $2::text)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfb630&gt;
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go"># b'foobar'</span>
+</pre>
+<p>One place in Django where this was needed is <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-b6a6632418c964155865691be58c9f76717ef512ced704d461f41cc3612a1db3">in array comparisons</a>,
+because they follow stricter rules than the base type comparisons and may
+require an explicit cast to work.</p>
+</li>
+<li><p class="first">The other option is to use a different type than the Python <tt class="docutils literal">str</tt> and
+handle it using a different dumper.</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execue</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)])</span>
+<span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span>
+<span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfbbd0&gt;
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go"># b'foobar'</span>
+</pre>
+<p>This is <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-76917634c6c088f56f8dec9493294c657953e61b01e38e33b02d876d5e96dd3a">proposed in Django</a> and used, for instance, <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-444d9c5689a90ceeb46dc42d947ff042d67d5fa229e633734afbe1235604ec28">in the concat()
+case</a>.</p>
+</li>
+</ul>
+<p>Note that both the solutions make the queries compatible both with Psycopg 2
+and 3: the <tt class="docutils literal"><span class="pre">%s::text</span></tt> casts are no problem in <tt class="docutils literal">psycopg2</tt> queries, and
+<tt class="docutils literal">psycopg2</tt> is smart enough to notice that <tt class="docutils literal">Text</tt> is a <tt class="docutils literal">str</tt> subclass and
+to apply the same conversion rules used for the vanilla strings.</p>
+</div>
+<div class="section" id="server-side-binding-doesn-t-work-for-all-the-queries">
+<h2>Server-side binding doesn't work for all the queries</h2>
+<p>Argument binding on the server only works for queries that select and modify
+data, but it doesn't work in the Data Definition Language. For example:</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
+<span class="go"># Traceback (most recent call last):
+#     ...
+# psycopg.errors.UndefinedParameter: there is no parameter $1
+# LINE 1: create table test (id int default $1)
+#                                           ^</span>
+</pre>
+<p>The solution for this type of problem is to use the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html">psycopg.sql</a> module to
+explicitly generate a query client-side and send it to the server without
+parameters:</p>
+<pre class="code pycon literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre>
+<p>A similar module is <a class="reference external" href="https://www.psycopg.org/docs/sql.html">available in psycopg2 too</a>, so it is easy to write code
+working for both the version: pretty much only the <tt class="docutils literal">import</tt> statement needs
+to be changed.</p>
+</div>
+<div class="section" id="a-different-package-organisation">
+<h2>A different package organisation</h2>
+<p>This is less mysterious to understand. The <tt class="docutils literal">psycopg2</tt> package has a bit of a
+chaotic organisation, with a couple of kitchen-sink modules (<tt class="docutils literal">extensions</tt>
+and <tt class="docutils literal">extras</tt>) containing a bit of everything: cursor subclasses, extra data
+types, utility functions, symbolic constants... Starting from Psycopg 3 the
+package is organised in a more rational way and <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/">separated in different
+modules and sub-packages</a>.</p>
+<p>So, the bulk of the changes required to use Psycopg 3 is just not to assume
+that talking to PostgreSQL will be done using <tt class="docutils literal">psycopg2</tt>, but to use objects
+according to the driver in use.</p>
+</div>
+<div class="section" id="takeaway-points">
+<h2>Takeaway points</h2>
+<p>In the design of Psycopg 3, a great effort has been made to allow a smooth
+adoption for users having both experience and codebases in <tt class="docutils literal">psycopg2</tt>. The
+experience of the Django backend porting shows that most of the adjustments
+required fall in these categories:</p>
+<ul class="simple">
+<li>different package organisation;</li>
+<li>over/under-specified types, which can be tweaked via casts and data
+wrappers;</li>
+<li>inability to use server-side parameters, which can be worked around with
+client-side query composition.</li>
+</ul>
+<p>Hopefully now you know how to address these problems in case you are thinking
+to use Psycopg 3 in your next or current project!</p>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>psycopg2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+    <li>
+      <a href="https://pypi.org/project/psycopg2/">
+        <i class="fa-li fa-lg fa fa-cloud-download" aria-hidden="true"></i>
+        Download</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>psycopg3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2021/">2021</a></li>
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2021 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
