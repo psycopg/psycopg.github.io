@@ -2,13 +2,285 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title type="text">Articles</title>
   <id>urn:uuid:2c1dc889-18e5-364f-aebe-4eb10b25c80c</id>
-  <updated>2021-06-16T00:00:00Z</updated>
+  <updated>2021-08-02T00:00:00Z</updated>
   <link href="https://www.psycopg.org/articles/" />
   <link href="https://www.psycopg.org/articles.xml" rel="self" />
   <author>
     <name></name>
   </author>
   <generator uri="https://github.com/t73fde/lektor-feed" version="20191006.1">Lektor Feed Plugin</generator>
+  <entry xml:base="https://www.psycopg.org/articles/2021/08/02/psycopg3-django-driver/">
+    <title type="text">Building a Django driver for Psycopg 3</title>
+    <id>urn:uuid:415d9dfd-ed5e-3485-b48f-15ccd11bee38</id>
+    <updated>2021-08-02T00:00:00Z</updated>
+    <link href="https://www.psycopg.org/articles/2021/08/02/psycopg3-django-driver/" />
+    <author>
+      <name>Daniele Varrazzo</name>
+    </author>
+    <content type="html">&lt;p&gt;One of the goals of the &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/&quot;&gt;Psycopg 3 project&lt;/a&gt; is to make easy to port code
+developed from Psycopg 2. For this reason the creation of a Django backend
+(the module you specify in the settings as your &lt;a class=&quot;reference external&quot; href=&quot;https://docs.djangoproject.com/en/3.2/ref/settings/#databases&quot;&gt;database ENGINE&lt;/a&gt;) was
+a project with a double goal:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;A Django driver is a way to make Psycopg 3 useful from the start, with the
+possibility of dropping it in a project transparently and have available,
+when needed the new features offered (for instance the superior &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/basic/copy.html&quot;&gt;COPY
+support&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;The difficulty of introducing Psycopg 3 in the Django codebase and the type
+of changes required are indicative of the type of problems that could be
+found porting other projects.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;...and it's done! A few days ago, the new &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/dvarrazzo/django-psycopg3-backend&quot;&gt;Psycopg 3 Django backend&lt;/a&gt; could
+pass the entire Django test suite!&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class=&quot;figure&quot;&gt;
+&lt;img alt=&quot;test-logs.png&quot; src=&quot;test-logs.png&quot; style=&quot;width: 700px;&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;The implementation of the Django backend actually started several months ago,
+but it can be seen, from the test progression above, that its development had
+been suspended for several months. The problem, in the first attempts, was
+that too much of the Django code was in need of being adapted: this was a sign
+that the changes needed to use the new adapter were too invasive and that the
+same type of difficulties would have been met by everyone trying to replace
+Psycopg 2 with Psycopg 3. Back to the design board then, but hopefully the
+resulting adapter will behave mostly as you might expect and will not force
+users to change every query in their program (which would have been a deal
+breaker for most non-trivial projects).&lt;/p&gt;
+&lt;p&gt;The backend cannot be used with the current Django version: &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support&quot;&gt;a few
+modifications&lt;/a&gt; to the Django codebase are needed in order to use it. These
+changes will be proposed to the Django project: if the Django maintainer
+will accept them, the driver should be usable starting from one of the next
+Django releases.&lt;/p&gt;
+&lt;p&gt;The aim of this article is to take a look at some of these modifications, to
+understand where the behaviour of Psycopg 3 diverges from its well known
+predecessor and how to work around the differences.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;server-side-parameters-binding&quot;&gt;
+&lt;h2&gt;Server-side parameters binding&lt;/h2&gt;
+&lt;p&gt;Many of these changes are the consequence of using server-side binding for the
+query parameters (using the libpq &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS&quot;&gt;PQexecParams()&lt;/a&gt; function), instead of
+merging the arguments to the query on the client-side and using the simpler
+&lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXEC&quot;&gt;PQexec()&lt;/a&gt; function.&lt;/p&gt;
+&lt;p&gt;In the &lt;tt class=&quot;docutils literal&quot;&gt;PQexec()&lt;/tt&gt; case, the Postgres query parser has access to the literal
+values in the context where they are used and it looks like it is able to use
+this information in ways we don't appreciate...until we lose them. Do you
+think that &lt;tt class=&quot;docutils literal&quot;&gt;text&lt;/tt&gt; is the best PostgreSQL data type to convert Python strings
+to? I wish it was so simple. Below is an experiment with the &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/api/pq.html&quot;&gt;psycopg.pq&lt;/a&gt; objects,
+the low level libpq wrapper that Psycopg 3 exposes:&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;psycopg.postgres&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;types&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;create table testjson (id serial primary key, data jsonb)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# &amp;lt;psycopg.Cursor [COMMAND_OK] [INTRANS] (database=piro) at 0x7f92d43d7b80&amp;gt;
+
+# Note: $1, $2... are the low level Postgres placeholders.
+# In a normal Psycopg query you would use classic '%s'.
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exec_params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;insert into testjson (data) values ($1)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# &amp;lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92cec70a90&amp;gt;
+
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error_message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;utf8&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# ERROR:  column &amp;quot;data&amp;quot; is of type jsonb but expression is of type text
+# LINE 1: insert into testjson (data) values ($1)
+#                                             ^
+# HINT:  You will need to rewrite or cast the expression.&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Specifying the &lt;tt class=&quot;docutils literal&quot;&gt;text&lt;/tt&gt; Postgres type is an exessivelly strict type
+indication: in most cases, Postgres will not be able to automatically convert
+the value to the required type.&lt;/p&gt;
+&lt;p&gt;When we use a literal &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;'{}'&lt;/span&gt;&lt;/tt&gt; in the query, we are specifying an &lt;em&gt;untyped
+literal&lt;/em&gt;. &lt;a class=&quot;reference external&quot; href=&quot;https://www.postgresql.org/docs/13/libpq-exec.html#LIBPQ-PQEXECPARAMS&quot;&gt;Postgres docs&lt;/a&gt; say that we can do the same using 0 as type OID for
+the parameter (see the &lt;tt class=&quot;docutils literal&quot;&gt;paramTypes[]&lt;/tt&gt; description). But it seems this isn't
+always the case. For instance:&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat(&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# ...becomes...
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exec_params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat($1, $2)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# &amp;lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92d43db4d0&amp;gt;
+
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error_message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;utf8&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# ERROR:  could not determine data type of parameter $1&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This problem doesn't happen with every function: it seems to be only a problem
+with &amp;quot;variadic&amp;quot; functions, such as &lt;tt class=&quot;docutils literal&quot;&gt;concat()&lt;/tt&gt; or &lt;tt class=&quot;docutils literal&quot;&gt;json_build_object()&lt;/tt&gt;. As
+sporadic as it is, it doesn't seem like there is a universally correct way of
+mapping Python types to PostgreSQL type OIDs: we can try to get it right &lt;em&gt;most
+of the time&lt;/em&gt; (so, by default, Psycopg 3 dumps Python strings using the OID 0),
+but places where this isn't right do exist...and they exist in Django, of
+course.&lt;/p&gt;
+&lt;p&gt;There are two different ways to work around the problem, both have their
+merit and one might be easier to use than the other in different contexts.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;Add a cast to the placeholder: specifying &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;%s::text&lt;/span&gt;&lt;/tt&gt; (or other types) in
+your query, it is possible to disambiguate the type where &amp;quot;unknown&amp;quot; doesn't
+work:&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat(&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;::text)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# ...becomes...
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exec_params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat($1::text, $2::text)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# &amp;lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfb630&amp;gt;
+
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# b'foobar'&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;One place in Django where this was needed is &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-b6a6632418c964155865691be58c9f76717ef512ced704d461f41cc3612a1db3&quot;&gt;in array comparisons&lt;/a&gt;,
+because they follow stricter rules than the base type comparisons and may
+require an explicit cast to work.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class=&quot;first&quot;&gt;The other option is to use a different type than the Python &lt;tt class=&quot;docutils literal&quot;&gt;str&lt;/tt&gt; and
+handle it using a different dumper.&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat(&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# ...becomes...
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgconn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exec_params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;select concat($1, $2)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# &amp;lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfbbd0&amp;gt;
+
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# b'foobar'&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This is &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-76917634c6c088f56f8dec9493294c657953e61b01e38e33b02d876d5e96dd3a&quot;&gt;proposed in Django&lt;/a&gt; and used, for instance, &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-444d9c5689a90ceeb46dc42d947ff042d67d5fa229e633734afbe1235604ec28&quot;&gt;in the concat()
+case&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that both the solutions make the queries compatible with Psycopg 2
+and 3: the &lt;tt class=&quot;docutils literal&quot;&gt;&lt;span class=&quot;pre&quot;&gt;%s::text&lt;/span&gt;&lt;/tt&gt; casts are no problem in &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; queries and
+&lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; is smart enough to notice that &lt;tt class=&quot;docutils literal&quot;&gt;Text&lt;/tt&gt; is a &lt;tt class=&quot;docutils literal&quot;&gt;str&lt;/tt&gt; subclass and
+to apply the same conversion rules used for the vanilla strings.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;server-side-binding-doesn-t-work-for-all-the-queries&quot;&gt;
+&lt;h2&gt;Server-side binding doesn't work for all the queries&lt;/h2&gt;
+&lt;p&gt;Argument binding on the server only works for queries that select and modify
+data, but it doesn't work in the Data Definition Language. For example:&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;create table test (id int default &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;go&quot;&gt;# Traceback (most recent call last):
+#     ...
+# psycopg.errors.UndefinedParameter: there is no parameter $1
+# LINE 1: create table test (id int default $1)
+#                                           ^&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The solution for this type of problem is to use the &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/api/sql.html&quot;&gt;psycopg.sql&lt;/a&gt; module to
+explicitly generate a query client-side and send it to the server without
+parameters:&lt;/p&gt;
+&lt;pre class=&quot;code pycon literal-block&quot;&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;sql&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SQL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;create table test (id int default &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sql&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Literal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;... &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;A similar module is &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/docs/sql.html&quot;&gt;available in psycopg2 too&lt;/a&gt; so it is easy to write code
+that works for both versions: it's just the &lt;tt class=&quot;docutils literal&quot;&gt;import&lt;/tt&gt; statement that needs
+to be changed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;group-by-order-by-with-parameters&quot;&gt;
+&lt;h2&gt;GROUP BY/ORDER BY with parameters&lt;/h2&gt;
+&lt;p&gt;Another unexpected problem manifested with tests failing with a message like
+&amp;quot;column &lt;em&gt;name&lt;/em&gt; must appear in the GROUP BY clause or be used in an aggregate
+function&amp;quot;. This type of error appeared in tests leveraging &lt;a class=&quot;reference external&quot; href=&quot;https://docs.djangoproject.com/en/3.2/topics/db/aggregation/#topics-db-aggregation&quot;&gt;Django ORM
+aggregation features&lt;/a&gt;, when the aggregation keys contain parameters.&lt;/p&gt;
+&lt;p&gt;For example, if you want to count your people by grouping them by the first
+two letters of their name, you may use a query such as:&lt;/p&gt;
+&lt;pre class=&quot;literal-block&quot;&gt;
+SELECT left(name, 2) AS prefix, count(*) AS number
+FROM people
+GROUP BY left(name, 2)
+ORDER BY left(name, 2)
+&lt;/pre&gt;
+&lt;p&gt;If the &amp;quot;2&amp;quot; is actually a parameter, Django ends up composing and executing a
+query like:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
+    SELECT left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;) AS prefix, count(*) AS number
+    FROM people
+    GROUP BY left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)
+    ORDER BY left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)
+    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;If composed by the client, this query presents no problem, because the server
+query parser can clearly see the same expression in the output column and in
+the group/order predicates. However, moving to use server-side parameters, the
+query would be transformed to:&lt;/p&gt;
+&lt;pre class=&quot;literal-block&quot;&gt;
+SELECT left(name, $1) AS prefix, count(*) AS number
+FROM people
+GROUP BY left(name, $2)
+ORDER BY left(name, $3)
+&lt;/pre&gt;
+&lt;p&gt;This query could be executed only if the three parameters are the same, but at
+parsing time the server cannot make sure this will be the case, failing with
+the error above.&lt;/p&gt;
+&lt;p&gt;If this query was under someone's control, it could be easily rewritten using
+named parameters instead of positional ones. I would personally write:&lt;/p&gt;
+&lt;pre class=&quot;code python literal-block&quot;&gt;
+&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&amp;quot;
+    SELECT left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%(len)s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;) AS prefix, count(*) AS number
+    FROM people
+    GROUP BY left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%(len)s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)
+    ORDER BY left(name, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%(len)s&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)
+    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;len&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;which is transformed in a query with a single &lt;tt class=&quot;docutils literal&quot;&gt;$1&lt;/tt&gt; placeholder used three
+times, and parsed successfully. Unfortunately Django only uses positional
+placeholders throughout its entire codebase and switching to a parameters
+mapping would be a very invasive change. A more localised change is to use
+column aliases: the same query can be rewritten as:&lt;/p&gt;
+&lt;pre class=&quot;literal-block&quot;&gt;
+SELECT left(name, %s) AS prefix, count(*) AS number
+FROM people
+GROUP BY 1
+ORDER BY 1
+&lt;/pre&gt;
+&lt;p&gt;where &amp;quot;1&amp;quot; refers to the first output column. It is not a particularly loved
+syntax but it turns out useful here.&lt;/p&gt;
+&lt;p&gt;Probably not every database supports this syntax, so, in the &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/dvarrazzo/django/commit/597b2fcd9b3154bcdcb6946c73d38e62b5ca48e7&quot;&gt;proposed Django
+changeset&lt;/a&gt;, new feature parameters can be used to signal that the feature is
+accepted by specific databases, and currently enabled only for PostgreSQL.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;a-different-package-organisation&quot;&gt;
+&lt;h2&gt;A different package organisation&lt;/h2&gt;
+&lt;p&gt;This is less mysterious to understand. The &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; package has a bit of a
+chaotic organisation, with a couple of kitchen-sink modules (&lt;tt class=&quot;docutils literal&quot;&gt;extensions&lt;/tt&gt;
+and &lt;tt class=&quot;docutils literal&quot;&gt;extras&lt;/tt&gt;) containing a bit of everything: cursor subclasses, extra data
+types, utility functions, symbolic constants...starting from Psycopg 3, the
+package is organised in a more rational way and &lt;a class=&quot;reference external&quot; href=&quot;https://www.psycopg.org/psycopg3/docs/api/&quot;&gt;separated in different
+modules and sub-packages&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The bulk of the changes required to use Psycopg 3 from Django is just not to
+assume that talking to PostgreSQL will be done using &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;, but to
+import and use the objects according to the version of the driver in use.&lt;/p&gt;
+&lt;p&gt;Note that, with these modifications, Django is able to use both Psycopg 2 and
+3, possibly both in the same project. While this is possible, it might not be
+the average use case in your project: more often than not you will be just
+interested in upgrading from Psycopg 2 to 3. In the simpler case of an update,
+you will just have to change your import statements, assuming unconditionally
+that the &lt;tt class=&quot;docutils literal&quot;&gt;psycopg&lt;/tt&gt; package is installed (there is no &lt;tt class=&quot;docutils literal&quot;&gt;psycopg3&lt;/tt&gt; package:
+the same module name will do for the following major versions too) and just
+say goodbye to the glorious workhorse that &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt; has been so far. 👋&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;takeaway-points&quot;&gt;
+&lt;h2&gt;Takeaway points&lt;/h2&gt;
+&lt;p&gt;In the design of Psycopg 3, a great effort has been made to allow a smooth
+adoption for users who have experience, and codebases, in &lt;tt class=&quot;docutils literal&quot;&gt;psycopg2&lt;/tt&gt;. The
+experience of the Django backend porting shows that most of the adjustments
+required fall in these categories:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;Different package organisation&lt;/li&gt;
+&lt;li&gt;Over/under-specified types, which can be tweaked via casts and data
+wrappers&lt;/li&gt;
+&lt;li&gt;Inability to use server-side parameters, which can be worked around with
+client-side query composition&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully now you know how to address these problems in case you are thinking
+of using Psycopg 3 in your next or current project!&lt;/p&gt;
+&lt;/div&gt;
+</content>
+  </entry>
   <entry xml:base="https://www.psycopg.org/articles/2021/06/16/psycopg-29-released/">
     <title type="text">Psycopg 2.9 released</title>
     <id>urn:uuid:5ffbbc8a-c1c5-32ed-bdf5-6eac4b92e794</id>
@@ -2445,53 +2717,6 @@ versions (&lt;a class=&quot;reference external&quot; href=&quot;http://psycopg.l
 &lt;p&gt;The talk will be about some of the most advanced functionalities and new features available in the latest Psycopg releases: asynchronous communication, notifications, server-side cursors, advanced data mapping between Python and PostgreSQL, the upcoming support for two-phase commit and hstore objects.&lt;/p&gt;
 &lt;p&gt;If you have any suggestion about what you'd like to be shown in the talk, you may leave a feedback.&lt;/p&gt;
 &lt;p&gt;See you in Stuttgart!&lt;/p&gt;
-</content>
-  </entry>
-  <entry xml:base="https://www.psycopg.org/articles/2010/10/22/passing-connections-functions-using-decorator/">
-    <title type="text">Passing connections to functions using a decorator</title>
-    <id>urn:uuid:7753d36e-d308-3290-ad4e-39d264bc6417</id>
-    <updated>2010-10-22T00:00:00Z</updated>
-    <link href="https://www.psycopg.org/articles/2010/10/22/passing-connections-functions-using-decorator/" />
-    <author>
-      <name>Daniele Varrazzo</name>
-    </author>
-    <content type="html">&lt;p&gt;In many script I write, there are functions requiring database operations. Every time I need them, I try to write such code in functions like:&lt;/p&gt;
-&lt;pre class=&quot;code python literal-block&quot;&gt;
-&lt;span class=&quot;nd&quot;&gt;&amp;#64;with_connection&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;do_some_job&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cur&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SQL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arg1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# or something else&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;do_some_job&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'hi'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/pre&gt;
-&lt;!-- CUT-HERE --&gt;
-&lt;p&gt;There are many benefits for this pattern:&lt;/p&gt;
-&lt;ul class=&quot;simple&quot;&gt;
-&lt;li&gt;the client code doesn't depend on the details of connection creation and disposal&lt;/li&gt;
-&lt;li&gt;the client code doesn't either need to deal with the session management: no more pending transactions...&lt;/li&gt;
-&lt;li&gt;connection management is consistent throughout all the functions.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Implementation of such a decorator is straightforward, but because of the many possible variation it never made its way into a proper library. It goes something like:&lt;/p&gt;
-&lt;pre class=&quot;code python literal-block&quot;&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;with_connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;with_connection_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;# or use a pool, or a factory function...&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;psycopg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DSN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;rv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;ne&quot;&gt;Exception&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rollback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# or maybe not&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;finally&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;cnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rv&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with_connection_&lt;/span&gt;
-&lt;/pre&gt;
-&lt;p&gt;There may be many variations: you may use use a connection pooler, you may want a read only or an autocommit connection... Best strategy I've found is just to keep one or a few decorator like this in the project I'm working at and use it for a consistent management of the database communications in the desired scope (the project, a package, a module...)&lt;/p&gt;
 </content>
   </entry>
 </feed>

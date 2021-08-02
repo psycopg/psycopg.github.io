@@ -118,6 +118,47 @@ list</a> psycopg&#64;postgresql.org.</p>
   <h1>Latest articles</h1>
   <div class="article">
   
+    <h2><a href="/articles/2021/08/02/psycopg3-django-driver/">Building a Django driver for Psycopg 3</a></h2>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2021-08-02
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/"
+          >psycopg3</a>,
+      <a class="tag" href="/"
+          >development</a>,
+      <a class="tag" href="/"
+          >recipe</a>
+      
+    
+  </p>
+  
+    <p>One of the goals of the <a class="reference external" href="https://www.psycopg.org/psycopg3/">Psycopg 3 project</a> is to make easy to port code
+developed from Psycopg 2. For this reason the creation of a Django backend
+(the module you specify in the settings as your <a class="reference external" href="https://docs.djangoproject.com/en/3.2/ref/settings/#databases">database ENGINE</a>) was
+a project with a double goal:</p>
+<ul class="simple">
+<li>A Django driver is a way to make Psycopg 3 useful from the start, with the
+possibility of dropping it in a project transparently and have available,
+when needed the new features offered (for instance the superior <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/copy.html">COPY
+support</a>).</li>
+<li>The difficulty of introducing Psycopg 3 in the Django codebase and the type
+of changes required are indicative of the type of problems that could be
+found porting other projects.</li>
+</ul>
+<p>...and it's done! A few days ago, the new <a class="reference external" href="https://github.com/dvarrazzo/django-psycopg3-backend">Psycopg 3 Django backend</a> could
+pass the entire Django test suite!</p>
+
+    
+    <p class="read-more"><a href="/articles/2021/08/02/psycopg3-django-driver/">Read more...</a></p>
+    
+  
+  </div>
+
+  <div class="article">
+  
     <h2><a href="/articles/2021/06/16/psycopg-29-released/">Psycopg 2.9 released</a></h2>
   
   <p class="header">
@@ -189,46 +230,6 @@ before I jump into enthusiastically implementing the wrong thing...</p>
 
     
     <p class="read-more"><a href="/articles/2021/01/17/pool-design/">Read more...</a></p>
-    
-  
-  </div>
-
-  <div class="article">
-  
-    <h2><a href="/articles/2020/11/24/psycopg3-adaptation/">The psycopg3 adaptation system</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2020-11-24
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/"
-          >psycopg3</a>,
-      <a class="tag" href="/"
-          >development</a>,
-      <a class="tag" href="/"
-          >news</a>
-      
-    
-  </p>
-  
-    <p>The adaptation system between Python objects and PostgreSQL types is at the
-core of <tt class="docutils literal">psycopg2</tt> and <tt class="docutils literal">psycopg3</tt>. The flexibility of the <tt class="docutils literal">psycopg2</tt>
-adaptation system provides <a class="reference external" href="https://www.psycopg.org/docs/usage.html#adaptation-of-python-values-to-sql-types">good out-of-the-box object mapping</a> and allows
-users to <a class="reference external" href="https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax">customise it to suit any need</a>. Do you want your <tt class="docutils literal">decimal</tt>
-numbers returned as <tt class="docutils literal">float</tt> because you need speed over pennies? Do you want
-to map PostgreSQL Infinity dates to the 25th of December 3099? That's
-certainly doable.</p>
-<blockquote>
-</blockquote>
-<p>The <tt class="docutils literal">psycopg3</tt> adaptation system needs some modification compared to
-<tt class="docutils literal">psycopg2</tt>, because <tt class="docutils literal">psycopg3</tt> uses the &quot;extended query protocol&quot; to send
-query parameters separately from the query. Together, with the differences to
-accommodate, there is also a chance to improve a system that has been in use
-for several years and has shown its shortcomings together with its strengths.</p>
-
-    
-    <p class="read-more"><a href="/articles/2020/11/24/psycopg3-adaptation/">Read more...</a></p>
     
   
   </div>
