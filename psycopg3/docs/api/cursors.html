@@ -469,6 +469,14 @@ cursor, if available, else <code class="xref py py-obj docutils literal notransl
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the last operation didn’t return a queryset.</p>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Cursor.statusmessage">
+<span class="sig-name descname"><span class="pre">statusmessage</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Cursor.statusmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>The command status tag from the last SQL command executed.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the cursor doesn’t have a result available.</p>
+<p>This is the status tag you typically see in <strong class="program">psql</strong> after
+a successful command, such as <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> or <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">42</span></code>.</p>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Cursor.rowcount">
 <span class="sig-name descname"><span class="pre">rowcount</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.Cursor.rowcount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of records affected by the precedent operation.</p>
@@ -480,18 +488,38 @@ cursor, if available, else <code class="xref py py-obj docutils literal notransl
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if there is no result to fetch.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="psycopg.Cursor.query">
-<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Cursor.query" title="Permalink to this definition">¶</a></dt>
-<dd><p>The last query sent to the server, if available.</p>
-<p>The query will be in PostgreSQL format (with <code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code>…
-parameters), the parameters will <em>not</em> be merged to the query: see
-<a class="reference internal" href="#psycopg.Cursor.params" title="psycopg.Cursor.params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span></code></a>.</p>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psycopg.Cursor.params">
-<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Cursor.params" title="Permalink to this definition">¶</a></dt>
-<dd><p>The last set of parameters sent to the server, if available.</p>
-<p>The parameters are adapted to PostgreSQL format.</p>
+<dt class="sig sig-object py" id="psycopg.Cursor._query">
+<span class="sig-name descname"><span class="pre">_query</span></span><a class="headerlink" href="#psycopg.Cursor._query" title="Permalink to this definition">¶</a></dt>
+<dd><p>An helper object used to convert queries and parameters before sending
+them to PostgreSQL.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This attribute is exposed because it might be helpful to debug
+problems when the communication between Python and PostgreSQL
+doesn’t work as expected. For this reason, the attribute is
+available when a query fails too.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You shouldn’t consider it part of the public interface of the
+object: it might change without warnings.</p>
+<p>Except this warning, I guess.</p>
+</div>
+<p>If you would like to build reliable features using this object,
+please get in touch so we can try and design an useful interface
+for it.</p>
+</div>
+<p>Among the properties currently exposed by this object:</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>): the query effectively sent to PostgreSQL. It
+will have Python placeholders (<code class="docutils literal notranslate"><span class="pre">%s</span></code>-style) replaced with
+PostgreSQL ones (<code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code>-style).</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span></code> (sequence of <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>): the parameters passed to
+PostgreSQL, adapted to the database format.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> (sequence of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>): the OID of the parameters passed to
+PostgreSQL.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">formats</span></code> (sequence of <a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq.Format</span></code></a>): whether the parameter format
+is text or binary.</p></li>
+</ul>
 </dd></dl>
 </dd></dl>
 </section>
@@ -896,7 +924,6 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple.</p>
 <dt class="sig sig-object py" id="psycopg.Column.scale">
 <span class="sig-name descname"><span class="pre">scale</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Column.scale" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of digits after the decimal point if available.</p>
-<p>TODO: probably better than precision for datetime objects? review.</p>
 </dd></dl>
 </dd></dl>
 </section>
@@ -969,11 +996,6 @@ bytes, unless data types are specified using <a class="reference internal" href=
 returned as unparsed strings or bytes.</p>
 <p>The types must be specified as a sequence of oid or PostgreSQL type
 names (e.g. <code class="docutils literal notranslate"><span class="pre">int4</span></code>, <code class="docutils literal notranslate"><span class="pre">timestamptz[]</span></code>).</p>
-<div class="admonition-todo admonition">
-<p class="admonition-title">TODO</p>
-<p>Only builtin names are supprted for the moment. In order to specify
-custom data types you must use their oid.</p>
-</div>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
