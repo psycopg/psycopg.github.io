@@ -383,43 +383,46 @@ at <a class="reference internal" href="adapt.html#types-adaptation"><span class=
 </section>
 <section id="binary-parameters-and-results">
 <span id="binary-data"></span><span id="index-2"></span><h2>Binary parameters and results<a class="headerlink" href="#binary-parameters-and-results" title="Permalink to this headline">¶</a></h2>
-<p>PostgreSQL has two different ways to represent data type on the wire:
-<a class="reference internal" href="../api/pq.html#psycopg.pq.Format.TEXT" title="psycopg.pq.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a>, always available, and
-<a class="reference internal" href="../api/pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>, available most of the times. Usually the binary
-format is more efficient to use.</p>
-<p>Psycopg can support both the formats of each data type. Whenever a value
+<p>PostgreSQL has two different ways to transmit data between client and server:
+<a class="reference internal" href="../api/pq.html#psycopg.pq.Format.TEXT" title="psycopg.pq.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a>, always available, and <a class="reference internal" href="../api/pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>,
+available most of the times but not always. Usually the binary format is more
+efficient to use.</p>
+<p>Psycopg can support both the formats for each data type. Whenever a value
 is passed to a query using the normal <code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholder, the best format
 available is chosen (often, but not always, the binary format is picked as the
 best choice).</p>
 <p>If you have a reason to select explicitly the binary format or the text format
 for a value you can use respectively a <code class="docutils literal notranslate"><span class="pre">%b</span></code> placeholder or a <code class="docutils literal notranslate"><span class="pre">%t</span></code>
-placeholder instead. <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> will fail if a
-<a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> for the right parameter type and format is not
-available.</p>
+placeholder instead of the normal <code class="docutils literal notranslate"><span class="pre">%s</span></code>. <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> will fail if a
+<a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> for the right data type and format is not available.</p>
 <p>The same two formats, text or binary, are used by PostgreSQL to return data
 from a query to the client. Unlike with parameters, where you can choose the
 format value-by-value, all the columns returned by a query will have the same
-format. For each of the types returned by the query, a
-<a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> must be available, otherwise the data will be
-returned as unparsed <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or buffer.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Currently the default is to return values from database queries in textual
-type, for the simple reason that not all the PostgreSQL data types have a
-binary <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code> implemented. The plan is to support the binary format for
-all PostgreSQL builtins before the first Psycopg 3 released: TODO!</p>
+format. Every type returned by the query should have a <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a>
+configured, otherwise the data will be returned as unparsed <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> (for text
+results) or buffer (for binary results).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/catalog-pg-type.html">pg_type</a> table defines which format is supported for each PostgreSQL
+data type. Text input/output is managed by the functions declared in the
+<code class="docutils literal notranslate"><span class="pre">typinput</span></code> and <code class="docutils literal notranslate"><span class="pre">typoutput</span></code> fields (always present), binary
+input/output is managed by the <code class="docutils literal notranslate"><span class="pre">typsend</span></code> and <code class="docutils literal notranslate"><span class="pre">typreceive</span></code> (which are
+optional).</p>
 </div>
-<p>By default the data will be returned in text format. In order to return data
-in binary format you can create the cursor using <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor</span></code></a><code class="docutils literal notranslate"><span class="pre">(binary=True)</span></code>.</p>
-<div class="admonition-todo admonition">
-<p class="admonition-title">TODO</p>
-<p>add a <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute</span></code></a><code class="docutils literal notranslate"><span class="pre">(binary=True)</span></code> parameter?</p>
+<p>Because not every PostgreSQL type supports binary output, By default the data
+will be returned in text format. In order to return data in binary format you
+can create the cursor using <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor</span></code></a><code class="docutils literal notranslate"><span class="pre">(binary=True)</span></code> or execute
+the query using <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute</span></code></a><code class="docutils literal notranslate"><span class="pre">(binary=True)</span></code>. A case in which
+requesting binary results is a clear winner is when you have large binary data
+in the database, such as images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">"select image_data from images where id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">image_id</span><span class="p">],</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
 </div>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <ul class="simple">
-<li><p>pass parameters in binary with <code class="docutils literal notranslate"><span class="pre">%b</span></code></p></li>
-<li><p>return parameters in binary with <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor(binary=True)</span></code></p></li>
 <li><p>cannot pass multiple statements in binary</p></li>
 </ul>
 </div>

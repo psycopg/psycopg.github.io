@@ -377,7 +377,7 @@ objects returned by cursors.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Connection.execute">
-<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.execute" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query and return a cursor to read its results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -390,12 +390,14 @@ objects returned by cursors.</p>
 <li><p><strong>prepare</strong> – Force (<code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) or disallow (<code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) preparation of
 the query. By default (<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) prepare automatically. See
 <a class="reference internal" href="../advanced/prepare.html#prepared-statements"><span class="std std-ref">Prepared statements</span></a>.</p></li>
+<li><p><strong>binary</strong> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> the cursor will return binary values from the
+database. All the types returned by the query must have a binary
+loader. See <a class="reference internal" href="../basic/params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details.</p></li>
 </ul>
 </dd>
 </dl>
-<p>The cursor is what returned calling <a class="reference internal" href="#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> without parameters. The
-parameters are passed to its <a class="reference internal" href="cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> and the cursor is
-returned.</p>
+<p>The method simply creates a <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instance, <a class="reference internal" href="cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> the
+query requested, and return it.</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 </dd></dl>
@@ -668,7 +670,7 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.execute">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.execute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>[~Row]</p>
