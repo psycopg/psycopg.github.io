@@ -250,7 +250,7 @@ connection is in autocommit, at the end of the COPY operation you will still
 have to commit the pending changes and you can still roll them back. See
 <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a> for details.</p>
 <section id="writing-data-row-by-row">
-<h2>Writing data row-by-row<a class="headerlink" href="#writing-data-row-by-row" title="Permalink to this headline">¶</a></h2>
+<span id="copy-in-row"></span><h2>Writing data row-by-row<a class="headerlink" href="#writing-data-row-by-row" title="Permalink to this headline">¶</a></h2>
 <p>Using a copy operation you can load data into the database from any Python
 iterable (a list of tuple, or any iterable of sequences): the Python values
 are adapted as they would be in normal querying. To perform such operation use
@@ -269,18 +269,21 @@ the records inserted so far are discarded.</p>
 <p>In order to read or write from <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> row-by-row you must not specify
 <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> options such as <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">CSV</span></code>, <code class="sql docutils literal notranslate"><span class="pre">DELIMITER</span></code>, <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code>:
 please leave these details alone, thank you :)</p>
+</section>
+<section id="binary-copy">
+<span id="copy-binary"></span><h2>Binary copy<a class="headerlink" href="#binary-copy" title="Permalink to this headline">¶</a></h2>
 <p>Binary copy is supported by specifying <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code> in the <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>
 statement. In order to load binary data, all the types passed to the database
 must have a binary dumper registered (see see <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a>).</p>
 <p>Note that PostgreSQL is particularly finicky when loading data in binary mode
-and will apply <em>no cast rule</em>. This means that e.g. passing a Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>
-object to an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> column (aka <code class="sql docutils literal notranslate"><span class="pre">int4</span></code>) will likely fail, because
-the default <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> will use the <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> aka <code class="sql docutils literal notranslate"><span class="pre">int8</span></code>
-format. You can work around the problem by registering the right binary dumper
-on the cursor or using the right data wrapper (see <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>).</p>
+and will apply <em>no cast rule</em>. This means that e.g. passing the value 100 to
+an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> column will fail because Psycopg will pass it as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code>
+value. You can work around the problem by registering the right binary
+<a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> on the cursor (see <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>) or using the right data
+wrapper (e.g. <a class="reference internal" href="../api/types.html#psycopg.types.numeric.Int4" title="psycopg.types.numeric.Int4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Int4</span></code></a>).</p>
 </section>
 <section id="reading-data-row-by-row">
-<h2>Reading data row-by-row<a class="headerlink" href="#reading-data-row-by-row" title="Permalink to this headline">¶</a></h2>
+<span id="copy-out-row"></span><h2>Reading data row-by-row<a class="headerlink" href="#reading-data-row-by-row" title="Permalink to this headline">¶</a></h2>
 <p>You can also do the opposite, reading rows out of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">TO</span> <span class="pre">STDOUT</span></code>
 operation, by iterating on <a class="reference internal" href="../api/cursors.html#psycopg.Copy.rows" title="psycopg.Copy.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows()</span></code></a>. However this is not something you
 may want to do normally: usually the normal query process will be easier to
@@ -303,7 +306,7 @@ you have to specify them yourselves.</p>
 </div>
 </section>
 <section id="copying-block-by-block">
-<h2>Copying block-by-block<a class="headerlink" href="#copying-block-by-block" title="Permalink to this headline">¶</a></h2>
+<span id="copy-block"></span><h2>Copying block-by-block<a class="headerlink" href="#copying-block-by-block" title="Permalink to this headline">¶</a></h2>
 <p>If data is already formatted in a way suitable for copy (for instance because
 it is coming from a file resulting from a previous <code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation) it can
 be loaded into the database using <a class="reference internal" href="../api/cursors.html#psycopg.Copy.write" title="psycopg.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code></a> instead.</p>
@@ -328,7 +331,7 @@ produce a stream of <code class="xref py py-obj docutils literal notranslate"><s
 </div>
 </section>
 <section id="asynchronous-copy-support">
-<h2>Asynchronous copy support<a class="headerlink" href="#asynchronous-copy-support" title="Permalink to this headline">¶</a></h2>
+<span id="copy-async"></span><h2>Asynchronous copy support<a class="headerlink" href="#asynchronous-copy-support" title="Permalink to this headline">¶</a></h2>
 <p>Asynchronous operations are supported using the same patterns as above, using
 the objects obtained by an <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>. For instance, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code> is an
 object supporting an asynchronous <code class="xref py py-obj docutils literal notranslate"><span class="pre">read()</span></code> method returning <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> data,
@@ -394,6 +397,7 @@ asynchronous methods and the differences from its sync <a class="reference inter
             <ul>
 <li><a class="reference internal" href="#">Using COPY TO and COPY FROM</a><ul>
 <li><a class="reference internal" href="#writing-data-row-by-row">Writing data row-by-row</a></li>
+<li><a class="reference internal" href="#binary-copy">Binary copy</a></li>
 <li><a class="reference internal" href="#reading-data-row-by-row">Reading data row-by-row</a></li>
 <li><a class="reference internal" href="#copying-block-by-block">Copying block-by-block</a></li>
 <li><a class="reference internal" href="#asynchronous-copy-support">Asynchronous copy support</a></li>

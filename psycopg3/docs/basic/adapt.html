@@ -258,15 +258,12 @@ types. In case you need to customise the conversion you should take a look at
 </td>
 <td rowspan="3"><p><a class="reference internal" href="#adapt-numbers"><span class="std std-ref">Numbers adaptation</span></a></p></td>
 </tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></div>
-<div class="line"><br/></div>
-</div>
-</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><code class="sql docutils literal notranslate"><span class="pre">smallint</span></code></div>
 <div class="line"><code class="sql docutils literal notranslate"><span class="pre">integer</span></code></div>
 <div class="line"><code class="sql docutils literal notranslate"><span class="pre">bigint</span></code></div>
+<div class="line"><code class="sql docutils literal notranslate"><span class="pre">numeric</span></code></div>
 </div>
 </td>
 </tr>
@@ -296,7 +293,7 @@ types. In case you need to customise the conversion you should take a look at
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></p></td>
 <td><p><code class="sql docutils literal notranslate"><span class="pre">date</span></code></p></td>
-<td rowspan="4"><p><a class="reference internal" href="#adapt-date"><span class="std std-ref">TODO adaptation</span></a></p></td>
+<td rowspan="4"><p><a class="reference internal" href="#adapt-date"><span class="std std-ref">Date/time types adaptation</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></p></td>
 <td><div class="line-block">
@@ -365,36 +362,35 @@ objects</p></td>
 </section>
 <section id="numbers-adaptation">
 <span id="adapt-numbers"></span><span id="index-2"></span><h2>Numbers adaptation<a class="headerlink" href="#numbers-adaptation" title="Permalink to this headline">¶</a></h2>
-<p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> (a.k.a.
-<code class="sql docutils literal notranslate"><span class="pre">int8</span></code>). Note that this could create some problems:</p>
-<ul>
-<li><p>Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> is unbounded. If you are inserting numbers larger than 2^63
-(so your target table is <code class="xref py py-obj docutils literal notranslate"><span class="pre">numeric</span></code>, or you’ll get an overflow on
-arrival…) you should convert them to <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a>.</p></li>
-<li><p>Certain PostgreSQL functions and operators, such a <code class="sql docutils literal notranslate"><span class="pre">date</span> <span class="pre">+</span> <span class="pre">int</span></code>
-expect an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> (aka <code class="sql docutils literal notranslate"><span class="pre">int4</span></code>): passing them a <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>
-may cause an error:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="c1"># UndefinedFunction: operator does not exist: date + bigint</span>
-</pre></div>
-</div>
-<p>In this case you should add an <code class="sql docutils literal notranslate"><span class="pre">::int</span></code> cast to your query or use the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">Int4</span></code> wrapper:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT current_date + </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Int4</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
-</pre></div>
-</div>
-<div class="admonition-todo admonition">
-<p class="admonition-title">TODO</p>
-<p>document Int* wrappers</p>
-</div>
-</li>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-numeric.html">PostgreSQL numeric types</a></p></li>
 </ul>
-<p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">float8</span></code>.</p>
-<p>Python <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code>.</p>
+</div>
+<ul class="simple">
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> values can be converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">smallint</span></code>,
+<code class="sql docutils literal notranslate"><span class="pre">integer</span></code>, <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>, or <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code>, according to their numeric
+value. Psycopg will choose the smallest data type available, because
+PostgreSQL can automatically cast a type up (e.g. passing a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code> where
+PostgreSQL expect an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> is gladly accepted) but will not cast down
+automatically (e.g. if a function has an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> argument, passing it
+a <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> value will fail, even if the value is 1).</p></li>
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">float8</span></code>.</p></li>
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code>.</p></li>
+</ul>
 <p>On the way back, smaller types (<code class="sql docutils literal notranslate"><span class="pre">int2</span></code>, <code class="sql docutils literal notranslate"><span class="pre">int4</span></code>, <code class="sql docutils literal notranslate"><span class="pre">flaot4</span></code>) are
 promoted to the larger Python counterpart.</p>
+<p>If you need a more precise control of how <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> are converted,
+The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.numeric</span></code> module contains a few <a class="reference internal" href="../api/types.html#numeric-wrappers"><span class="std std-ref">wrappers</span></a> which can be used to convince Psycopg to cast the values
+to a specific PostgreSQL type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select pg_typeof(</span><span class="si">%s</span><span class="s2">), pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">Int4</span><span class="p">(</span><span class="mi">42</span><span class="p">)))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">('smallint', 'integer')</span>
+</pre></div>
+</div>
+<p>These wrappers are rarely needed, because PostgreSQL cast rules and Psycopg
+choices usually do the right thing. One use case where they are useful is
+<a class="reference internal" href="copy.html#copy-binary"><span class="std std-ref">Binary copy</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Sometimes you may prefer to receive <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> data as <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>
@@ -402,23 +398,22 @@ instead, for performance reason or ease of manipulation: you can configure
 an adapter to <a class="reference external" href="https://www.psycopg.org/docs/faq.html#faq-float" title="(in Psycopg v2.9)"><span class="xref std std-ref">cast PostgreSQL numeric to Python float</span></a>.
 This of course may imply a loss of precision.</p>
 </div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-numeric.html">PostgreSQL numeric types</a></p></li>
-<li><p><a class="reference external" href="https://www.varrazzo.com/blog/2020/11/07/psycopg3-adaptation/">Musings about numeric adaptation choices</a></p></li>
-</ul>
-</div>
 </section>
 <section id="strings-adaptation">
 <span id="adapt-string"></span><span id="index-3"></span><h2>Strings adaptation<a class="headerlink" href="#strings-adaptation" title="Permalink to this headline">¶</a></h2>
-<p>Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> is converted to PostgreSQL string syntax, and PostgreSQL types
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.postgresql.org/docs/current/datatype-character.html">PostgreSQL character types</a></p></li>
+</ul>
+</div>
+<p>Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> are converted to PostgreSQL string syntax, and PostgreSQL types
 such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">"INSERT INTO strtest (id, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+    <span class="s2">"INSERT INTO menu (id, entry) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
     <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Crème Brûlée at 4.99€"</span><span class="p">))</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="s1">'Crème Brûlée at 4.99€'</span>
 </pre></div>
 </div>
@@ -435,12 +430,12 @@ encoding/decoding errors:</p>
 <span class="c1"># The Latin-9 encoding can manage some European accented letters</span>
 <span class="c1"># and the Euro symbol</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin9'</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="s1">'Crème Brûlée at 4.99€'</span>
 
 <span class="c1"># The Latin-1 encoding doesn't have a representation for the Euro symbol</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin1'</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Traceback (most recent call last)</span>
 <span class="c1"># ...</span>
 <span class="c1"># UntranslatableCharacter: character with byte sequence 0xe2 0x82 0xac</span>
@@ -452,7 +447,7 @@ Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code></a> <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">"ascii"</span></code>) will disable decoding of the data
 coming from the database, which will be returned as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s2">"ascii"</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM strtest WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="sa">b</span><span class="s1">'Cr</span><span class="se">\xc3\xa8</span><span class="s1">me Br</span><span class="se">\xc3\xbb</span><span class="s1">l</span><span class="se">\xc3\xa9</span><span class="s1">e at 4.99</span><span class="se">\xe2\x82\xac</span><span class="s1">'</span>
 </pre></div>
 </div>
@@ -467,15 +462,40 @@ store Python strings that may contain binary zeros you should use a
 <p>Python types representing binary objects (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytearray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoryview</span></code></a>)
 are converted by default to <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> fields. By default data received is
 returned as <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>.</p>
-<div class="admonition-todo admonition">
-<p class="admonition-title">todo</p>
-<p>Make sure bytearry/memoryview work and are compsable with
-arrays/composite</p>
-</div>
 <p>If you are storing large binary data in bytea fields (such as binary documents
 or images) you should probably use the binary format to pass and return
 values, otherwise binary data will undergo <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-binary.html">ASCII escaping</a>, taking some CPU
 time and more bandwidth. See <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for details.</p>
+</section>
+<section id="date-time-types-adaptation">
+<span id="adapt-date"></span><h2>Date/time types adaptation<a class="headerlink" href="#date-time-types-adaptation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.postgresql.org/docs/current/datatype-datetime.html">PostgreSQL date/time types</a></p></li>
+</ul>
+</div>
+<ul class="simple">
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a> objects are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">date</span></code>.</p></li>
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> objects are converted to PostgreSQL
+<code class="sql docutils literal notranslate"><span class="pre">timestamp</span></code> (if they don’t have a <code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code> set) or <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code>
+(if they do).</p></li>
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> objects are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">time</span></code>
+(if they don’t have a <code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code> set) or <code class="sql docutils literal notranslate"><span class="pre">timetz</span></code> (if they do).</p></li>
+<li><p>Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timedelta</span></code></a> objects are converted to PostgreSQL
+<code class="sql docutils literal notranslate"><span class="pre">interval</span></code>.</p></li>
+</ul>
+<p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> values are returned with a timezone set to the
+<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-TIMEZONE">connection TimeZone setting</a>, which is available as a Python
+<a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.ZoneInfo" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoneInfo</span></code></a> object in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info</span></code>.<a class="reference internal" href="../api/connections.html#psycopg.ConnectionInfo.timezone" title="psycopg.ConnectionInfo.timezone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a>
+attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timezone</span>
+<span class="go">zoneinfo.ZoneInfo(key='Europe/London')</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2048-07-08 12:00'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">datetime.datetime(2048, 7, 8, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Europe/London'))</span>
+</pre></div>
+</div>
 </section>
 <section id="json-adaptation">
 <span id="adapt-json"></span><h2>JSON adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this headline">¶</a></h2>
@@ -483,7 +503,7 @@ time and more bandwidth. See <a class="reference internal" href="params.html#bin
 types</a>, allowing to customise the load and dump function used.</p>
 <p>Because several Python objects could be considered JSON (dicts, lists,
 scalars, even date/time if using a dumps function customised to use them),
-Psycopg requires you to wrap what you want to dump as JSON into a wrapper:
+Psycopg requires you to wrap the object to dump as JSON into a wrapper:
 either <a class="reference internal" href="../api/types.html#psycopg.types.json.Json" title="psycopg.types.json.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.json.Json</span></code></a> or <a class="reference internal" href="../api/types.html#psycopg.types.json.Jsonb" title="psycopg.types.json.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span>
 
@@ -534,7 +554,7 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
 </div>
 </section>
 <section id="todo-adaptation">
-<span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><span id="adapt-date"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
+<span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <p>Document the other types</p>
@@ -596,6 +616,7 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
 <li><a class="reference internal" href="#numbers-adaptation">Numbers adaptation</a></li>
 <li><a class="reference internal" href="#strings-adaptation">Strings adaptation</a></li>
 <li><a class="reference internal" href="#binary-adaptation">Binary adaptation</a></li>
+<li><a class="reference internal" href="#date-time-types-adaptation">Date/time types adaptation</a></li>
 <li><a class="reference internal" href="#json-adaptation">JSON adaptation</a></li>
 <li><a class="reference internal" href="#todo-adaptation">TODO adaptation</a></li>
 </ul>
