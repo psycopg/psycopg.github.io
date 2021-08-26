@@ -486,15 +486,30 @@ time and more bandwidth. See <a class="reference internal" href="params.html#bin
 <code class="sql docutils literal notranslate"><span class="pre">interval</span></code>.</p></li>
 </ul>
 <p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> values are returned with a timezone set to the
-<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-TIMEZONE">connection TimeZone setting</a>, which is available as a Python
+<a class="reference external" href="https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-TIMEZONES">connection TimeZone setting</a>, which is available as a Python
 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.ZoneInfo" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoneInfo</span></code></a> object in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info</span></code>.<a class="reference internal" href="../api/connections.html#psycopg.ConnectionInfo.timezone" title="psycopg.ConnectionInfo.timezone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a>
 attribute:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timezone</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timezone</span>
 <span class="go">zoneinfo.ZoneInfo(key='Europe/London')</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2048-07-08 12:00'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2048-07-08 12:00'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">datetime.datetime(2048, 7, 8, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Europe/London'))</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> doesn’t store “a timestamp with a timezone
+attached”: it stores a timestamp always in UTC, which is converted, on
+output, to the connection TimeZone setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET TIMEZONE to 'Europe/Rome'"</span><span class="p">)</span>  <span class="c1"># UTC+2 in summer</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2042-07-01 12:00Z'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># UTC input</span>
+<span class="go">datetime.datetime(2042, 7, 1, 14, 0, tzinfo=zoneinfo.ZoneInfo(key='Europe/Rome'))</span>
+</pre></div>
+</div>
+<p>Check out the <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-TIMEZONE">PostgreSQL documentation about timezones</a> for all the
+details.</p>
 </div>
 </section>
 <section id="json-adaptation">
