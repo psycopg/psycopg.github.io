@@ -263,9 +263,17 @@ exceptions, mapping to the database error states (see
 <dl class="py data">
 <dt class="sig sig-object py" id="psycopg.adapters">
 <span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">adapters</span></span><a class="headerlink" href="#psycopg.adapters" title="Permalink to this definition">¶</a></dt>
-<dd><p>The global, default adapters map establishing how Python and PostgreSQL
-types are converted into each other. This map is used as template when new
-connections are created, using <a class="reference internal" href="#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.connect()</span></code></a>.</p>
+<dd><p>The default adapters map establishing how Python and PostgreSQL types are
+converted into each other.</p>
+<p>This map is used as template when new connections are created, using
+<a class="reference internal" href="#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.connect()</span></code></a>. Its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.types" title="psycopg.adapt.AdaptersMap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a> attribute is a
+<a class="reference internal" href="types.html#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a> containing information about every
+PostgreSQL builtin type, useful for adaptation customisation (see
+<a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"int4"</span><span class="p">]</span>
+<span class="go">&lt;TypeInfo: int4 (oid: 23, array oid: 1007)&gt;</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a></p>
