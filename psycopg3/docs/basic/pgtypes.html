@@ -320,7 +320,8 @@ documentation for generic details.</p>
 with bounds parsed as the right subtype.</p>
 </dd></dl>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create type strrange as range (subtype = text)"</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.range</span> <span class="kn">import</span> <span class="n">Range</span><span class="p">,</span> <span class="n">RangeInfo</span><span class="p">,</span> <span class="n">register_range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create type strrange as range (subtype = text)"</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">RangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"strrange"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_range</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
@@ -329,7 +330,44 @@ with bounds parsed as the right subtype.</p>
 <span class="go">'strrange'</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '[a,z]'::strrange"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go"> Range('a', 'z', '[]')</span>
+<span class="go">Range('a', 'z', '[]')</span>
+</pre></div>
+</div>
+</section>
+<section id="hstore-adaptation">
+<span id="adapt-hstore"></span><span id="index-1"></span><h2>Hstore adaptation<a class="headerlink" href="#hstore-adaptation" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/hstore.html"><code class="sql docutils literal notranslate"><span class="pre">hstore</span></code></a> data type is a key-value store embedded in PostgreSQL. It
+supports GiST or GIN indexes allowing search by keys or key/value pairs as
+well as regular BTree indexes for equality, uniqueness etc.</p>
+<p>Psycopg can convert Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> objects to and from <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> structures.
+Only dictionaries with string keys and values are supported. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> is also
+allowed as value but not as a key.</p>
+<p>In order to use the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> data type it is necessary to load it in a
+database using</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>=# CREATE EXTENSION hstore;
+</pre></div>
+</div>
+<p>Because <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> is distributed as a contrib module, its oid is not well
+known, so it is necessary to use <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> to query the
+database and get its oid. After that you can use
+<a class="reference internal" href="#psycopg.types.hstore.register_hstore" title="psycopg.types.hstore.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a> to allow dumping <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> to <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code>
+and parsing <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> back to <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> in the context where it is registered.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg.types.hstore.register_hstore">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.hstore.</span></span><span class="sig-name descname"><span class="pre">register_hstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.hstore.register_hstore" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types</span> <span class="kn">import</span> <span class="n">TypeInfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.hstore</span> <span class="kn">import</span> <span class="n">register_hstore</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"hstore"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_hstore</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[{</span><span class="s2">"a"</span><span class="p">:</span> <span class="s2">"b"</span><span class="p">}])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'hstore'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select 'foo =&gt; bar'::hstore"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">{'foo': 'bar'}</span>
 </pre></div>
 </div>
 </section>
@@ -386,6 +424,7 @@ with bounds parsed as the right subtype.</p>
             <ul>
 <li><a class="reference internal" href="#">Adapting other PostgreSQL types</a><ul>
 <li><a class="reference internal" href="#range-adaptation">Range adaptation</a></li>
+<li><a class="reference internal" href="#hstore-adaptation">Hstore adaptation</a></li>
 </ul>
 </li>
 </ul>
