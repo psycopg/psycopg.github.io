@@ -330,6 +330,68 @@ its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.typ
 <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> (e.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">conn.adapters.types</span></code>).</p>
 <p>The global registry, from which the others inherit from, is available as
 <a class="reference internal" href="module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a><code class="docutils literal notranslate"><span class="pre">.types</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.types.TypesRegistry.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return info about a type, specified by name or oid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – the name or oid of the type to look for.</p>
+</dd>
+</dl>
+<p>Raise KeyError if not found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeInfo</span></code></a></p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">psycopg</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span>
+<span class="go">&lt;TypeInfo: text (oid: 25, array oid: 1009)&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span>
+<span class="go">&lt;TypeInfo: int4 (oid: 23, array oid: 1007)&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.types.TypesRegistry.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return info about a type, specified by name or oid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – the name or oid of the type to look for.</p>
+</dd>
+</dl>
+<p>Unlike <a class="reference internal" href="#psycopg.types.TypesRegistry.__getitem__" title="psycopg.types.TypesRegistry.__getitem__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__getitem__</span></code></a>, return None if not found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.types.TypesRegistry.get_oid">
+<span class="sig-name descname"><span class="pre">get_oid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry.get_oid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the oid of a PostgreSQL type by name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> – the name of the type to look for.</p>
+</dd>
+</dl>
+<p>Return the array oid if the type ends with “<code class="docutils literal notranslate"><span class="pre">[]</span></code>”</p>
+<p>Raise KeyError if the name is unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">get_oid</span><span class="p">(</span><span class="s2">"text[]"</span><span class="p">)</span>
+<span class="go">1009</span>
+</pre></div>
+</div>
+</dd></dl>
 </dd></dl>
 </section>
 <section id="numeric-wrappers">
