@@ -469,7 +469,15 @@ the values as a list (not a tuple).</p>
 </section>
 <section id="uuid-adaptation">
 <span id="adapt-uuid"></span><h2>UUID adaptation<a class="headerlink" href="#uuid-adaptation" title="Permalink to this headline">¶</a></h2>
-<p>Python <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uuid.UUID</span></code></a> objects are adapted to PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-uuid.html">UUID type</a> and back.</p>
+<p>Python <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uuid.UUID</span></code></a> objects are adapted to PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-uuid.html">UUID type</a> and back:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select gen_random_uuid()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">UUID('97f0dd62-3bd2-459e-89b8-a5e36ea3c16c')</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select gen_random_uuid() = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">uuid4</span><span class="p">()])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">False  # long shot</span>
+</pre></div>
+</div>
 </section>
 <section id="network-data-types-adaptation">
 <span id="adapt-network"></span><h2>Network data types adaptation<a class="headerlink" href="#network-data-types-adaptation" title="Permalink to this headline">¶</a></h2>
@@ -486,6 +494,13 @@ back.</p></li>
 <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Network" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Network</span></code></a> objects follow the same rules, with IPv6
 <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> and <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> values.</p></li>
 </ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '192.168.0.1'::inet, '192.168.0.1/24'::inet"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">(IPv4Address('192.168.0.1'), IPv4Interface('192.168.0.1/24'))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '::ffff:1.2.3.0/120'::cidr"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">IPv6Network('::ffff:102:300/120')</span>
+</pre></div>
+</div>
 </section>
 </section>
 

@@ -362,9 +362,24 @@ using a result in a single expression:</p>
 </div>
 <p>When the block is exited, if there is a transaction open, it will be
 committed. If an exception is raised within the block the transaction is
-rolled back. In either case the connection is closed.</p>
+rolled back. In both cases the connection is closed.</p>
 <p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
 but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
+</section>
+<section id="adapting-pyscopg-to-your-program">
+<h2>Adapting pyscopg to your program<a class="headerlink" href="#adapting-pyscopg-to-your-program" title="Permalink to this headline">¶</a></h2>
+<p>The above <a class="reference internal" href="#usage"><span class="std std-ref">pattern of use</span></a> only shows the default behaviour of
+the adapter. Psycopg can be customised in several way, to allow the smoothest
+integration between your Python program and your PostgreSQL database:</p>
+<ul class="simple">
+<li><p>If your program is concurrent and based on <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> instead of on
+threads/processes, you can use <a class="reference internal" href="../advanced/async.html#async"><span class="std std-ref">async connections and cursors</span></a>.</p></li>
+<li><p>If you want to customise the objects that the cursor returns, instead of
+receiving tuples, you can specify your <a class="reference internal" href="../advanced/rows.html#row-factories"><span class="std std-ref">row factories</span></a>.</p></li>
+<li><p>If you want to customise how Python values and PostgreSQL types are mapped
+into each other, beside the <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">basic type mapping</span></a>,
+you can <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">configure your types</span></a>.</p></li>
+</ul>
 </section>
 </section>
 
@@ -421,6 +436,7 @@ but be careful about its quirkiness: see <a class="reference internal" href="../
 <li><a class="reference internal" href="#main-objects-in-psycopg-3">Main objects in Psycopg 3</a></li>
 <li><a class="reference internal" href="#shortcuts">Shortcuts</a></li>
 <li><a class="reference internal" href="#connection-context">Connection context</a></li>
+<li><a class="reference internal" href="#adapting-pyscopg-to-your-program">Adapting pyscopg to your program</a></li>
 </ul>
 </li>
 </ul>
