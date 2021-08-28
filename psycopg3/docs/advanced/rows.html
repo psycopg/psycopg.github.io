@@ -193,6 +193,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/rows.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows</span></code> – row factory implementations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/adapt.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters</a></li>
@@ -231,9 +232,9 @@
 <p>Cursor’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*</span></code> methods, by default, return the records received from the
 database as tuples. This can be changed to better suit the needs of the
 programmer by using custom <em>row factories</em>.</p>
-<p>The module <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code> exposes several row factories ready to be used. For
+<p>The module <a class="reference internal" href="../api/rows.html#module-psycopg.rows" title="psycopg.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code></a> exposes several row factories ready to be used. For
 instance, if you want to return your records as dictionaries, you can use
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row</span></code>:</p>
+<a class="reference internal" href="../api/rows.html#psycopg.rows.dict_row" title="psycopg.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">dict_row</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
@@ -258,8 +259,8 @@ they return:</p>
 </pre></div>
 </div>
 <p>If you want to return objects of your choice you can use a row factory
-<em>generator</em>, for instance <code class="xref py py-obj docutils literal notranslate"><span class="pre">class_row</span></code> or
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">args_row</span></code>, or you can <a class="reference internal" href="#row-factory-create"><span class="std std-ref">write your own row factory</span></a>:</p>
+<em>generator</em>, for instance <a class="reference internal" href="../api/rows.html#psycopg.rows.class_row" title="psycopg.rows.class_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_row</span></code></a> or
+<a class="reference internal" href="../api/rows.html#psycopg.rows.args_row" title="psycopg.rows.args_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args_row</span></code></a>, or you can <a class="reference internal" href="#row-factory-create"><span class="std std-ref">write your own row factory</span></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
@@ -284,8 +285,8 @@ query is executed and properties such as <a class="reference internal" href="../
 <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.pgresult" title="psycopg.Cursor.pgresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pgresult</span></code></a> are available on the cursor) and to prepare a callable
 which is efficient to call repeatedly (because, for instance, the names of the
 columns are extracted, sanitised, and stored in local variables).</p>
-<p>Formally, these objects are represented by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> and
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code> protocols.</p>
+<p>Formally, these objects are represented by the <a class="reference internal" href="../api/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code></a> and
+<a class="reference internal" href="../api/rows.html#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> protocols.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> objects can be implemented as a class, for instance:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Cursor</span>
@@ -324,7 +325,7 @@ columns are extracted, sanitised, and stored in local variables).</p>
 the parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> is passed by the <code class="docutils literal notranslate"><span class="pre">row_factory</span></code> argument (of the
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method) and it controls
 what type of record is returned by the fetch methods of the cursors. The
-default <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row</span></code> returns a generic tuple as return type
+default <a class="reference internal" href="../api/rows.html#psycopg.rows.tuple_row" title="psycopg.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row</span></code></a> returns a generic tuple as return type
 (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Tuple[Any,</span> <span class="pre">...]</span></code>). This information can be used for type checking using a
 static analyzer such as <a class="reference external" href="https://mypy.readthedocs.io/">mypy</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
