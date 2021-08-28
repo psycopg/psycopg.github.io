@@ -172,7 +172,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../basic/install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../basic/adapt.html">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/adapt.html">Adapting basic Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/transactions.html">Transaction management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -362,6 +363,11 @@ customise the type mapping for the entire application.</p>
 Copies are copy-on-write: if the maps are updated make a copy. This way
 extending e.g. global map by a connection or a connection map from a cursor
 is cheap: a copy is made only on customisation.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for an explanation about how contexts are
+connected.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.register_dumper">
 <span class="sig-name descname"><span class="pre">register_dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_dumper" title="Permalink to this definition">¶</a></dt>
@@ -373,7 +379,7 @@ doesn’t specify a format (i.e. when the value is used with a <code class="docu
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – The type to manage.</p></li>
+<li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – The type to manage.</p></li>
 <li><p><strong>dumper</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dumper</span></code></a>]) – The dumper to register for <em>cls</em>.</p></li>
 </ul>
 </dd>

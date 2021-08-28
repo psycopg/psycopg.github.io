@@ -172,7 +172,8 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="adapt.html">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adapt.html">Adapting basic Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transaction management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -301,7 +302,7 @@ to close them and free their resources at the end of the block (notice that
 <p>A few important topics you will have to deal with are:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a>.</p></li>
-<li><p><a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">Adaptation between Python and PostgreSQL types</span></a>.</p></li>
+<li><p><a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">Adapting basic Python types</span></a>.</p></li>
 <li><p><a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a>.</p></li>
 </ul>
 </div>
@@ -314,18 +315,18 @@ exposes a few simple extensions which make the above pattern leaner:</p>
 <li><p>the <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> objects exposes a <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method,
 equivalent to creating a cursor, calling its <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method, and
 returning it.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This</span>
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-
-<span class="c1"># is equivalent to:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In Psycopg 2</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># In Psycopg 3</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p>The <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> method returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>. This means that you can chain
 a fetch operation, such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In Psycopg 2</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="n">record</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
@@ -333,8 +334,9 @@ a fetch operation, such as <a class="reference internal" href="../api/cursors.ht
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
     <span class="o">...</span>
 
-<span class="c1"># is equivalent to:</span>
+<span class="c1"># In Psycopg 3</span>
 <span class="n">record</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
     <span class="o">...</span>
 </pre></div>

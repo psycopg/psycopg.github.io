@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Transaction management" href="transactions.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Adapting other PostgreSQL types" href="pgtypes.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
-        <title>Adaptation between Python and PostgreSQL types - psycopg 3.0.dev3 documentation</title>
+        <title>Adapting basic Python types - psycopg 3.0.dev3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=910ac4ccc9d7c023151c34010d7b500fb9777a51" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -172,7 +172,8 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Adapting basic Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transaction management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -225,13 +226,13 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <section id="adaptation-between-python-and-postgresql-types">
-<span id="types-adaptation"></span><span id="index-0"></span><h1>Adaptation between Python and PostgreSQL types<a class="headerlink" href="#adaptation-between-python-and-postgresql-types" title="Permalink to this headline">¶</a></h1>
+        <section id="adapting-basic-python-types">
+<span id="types-adaptation"></span><span id="index-0"></span><h1>Adapting basic Python types<a class="headerlink" href="#adapting-basic-python-types" title="Permalink to this headline">¶</a></h1>
 <p>Many standard Python types are adapted into SQL and returned as Python
 objects when a query is executed.</p>
-<p>The following table shows the default mapping between Python and PostgreSQL
-types. In case you need to customise the conversion you should take a look at
-<a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>.</p>
+<p>Converting the following data types between Python and PostgreSQL works
+out-of-the-box and doesn’t require any configuration. In case you need to
+customise the conversion you should take a look at <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>.</p>
 <p>TODO: complete table</p>
 <div class="table-wrapper"><table class="data-types docutils align-default">
 <colgroup>
@@ -246,77 +247,7 @@ types. In case you need to customise the conversion you should take a look at
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">bool</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-bool"><span class="std std-ref">Booleans adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">real</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">double</span></code></div>
-</div>
-</td>
-<td rowspan="3"><p><a class="reference internal" href="#adapt-numbers"><span class="std std-ref">Numbers adaptation</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">smallint</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">integer</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">bigint</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">numeric</span></code></div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">numeric</span></code></p></td>
-</tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></div>
-<div class="line"><br/></div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">varchar</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">text</span></code></div>
-</div>
-</td>
-<td><p><a class="reference internal" href="#adapt-string"><span class="std std-ref">Strings adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a></div>
-<div class="line"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytearray</span></code></a></div>
-<div class="line"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoryview</span></code></a></div>
-</div>
-</td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">bytea</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-binary"><span class="std std-ref">Binary adaptation</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">date</span></code></p></td>
-<td rowspan="4"><p><a class="reference internal" href="#adapt-date"><span class="std std-ref">Date/time types adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">time</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">timetz</span></code></div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">timestamp</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code></div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timedelta</span></code></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">interval</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">ARRAY</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-list"><span class="std std-ref">TODO adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
 <div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></div>
 <div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code></div>
 </div>
@@ -324,30 +255,9 @@ types. In case you need to customise the conversion you should take a look at
 <td><p>Composite types</p></td>
 <td><p><a class="reference internal" href="#adapt-composite"><span class="std std-ref">TODO adaptation</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td><p><code class="sql docutils literal notranslate"><span class="pre">hstore</span></code></p></td>
 <td><p><a class="reference internal" href="#adapt-hstore"><span class="std std-ref">TODO adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>Psycopg’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">range</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-range"><span class="std std-ref">TODO adaptation</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>Anything™</p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">json</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-json"><span class="std std-ref">JSON adaptation</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UUID</span></code></a></p></td>
-<td><p><code class="sql docutils literal notranslate"><span class="pre">uuid</span></code></p></td>
-<td><p><a class="reference internal" href="#adapt-uuid"><span class="std std-ref">TODO adaptation</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#module-ipaddress" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipaddress</span></code></a>
-objects</p></td>
-<td><div class="line-block">
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">inet</span></code></div>
-<div class="line"><code class="sql docutils literal notranslate"><span class="pre">cidr</span></code></div>
-</div>
-</td>
-<td><p><a class="reference internal" href="#adapt-network"><span class="std std-ref">TODO adaptation</span></a></p></td>
 </tr>
 </tbody>
 </table></div>
@@ -381,16 +291,6 @@ a <code class="sql docutils literal notranslate"><span class="pre">bigint</span>
 </ul>
 <p>On the way back, smaller types (<code class="sql docutils literal notranslate"><span class="pre">int2</span></code>, <code class="sql docutils literal notranslate"><span class="pre">int4</span></code>, <code class="sql docutils literal notranslate"><span class="pre">flaot4</span></code>) are
 promoted to the larger Python counterpart.</p>
-<p>If you need a more precise control of how <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> are converted,
-The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.numeric</span></code> module contains a few <a class="reference internal" href="../api/types.html#numeric-wrappers"><span class="std std-ref">wrappers</span></a> which can be used to convince Psycopg to cast the values
-to a specific PostgreSQL type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select pg_typeof(</span><span class="si">%s</span><span class="s2">), pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">Int4</span><span class="p">(</span><span class="mi">42</span><span class="p">)))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">('smallint', 'integer')</span>
-</pre></div>
-</div>
-<p>These wrappers are rarely needed, because PostgreSQL cast rules and Psycopg
-choices usually do the right thing. One use case where they are useful is
-<a class="reference internal" href="copy.html#copy-binary"><span class="std std-ref">Binary copy</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Sometimes you may prefer to receive <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> data as <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>
@@ -568,8 +468,54 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
 </pre></div>
 </div>
 </section>
+<section id="lists-adaptation">
+<span id="adapt-list"></span><h2>Lists adaptation<a class="headerlink" href="#lists-adaptation" title="Permalink to this headline">¶</a></h2>
+<p>Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> objects are adapted to <a class="reference external" href="https://www.postgresql.org/docs/current/arrays.html">PostgreSQL arrays</a> and back. Only
+lists containing objects of the same type can be dumped to PostgreSQL (but the
+list may contain <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> elements).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have a list of values which you want to use with the <code class="sql docutils literal notranslate"><span class="pre">IN</span></code>
+operator… don’t. It won’t work (neither with a list nor with a tuple):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM mytable WHERE id IN </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">"&lt;stdin&gt;"</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
+<span class="go">LINE 1: SELECT * FROM mytable WHERE id IN $1</span>
+<span class="go">                                          ^</span>
+</pre></div>
+</div>
+<p>What you want to do instead is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparisons.html#id-1.5.8.30.16">‘= ANY()’ expression</a> and pass
+the values as a list (not a tuple).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM mytable WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>This has also the advantage of working with an empty list, whereas <code class="docutils literal notranslate"><span class="pre">IN</span>
+<span class="pre">()</span></code> is not valid SQL.</p>
+</div>
+</section>
+<section id="uuid-adaptation">
+<span id="adapt-uuid"></span><h2>UUID adaptation<a class="headerlink" href="#uuid-adaptation" title="Permalink to this headline">¶</a></h2>
+<p>Python <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uuid.UUID</span></code></a> objects are adapted to PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-uuid.html">UUID type</a> and back.</p>
+</section>
+<section id="network-data-types-adaptation">
+<span id="adapt-network"></span><h2>Network data types adaptation<a class="headerlink" href="#network-data-types-adaptation" title="Permalink to this headline">¶</a></h2>
+<p>Objects from the <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#module-ipaddress" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipaddress</span></code></a> module are converted to PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-net-types.html#DATATYPE-CIDR">network
+address types</a>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Address" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Address</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Interface" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code></a> objects are converted
+to the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> type. On the way back, <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> values
+indicating a single address are converted to <code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Address</span></code>, otherwise they
+are converted to <code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Network" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Network</span></code></a> objects are converted to the <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> type and
+back.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Address" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Address</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Interface" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Interface</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Network" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Network</span></code></a> objects follow the same rules, with IPv6
+<code class="sql docutils literal notranslate"><span class="pre">inet</span></code> and <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> values.</p></li>
+</ul>
+</section>
 <section id="todo-adaptation">
-<span id="adapt-network"></span><span id="adapt-uuid"></span><span id="adapt-range"></span><span id="adapt-hstore"></span><span id="adapt-composite"></span><span id="adapt-list"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
+<span id="adapt-hstore"></span><span id="adapt-composite"></span><h2>TODO adaptation<a class="headerlink" href="#todo-adaptation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
 <p>Document the other types</p>
@@ -581,12 +527,12 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="transactions.html">
+          <a class="next-page" href="pgtypes.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Transaction management</div>
+                <div class="title">Adapting other PostgreSQL types</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -626,13 +572,16 @@ take precedence over what specified by <code class="xref py py-obj docutils lite
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Adaptation between Python and PostgreSQL types</a><ul>
+<li><a class="reference internal" href="#">Adapting basic Python types</a><ul>
 <li><a class="reference internal" href="#booleans-adaptation">Booleans adaptation</a></li>
 <li><a class="reference internal" href="#numbers-adaptation">Numbers adaptation</a></li>
 <li><a class="reference internal" href="#strings-adaptation">Strings adaptation</a></li>
 <li><a class="reference internal" href="#binary-adaptation">Binary adaptation</a></li>
 <li><a class="reference internal" href="#date-time-types-adaptation">Date/time types adaptation</a></li>
 <li><a class="reference internal" href="#json-adaptation">JSON adaptation</a></li>
+<li><a class="reference internal" href="#lists-adaptation">Lists adaptation</a></li>
+<li><a class="reference internal" href="#uuid-adaptation">UUID adaptation</a></li>
+<li><a class="reference internal" href="#network-data-types-adaptation">Network data types adaptation</a></li>
 <li><a class="reference internal" href="#todo-adaptation">TODO adaptation</a></li>
 </ul>
 </li>

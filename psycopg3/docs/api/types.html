@@ -172,7 +172,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../basic/install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../basic/adapt.html">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/adapt.html">Adapting basic Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/transactions.html">Transaction management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -272,85 +273,57 @@ types to PostgreSQL types and back.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.types.TypeInfo.fetch">
 <em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aconn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Query a system catalog to read information about a type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>conn</strong> (<a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><em>Connection</em></a><em>[</em><em>Any</em><em>]</em>) – the connection to query</p></li>
+<li><p><strong>conn</strong> (<a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><em>Connection</em></a><em> or </em><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><em>AsyncConnection</em></a>) – the connection to query</p></li>
 <li><p><strong>name</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <a class="reference internal" href="sql.html#psycopg.sql.Identifier" title="psycopg.sql.Identifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Identifier</span></code></a>) – the name of the type to query. It can include a schema
 name.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[~T]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object populated with the type information,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object (or subclass) populated with the type
+information, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
 </dd>
 </dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.types.TypeInfo.fetch_async">
-<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fetch_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.fetch_async" title="Permalink to this definition">¶</a></dt>
-<dd><p>Query a system catalog to read information about a type.</p>
-<p>Similar to <a class="reference internal" href="#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> but can use an asynchronous connection.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[~T]</p>
-</dd>
-</dl>
+<p>If the connection is async the function will behave as a coroutine and
+the caller will need to <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it to get the result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="k">await</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">aconn</span><span class="p">,</span> <span class="s2">"mytype"</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.types.TypeInfo.register">
 <span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypeInfo.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
-<p>The <em>context</em> can be a <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>.
-Specifying no context will register the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> globally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>context</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><em>AdaptContext</em></a><em>]</em>) – the context where the type is registered, for instance
+a <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> registers
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> globally.</p>
+</dd>
+</dl>
 <p>Registering the <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> in a context allows the adapters of that
 context to look up type information: for instance it allows to
 recognise automatically arrays of that type and load them from the
 database as a list of the base type.</p>
 </dd></dl>
 </dd></dl>
+<p>For recursive types, Psycopg offers a few <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses which can be
+used to extract more complete information, for instance
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code> and <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> objects are collected in <a class="reference internal" href="#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a> instances, which help type
+information lookup. Every <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> expose its type map on
+its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.types" title="psycopg.adapt.AdaptersMap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a> attribute.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.types.TypesRegistry">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.</span></span><span class="sig-name descname"><span class="pre">TypesRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the information about types in a database.</p>
-</dd></dl>
-<p>The following <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses allow to fetch more specialised
-information from certain class of PostgreSQL types and to create more
-specialised adapters configurations.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="psycopg.types.composite.CompositeInfo">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.composite.</span></span><span class="sig-name descname"><span class="pre">CompositeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Manage information about a composite type.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.types.composite.CompositeInfo.register">
-<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.composite.CompositeInfo.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
-<p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo.register()</span></code> will also register a specialised
-loader to fetch the composite type as a Python named tuple, or a
-custom object if <em>factory</em> is specified.</p>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="psycopg.types.range.RangeInfo">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.range.</span></span><span class="sig-name descname"><span class="pre">RangeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype_oid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Manage information about a range type.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.types.range.RangeInfo.register">
-<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.range.RangeInfo.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register the type information, globally or in the specified <em>context</em>.</p>
-<p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo.register()</span></code> will also register a specialised loaders
-and dumpers. For instance, if you create a PostgreSQL range on the
-type <code class="sql docutils literal notranslate"><span class="pre">inet</span></code>, loading these object with the database will use the
-loader for the <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> type to parse the range bounds - either the
-builtin ones or any one you might have configured.</p>
-<p>The type information will also be used by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> dumper so that
-if you dump a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range(address1,</span> <span class="pre">address2)</span></code> object it will use the
-correct oid for your <code class="sql docutils literal notranslate"><span class="pre">inetrange</span></code> type.</p>
-</dd></dl>
 </dd></dl>
 </section>
 <section id="numeric-wrappers">

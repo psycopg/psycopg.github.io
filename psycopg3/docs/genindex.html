@@ -170,7 +170,8 @@
 <li class="toctree-l2"><a class="reference internal" href="basic/install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="basic/adapt.html">Adaptation between Python and PostgreSQL types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic/adapt.html">Adapting basic Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic/pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/transactions.html">Transaction management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/copy.html">Using COPY TO and COPY FROM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic/from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
@@ -269,14 +270,14 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pq.html#psycopg.pq.TransactionStatus.ACTIVE">ACTIVE (psycopg.pq.TransactionStatus attribute)</a>
 </li>
-        <li><a href="basic/adapt.html#index-0">Adaptation</a>
+        <li><a href="basic/adapt.html#index-0">Adaptation</a>, <a href="basic/pgtypes.html#index-0">[1]</a>
 
         <ul>
           <li><a href="basic/adapt.html#index-1">Boolean</a>
 </li>
           <li><a href="basic/adapt.html#index-2">numbers</a>
 </li>
-          <li><a href="basic/adapt.html#index-0">Objects</a>
+          <li><a href="basic/adapt.html#index-0">Objects</a>, <a href="basic/pgtypes.html#index-0">[1]</a>
 </li>
           <li><a href="basic/adapt.html#index-3">Strings</a>
 </li>
@@ -482,8 +483,6 @@
 </li>
         <li><a href="api/sql.html#psycopg.sql.Composed">Composed (class in psycopg.sql)</a>
 </li>
-        <li><a href="api/types.html#psycopg.types.composite.CompositeInfo">CompositeInfo (class in psycopg.types.composite)</a>
-</li>
         <li><a href="api/module.html#psycopg.connect">connect() (in module psycopg)</a>
 
         <ul>
@@ -596,7 +595,7 @@
     Data types
 
         <ul>
-          <li><a href="basic/adapt.html#index-0">Adaptation</a>
+          <li><a href="basic/adapt.html#index-0">Adaptation</a>, <a href="basic/pgtypes.html#index-0">[1]</a>
 </li>
         </ul></li>
         <li><a href="api/errors.html#psycopg.DatabaseError">DatabaseError</a>
@@ -753,8 +752,6 @@
 </li>
         <li><a href="api/types.html#psycopg.types.TypeInfo.fetch">fetch() (psycopg.types.TypeInfo class method)</a>
 </li>
-        <li><a href="api/types.html#psycopg.types.TypeInfo.fetch_async">fetch_async() (psycopg.types.TypeInfo class method)</a>
-</li>
         <li><a href="api/cursors.html#psycopg.AsyncCursor.fetchall">fetchall() (psycopg.AsyncCursor method)</a>
 
         <ul>
@@ -893,10 +890,10 @@
           <li><a href="basic/adapt.html#index-2">Adaptation</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/errors.html#psycopg.IntegrityError">IntegrityError</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/errors.html#psycopg.InterfaceError">InterfaceError</a>
 </li>
         <li><a href="api/errors.html#psycopg.errors.Diagnostic.internal_position">internal_position (psycopg.errors.Diagnostic attribute)</a>
@@ -912,6 +909,8 @@
         <li><a href="api/errors.html#psycopg.InternalError">InternalError</a>
 </li>
         <li><a href="api/pq.html#psycopg.pq.TransactionStatus.INTRANS">INTRANS (psycopg.pq.TransactionStatus attribute)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.isempty">isempty (psycopg.types.range.Range attribute)</a>
 </li>
         <li><a href="api/connections.html#psycopg.Connection.isolation_level">isolation_level (psycopg.Connection attribute)</a>
 </li>
@@ -968,14 +967,14 @@
         </ul></li>
         <li><a href="api/sql.html#psycopg.sql.Literal">Literal (class in psycopg.sql)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/abc.html#psycopg.abc.Loader.load">load() (psycopg.abc.Loader method)</a>
 
         <ul>
           <li><a href="api/adapt.html#psycopg.adapt.Loader.load">(psycopg.adapt.Loader method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/abc.html#psycopg.abc.Loader">Loader (class in psycopg.abc)</a>
 
         <ul>
@@ -983,6 +982,12 @@
 </li>
         </ul></li>
         <li><a href="api/errors.html#psycopg.errors.lookup">lookup() (in module psycopg.errors)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.lower">lower (psycopg.types.range.Range attribute)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.lower_inc">lower_inc (psycopg.types.range.Range attribute)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.lower_inf">lower_inf (psycopg.types.range.Range attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1111,7 +1116,7 @@
     Objects
 
         <ul>
-          <li><a href="basic/adapt.html#index-0">Adaptation</a>
+          <li><a href="basic/adapt.html#index-0">Adaptation</a>, <a href="basic/pgtypes.html#index-0">[1]</a>
 </li>
         </ul></li>
         <li><a href="api/types.html#psycopg.types.numeric.Oid">Oid (class in psycopg.types.numeric)</a>
@@ -1314,7 +1319,9 @@
   <h2>R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/types.html#psycopg.types.range.RangeInfo">RangeInfo (class in psycopg.types.range)</a>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range">Range (class in psycopg.types.range)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.RangeInfo">RangeInfo (class in psycopg.types.range)</a>
 </li>
         <li><a href="api/cursors.html#psycopg.AsyncCopy.read">read() (psycopg.AsyncCopy method)</a>
 
@@ -1336,17 +1343,13 @@
 </li>
         <li><a href="api/pq.html#psycopg.pq.PollingStatus.READING">READING (psycopg.pq.PollingStatus attribute)</a>
 </li>
-        <li><a href="api/types.html#psycopg.types.composite.CompositeInfo.register">register() (psycopg.types.composite.CompositeInfo method)</a>
-
-        <ul>
-          <li><a href="api/types.html#psycopg.types.range.RangeInfo.register">(psycopg.types.range.RangeInfo method)</a>
+        <li><a href="api/types.html#psycopg.types.TypeInfo.register">register() (psycopg.types.TypeInfo method)</a>
 </li>
-          <li><a href="api/types.html#psycopg.types.TypeInfo.register">(psycopg.types.TypeInfo method)</a>
-</li>
-        </ul></li>
         <li><a href="api/adapt.html#psycopg.adapt.AdaptersMap.register_dumper">register_dumper() (psycopg.adapt.AdaptersMap method)</a>
 </li>
         <li><a href="api/adapt.html#psycopg.adapt.AdaptersMap.register_loader">register_loader() (psycopg.adapt.AdaptersMap method)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.register_range">register_range() (in module psycopg.types.range)</a>
 </li>
         <li><a href="api/pq.html#psycopg.pq.Ping.REJECT">REJECT (psycopg.pq.Ping attribute)</a>
 </li>
@@ -1613,6 +1616,12 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.upper">upper (psycopg.types.range.Range attribute)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.upper_inc">upper_inc (psycopg.types.range.Range attribute)</a>
+</li>
+        <li><a href="basic/pgtypes.html#psycopg.types.range.Range.upper_inf">upper_inf (psycopg.types.range.Range attribute)</a>
+</li>
         <li>
     Usage
 
