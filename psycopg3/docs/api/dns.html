@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="psycopg_pool – Connection pool implementations" href="pool.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
-        <title>_dns – DNS resolution utilities - psycopg 3.0.dev3 documentation</title>
+        <title>_dns – DNS resolution utilities - psycopg 3.0.beta1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=910ac4ccc9d7c023151c34010d7b500fb9777a51" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -132,7 +132,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.0.dev3 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.0.beta1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -159,7 +159,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.0.dev3 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.0.beta1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -292,6 +292,65 @@ and how they support multiple entries.</p>
 </pre></div>
 </div>
 </div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg._dns.resolve_srv">
+<span class="sig-prename descclassname"><span class="pre">psycopg._dns.</span></span><span class="sig-name descname"><span class="pre">resolve_srv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg._dns.resolve_srv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply SRV DNS lookup as defined in <span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2782.html"><strong>RFC 2782</strong></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – The input parameters, for instance as returned by
+<a class="reference internal" href="conninfo.html#psycopg.conninfo.conninfo_to_dict" title="psycopg.conninfo.conninfo_to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conninfo_to_dict()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An updated list of connection parameters.</p>
+</dd>
+</dl>
+<p>For every host defined in the <code class="docutils literal notranslate"><span class="pre">params["host"]</span></code> list (comma-separated),
+perform SRV lookup if the host is in the form <code class="docutils literal notranslate"><span class="pre">_Service._Proto.Target</span></code>.
+If lookup is successful, return a params dict with hosts and ports replaced
+with the looked-up entries.</p>
+<p>Raise <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a> if no lookup is successful and no host
+(looked up or unchanged) could be returned.</p>
+<p>In addition to the rules defined by RFC 2782 about the host name pattern,
+perform SRV lookup also if the the port is the string <code class="docutils literal notranslate"><span class="pre">SRV</span></code> (case
+insensitive).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is an experimental functionality.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One possible way to use this function automatically is to subclass
+<a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>, extending the
+<a class="reference internal" href="#psycopg.Connection._get_connection_params" title="psycopg.Connection._get_connection_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_connection_params()</span></code></a> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg._dns</span>  <span class="c1"># not imported automatically</span>
+
+<span class="k">class</span> <span class="nc">SrvCognizantConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_connection_params</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">_dns</span><span class="o">.</span><span class="n">resolve_srv</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span>
+
+<span class="c1"># The name will be resolved to db1.example.com</span>
+<span class="n">cnn</span> <span class="o">=</span> <span class="n">SrvCognizantConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"host=_postgres._tcp.db.psycopg.org"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg._dns.resolve_srv_async">
+<em class="property"><span class="pre">async</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg._dns.</span></span><span class="sig-name descname"><span class="pre">resolve_srv_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg._dns.resolve_srv_async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Async equivalent of <a class="reference internal" href="#psycopg._dns.resolve_srv" title="psycopg._dns.resolve_srv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_srv()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Connection._get_connection_params">
