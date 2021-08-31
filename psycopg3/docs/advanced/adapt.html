@@ -293,12 +293,11 @@ too many ways of handling XML in Python.Creating a loader to parse the
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Register the loader on the adapters of a context.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"xml"</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">XmlLoader</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"xml"</span><span class="p">,</span> <span class="n">XmlLoader</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now just query the database returning XML data.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sd">"""select XMLPARSE (DOCUMENT '</span>
-<span class="gp">... </span><span class="sd">           &lt;?xml version="1.0"?&gt;</span>
+<span class="gp">... </span>    <span class="sd">"""select XMLPARSE (DOCUMENT '&lt;?xml version="1.0"?&gt;</span>
 <span class="gp">... </span><span class="sd">           &lt;book&gt;&lt;title&gt;Manual&lt;/title&gt;&lt;chapter&gt;...&lt;/chapter&gt;&lt;/book&gt;')</span>
 <span class="gp">... </span><span class="sd">    """</span><span class="p">)</span>
 
