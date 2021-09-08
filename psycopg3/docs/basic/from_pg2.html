@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="More advanced topics" href="../advanced/index.html" /><link rel="prev" title="Using COPY TO and COPY FROM" href="copy.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.31"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.09.08"/>
         <title>Differences from psycopg2 - psycopg 3.0.beta2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=c7c65a82b42f6b978e58466c1e9ef2509836d916" />
@@ -216,7 +216,7 @@
   </aside>
   <div class="main">
     <div class="content">
-      <article role="main">
+      <div class="article-container">
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
@@ -231,55 +231,107 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <section id="differences-from-psycopg2">
+        <article role="main">
+          <section id="differences-from-psycopg2">
 <span id="index-0"></span><h1>Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this headline">¶</a></h1>
 <p>Psycopg 3 uses the common DBAPI structure of many other database adapter and
 tries to behave as close as possible to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. There are however a few
 differences to be aware of.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Most of the times, the workarounds suggested here will work with both
+Psycopg 2 and 3, which could be useful if you are porting a program or
+writing a program that should work with both Psycopg 2 and 3.</p>
+</div>
 <section id="server-side-binding">
 <span id="id1"></span><h2>Server-side binding<a class="headerlink" href="#server-side-binding" title="Permalink to this headline">¶</a></h2>
-<p>Psycopg 3 sends the query and the parameters to the server separately,
-instead of merging them client-side. PostgreSQL may behave slightly
-differently in this case, usually throwing an error and suggesting to use an
-explicit cast.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># returns (20,)</span>
+<p>Psycopg 3 sends the query and the parameters to the server separately, instead
+of merging them on the client side. Server-side binding works for normal
+<code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> and data manipulation statements (<code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code>, <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code>,
+<code class="sql docutils literal notranslate"><span class="pre">DELETE</span></code>), but it doesn’t work with many other statements. For instance,
+it doesn’t work with <code class="sql docutils literal notranslate"><span class="pre">SET</span></code> or with <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET TimeZone TO </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"UTC"</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
+<span class="go">LINE 1: SET TimeZone TO $1</span>
+<span class="go">                        ^</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># raises an exception:</span>
-<span class="c1"># UndefinedFunction: operator does not exist: jsonb -&gt; numeric</span>
-
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[10,20,30]'::jsonb -&gt; </span><span class="si">%s</span><span class="s2">::int"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># returns (20,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"NOTIFY </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"chan"</span><span class="p">,</span> <span class="mi">42</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
+<span class="go">LINE 1: NOTIFY $1, $2</span>
+<span class="go">               ^</span>
 </pre></div>
 </div>
-<p>PostgreSQL will also reject the execution of several queries at once
-(separated by semicolon), if they contain parameters. If parameters are used
-you should use distinct <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> calls; otherwise you may consider merging
-the query client-side, using <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module.</p>
-<p>Certain commands cannot be used with server-side binding, for instance
-<code class="sql docutils literal notranslate"><span class="pre">SET</span></code> or <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET timezone TO </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"utc"</span><span class="p">])</span>
-<span class="gp">...</span>
-<span class="go">psycopg.errors.SyntaxError: syntax error at or near "$1"</span>
+<p>and with any data definition statement:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TABLE foo (id int DEFAULT </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.UndefinedParameter</span>: <span class="n">there is no parameter $1</span>
+<span class="go">LINE 1: CREATE TABLE foo (id int DEFAULT $1)</span>
+<span class="go">                                         ^</span>
 </pre></div>
 </div>
-<p>Sometimes PostgreSQL offers an alternative (e.g. <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">set_config()</span></code>,
-<code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">pg_notify()</span></code>). If no alternative exist you can use <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a>
-to compose the query client-side.</p>
-<p>You cannot use <code class="sql docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> and pass a tuple, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">IN</span> <span class="pre">()</span></code> is an SQL
-construct. You must use <code class="sql docutils literal notranslate"><span class="pre">=</span> <span class="pre">any(%s)</span></code> and pass a list. Note that this also
-works for an empty list, whereas an empty tuple would have resulted in an
-error.</p>
+<p>Sometimes, PostgreSQL offers an alternative: for instance the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET">set_config()</a>
+function can be used instead of the <code class="sql docutils literal notranslate"><span class="pre">SET</span></code> statement, the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html#id-1.9.3.157.7.5">pg_notify()</a>
+function can be used instead of <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT set_config('TimeZone', </span><span class="si">%s</span><span class="s2">, false)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"UTC"</span><span class="p">])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_notify(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"chan"</span><span class="p">,</span> <span class="s2">"42"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If this is not possible, you can use client-side binding using the objects
+from the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code></a> module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"CREATE TABLE foo (id int DEFAULT </span><span class="si">{}</span><span class="s2">)"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="different-cast-rules">
+<span id="difference-cast-rules"></span><h2>Different cast rules<a class="headerlink" href="#different-cast-rules" title="Permalink to this headline">¶</a></h2>
+<p>In rare cases, especially around variadic functions, PostgreSQL might fail to
+find a function candidate for the given data types:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT json_build_array(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="gr">psycopg.errors.IndeterminateDatatype</span>: <span class="n">could not determine data type of parameter $1</span>
+</pre></div>
+</div>
+<p>This can be worked around specifying the argument types explicitly via a cast:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT json_build_array(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="you-cannot-use-in-s-with-a-tuple">
+<span id="in-and-tuple"></span><h2>You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple<a class="headerlink" href="#you-cannot-use-in-s-with-a-tuple" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">IN</span></code> cannot be used with a tuple as single parameter, as was possible with
+<code class="docutils literal notranslate"><span class="pre">psycopg2</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE id IN </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">)])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
+<span class="go">LINE 1: SELECT * FROM foo WHERE id IN $1</span>
+<span class="go">                                      ^</span>
+</pre></div>
+</div>
+<p>What you can do is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparisons.html#id-1.5.8.30.16">= ANY()</a> construct and pass the candidate
+values as a list instead of a tuple, which will be adapted to a PostgreSQL
+array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Note that this variant is also superior because, unlike <code class="sql docutils literal notranslate"><span class="pre">IN</span></code>, it works
+with an empty list of values.</p>
 </section>
 <section id="different-adaptation-system">
 <span id="diff-adapt"></span><h2>Different adaptation system<a class="headerlink" href="#different-adaptation-system" title="Permalink to this headline">¶</a></h2>
 <p>The adaptation system has been completely rewritten, in order to address
 server-side parameters adaptation, but also to consider performance,
 flexibility, ease of customization.</p>
-<p>The behaviour with builtin data should be as expected; if you have customised
-the way to adapt data, or you have your own extension types, you should look
-at the new objects involved in adaptation.</p>
+<p>The default behaviour with builtin data should be <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">what you would expect</span></a>. If you have customised the way to adapt data, or if you
+are managing your own extension types, you should look at the <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">new
+adaptation system</span></a>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -291,8 +343,8 @@ at the new objects involved in adaptation.</p>
 <section id="copy-is-no-more-file-based">
 <span id="diff-copy"></span><h2>Copy is no more file-based<a class="headerlink" href="#copy-is-no-more-file-based" title="Permalink to this headline">¶</a></h2>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> exposes <a class="reference external" href="https://www.psycopg.org/docs/usage.html#copy" title="(in Psycopg v2.9)"><span class="xref std std-ref">a few copy methods</span></a> to interact with
-PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>. The interface doesn’t make easy to load
-dynamically-generated data to the database.</p>
+PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>. Their file-based interface doesn’t make easy to load
+dynamically-generated data into a database.</p>
 <p>There is now a single <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a> method, which is similar to
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_expert()</span></code> in accepting a free-form <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> command and
 returns an object to read/write data, block-wise or record-wise. The different
@@ -335,13 +387,15 @@ set-returning functions… Use a normal <a class="reference internal" href="../a
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> support.</p></li>
 <li><p>Several data types are adapted out-of-the-box: uuid, network, range, bytea,
-array of any supported type are dealt with automatically.</p></li>
-<li><p>Access to the low-level libpq functions.</p></li>
+array of any supported type are dealt with automatically
+(see <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">Adapting basic Python types</span></a>).</p></li>
+<li><p>Access to the low-level libpq functions via the <a class="reference internal" href="../api/pq.html#module-psycopg.pq" title="psycopg.pq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code></a> module.</p></li>
 </ul>
 </section>
 </section>
 
-      </article>
+        </article>
+      </div>
       <footer>
         
         <div class="related-pages">
@@ -368,8 +422,7 @@ array of any supported type are dealt with automatically.</p></li>
         </div>
 
         <div class="related-information">
-              Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team
-            |
+              Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team |
             <a class="muted-link" href="../_sources/basic/from_pg2.rst.txt"
                rel="nofollow">
               Show Source
@@ -392,6 +445,8 @@ array of any supported type are dealt with automatically.</p></li>
             <ul>
 <li><a class="reference internal" href="#">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a><ul>
 <li><a class="reference internal" href="#server-side-binding">Server-side binding</a></li>
+<li><a class="reference internal" href="#different-cast-rules">Different cast rules</a></li>
+<li><a class="reference internal" href="#you-cannot-use-in-s-with-a-tuple">You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple</a></li>
 <li><a class="reference internal" href="#different-adaptation-system">Different adaptation system</a></li>
 <li><a class="reference internal" href="#copy-is-no-more-file-based">Copy is no more file-based</a></li>
 <li><a class="reference internal" href="#with-connection"><code class="docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
