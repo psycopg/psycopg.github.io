@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Row factories" href="rows.html" /><link rel="prev" title="More advanced topics" href="index.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.09.08"/>
-        <title>Async operations - psycopg 3.0.beta2 documentation</title>
+        <title>Asynchronous operations - psycopg 3.0.beta2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=c7c65a82b42f6b978e58466c1e9ef2509836d916" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -182,7 +182,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Async operations</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Asynchronous operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Connection pools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
@@ -232,8 +232,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="async-operations">
-<span id="async"></span><span id="index-0"></span><h1>Async operations<a class="headerlink" href="#async-operations" title="Permalink to this headline">¶</a></h1>
+          <section id="asynchronous-operations">
+<span id="async"></span><span id="index-0"></span><h1>Asynchronous operations<a class="headerlink" href="#asynchronous-operations" title="Permalink to this headline">¶</a></h1>
 <p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
 <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
@@ -274,8 +274,8 @@ context managers, so you can run:</p>
 not quite. Please note that <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a>
 <em>don’t return a context</em>: they are both factory methods which return <em>an
 object which can be used as a context</em>. That’s because there are several use
-cases where it’s useful to handle the object manually and <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> them when
-required.</p>
+cases where it’s useful to handle the objects manually and only <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> them
+when required.</p>
 <p>As a consequence you cannot use <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">connect()</span></code>: you have to do it in
 two steps instead, as in</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
@@ -284,16 +284,16 @@ two steps instead, as in</p>
         <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>which can be condensed as:</p>
+<p>which can be condensed into <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">await</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>…but no less than that: you still need to do the double async thing.</p>
-<p>The <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.cursor" title="psycopg.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> function is not marked as <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> (it never
-performs I/O), so you don’t need an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it and you can use the normal
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> context manager.</p>
+<p>Note that the <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.cursor" title="psycopg.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> function is not an <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> function
+(it never performs I/O), so you don’t need an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it; as a consequence
+you can use the normal <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> context manager.</p>
 </section>
 <section id="asynchronous-notifications">
 <span id="async-notify"></span><span id="index-2"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
@@ -468,7 +468,7 @@ something similar using <a class="reference external" href="https://docs.python.
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Async operations</a><ul>
+<li><a class="reference internal" href="#">Asynchronous operations</a><ul>
 <li><a class="reference internal" href="#with-async-connections"><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
 <li><a class="reference internal" href="#detecting-disconnections">Detecting disconnections</a></li>
