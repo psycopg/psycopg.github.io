@@ -438,10 +438,11 @@ database using</p>
 </pre></div>
 </div>
 <p>Because <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> is distributed as a contrib module, its oid is not well
-known, so it is necessary to use <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> to query the
-database and get its oid. After that you can use
-<a class="reference internal" href="#psycopg.types.hstore.register_hstore" title="psycopg.types.hstore.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a> to allow dumping <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> to <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code>
-and parsing <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> back to <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> in the context where it is registered.</p>
+known, so it is necessary to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> to query the database and get its oid. The
+resulting object you can use passed to
+<a class="reference internal" href="#psycopg.types.hstore.register_hstore" title="psycopg.types.hstore.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a> to configure dumping <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> to
+<code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> and parsing <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> back to <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>, in the context where the
+adapter is registered.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="psycopg.types.hstore.register_hstore">
 <span class="sig-prename descclassname"><span class="pre">psycopg.types.hstore.</span></span><span class="sig-name descname"><span class="pre">register_hstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.hstore.register_hstore" title="Permalink to this definition">¶</a></dt>
@@ -468,6 +469,78 @@ register it globally.</p></li>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'foo =&gt; bar'::hstore"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">{'foo': 'bar'}</span>
+</pre></div>
+</div>
+</section>
+<section id="geometry-adaptation-using-shapely">
+<span id="index-4"></span><h2>Geometry adaptation using Shapely<a class="headerlink" href="#geometry-adaptation-using-shapely" title="Permalink to this headline">¶</a></h2>
+<p>When using the <a class="reference external" href="https://postgis.net/">PostGIS</a> extension, it can be useful to retrieve <a class="reference external" href="https://postgis.net/docs/geometry.html">geometry</a>
+values and have them automatically converted to <a class="reference external" href="https://github.com/Toblerity/Shapely">Shapely</a> instances. Likewise,
+you may want to store such instances in the database and have the conversion
+happen automatically.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Psycopg doesn’t have a dependency on the <code class="docutils literal notranslate"><span class="pre">shapely</span></code> package: you should
+install the library as an additional dependency of your project.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This module is experimental and might be changed in the future according
+to users’ feedback.</p>
+</div>
+<p>Since PostgGIS is an extension, the <code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> type oid is not well
+known, so it is necessary to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> to query the database and find it. The
+resulting object can be passed to <a class="reference internal" href="#psycopg.types.shapely.register_shapely" title="psycopg.types.shapely.register_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_shapely()</span></code></a>
+to configure dumping <a class="reference external" href="https://shapely.readthedocs.io/en/stable/manual.html#shapely.geometry.shape">shape</a> instances to <code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> columns and parsing
+<code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> data back to <code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code> instances, in the context where the
+adapters are registered.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg.types.shapely.register_shapely">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.shapely.</span></span><span class="sig-name descname"><span class="pre">register_shapely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.shapely.register_shapely" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register Shapely dumper and loaders.</p>
+<p>After invoking this function on an adapter, the queries retrieving
+PostGIS geometry objects will return Shapely’s shape object instances
+both in text and binary mode.</p>
+<p>Similarly, shape objects can be sent to the database.</p>
+<p>This requires the Shapely library to be installed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>info</strong> (<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>) – The object with the information about the geometry type.</p></li>
+<li><p><strong>context</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>]) – The context where to register the adapters. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>,
+register it globally.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types</span> <span class="kn">import</span> <span class="n">TypeInfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.shapely</span> <span class="kn">import</span> <span class="n">register_shapely</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"geometry"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_shapely</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'geometry'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON('{</span>
+<span class="gp">... </span><span class="s2">    "type":"Point",</span>
+<span class="gp">... </span><span class="s2">    "coordinates":[-48.23456,20.12345]}')</span>
+<span class="gp">... </span><span class="s2">"""</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;shapely.geometry.multipolygon.MultiPolygon object at 0x7fb131f3cd90&gt;</span>
+</pre></div>
+</div>
+<p>Notice that, if the geometry adapters are registered on a specific object (a
+connection or cursor), other connections and cursors will be unaffected:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn2</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">CONN_STR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON('{</span>
+<span class="gp">... </span><span class="s2">    "type":"Point",</span>
+<span class="gp">... </span><span class="s2">    "coordinates":[-48.23456,20.12345]}')</span>
+<span class="gp">... </span><span class="s2">"""</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'0101000020E61000009279E40F061E48C0F2B0506B9A1F3440'</span>
 </pre></div>
 </div>
 </section>
@@ -526,6 +599,7 @@ register it globally.</p></li>
 <li><a class="reference internal" href="#composite-types-casting">Composite types casting</a></li>
 <li><a class="reference internal" href="#range-adaptation">Range adaptation</a></li>
 <li><a class="reference internal" href="#hstore-adaptation">Hstore adaptation</a></li>
+<li><a class="reference internal" href="#geometry-adaptation-using-shapely">Geometry adaptation using Shapely</a></li>
 </ul>
 </li>
 </ul>
