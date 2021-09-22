@@ -248,7 +248,7 @@ adaptation rules.</p>
 <ul>
 <li><p>Adaptation configuration is performed by changing the
 <a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext.adapters" title="psycopg.abc.AdaptContext.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code></a> object of objects implementing the
-<a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a> protocols, for instance <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>
+<a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a> protocol, for instance <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>
 or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>.</p></li>
 <li><p>Every context object derived from another context inherits its adapters
 mapping: cursors created from a connection inherit the connection’s
@@ -278,6 +278,13 @@ when a query is executed.</p></li>
 </ul>
 </li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Changing adapters in a context only affects that context and its children
+objects created <em>afterwards</em>; the objects already created are not
+affected. For instance, changing the global context will only change newly
+created connections, not the ones already existing.</p>
+</div>
 <section id="writing-a-custom-adapter-xml">
 <span id="adapt-example-xml"></span><h2>Writing a custom adapter: XML<a class="headerlink" href="#writing-a-custom-adapter-xml" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg doesn’t provide adapters for the XML data type, because there are just

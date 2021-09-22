@@ -363,15 +363,17 @@ to customise adaptation in a context without changing separated contexts.</p>
 <a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> is created from a <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>), the parent’s
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code> are used as template for the child’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code>, so that every
 cursor created from the same connection use the connection’s types
-configuration, but separate connections have independent mappings. Once
-created, <code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code> are independent.</p>
+configuration, but separate connections have independent mappings.</p>
+<p>Once created, <code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code> are independent. This means that objects
+already created are not affected if a wider scope (e.g. the global one) is
+changed.</p>
 <p>The connections adapters are initialised using a global <code class="xref py py-obj docutils literal notranslate"><span class="pre">AdptersMap</span></code>
 template, exposed as <a class="reference internal" href="module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a>: changing such mapping allows to
-customise the type mapping for the entire application.</p>
+customise the type mapping for every connections created afterwards.</p>
 <p>The object can start empty or copy from another object of the same class.
 Copies are copy-on-write: if the maps are updated make a copy. This way
 extending e.g. global map by a connection or a connection map from a cursor
-is cheap: a copy is made only on customisation.</p>
+is cheap: a copy is only made on customisation.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> for an explanation about how contexts are
