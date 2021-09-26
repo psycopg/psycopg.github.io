@@ -206,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/dns.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_dns</span></code> – DNS resolution utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Release notes</a></li>
 </ul>
 
 </div>
@@ -252,9 +253,12 @@ adaptation rules.</p>
 or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a>.</p></li>
 <li><p>Every context object derived from another context inherits its adapters
 mapping: cursors created from a connection inherit the connection’s
-configuration. Connections obtain an adapters map from the global map
+configuration.</p>
+<p>By default, connections obtain an adapters map from the global map
 exposed as <a class="reference internal" href="../api/module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a>: changing the content of this object will
-affect every connection created afterwards.</p>
+affect every connection created afterwards. You may specify a different
+template adapters map using the <em>context</em> parameter on
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>.</p>
 <img alt="../_images/adapt.svg" class="align-center" src="../_images/adapt.svg"/></li>
 <li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code> attributes are <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> instances, and contain the
 mapping from Python types and <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> classes, and from
