@@ -1001,11 +1001,19 @@ bytes, unless data types are specified using <a class="reference internal" href=
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Copy.set_types">
 <span class="sig-name descname"><span class="pre">set_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Copy.set_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the types expected out of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation.</p>
-<p>Without setting the types, the data from <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> will be
-returned as unparsed strings or bytes.</p>
+<dd><p>Set the types expected in a COPY operation.</p>
 <p>The types must be specified as a sequence of oid or PostgreSQL type
 names (e.g. <code class="docutils literal notranslate"><span class="pre">int4</span></code>, <code class="docutils literal notranslate"><span class="pre">timestamptz[]</span></code>).</p>
+<p>This operation overcomes the lack of metadata returned by PostgreSQL
+when a COPY operation begins:</p>
+<ul class="simple">
+<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows to specify what types the
+operation returns. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> is not used, the data will be
+reurned as unparsed strings or bytes instead of Python objects.</p></li>
+<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows to choose what type the
+database expects. This is especially useful in binary copy, because
+PostgreSQL will apply no cast rule.</p></li>
+</ul>
 </dd></dl>
 </dd></dl>
 <dl class="py class">

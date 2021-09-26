@@ -400,6 +400,10 @@ doesn’t specify a format (i.e. when the value is used with a <code class="docu
 will be possible to register it without importing it before. In this
 case it should be the fully qualified name of the object (e.g.
 <code class="docutils literal notranslate"><span class="pre">"uuid.UUID"</span></code>).</p>
+<p>If <em>cls</em> is None, only use the dumper when looking up using
+<a class="reference internal" href="#psycopg.adapt.AdaptersMap.get_dumper_by_oid" title="psycopg.adapt.AdaptersMap.get_dumper_by_oid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dumper_by_oid()</span></code></a>, which happens when we know the Postgres type to
+adapt to, but not the Python type that will be adapted (e.g. in COPY
+after using <a class="reference internal" href="cursors.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a>).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.register_loader">
@@ -431,10 +435,34 @@ between type names and oids in the specified context).</p>
 <dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.get_dumper">
 <span class="sig-name descname"><span class="pre">get_dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dumper class for the given type and format.</p>
-<p>Raise ProgrammingError if a class is not available.</p>
+<p>Raise <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> if a class is not available.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dumper</span></code></a>]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>) – The class to adapt.</p></li>
+<li><p><strong>format</strong> (<a class="reference internal" href="#psycopg.adapt.PyFormat" title="psycopg.adapt.PyFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyFormat</span></code></a>) – The format to dump to. If <a class="reference internal" href="#psycopg.adapt.PyFormat.AUTO" title="psycopg.adapt.PyFormat.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>,
+use the last one of the dumpers registered on <em>cls</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dumper</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.get_dumper_by_oid">
+<span class="sig-name descname"><span class="pre">get_dumper_by_oid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_dumper_by_oid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dumper class for the given oid and format.</p>
+<p>Raise <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> if a class is not available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>oid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – The oid of the type to dump to.</p></li>
+<li><p><strong>format</strong> (<a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><code class="xref py py-class docutils literal notranslate"><span class="pre">Format</span></code></a>) – The format to dump to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dumper</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -442,10 +470,16 @@ between type names and oids in the specified context).</p>
 <dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.get_loader">
 <span class="sig-name descname"><span class="pre">get_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.get_loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the loader class for the given oid and format.</p>
-<p>Return None if not found.</p>
+<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Loader</span></code></a>]]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>oid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – The oid of the type to load.</p></li>
+<li><p><strong>format</strong> (<a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><code class="xref py py-class docutils literal notranslate"><span class="pre">Format</span></code></a>) – The format to load from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Loader</span></code></a>]]</p>
 </dd>
 </dl>
 </dd></dl>

@@ -286,9 +286,8 @@ must have a binary dumper registered (see see <a class="reference internal" href
 <p>Note that PostgreSQL is particularly finicky when loading data in binary mode
 and will apply <em>no cast rule</em>. This means that e.g. passing the value 100 to
 an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> column will fail because Psycopg will pass it as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code>
-value. You can work around the problem by registering the right binary
-<a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> on the cursor (see <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>) or using the right data
-wrapper (e.g. <a class="reference internal" href="../api/types.html#psycopg.types.numeric.Int4" title="psycopg.types.numeric.Int4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Int4</span></code></a>).</p>
+value. You can work around the problem using the <a class="reference internal" href="../api/cursors.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> method of
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object and specify carefully the types to dump.</p>
 </section>
 <section id="reading-data-row-by-row">
 <span id="copy-out-row"></span><h2>Reading data row-by-row<a class="headerlink" href="#reading-data-row-by-row" title="Permalink to this headline">¶</a></h2>
