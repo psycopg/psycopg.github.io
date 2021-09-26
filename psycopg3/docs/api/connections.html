@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Cursor classes" href="cursors.html" /><link rel="prev" title="The psycopg module" href="module.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.09.22"/>
-        <title>Connection classes - psycopg 3.0.b2 documentation</title>
+        <title>Connection classes - psycopg 3.0b2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=150e365fa939648e89c22f6d7d13c72a1657915a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -134,7 +134,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.0.b2 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.0b2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -161,7 +161,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.0.b2 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.0b2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -509,35 +509,6 @@ features not currently wrapped by Psycopg.</p>
 <dd><p>A <a class="reference internal" href="#psycopg.ConnectionInfo" title="psycopg.ConnectionInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionInfo</span></code></a> attribute to inspect connection properties.</p>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="psycopg.Connection.client_encoding">
-<span class="sig-name descname"><span class="pre">client_encoding</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.Connection.client_encoding" title="Permalink to this definition">¶</a></dt>
-<dd><p>The Python codec name of the connection’s client encoding.</p>
-<p>The property is writable for sync connections, read-only for async
-ones: you should call <code class="docutils literal notranslate"><span class="pre">await</span></code> <a class="reference internal" href="#psycopg.AsyncConnection.set_client_encoding" title="psycopg.AsyncConnection.set_client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_client_encoding</span></code></a><code class="samp docutils literal notranslate"><span class="pre">(</span><em><span class="pre">value</span></em><span class="pre">)</span></code> instead.</p>
-<p>The value returned is always normalized to the Python codec
-<a class="reference external" href="https://docs.python.org/3/library/codecs.html#codecs.CodecInfo.name" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin9'</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span>
-<span class="s1">'iso8859-15'</span>
-</pre></div>
-</div>
-<p>and it reflects the current connection property, even if it is set
-outside Python:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN1"</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span>
-<span class="s1">'iso8859-1'</span>
-</pre></div>
-</div>
-<p>A few PostgreSQL encodings are not available in Python and cannot be
-selected (currently <code class="docutils literal notranslate"><span class="pre">EUC_TW</span></code>, <code class="docutils literal notranslate"><span class="pre">MULE_INTERNAL</span></code>). The PostgreSQL
-<code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> encoding has the special meaning of “no encoding”: see
-<a class="reference internal" href="../basic/adapt.html#adapt-string"><span class="std std-ref">Strings adaptation</span></a> for details.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">PostgreSQL supported encodings</a>.</p>
-</div>
-</dd></dl>
-<dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Connection.prepare_threshold">
 <span class="sig-name descname"><span class="pre">prepare_threshold</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Connection.prepare_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of times a query is executed before it is prepared.</p>
@@ -729,11 +700,6 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.AsyncIterator" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncIterator</span></code></a>[<a class="reference internal" href="#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-class docutils literal notranslate"><span class="pre">Notify</span></code></a>]</p>
 </dd>
 </dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.AsyncConnection.set_client_encoding">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">set_client_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_client_encoding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Async version of the <a class="reference internal" href="#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code></a> setter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.set_autocommit">
@@ -928,6 +894,26 @@ See <code class="docutils literal notranslate"><a class="reference external" hre
 <p>Example of parameters are <code class="docutils literal notranslate"><span class="pre">server_version</span></code>,
 <code class="docutils literal notranslate"><span class="pre">standard_conforming_strings</span></code>… See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-status.html#LIBPQ-PQPARAMETERSTATUS"><span class="pre">PQparameterStatus()</span></a></code> for
 all the available parameters.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.ConnectionInfo.encoding">
+<span class="sig-name descname"><span class="pre">encoding</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.ConnectionInfo.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Python codec name of the connection’s client encoding.</p>
+<p>The value returned is always normalized to the Python codec
+<a class="reference external" href="https://docs.python.org/3/library/codecs.html#codecs.CodecInfo.name" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN9"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
+<span class="s1">'iso8859-15'</span>
+</pre></div>
+</div>
+<p>A few PostgreSQL encodings are not available in Python and cannot be
+selected (currently <code class="docutils literal notranslate"><span class="pre">EUC_TW</span></code>, <code class="docutils literal notranslate"><span class="pre">MULE_INTERNAL</span></code>). The PostgreSQL
+<code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> encoding has the special meaning of “no encoding”: see
+<a class="reference internal" href="../basic/adapt.html#adapt-string"><span class="std std-ref">Strings adaptation</span></a> for details.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">PostgreSQL supported encodings</a>.</p>
+</div>
 </dd></dl>
 </dd></dl>
 <p class="rubric">Objects involved in <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transaction management</span></a></p>

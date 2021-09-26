@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Adapting other PostgreSQL types" href="pgtypes.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.09.22"/>
-        <title>Adapting basic Python types - psycopg 3.0.b2 documentation</title>
+        <title>Adapting basic Python types - psycopg 3.0b2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=150e365fa939648e89c22f6d7d13c72a1657915a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -134,7 +134,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.0.b2 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.0b2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -161,7 +161,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.0.b2 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.0b2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -297,23 +297,23 @@ such as <code class="sql docutils literal notranslate"><span class="pre">text</s
 </pre></div>
 </div>
 <p>PostgreSQL databases <a class="reference external" href="https://www.postgresql.org/docs/current/sql-createdatabase.html">have an encoding</a>, and <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">the session has an encoding</a>
-too, exposed in the <a class="reference internal" href="../api/connections.html#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.client_encoding</span></code></a> attribute. If your database
-and connection are in UTF-8 encoding you will likely have no problem,
-otherwise you will have to make sure that your application only deals with the
-non-ASCII chars that the database can handle; failing to do so may result in
-encoding/decoding errors:</p>
+too, exposed in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info.</span></code><a class="reference internal" href="../api/connections.html#psycopg.ConnectionInfo.encoding" title="psycopg.ConnectionInfo.encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code></a>
+attribute. If your database and connection are in UTF-8 encoding you will
+likely have no problem, otherwise you will have to make sure that your
+application only deals with the non-ASCII chars that the database can handle;
+failing to do so may result in encoding/decoding errors:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The encoding is set at connection time according to the db configuration</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
 <span class="s1">'utf-8'</span>
 
 <span class="c1"># The Latin-9 encoding can manage some European accented letters</span>
 <span class="c1"># and the Euro symbol</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin9'</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN9"</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="s1">'Crème Brûlée at 4.99€'</span>
 
 <span class="c1"># The Latin-1 encoding doesn't have a representation for the Euro symbol</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s1">'latin1'</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN1"</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Traceback (most recent call last)</span>
 <span class="c1"># ...</span>
@@ -322,10 +322,9 @@ encoding/decoding errors:</p>
 </pre></div>
 </div>
 <p>In rare cases you may have strings with unexpected encodings in the database.
-Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> client encoding (or setting
-<a class="reference internal" href="../api/connections.html#psycopg.Connection.client_encoding" title="psycopg.Connection.client_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code></a> <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">"ascii"</span></code>) will disable decoding of the data
+Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> client encoding  will disable decoding of the data
 coming from the database, which will be returned as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">client_encoding</span> <span class="o">=</span> <span class="s2">"ascii"</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO SQL_ASCII"</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="sa">b</span><span class="s1">'Cr</span><span class="se">\xc3\xa8</span><span class="s1">me Br</span><span class="se">\xc3\xbb</span><span class="s1">l</span><span class="se">\xc3\xa9</span><span class="s1">e at 4.99</span><span class="se">\xe2\x82\xac</span><span class="s1">'</span>
 </pre></div>
