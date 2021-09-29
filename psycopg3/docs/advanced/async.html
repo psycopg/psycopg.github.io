@@ -260,6 +260,16 @@ To avoid that you should <a class="reference external" href="https://www.postgre
 <p>The <a class="reference internal" href="../api/dns.html#psycopg._dns.resolve_hostaddr_async" title="psycopg._dns.resolve_hostaddr_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_hostaddr_async()</span></code></a> is an experimental solution
 to help to do that. Feedback about the feature is welcome!</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>On Windows, Psycopg is not compatible with the default
+<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProactorEventLoop</span></code></a>. Please use a different loop, for instance
+the <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorEventLoop</span></code></a>.</p>
+<p>For instance, you can use, early in your program:</p>
+<pre class="literal-block"><a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.set_event_loop_policy" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.set_event_loop_policy</span></code></a>(
+    <a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.WindowsSelectorEventLoopPolicy" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.WindowsSelectorEventLoopPolicy</span></code></a>()
+)</pre>
+</div>
 <section id="with-async-connections">
 <span id="async-with"></span><span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this headline">¶</a></h2>
 <p>As seen in <a class="reference internal" href="../basic/usage.html#usage"><span class="std std-ref">the basic usage</span></a>, connections and cursors can act as
