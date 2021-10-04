@@ -347,6 +347,9 @@ representing whether the lower or upper bounds are included</p></li>
 from PostgreSQL and doesn’t attempt to replicate the PostgreSQL range
 features: it doesn’t perform normalization and doesn’t implement all the
 <a class="reference external" href="https://www.postgresql.org/docs/current/static/functions-range.html#RANGE-OPERATORS-TABLE">operators</a> supported by the database.</p>
+<p>PostgreSQL will perform normalisation on <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects used as query
+parameters, so, when they are fetched back, they will be found in the
+normal form (for instance ranges on integers will have <code class="xref py py-obj docutils literal notranslate"><span class="pre">[)</span></code> bounds).</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects are immutable, hashable, and support the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator
 (checking if an element is within the range). They can be tested for
 equivalence. Empty ranges evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> in boolean context,
@@ -426,8 +429,8 @@ connections.</p>
 </dd></dl>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.range</span> <span class="kn">import</span> <span class="n">Range</span><span class="p">,</span> <span class="n">RangeInfo</span><span class="p">,</span> <span class="n">register_range</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create type strrange as range (subtype = text)"</span><span class="p">)</span>
 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE strrange AS RANGE (SUBTYPE = text)"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">RangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"strrange"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_range</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
@@ -439,8 +442,97 @@ connections.</p>
 </pre></div>
 </div>
 </section>
+<section id="multirange-adaptation">
+<span id="adapt-multirange"></span><span id="index-3"></span><h2>Multirange adaptation<a class="headerlink" href="#multirange-adaptation" title="Permalink to this headline">¶</a></h2>
+<p>Since PostgreSQL 14, every range type is associated with a <a class="reference external" href="https://www.postgresql.org/docs/current/rangetypes.html">multirange</a>, a
+type representing a disjoint set of ranges. A multirange is
+automatically available for every range, built-in and user-defined.</p>
+<p>All the PostgreSQL range types are loaded as the
+<a class="reference internal" href="#psycopg.types.multirange.Multirange" title="psycopg.types.multirange.Multirange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code></a> Python type, which is a mutable
+sequence of <a class="reference internal" href="#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> elements.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.types.multirange.Multirange">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.multirange.</span></span><span class="sig-name descname"><span class="pre">Multirange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.multirange.Multirange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python representation for a PostgreSQL multirange type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a>[~T]]) – Sequence of ranges to initialise the object.</p>
+</dd>
+</dl>
+<p>This Python type is only used to pass and retrieve multirange values to
+and from PostgreSQL and doesn’t attempt to replicate the PostgreSQL
+multirange features: overlapping items are not merged, empty ranges are
+not discarded, the items are not ordered, the behaviour of <a class="reference external" href="https://www.postgresql.org/docs/current/static/functions-range.html#MULTIRANGE-OPERATORS-TABLE">multirange
+operators</a> is not replicated in Python.</p>
+<p>PostgreSQL will perform normalisation on <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> objects used as
+query parameters, so, when they are fetched back, they will be found
+ordered, with overlapping ranges merged, etc.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> objects are a <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableSequence" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MutableSequence</span></code></a> and are
+totally ordered: they behave pretty much like a list of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code>. Like
+Range, they are <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> on the subtype of their range, so you
+can declare a variable to be <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multitype[date]</span></code> and mypy will complain if
+you try to add it a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range[Decimal]</span></code>.</p>
+</dd></dl>
+<p>Like for <a class="reference internal" href="#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>, built-in multirange objects are adapted
+automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> objects contains <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> with
+<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a> bounds, it is dumped using the <code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> OID, and
+<code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> values are loaded back as <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange[date]</span></code>.</p>
+<p>If you have created your own range type you can use
+<a class="reference internal" href="#psycopg.types.multirange.MultirangeInfo" title="psycopg.types.multirange.MultirangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a> and
+<a class="reference internal" href="#psycopg.types.multirange.register_multirange" title="psycopg.types.multirange.register_multirange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_multirange()</span></code></a> to associate the resulting
+multirange type with its subtype and make it work like the builtin ones.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.types.multirange.MultirangeInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.types.multirange.</span></span><span class="sig-name descname"><span class="pre">MultirangeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype_oid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.multirange.MultirangeInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage information about a multirange type.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code> is a <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> subclass: check its
+documentation for generic details.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg.types.multirange.register_multirange">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.multirange.</span></span><span class="sig-name descname"><span class="pre">register_multirange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.multirange.register_multirange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the adapters to load and dump a multirange type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>info</strong> (<a class="reference internal" href="#psycopg.types.multirange.MultirangeInfo" title="psycopg._typeinfo.MultirangeInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a>) – The object with the information about the range to register.</p></li>
+<li><p><strong>context</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>]) – The context where to register the adapters. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>,
+register it globally.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Register loaders so that loading data of this type will result in a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code>
+with bounds parsed as the right subtype.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Registering the adapters doesn’t affect objects already created, even
+if they are children of the registered context. For instance,
+registering the adapter globally doesn’t affect already existing
+connections.</p>
+</div>
+</dd></dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.multirange</span> <span class="kn">import</span> \
+<span class="gp">... </span>    <span class="n">Multirange</span><span class="p">,</span> <span class="n">MultirangeInfo</span><span class="p">,</span> <span class="n">register_multirange</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.range</span> <span class="kn">import</span> <span class="n">Range</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE strrange AS RANGE (SUBTYPE = text)"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">MultirangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"strmultirange"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_multirange</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"SELECT pg_typeof(</span><span class="si">%(mr)s</span><span class="s2">), </span><span class="si">%(mr)s</span><span class="s2">"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"mr"</span><span class="p">:</span> <span class="n">Multirange</span><span class="p">([</span><span class="n">Range</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"q"</span><span class="p">),</span> <span class="n">Range</span><span class="p">(</span><span class="s2">"l"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)])})</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'strmultirange'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">Multirange([Range('a', 'z', '[)')])</span>
+</pre></div>
+</div>
+</section>
 <section id="hstore-adaptation">
-<span id="adapt-hstore"></span><span id="index-3"></span><h2>Hstore adaptation<a class="headerlink" href="#hstore-adaptation" title="Permalink to this headline">¶</a></h2>
+<span id="adapt-hstore"></span><span id="index-4"></span><h2>Hstore adaptation<a class="headerlink" href="#hstore-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/hstore.html"><code class="sql docutils literal notranslate"><span class="pre">hstore</span></code></a> data type is a key-value store embedded in PostgreSQL. It
 supports GiST or GIN indexes allowing search by keys or key/value pairs as
 well as regular BTree indexes for equality, uniqueness etc.</p>
@@ -495,7 +587,7 @@ connections.</p>
 </div>
 </section>
 <section id="geometry-adaptation-using-shapely">
-<span id="adapt-shapely"></span><span id="index-4"></span><h2>Geometry adaptation using Shapely<a class="headerlink" href="#geometry-adaptation-using-shapely" title="Permalink to this headline">¶</a></h2>
+<span id="adapt-shapely"></span><span id="index-5"></span><h2>Geometry adaptation using Shapely<a class="headerlink" href="#geometry-adaptation-using-shapely" title="Permalink to this headline">¶</a></h2>
 <p>When using the <a class="reference external" href="https://postgis.net/">PostGIS</a> extension, it can be useful to retrieve <a class="reference external" href="https://postgis.net/docs/geometry.html">geometry</a>
 values and have them automatically converted to <a class="reference external" href="https://github.com/Toblerity/Shapely">Shapely</a> instances. Likewise,
 you may want to store such instances in the database and have the conversion
@@ -627,6 +719,7 @@ connection or cursor), other connections and cursors will be unaffected:</p>
 <li><a class="reference internal" href="#">Adapting other PostgreSQL types</a><ul>
 <li><a class="reference internal" href="#composite-types-casting">Composite types casting</a></li>
 <li><a class="reference internal" href="#range-adaptation">Range adaptation</a></li>
+<li><a class="reference internal" href="#multirange-adaptation">Multirange adaptation</a></li>
 <li><a class="reference internal" href="#hstore-adaptation">Hstore adaptation</a></li>
 <li><a class="reference internal" href="#geometry-adaptation-using-shapely">Geometry adaptation using Shapely</a></li>
 </ul>

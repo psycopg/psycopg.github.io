@@ -241,18 +241,22 @@ PostgreSQL types and wrappers to help or customise the types conversion.</p>
 <section id="types-information">
 <h2>Types information<a class="headerlink" href="#types-information" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> object describes simple information about a PostgreSQL data
-type, such as its name, oid and array oid. The class can be used to query a
-database for custom data types: this allows for instance to load automatically
-arrays of a custom type, once a loader for the base type has been registered.</p>
+type, such as its name, oid and array oid. Subclasses may hold more
+information, for instance the components of a composite type.</p>
+<p>You can use <a class="reference internal" href="#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo.fetch()</span></code></a> to query information from a database catalog,
+which is then used by helper functions, such as
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.hstore.register_hstore" title="psycopg.types.hstore.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a>, to register adapters on types whose
+OID is not known upfront or to create more specialised adapters.</p>
 <p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object doesn’t instruct Psycopg to convert a PostgreSQL type
 into a Python type: this is the role of a <a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a>. However it
-can extend the behaviour of the adapters: if you create a loader for
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code>, using <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> you will be able to manage seamlessly arrays of
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code> or ranges and composite types using it as a subtype.</p>
+can extend the behaviour of other adapters: if you create a loader for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code>, using the <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> information, Psycopg will be able to manage
+seamlessly arrays of <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code> or ranges and composite types using <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyType</span></code>
+as a subtype.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> describes about how to convert from Python
-types to PostgreSQL types and back.</p>
+<p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> describes how to convert from Python objects to
+PostgreSQL types and back.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.adapt</span> <span class="kn">import</span> <span class="n">Loader</span>
 <span class="kn">from</span> <span class="nn">psycopg.types</span> <span class="kn">import</span> <span class="n">TypeInfo</span>
@@ -322,10 +326,11 @@ database as a list of the base type.</p>
 </dd></dl>
 </dd></dl>
 <p>For recursive types, Psycopg offers a few <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses which can be
-used to extract more complete information, for instance
-<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a> and <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>.</p>
+used to extract more complete information, such as
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a>, <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>,
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.multirange.MultirangeInfo" title="psycopg.types.multirange.MultirangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a>.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> objects are collected in <a class="reference internal" href="#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a> instances, which help type
-information lookup. Every <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> expose its type map on
+information lookup. Every <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> exposes its type map on
 its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.types" title="psycopg.adapt.AdaptersMap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a> attribute.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.types.TypesRegistry">
@@ -401,6 +406,28 @@ its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.typ
 <span class="go">1009</span>
 </pre></div>
 </div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.types.TypesRegistry.get_by_subtype">
+<span class="sig-name descname"><span class="pre">get_by_subtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.TypesRegistry.get_by_subtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return info about a <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> subclass by its element name or oid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[~T]) – the subtype of <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> to look for. Currently
+supported are <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a> and
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.multirange.MultirangeInfo" title="psycopg.types.multirange.MultirangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a>.</p></li>
+<li><p><strong>subtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – The name or OID of the subtype of the element to look for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[~T]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object of class <em>cls</em> whose subtype is
+<em>subtype</em>. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the element or its range are not found.</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>
