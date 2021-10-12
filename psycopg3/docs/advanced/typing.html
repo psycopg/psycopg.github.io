@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Psycopg 3 API" href="../api/index.html" /><link rel="prev" title="Data adaptation configuration" href="adapt.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Row factories" href="rows.html" /><link rel="prev" title="Asynchronous operations" href="async.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.10.09"/>
-        <title>Prepared statements - psycopg 3.0b2 documentation</title>
+        <title>Static Typing - psycopg 3.0b2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -145,7 +145,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -183,12 +183,12 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="typing.html">Static Typing</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Static Typing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Connection pools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="adapt.html">Data adaptation configuration</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Prepared statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html">Prepared statements</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -228,43 +228,115 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="prepared-statements">
-<span id="index-0"></span><span id="id1"></span><h1>Prepared statements<a class="headerlink" href="#prepared-statements" title="Permalink to this headline">¶</a></h1>
-<p>Psycopg uses an automatic system to manage <em>prepared statements</em>. When a
-query is prepared, its parsing and planning is stored in the server session,
-so that further executions of the same query on the same connection (even with
-different parameters) are optimised.</p>
-<p>A query is prepared automatically after it is executed more than
-<a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code></a> times on a connection. <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> will make
-sure that no more than <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepared_max" title="psycopg.Connection.prepared_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepared_max</span></code></a> statements are planned: if
-further queries are executed, the least recently used ones are deallocated and
-the associated resources freed.</p>
-<p>Statement preparation can be controlled in several ways:</p>
-<ul class="simple">
-<li><p>You can decide to prepare a query immediately by passing <code class="docutils literal notranslate"><span class="pre">prepare=True</span></code> to
-<a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a> or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a>. The query is prepared, if it
-wasn’t already, and executed as prepared from its first use.</p></li>
-<li><p>Conversely, passing <code class="docutils literal notranslate"><span class="pre">prepare=False</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> will avoid to prepare
-the query, regardless of the number of times it is executed. The default of
-the parameter is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, meaning that the query is prepared if the
-conditions described above are met.</p></li>
-<li><p>You can disable the use of prepared statements on a connection by setting
-its <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code></a> attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-</ul>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/sql-prepare.html">PREPARE</a> PostgreSQL documentation contains plenty of details about
-prepared statements in PostgreSQL.</p>
-<p>Note however that Psycopg doesn’t use SQL statements such as
-<code class="sql docutils literal notranslate"><span class="pre">PREPARE</span></code> and <code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code>, but protocol level commands such as the
-ones exposed by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-async.html#LIBPQ-PQSENDPREPARE"><span class="pre">PQsendPrepare</span></a></code>, <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/13/libpq-async.html#LIBPQ-PQSENDQUERYPREPARED"><span class="pre">PQsendQueryPrepared</span></a></code>.</p>
+          <section id="static-typing">
+<span id="id1"></span><h1>Static Typing<a class="headerlink" href="#static-typing" title="Permalink to this headline">¶</a></h1>
+<p>Psycopg source code is annotated according to <span class="target" id="index-0"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0484"><strong>PEP 0484</strong></a> type hints and is
+checked using the current version of <a class="reference external" href="http://mypy-lang.org/">Mypy</a> in <code class="docutils literal notranslate"><span class="pre">--strict</span></code> mode.</p>
+<p>If your application is checked using Mypy too you can make use of Psycopg
+types to validate the correct use of Psycopg objects and of the data returned
+by the database.</p>
+<section id="generic-types">
+<h2>Generic types<a class="headerlink" href="#generic-types" title="Permalink to this headline">¶</a></h2>
+<p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects are <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> objects and
+support a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> parameter which is the type of the records returned.</p>
+<p>By default methods such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.fetchall()</span></code></a> return normal tuples of unknown
+size and content. As such, the <a class="reference internal" href="../api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> function returns an object of type
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Connection[Tuple[Any,</span> <span class="pre">...]]</span></code> and <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> returns an
+object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Cursor[Tuple[Any,</span> <span class="pre">...]]</span></code>. If you are writing generic
+plumbing code it might be practical to use annotations such as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection[Any]</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor[Any]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="c1"># type is psycopg.Connection[Tuple[Any, ...]]</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>      <span class="c1"># type is psycopg.Cursor[Tuple[Any, ...]]</span>
+
+<span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>     <span class="c1"># type is Optional[Tuple[Any, ...]]</span>
+
+<span class="n">recs</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>    <span class="c1"># type is List[Tuple[Any, ...]]</span>
+</pre></div>
 </div>
+</section>
+<section id="type-of-rows-returned">
+<span id="row-factory-static"></span><h2>Type of rows returned<a class="headerlink" href="#type-of-rows-returned" title="Permalink to this headline">¶</a></h2>
+<p>If you want to use connections and cursors returning your data as different
+types, for instance as dictionaries, you can use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> argument
+of the <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method, which
+will control what type of record is returned by the fetch methods of the
+cursors and annotate the returned objects accordingly. See
+<a class="reference internal" href="rows.html#row-factories"><span class="std std-ref">Row factories</span></a> for more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dconn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
+<span class="c1"># dconn type is psycopg.Connection[Dict[str, Any]]</span>
+
+<span class="n">dcur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
+<span class="n">dcur</span> <span class="o">=</span> <span class="n">dconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="c1"># dcur type is psycopg.Cursor[Dict[str, Any]] in both cases</span>
+
+<span class="n">drec</span> <span class="o">=</span> <span class="n">dcur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># drec type is Optional[Dict[str, Any]]</span>
+</pre></div>
+</div>
+</section>
+<section id="example-returning-records-as-pydantic-models">
+<span id="example-pydantic"></span><h2>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Permalink to this headline">¶</a></h2>
+<p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
+Pydantic model factory the code can be checked statically using Mypy and
+querying the database will raise an exception if the rows returned is not
+compatible with the model.</p>
+<p>The following example can be checked with <code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span></code> without reporting
+any issue. Pydantic will also raise a runtime error in case the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code> is used with a query that returns incompatible data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">psycopg</span>
+<span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">class_row</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">first_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">last_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dob</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="sd">"""</span>
+<span class="sd">                SELECT id, first_name, last_name, dob</span>
+<span class="sd">                FROM (VALUES</span>
+<span class="sd">                    (1, 'John', 'Doe', '2000-01-01'::date),</span>
+<span class="sd">                    (2, 'Jane', 'White', NULL)</span>
+<span class="sd">                ) AS data (id, first_name, last_name, dob)</span>
+<span class="sd">                WHERE id = %(id)s;</span>
+<span class="sd">                """</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+            <span class="c1"># reveal_type(obj) would return 'Optional[Person]' here</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"person </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+
+            <span class="c1"># reveal_type(obj) would return 'Person' here</span>
+
+            <span class="k">return</span> <span class="n">obj</span>
+
+<span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born in </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -272,23 +344,23 @@ ones exposed by <code class="docutils literal notranslate"><a class="reference e
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../api/index.html">
+          <a class="next-page" href="rows.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Psycopg 3 API</div>
+                <div class="title">Row factories</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="adapt.html">
+          <a class="prev-page" href="async.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Data adaptation configuration</div>
+                <div class="title">Asynchronous operations</div>
                 
               </div>
             </a>
@@ -296,7 +368,7 @@ ones exposed by <code class="docutils literal notranslate"><a class="reference e
 
         <div class="related-information">
               Copyright &#169; 2020-2021, Daniele Varrazzo and The Psycopg Team |
-            <a class="muted-link" href="../_sources/advanced/prepare.rst.txt"
+            <a class="muted-link" href="../_sources/advanced/typing.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -304,8 +376,29 @@ ones exposed by <code class="docutils literal notranslate"><a class="reference e
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Static Typing</a><ul>
+<li><a class="reference internal" href="#generic-types">Generic types</a></li>
+<li><a class="reference internal" href="#type-of-rows-returned">Type of rows returned</a></li>
+<li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

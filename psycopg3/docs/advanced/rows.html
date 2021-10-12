@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Connection pools" href="pool.html" /><link rel="prev" title="Asynchronous operations" href="async.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Connection pools" href="pool.html" /><link rel="prev" title="Static Typing" href="typing.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.10.09"/>
         <title>Row factories - psycopg 3.0b2 documentation</title>
@@ -183,6 +183,7 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="typing.html">Static Typing</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Connection pools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor types</a></li>
@@ -325,92 +326,6 @@ columns are extracted, sanitised, and stored in local variables).</p>
 </pre></div>
 </div>
 </section>
-<section id="use-with-a-static-analyzer">
-<span id="row-factory-static"></span><h2>Use with a static analyzer<a class="headerlink" href="#use-with-a-static-analyzer" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> classes are <a class="reference external" href="https://mypy.readthedocs.io/en/stable/generics.html">generic types</a>:
-the parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> is passed by the <code class="docutils literal notranslate"><span class="pre">row_factory</span></code> argument (of the
-<a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method) and it controls
-what type of record is returned by the fetch methods of the cursors. The
-default <a class="reference internal" href="../api/rows.html#psycopg.rows.tuple_row" title="psycopg.rows.tuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_row</span></code></a> returns a generic tuple as return type
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">Tuple[Any,</span> <span class="pre">...]</span></code>). This information can be used for type checking using a
-static analyzer such as <a class="reference external" href="https://mypy.readthedocs.io/">mypy</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="c1"># conn type is psycopg.Connection[Tuple[Any, ...]]</span>
-
-<span class="n">dconn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
-<span class="c1"># dconn type is psycopg.Connection[Dict[str, Any]]</span>
-
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="c1"># cur type is psycopg.Cursor[Tuple[Any, ...]]</span>
-
-<span class="n">dcur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
-<span class="n">dcur</span> <span class="o">=</span> <span class="n">dconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="c1"># dcur type is psycopg.Cursor[Dict[str, Any]] in both cases</span>
-
-<span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># rec type is Optional[Tuple[Any, ...]]</span>
-
-<span class="n">drec</span> <span class="o">=</span> <span class="n">dcur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># drec type is Optional[Dict[str, Any]]</span>
-</pre></div>
-</div>
-<section id="example-returning-records-as-pydantic-models">
-<h3>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Permalink to this headline">¶</a></h3>
-<p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
-Pydantic model factory the code can be checked statically using mypy and
-querying the database will raise an exception if the rows returned is not
-compatible with the model.</p>
-<p>The following example can be checked with <code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span></code> without reporting
-any issue. Pydantic will also raise a runtime error in case the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code> is used with a query that returns incompatible data.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-
-<span class="kn">import</span> <span class="nn">psycopg</span>
-<span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">class_row</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
-
-<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">first_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">last_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">dob</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
-
-<span class="k">def</span> <span class="nf">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-                <span class="sd">"""</span>
-<span class="sd">                SELECT id, first_name, last_name, dob</span>
-<span class="sd">                FROM (VALUES</span>
-<span class="sd">                    (1, 'John', 'Doe', '2000-01-01'::date),</span>
-<span class="sd">                    (2, 'Jane', 'White', NULL)</span>
-<span class="sd">                ) AS data (id, first_name, last_name, dob)</span>
-<span class="sd">                WHERE id = %(id)s;</span>
-<span class="sd">                """</span><span class="p">,</span>
-                <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
-            <span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-
-            <span class="c1"># reveal_type(obj) would return 'Optional[Person]' here</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"person </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
-
-            <span class="c1"># reveal_type(obj) would return 'Person' here</span>
-
-            <span class="k">return</span> <span class="n">obj</span>
-
-<span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born in </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born"</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
 </section>
 
         </article>
@@ -427,14 +342,14 @@ any issue. Pydantic will also raise a runtime error in case the
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="async.html">
+          <a class="prev-page" href="typing.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Asynchronous operations</div>
+                <div class="title">Static Typing</div>
                 
               </div>
             </a>
@@ -464,10 +379,6 @@ any issue. Pydantic will also raise a runtime error in case the
             <ul>
 <li><a class="reference internal" href="#">Row factories</a><ul>
 <li><a class="reference internal" href="#creating-new-row-factories">Creating new row factories</a></li>
-<li><a class="reference internal" href="#use-with-a-static-analyzer">Use with a static analyzer</a><ul>
-<li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
