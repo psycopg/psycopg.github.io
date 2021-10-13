@@ -293,7 +293,7 @@ type to a query will adapt them to the registered type.</p>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE card AS (value int, suit text)"</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"card"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"card"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_composite</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">my_card</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">python_type</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">"hearts"</span><span class="p">)</span>
@@ -317,6 +317,7 @@ composite components are registered as well:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_composite</span><span class="p">(</span><span class="n">info2</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT ((8, 'hearts'), 'blue')::card_back"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">card_back(face=card(value=8, suit='hearts'), back='blue')</span>
 </pre></div>
 </div>
 </section>
