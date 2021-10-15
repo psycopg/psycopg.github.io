@@ -291,12 +291,53 @@ from the <a class="reference internal" href="../api/sql.html#module-psycopg.sql"
 </pre></div>
 </div>
 </section>
+<section id="multiple-statements-in-the-same-query">
+<span id="multi-statements"></span><h2>Multiple statements in the same query<a class="headerlink" href="#multiple-statements-in-the-same-query" title="Permalink to this headline">¶</a></h2>
+<p>As a consequence of using <a class="reference internal" href="#server-side-binding"><span class="std std-ref">server-side bindings</span></a>,
+when parameters are used, it is not possible to execute several statements in
+the same <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call, separating them by semicolon:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"insert into foo values (</span><span class="si">%s</span><span class="s2">); insert into foo values (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">cannot insert multiple commands into a prepared statement</span>
+</pre></div>
+</div>
+<p>One obvious way to work around the problem is to use several <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>
+calls.</p>
+<p>There is no such limitation if no parameter is used. This allows to generate
+batches of statement entirely on the client side, for instance using the
+<a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects, and to run them in the same <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"insert into foo values (</span><span class="si">{}</span><span class="s2">); insert into foo values (</span><span class="si">{}</span><span class="s2">)"</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that statements that require to run outside a transaction (such as
+<code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>) can never be executed in batch with other statements,
+even if the transaction is in autocommit mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create database foo; select 1"</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.ActiveSqlTransaction</span>: <span class="n">CREATE DATABASE cannot run inside a transaction block</span>
+</pre></div>
+</div>
+<p>This happens because PostgreSQL will wrap multiple statements in a transaction
+itself and is different from how <strong class="program">psql</strong> behaves (<strong class="program">psql</strong>
+split the queries on semicolons and sends them separately). This is not new in
+Psycopg 3: the same limitation is present in <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> too.</p>
+</section>
 <section id="different-cast-rules">
 <span id="difference-cast-rules"></span><h2>Different cast rules<a class="headerlink" href="#different-cast-rules" title="Permalink to this headline">¶</a></h2>
 <p>In rare cases, especially around variadic functions, PostgreSQL might fail to
 find a function candidate for the given data types:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT json_build_array(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
 <span class="gr">psycopg.errors.IndeterminateDatatype</span>: <span class="n">could not determine data type of parameter $1</span>
 </pre></div>
 </div>
@@ -455,6 +496,7 @@ you?</p>
             <ul>
 <li><a class="reference internal" href="#">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a><ul>
 <li><a class="reference internal" href="#server-side-binding">Server-side binding</a></li>
+<li><a class="reference internal" href="#multiple-statements-in-the-same-query">Multiple statements in the same query</a></li>
 <li><a class="reference internal" href="#different-cast-rules">Different cast rules</a></li>
 <li><a class="reference internal" href="#you-cannot-use-in-s-with-a-tuple">You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple</a></li>
 <li><a class="reference internal" href="#different-adaptation-system">Different adaptation system</a></li>
