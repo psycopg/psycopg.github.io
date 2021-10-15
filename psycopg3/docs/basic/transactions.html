@@ -244,6 +244,76 @@ discarded by <a class="reference internal" href="../api/connections.html#psycopg
 connection will start a new transaction.</p>
 <p>If a database operation fails, the server will refuse further commands, until
 a <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> is called.</p>
+<p>If the cursor is closed with a transaction open, no COMMIT command is sent to
+the server, which will then discard the connection. Certain middleware (such
+as pgbouncer) will also discard a connection left in transaction state, so, if
+possible you will want to commit or rollback a connection before finishing
+working with it.</p>
+<p>An example of what will happen, the first time you will use Psycopg (and to be
+disappointed by it), is likely:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="c1"># Creating a cursor doesn't start a transaction or affect the connection</span>
+<span class="c1"># in any way.</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+<span class="c1"># This function call executes:</span>
+<span class="c1"># - BEGIN</span>
+<span class="c1"># - SELECT count(*) FROM my_table</span>
+<span class="c1"># So now a transaction has started.</span>
+
+<span class="c1"># If your program spends a long time in this state, the server will keep</span>
+<span class="c1"># a connection "idle in transaction", which is likely something undesired</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+<span class="c1"># This statement is executed inside the transaction</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># No COMMIT was sent: the INSERT was discarded.</span>
+</pre></div>
+</div>
+<p>There are a few things going wrong here, let’s see how they can be improved.</p>
+<p>One obvious problem after the run above is that, firing up <strong class="program">psql</strong>,
+you will see no new record in the table <code class="docutils literal notranslate"><span class="pre">data</span></code>. One way to fix the problem
+is to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">conn.commit()</span></code> before closing the connection. Thankfully, if you
+use the <a class="reference internal" href="usage.html#with-connection"><span class="std std-ref">connection context</span></a>, Psycopg will commit the
+connection at the end of the block (or roll it back if the block is exited
+with an exception):</p>
+<p>The code modified using a connection context will result in the following
+sequence of database statements:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="c1"># This function call executes:</span>
+    <span class="c1"># - BEGIN</span>
+    <span class="c1"># - SELECT count(*) FROM my_table</span>
+    <span class="c1"># So now a transaction has started.</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+    <span class="c1"># This statement is executed inside the transaction</span>
+
+<span class="c1"># No exception the end of the block:</span>
+<span class="c1"># COMMIT is executed.</span>
+</pre></div>
+</div>
+<p>This way we don’t have to remember to call neither <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> nor <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code>
+and the database operation have actually a persistent effect. The code might
+still do something you don’t expect: keep a transaction from the first
+operation to the connection closure. You can have a finer control on the
+transactions using an <a class="reference internal" href="#autocommit"><span class="std std-ref">autocommit transaction</span></a> and/or
+<a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction contexts</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>By default even a simple <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> will start a transaction: in
+long-running programs, if no further action is taken, the session will
+remain <em>idle in transaction</em>, an undesirable condition for several
+reasons (locks are held by the session, tables bloat…). For long lived
+scripts, either make sure to terminate a transaction as soon as possible or
+use an <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> connection.</p>
+</div>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>If a database operation fails with an error message such as
@@ -259,50 +329,114 @@ either as connection attribute or as <a class="reference internal" href="../api/
 parameter. This may be required to run operations that cannot be executed
 inside a transaction, such as <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on <a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>By default even a simple <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> will start a transaction: in
-long-running programs, if no further action is taken, the session will
-remain <em>idle in transaction</em>, an undesirable condition for several
-reasons (locks are held by the session, tables bloat…). For long lived
-scripts, either make sure to terminate a transaction as soon as possible or
-use an <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a> connection.</p>
+<p>With an autocommit transaction, the above sequence of operation results in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="c1"># This function call now only executes:</span>
+    <span class="c1"># - SELECT count(*) FROM my_table</span>
+    <span class="c1"># and no transaction starts.</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+    <span class="c1"># The result of this statement is persisted immediately by the database</span>
+
+<span class="c1"># The connection is closed at the end of the block but, because it is not</span>
+<span class="c1"># in a transaction state, no COMMIT is executed.</span>
+</pre></div>
 </div>
+<p>An autocommit transaction behaves more as someone coming from <strong class="program">psql</strong>
+would expect. This has a beneficial performance effect, because less queries
+are sent and less operations are performed by the database. The statements,
+however, are not executed in an atomic transaction; if you need to execute
+certain operations inside a transaction, you can achieve that with an
+autocommit connection too, using an explicit <a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction block</span></a>.</p>
 </section>
-<section id="transaction-blocks">
-<span id="transaction-block"></span><h2>Transaction blocks<a class="headerlink" href="#transaction-blocks" title="Permalink to this headline">¶</a></h2>
+<section id="transaction-contexts">
+<span id="transaction-context"></span><h2>Transaction contexts<a class="headerlink" href="#transaction-contexts" title="Permalink to this headline">¶</a></h2>
 <p>A more transparent way to make sure that transactions are finalised at the
 right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
-transaction block. When the block is entered a transaction is started; when
-leaving the block the transaction is committed, or it is rolled back if an
-exception is raised inside the block.</p>
-<p>For instance, an hypothetical but extremely secure bank may have the following
-code to avoid that no accident between the following two lines leaves the
-accounts unbalanced:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
-    <span class="n">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account1</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">)</span>
-    <span class="n">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account2</span><span class="p">,</span> <span class="o">+</span><span class="mi">100</span><span class="p">)</span>
+transaction context. When the context is entered, a transaction is started;
+when leaving the context the transaction is committed, or it is rolled back if
+an exception is raised inside the block.</p>
+<p>Continuing the example above, if you want to use an autocommit connection but
+still wrap selected groups of commands inside an atomic transaction, you can
+use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> context:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 
-<span class="c1"># The transaction is now committed</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="c1"># The connection is autocommit, so no BEGIN executed.</span>
+
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+        <span class="c1"># BEGIN is executed, a transaction started</span>
+
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO times VALUES (now())"</span><span class="p">)</span>
+        <span class="c1"># These two operation run atomically in the same transaction</span>
+
+    <span class="c1"># COMMIT is executed at the end of the block.</span>
+    <span class="c1"># The connection is in idle state again.</span>
+
+<span class="c1"># The connection is closed at the end of the block.</span>
 </pre></div>
 </div>
-<p>But because the bank is, like, <em>extremely secure</em>, they also verify that no
-account goes negative:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">move_money</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
-    <span class="n">new_balance</span> <span class="o">=</span> <span class="n">add_to_balance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">new_balance</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"account balance cannot go negative"</span><span class="p">)</span>
+<p>Note that connection blocks can also be used with non-autocommit connections:
+in this case you still need to pay attention to eventual transactions started
+automatically. If an operation starts an implicit transaction, a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> block will only manage <a class="reference internal" href="#nested-transactions"><span class="std std-ref">a savepoint sub-transaction</span></a>, leaving the caller to deal with the main transaction,
+as explained in <a class="reference internal" href="#transactions"><span class="std std-ref">Transaction management</span></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+<span class="c1"># This function call executes:</span>
+<span class="c1"># - BEGIN</span>
+<span class="c1"># - SELECT count(*) FROM my_table</span>
+<span class="c1"># So now a transaction has started.</span>
+
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+    <span class="c1"># The block starts with a transaction already open, so it will execute</span>
+    <span class="c1"># - SAVEPOINT</span>
+
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+
+<span class="c1"># The block was executing a sub-transaction so on exit it will only run:</span>
+<span class="c1"># - RELEASE SAVEPOINT</span>
+<span class="c1"># The transaction is still on.</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># No COMMIT was sent: the INSERT was discarded.</span>
 </pre></div>
 </div>
-<p>In case this function raises an exception, be it the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code> in the
-example or any other exception expected or not, the transaction will be rolled
-back, and the exception will propagate out of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block, further down
-the call stack.</p>
-<p>Transaction blocks can also be nested (internal transaction blocks are
+<p>If a <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> block starts when no transaction is active then it will
+manage a proper transaction. In essence, a transaction context tries to leave
+a connection in the state it found it, and leaves you to deal with the wider
+context.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The interaction between non-autocommit transactions and transaction
+contexts is probably surprising. Although the non-autocommit default is
+what demanded by the DBAPI, the personal preference of several experienced
+developers is to:</p>
+<ul class="simple">
+<li><p>use a connection block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">psycopg.connect(...)</span> <span class="pre">as</span> <span class="pre">conn</span></code>;</p></li>
+<li><p>use an autocommit connection: <code class="docutils literal notranslate"><span class="pre">conn.autocommit</span> <span class="pre">=</span> <span class="pre">True</span></code>, eventually as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> parameter too;</p></li>
+<li><p>use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span> <span class="pre">conn.transaction()</span></code> blocks to manage transactions only where
+needed.</p></li>
+</ul>
+</div>
+<section id="nested-transactions">
+<span id="id2"></span><h3>Nested transactions<a class="headerlink" href="#nested-transactions" title="Permalink to this headline">¶</a></h3>
+<p>Transaction blocks can be also nested (internal transaction blocks are
 implemented using <a class="reference external" href="https://www.postgresql.org/docs/current/sql-savepoint.html">SAVEPOINT</a>): an exception raised inside an inner block
 has a chance of being handled and not completely fail outer operations. The
 following is an example where a series of operations interact with the
-database: operations are allowed to fail, plus we also want to store the
+database: operations are allowed to fail; at the end we also want to store the
 number of operations successfully processed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx1</span><span class="p">:</span>
     <span class="n">num_ok</span> <span class="o">=</span> <span class="mi">0</span>
@@ -345,8 +479,9 @@ but not entirely committed yet.</p>
 </pre></div>
 </div>
 </section>
+</section>
 <section id="transaction-characteristics">
-<span id="id3"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this headline">¶</a></h2>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
 transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
@@ -426,7 +561,10 @@ caused the exception.</p>
             <ul>
 <li><a class="reference internal" href="#">Transaction management</a><ul>
 <li><a class="reference internal" href="#autocommit-transactions">Autocommit transactions</a></li>
-<li><a class="reference internal" href="#transaction-blocks">Transaction blocks</a></li>
+<li><a class="reference internal" href="#transaction-contexts">Transaction contexts</a><ul>
+<li><a class="reference internal" href="#nested-transactions">Nested transactions</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#transaction-characteristics">Transaction characteristics</a></li>
 </ul>
 </li>
