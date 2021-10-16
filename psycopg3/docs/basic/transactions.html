@@ -282,8 +282,8 @@ connection at the end of the block (or roll it back if the block is exited
 with an exception):</p>
 <p>The code modified using a connection context will result in the following
 sequence of database statements:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
@@ -330,8 +330,8 @@ parameter. This may be required to run operations that cannot be executed
 inside a transaction, such as <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on <a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
 <p>With an autocommit transaction, the above sequence of operation results in:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
@@ -370,8 +370,8 @@ use a <code class="xref py py-obj docutils literal notranslate"><span class="pre
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># The connection is autocommit, so no BEGIN executed.</span>
 
-    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
-        <span class="c1"># BEGIN is executed, a transaction started</span>
+<span class="hll">    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+</span>        <span class="c1"># BEGIN is executed, a transaction started</span>
 
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO times VALUES (now())"</span><span class="p">)</span>
@@ -424,8 +424,9 @@ what demanded by the DBAPI, the personal preference of several experienced
 developers is to:</p>
 <ul class="simple">
 <li><p>use a connection block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">psycopg.connect(...)</span> <span class="pre">as</span> <span class="pre">conn</span></code>;</p></li>
-<li><p>use an autocommit connection: <code class="docutils literal notranslate"><span class="pre">conn.autocommit</span> <span class="pre">=</span> <span class="pre">True</span></code>, eventually as
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> parameter too;</p></li>
+<li><p>use an autocommit connection, either passing <code class="docutils literal notranslate"><span class="pre">autocommit=True</span></code> as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> parameter or setting the attribute <code class="docutils literal notranslate"><span class="pre">conn.autocommit</span> <span class="pre">=</span>
+<span class="pre">True</span></code>;</p></li>
 <li><p>use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span> <span class="pre">conn.transaction()</span></code> blocks to manage transactions only where
 needed.</p></li>
 </ul>
