@@ -255,7 +255,7 @@ disappointed by it), is likely:</p>
 
 <span class="c1"># Creating a cursor doesn't start a transaction or affect the connection</span>
 <span class="c1"># in any way.</span>
-<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
@@ -284,7 +284,7 @@ with an exception):</p>
 sequence of database statements:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 </span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># This function call executes:</span>
@@ -332,7 +332,7 @@ inside a transaction, such as <code class="sql docutils literal notranslate"><sp
 <p>With an autocommit transaction, the above sequence of operation results in:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 </span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># This function call now only executes:</span>
@@ -365,7 +365,7 @@ still wrap selected groups of commands inside an atomic transaction, you can
 use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> context:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># The connection is autocommit, so no BEGIN executed.</span>
@@ -390,7 +390,7 @@ automatically. If an operation starts an implicit transaction, a
 as explained in <a class="reference internal" href="#transactions"><span class="std std-ref">Transaction management</span></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
