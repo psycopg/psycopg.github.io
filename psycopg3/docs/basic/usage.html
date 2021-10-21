@@ -369,7 +369,49 @@ using a result in a single expression:</p>
 </div>
 <p>When the block is exited, if there is a transaction open, it will be
 committed. If an exception is raised within the block the transaction is
-rolled back. In both cases the connection is closed.</p>
+rolled back. In both cases the connection is closed. It is roughly the
+equivalent of:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="o">...</span> <span class="c1"># use the connection</span>
+<span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This behaviour is not what <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> does: in <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <a class="reference external" href="https://www.psycopg.org/docs/usage.html#with" title="(in Psycopg v2.9)"><span class="xref std std-ref">there is
+no final close()</span></a> and the connection can be used in several
+<code class="docutils literal notranslate"><span class="pre">with</span></code> statements to manage different transactions. This behaviour has
+been considered non-standard and surprising so it has been replaced by the
+more explicit <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a> block.</p>
+</div>
+<p>Note that, while the above pattern is what most people would use, <a class="reference internal" href="../api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
+doesn’t enter a block itself, but returns an “un-entered” connection, so that
+it is still possible to use a connection regardless of the code scope and the
+developer is free to use (and responsible of calling) <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a>,
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>, <a class="reference internal" href="../api/connections.html#psycopg.Connection.close" title="psycopg.Connection.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> as and where needed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If a connection is just left to go out of scope, the way it will behave
+with or without the use of a <code class="docutils literal notranslate"><span class="pre">with</span></code> block is different:</p>
+<ul class="simple">
+<li><p>if the connection is used without a <code class="docutils literal notranslate"><span class="pre">with</span></code> block, the server will find
+a connection closed INTRANS and roll back the current transaction;</p></li>
+<li><p>if the connection is used with a <code class="docutils literal notranslate"><span class="pre">with</span></code> block, there will be an
+explicit COMMIT and the operations will be finalised.</p></li>
+</ul>
+<p>You should use a <code class="docutils literal notranslate"><span class="pre">with</span></code> block when your intention is just to execute a
+set of operations and then committing the result, which is the most usual
+thing to do with a connection. If your connection life cycle and
+transaction pattern is different, and want more control on it, the use
+without <code class="docutils literal notranslate"><span class="pre">with</span></code> might be more convenient.</p>
+<p>See <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transaction management</span></a> for more information.</p>
+</div>
 <p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
 but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
 </section>
