@@ -239,16 +239,17 @@
         <article role="main">
           <section id="psycopg-pool-connection-pool-implementations">
 <h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> – Connection pool implementations<a class="headerlink" href="#psycopg-pool-connection-pool-implementations" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-psycopg_pool"><span id="index-0"></span></span><p>The package contains two connection pool implementations. A connection pool
-creates and maintains a limited amount of PostgreSQL connections and allows a
-larger number of users to use them. See <a class="reference internal" href="../advanced/pool.html#connection-pools"><span class="std std-ref">Connection pools</span></a> for more
-details and usage pattern.</p>
+<span class="target" id="module-psycopg_pool"><span id="index-0"></span></span><p>A connection pool is an object to create and maintain a specified amount of
+PostgreSQL connections, reducing the time requested by the program to obtain a
+working connection and allowing an arbitrary large number of concurrent
+threads or tasks to use a controlled amount of resources on the server. See
+<a class="reference internal" href="../advanced/pool.html#connection-pools"><span class="std std-ref">Connection pools</span></a> for more details and usage pattern.</p>
 <p>This module implement two connection pools: <a class="reference internal" href="#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> is a
 synchronous connection pool yielding <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> objects and can be
 used by multithread applications. <a class="reference internal" href="#psycopg_pool.AsyncConnectionPool" title="psycopg_pool.AsyncConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a> has a similar
 interface, but with <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> functions replacing blocking functions, and
 yields <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> instances.</p>
-<p>The intended use (but not mandatory) is to create a single connection pool, as
+<p>The intended (but not mandatory) use is to create a single connection pool, as
 a global object exposed by a module in your application, and use the same
 instance from the rest of the code (especially the
 <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> method.</p>
