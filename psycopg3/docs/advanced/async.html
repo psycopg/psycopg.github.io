@@ -332,7 +332,7 @@ blocking <a class="reference internal" href="../api/connections.html#psycopg.Con
 the <code class="docutils literal notranslate"><span class="pre">stop</span></code> message is received.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg</span>
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LISTEN mychan"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LISTEN mychan"</span><span class="p">)</span>
 <span class="n">gen</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">gen</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">notify</span><span class="p">)</span>
@@ -368,7 +368,7 @@ received immediately, but only during a connection operation, such as a query.</
 <span class="c1"># =# notify mychan, 'hey';</span>
 <span class="c1"># NOTIFY</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
 <span class="c1"># got this: Notify(channel='mychan', payload='hey', pid=961823)</span>
 <span class="c1"># (1,)</span>
 </pre></div>
