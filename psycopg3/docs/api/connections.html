@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Cursor classes" href="cursors.html" /><link rel="prev" title="The psycopg module" href="module.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2021.11.23"/>
-        <title>Connection classes - psycopg 3.0.5 documentation</title>
+        <title>Connection classes - psycopg 3.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
@@ -134,7 +134,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.0.5 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.1.dev0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -161,7 +161,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.0.5 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.1.dev0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -596,6 +596,133 @@ functions waiting for readiness, such as the ones defined in the
 </dd>
 </dl>
 </dd></dl>
+<p class="rubric" id="tpc-methods">Two-Phase Commit support methods</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../basic/transactions.html#two-phase-commit"><span class="std std-ref">Two-Phase Commit protocol support</span></a> for an introductory explanation of
+these methods.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.xid">
+<span class="sig-name descname"><span class="pre">xid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bqual</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.xid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xid</span></code></a> to pass to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_*()</span></code> methods of this connection.</p>
+<p>The argument types and constraints are explained in
+<a class="reference internal" href="../basic/transactions.html#two-phase-commit"><span class="std std-ref">Two-Phase Commit protocol support</span></a>.</p>
+<p>The values passed to the method will be available on the returned
+object as the members <a class="reference internal" href="#psycopg.Xid.format_id" title="psycopg.Xid.format_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_id</span></code></a>, <a class="reference internal" href="#psycopg.Xid.gtrid" title="psycopg.Xid.gtrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gtrid</span></code></a>, <a class="reference internal" href="#psycopg.Xid.bqual" title="psycopg.Xid.bqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bqual</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Xid</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.tpc_begin">
+<span class="sig-name descname"><span class="pre">tpc_begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.tpc_begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin a TPC transaction with the given transaction ID <em>xid</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xid</strong> (<a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><em>Xid</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The id of the transaction</p>
+</dd>
+</dl>
+<p>This method should be called outside of a transaction (i.e. nothing
+may have executed since the last <a class="reference internal" href="#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or <a class="reference internal" href="#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> and
+<a class="reference internal" href="#psycopg.ConnectionInfo.transaction_status" title="psycopg.ConnectionInfo.transaction_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_status</span></code></a> is <a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus.IDLE" title="psycopg.pq.TransactionStatus.IDLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IDLE</span></code></a>).</p>
+<p>Furthermore, it is an error to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code>
+within the TPC transaction: in this case a <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a>
+is raised.</p>
+<p>The <em>xid</em> may be either an object returned by the <a class="reference internal" href="#psycopg.Connection.xid" title="psycopg.Connection.xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xid()</span></code></a> method or a
+plain string: the latter allows to create a transaction using the
+provided string as PostgreSQL transaction id. See also
+<a class="reference internal" href="#psycopg.Connection.tpc_recover" title="psycopg.Connection.tpc_recover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_recover()</span></code></a>.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.tpc_prepare">
+<span class="sig-name descname"><span class="pre">tpc_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.tpc_prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the first phase of a transaction started with <a class="reference internal" href="#psycopg.Connection.tpc_begin" title="psycopg.Connection.tpc_begin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_begin()</span></code></a>.</p>
+<p>A <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> is raised if this method is used outside of a TPC
+transaction.</p>
+<p>After calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code>, no statements can be executed until
+<a class="reference internal" href="#psycopg.Connection.tpc_commit" title="psycopg.Connection.tpc_commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code></a> or <a class="reference internal" href="#psycopg.Connection.tpc_rollback" title="psycopg.Connection.tpc_rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code></a> will be
+called.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-prepare-transaction.html"><code class="sql docutils literal notranslate"><span class="pre">PREPARE</span> <span class="pre">TRANSACTION</span></code></a> PostgreSQL command.</p>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.tpc_commit">
+<span class="sig-name descname"><span class="pre">tpc_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.tpc_commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit a prepared two-phase transaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xid</strong> (<a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><em>Xid</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The id of the transaction</p>
+</dd>
+</dl>
+<p>When called with no arguments, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code> commits a TPC
+transaction previously prepared with <a class="reference internal" href="#psycopg.Connection.tpc_prepare" title="psycopg.Connection.tpc_prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code></a>.</p>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code> is called prior to <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code>, a single phase
+commit is performed.  A transaction manager may choose to do this if
+only a single resource is participating in the global transaction.</p>
+<p>When called with a transaction ID <em>xid</em>, the database commits the
+given transaction.  If an invalid transaction ID is provided, a
+<a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> will be raised.  This form should be called outside
+of a transaction, and is intended for use in recovery.</p>
+<p>On return, the TPC transaction is ended.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-commit-prepared.html"><code class="sql docutils literal notranslate"><span class="pre">COMMIT</span> <span class="pre">PREPARED</span></code></a> PostgreSQL command.</p>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.tpc_rollback">
+<span class="sig-name descname"><span class="pre">tpc_rollback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.tpc_rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roll back a prepared two-phase transaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xid</strong> (<a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><em>Xid</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The id of the transaction</p>
+</dd>
+</dl>
+<p>When called with no arguments, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code> rolls back a TPC
+transaction.  It may be called before or after <a class="reference internal" href="#psycopg.Connection.tpc_prepare" title="psycopg.Connection.tpc_prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code></a>.</p>
+<p>When called with a transaction ID <em>xid</em>, it rolls back the given
+transaction.  If an invalid transaction ID is provided, a
+<a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> is raised.  This form should be called outside of a
+transaction, and is intended for use in recovery.</p>
+<p>On return, the TPC transaction is ended.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-rollback-prepared.html"><code class="sql docutils literal notranslate"><span class="pre">ROLLBACK</span> <span class="pre">PREPARED</span></code></a> PostgreSQL command.</p>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.tpc_recover">
+<span class="sig-name descname"><span class="pre">tpc_recover</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.tpc_recover" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Xid</span></code></a>]</p>
+</dd>
+</dl>
+<p>Returns a list of <a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xid</span></code></a> representing pending transactions, suitable
+for use with <a class="reference internal" href="#psycopg.Connection.tpc_commit" title="psycopg.Connection.tpc_commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code></a> or <a class="reference internal" href="#psycopg.Connection.tpc_rollback" title="psycopg.Connection.tpc_rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code></a>.</p>
+<p>If a transaction was not initiated by Psycopg, the returned Xids will
+have attributes <a class="reference internal" href="#psycopg.Xid.format_id" title="psycopg.Xid.format_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_id</span></code></a> and <a class="reference internal" href="#psycopg.Xid.bqual" title="psycopg.Xid.bqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bqual</span></code></a> set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> and
+the <a class="reference internal" href="#psycopg.Xid.gtrid" title="psycopg.Xid.gtrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gtrid</span></code></a> set to the PostgreSQL transaction ID: such Xids are
+still usable for recovery.  Psycopg uses the same algorithm of the
+<a class="reference external" href="https://jdbc.postgresql.org/">PostgreSQL JDBC driver</a> to encode a XA triple in a string, so
+transactions initiated by a program using such driver should be
+unpacked correctly.</p>
+<p>Xids returned by <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_recover()</span></code> also have extra attributes
+<a class="reference internal" href="#psycopg.Xid.prepared" title="psycopg.Xid.prepared"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepared</span></code></a>, <a class="reference internal" href="#psycopg.Xid.owner" title="psycopg.Xid.owner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">owner</span></code></a>, <a class="reference internal" href="#psycopg.Xid.database" title="psycopg.Xid.database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">database</span></code></a> populated with the
+values read from the server.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>the <a class="reference external" href="https://www.postgresql.org/docs/current/static/view-pg-prepared-xacts.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pg_prepared_xacts</span></code></a> system view.</p>
+</div>
+</dd></dl>
 </dd></dl>
 </section>
 <section id="the-asyncconnection-class">
@@ -724,6 +851,27 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.set_deferrable">
 <em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">set_deferrable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_deferrable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Async version of the <a class="reference internal" href="#psycopg.Connection.deferrable" title="psycopg.Connection.deferrable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deferrable</span></code></a> setter.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.tpc_prepare">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">tpc_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.tpc_prepare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.tpc_commit">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">tpc_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.tpc_commit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.tpc_rollback">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">tpc_rollback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.tpc_rollback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.tpc_recover">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">tpc_recover</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.tpc_recover" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference internal" href="#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Xid</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>
@@ -986,6 +1134,50 @@ the <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Tra
 <span class="pre">conn.transaction()</span> <span class="pre">as</span> <em><span class="pre">tx</span></em><span class="pre">:</span></code> and all the blocks nested within. The
 program will continue after the <em>tx</em> block.</p></li>
 </ul>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.Xid">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Xid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bqual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Xid" title="Permalink to this definition">¶</a></dt>
+<dd><p>A two-phase commit transaction identifier.</p>
+<p>The object can also be unpacked as a 3-item tuple (<a class="reference internal" href="#psycopg.Xid.format_id" title="psycopg.Xid.format_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_id</span></code></a>, <a class="reference internal" href="#psycopg.Xid.gtrid" title="psycopg.Xid.gtrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gtrid</span></code></a>,
+<a class="reference internal" href="#psycopg.Xid.bqual" title="psycopg.Xid.bqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bqual</span></code></a>).</p>
+<p>See <a class="reference internal" href="../basic/transactions.html#two-phase-commit"><span class="std std-ref">Two-Phase Commit protocol support</span></a> for details.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.format_id">
+<span class="sig-name descname"><span class="pre">format_id</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Xid.format_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format Identifier of the two-phase transaction.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.gtrid">
+<span class="sig-name descname"><span class="pre">gtrid</span></span><em class="property"><span class="pre">:</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#psycopg.Xid.gtrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global Transaction Identifier of the two-phase transaction.</p>
+<p>If the Xid doesn’t follow the XA standard, it will be the PostgreSQL
+ID of the transaction (in which case <a class="reference internal" href="#psycopg.Xid.format_id" title="psycopg.Xid.format_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_id</span></code></a> and <a class="reference internal" href="#psycopg.Xid.bqual" title="psycopg.Xid.bqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bqual</span></code></a> will be
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.bqual">
+<span class="sig-name descname"><span class="pre">bqual</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#psycopg.Xid.bqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Branch Qualifier of the two-phase transaction.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.prepared">
+<span class="sig-name descname"><span class="pre">prepared</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#psycopg.Xid.prepared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestamp at which the transaction was prepared for commit.</p>
+<p>Only available on transactions recovered by <a class="reference internal" href="#psycopg.Connection.tpc_recover" title="psycopg.Connection.tpc_recover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_recover()</span></code></a>.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#psycopg.Xid.owner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Named of the user that executed the transaction.</p>
+<p>Only available on recovered transactions.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Xid.database">
+<span class="sig-name descname"><span class="pre">database</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#psycopg.Xid.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Named of the database in which the transaction was executed.</p>
+<p>Only available on recovered transactions.</p>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

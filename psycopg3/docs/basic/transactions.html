@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Using COPY TO and COPY FROM" href="copy.html" /><link rel="prev" title="Adapting other PostgreSQL types" href="pgtypes.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2021.11.23"/>
-        <title>Transaction management - psycopg 3.0.5 documentation</title>
+        <title>Transaction management - psycopg 3.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
@@ -134,7 +134,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.0.5 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.1.dev0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -161,7 +161,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.0.5 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.1.dev0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -512,6 +512,42 @@ exception looking like:</p>
 caused the exception.</p>
 </div>
 </section>
+<section id="two-phase-commit-protocol-support">
+<span id="two-phase-commit"></span><span id="index-3"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<p>Psycopg exposes the two-phase commit features available in PostgreSQL
+implementing the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions">two-phase commit extensions</a> proposed by the DBAPI.</p>
+<p>The DBAPI model of two-phase commit is inspired by the <a class="reference external" href="https://publications.opengroup.org/c193">XA specification</a>,
+according to which transaction IDs are formed from three components:</p>
+<ul class="simple">
+<li><p>a format ID (non-negative 32 bit integer)</p></li>
+<li><p>a global transaction ID (string not longer than 64 bytes)</p></li>
+<li><p>a branch qualifier (string not longer than 64 bytes)</p></li>
+</ul>
+<p>For a particular global transaction, the first two components will be the same
+for all the resources. Every resource will be assigned a different branch
+qualifier.</p>
+<p>According to the DBAPI specification, a transaction ID is created using the
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.xid" title="psycopg.Connection.xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.xid()</span></code></a> method. Once you have a transaction id, a distributed
+transaction can be started with <a class="reference internal" href="../api/connections.html#psycopg.Connection.tpc_begin" title="psycopg.Connection.tpc_begin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.tpc_begin()</span></code></a>, prepared using
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.tpc_prepare" title="psycopg.Connection.tpc_prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code></a> and completed using <a class="reference internal" href="../api/connections.html#psycopg.Connection.tpc_commit" title="psycopg.Connection.tpc_commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code></a> or
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.tpc_rollback" title="psycopg.Connection.tpc_rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code></a>.  Transaction IDs can also be retrieved from the
+database using <a class="reference internal" href="../api/connections.html#psycopg.Connection.tpc_recover" title="psycopg.Connection.tpc_recover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_recover()</span></code></a> and completed using the above
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code>.</p>
+<p>PostgreSQL doesn’t follow the XA standard though, and the ID for a PostgreSQL
+prepared transaction can be any string up to 200 characters long. Psycopg’s
+<a class="reference internal" href="../api/connections.html#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xid</span></code></a> objects can represent both XA-style transactions IDs (such as the ones
+created by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">xid()</span></code> method) and PostgreSQL transaction IDs identified by
+an unparsed string.</p>
+<p>The format in which the Xids are converted into strings passed to the
+database is the same employed by the <a class="reference external" href="https://jdbc.postgresql.org/">PostgreSQL JDBC driver</a>: this should
+allow interoperation between tools written in Python and in Java. For example
+a recovery tool written in Python would be able to recognize the components of
+transactions produced by a Java program.</p>
+<p>For further details see the documentation for the <a class="reference internal" href="../api/connections.html#tpc-methods"><span class="std std-ref">Two-Phase Commit support methods</span></a>.</p>
+</section>
 </section>
 
         </article>
@@ -572,6 +608,7 @@ caused the exception.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#transaction-characteristics">Transaction characteristics</a></li>
+<li><a class="reference internal" href="#two-phase-commit-protocol-support">Two-Phase Commit protocol support</a></li>
 </ul>
 </li>
 </ul>
