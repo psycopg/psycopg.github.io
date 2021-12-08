@@ -239,13 +239,20 @@
         <article role="main">
           <section id="module-psycopg.types">
 <span id="types-types-information-and-adapters"></span><span id="psycopg-types"></span><h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters<a class="headerlink" href="#module-psycopg.types" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types</span></code> package exposes the concrete implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>
-and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code> to manage builtin objects, together with objects to describe
-PostgreSQL types and wrappers to help or customise the types conversion.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types</span></code> package exposes:</p>
+<ul class="simple">
+<li><p>objects to describe PostgreSQL types, such as <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>, <a class="reference internal" href="#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a>,
+to help or <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">customise the types conversion</span></a>;</p></li>
+<li><p>concrete implementations of <a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> and <a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a>
+protocols to <a class="reference internal" href="../basic/adapt.html#types-adaptation"><span class="std std-ref">handle builtin data types</span></a>;</p></li>
+<li><p>helper objects to represent PostgreSQL data types which <a class="reference internal" href="../basic/pgtypes.html#extra-adaptation"><span class="std std-ref">don’t have a
+straightforward Python representation</span></a>, such as
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>.</p></li>
+</ul>
 <section id="types-information">
 <h2>Types information<a class="headerlink" href="#types-information" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a> object describes simple information about a PostgreSQL data
-type, such as its name, oid and array oid. Subclasses may hold more
+type, such as its name, oid and array oid. <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses may hold more
 information, for instance the components of a composite type.</p>
 <p>You can use <a class="reference internal" href="#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo.fetch()</span></code></a> to query information from a database catalog,
 which is then used by helper functions, such as
