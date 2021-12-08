@@ -253,9 +253,9 @@ in the normal use of Psycopg.</p>
 <dt class="sig sig-object py" id="psycopg.adapt.Dumper">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">Dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Python object of the type <em>cls</em> to PostgreSQL representation.</p>
-<p>This is an abstract base class: subclasses <em>must</em> at least implement the
-<a class="reference internal" href="#psycopg.adapt.Dumper.dump" title="psycopg.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method and specify the <a class="reference external" href="https://docs.python.org/3/library/functions.html#format" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>.</p>
-<p>The class implements the <a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> protocol.</p>
+<p>This is an <a class="reference external" href="https://docs.python.org/glossary.html#term-abstract-base-class">abstract base class</a>, partially implementing the
+<a class="reference internal" href="abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> protocol. Subclasses <em>must</em> at least implement the
+<a class="reference internal" href="#psycopg.adapt.Dumper.dump" title="psycopg.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method and optionally override other members.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.adapt.Dumper.dump">
 <em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Dumper.dump" title="Permalink to this definition">¶</a></dt>
@@ -268,6 +268,12 @@ in the normal use of Psycopg.</p>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a>]</p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.adapt.Dumper.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">psycopg.pq.Format</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TEXT</span></em><a class="headerlink" href="#psycopg.adapt.Dumper.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class attribute. Set it to <a class="reference internal" href="pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a> if the class
+<a class="reference internal" href="#psycopg.adapt.Dumper.dump" title="psycopg.adapt.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> methods converts the object to binary format.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.adapt.Dumper.quote">
@@ -314,10 +320,10 @@ should override this class.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.adapt.Loader">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">psycopg.adapt.</span></span><span class="sig-name descname"><span class="pre">Loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert PostgreSQL objects with OID <em>oid</em> to Python objects.</p>
-<p>This is an abstract base class: subclasses <em>must</em> at least implement the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code> method and specify a <a class="reference external" href="https://docs.python.org/3/library/functions.html#format" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>.</p>
-<p>The class implements the <a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> protocol.</p>
+<dd><p>Convert PostgreSQL values with type OID <em>oid</em> to Python objects.</p>
+<p>This is an <a class="reference external" href="https://docs.python.org/glossary.html#term-abstract-base-class">abstract base class</a>, partially implementing the
+<a class="reference internal" href="abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> protocol. Subclasses <em>must</em> at least implement the
+<a class="reference internal" href="#psycopg.adapt.Loader.load" title="psycopg.adapt.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method and optionally override other members.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.adapt.Loader.load">
 <em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.Loader.load" title="Permalink to this definition">¶</a></dt>
@@ -327,6 +333,12 @@ should override this class.</p>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.adapt.Loader.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">psycopg.pq.Format</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TEXT</span></em><a class="headerlink" href="#psycopg.adapt.Loader.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class attribute. Set it to <a class="reference internal" href="pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a> if the class
+<a class="reference internal" href="#psycopg.adapt.Loader.load" title="psycopg.adapt.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> methods converts the object from binary format.</p>
 </dd></dl>
 </dd></dl>
 </section>
@@ -388,7 +400,7 @@ connected.</p>
 <dt class="sig sig-object py" id="psycopg.adapt.AdaptersMap.register_dumper">
 <span class="sig-name descname"><span class="pre">register_dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.adapt.AdaptersMap.register_dumper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the context to use <em>dumper</em> to convert object of type <em>cls</em>.</p>
-<p>If two dumpers with different <code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code> are registered for the
+<p>If two dumpers with different <a class="reference internal" href="#psycopg.adapt.Dumper.format" title="psycopg.adapt.Dumper.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a> are registered for the
 same type, the last one registered will be chosen when the query
 doesn’t specify a format (i.e. when the value is used with a <code class="docutils literal notranslate"><span class="pre">%s</span></code>
 “<a class="reference internal" href="#psycopg.adapt.PyFormat.AUTO" title="psycopg.adapt.PyFormat.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a>” placeholder).</p>
