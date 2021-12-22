@@ -240,9 +240,8 @@
           <section id="connection-pools">
 <span id="id1"></span><h1>Connection pools<a class="headerlink" href="#connection-pools" title="Permalink to this headline">¶</a></h1>
 <p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Connection_pool">connection pool</a> is an object managing a set of connections and allowing
-their use to functions needing one. Because the time to establish a new
-connection can be relatively long, keeping connections open can reduce the
-latency of a program operations.</p>
+their use in functions needing one. Because the time to establish a new
+connection can be relatively long, keeping connections open can reduce latency.</p>
 <p>This page explains a few basic concepts of Psycopg connection pool’s
 behaviour. Please refer to the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> object API for details about
 the pool operations.</p>
@@ -282,7 +281,7 @@ expired. If this behaviour is not desirable you should call the
 until the pool is full or will throw a <a class="reference internal" href="../api/pool.html#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> if the pool isn’t ready
 within an allocated time.</p>
 <p>The pool background workers create connections according to the parameters
-<em>conninfo</em>, <em>kwargs</em>, <em>connection_class</em> passed to <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>
+<em>conninfo</em>, <em>kwargs</em>, and <em>connection_class</em> passed to <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>
 constructor. Once a connection is created it is also passed to the
 <em>configure()</em> callback, if provided, after which it is put in the pool (or
 passed to a client requesting it, if someone is already knocking at the door).
@@ -325,7 +324,7 @@ execution without being slowed down.</p>
 <p>A pool can have a fixed size (specifying no <em>max_size</em> or <em>max_size</em> =
 <em>min_size</em>) or a dynamic size (when <em>max_size</em> &gt; <em>min_size</em>). In both cases, as
 soon as the pool is created, it will try to acquire <em>min_size</em> connections in
-background.</p>
+the background.</p>
 <p>If an attempt to create a connection fails, a new attempt will be made soon
 after, using an exponential backoff to increase the time between attempts,
 until a maximum of <em>reconnect_timeout</em> is reached. When that happens, the pool
@@ -335,7 +334,7 @@ alerts or to interrupt the program and allow the rest of your infrastructure
 to restart it.</p>
 <p>If more than <em>min_size</em> connections are requested concurrently, new ones are
 created, up to <em>max_size</em>. Note that the connections are always created by the
-background workers, not by the thread asking the connection: if a client
+background workers, not by the thread asking for the connection: if a client
 requests a new connection, and a previous client terminates its job before the
 new connection is ready, the waiting client will be served the existing
 connection. This is especially useful in scenarios where the time to connect
@@ -347,15 +346,15 @@ in the pool constructor.</p>
 <section id="what-s-the-right-size-for-the-pool">
 <h3>What’s the right size for the pool<a class="headerlink" href="#what-s-the-right-size-for-the-pool" title="Permalink to this headline">¶</a></h3>
 <p>Big question. Who knows. However, probably not as large as you imagine. Please
-take a look at <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">this this analysis</a> for some ideas.</p>
+take a look at <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">this analysis</a> for some ideas.</p>
 <p>Something useful you can do is probably to use the
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> method and monitor the behaviour of your
 program, eventually adjusting the size of the pool using the
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
 </section>
 </section>
-<section id="connections-quality">
-<h2>Connections quality<a class="headerlink" href="#connections-quality" title="Permalink to this headline">¶</a></h2>
+<section id="connection-quality">
+<h2>Connection quality<a class="headerlink" href="#connection-quality" title="Permalink to this headline">¶</a></h2>
 <p>The state of the connection is verified when a connection is returned to the
 pool: if a connection is broken during its usage it will be discarded on
 return and a new connection will be created.</p>
@@ -367,7 +366,7 @@ client.</p>
 <p>Why not? Because doing so would require an extra network roundtrip: we want to
 save you from its latency. Before getting too angry about it, just think that
 the connection can be lost any moment while your program is using it. As your
-program should be already able to cope with a loss of a connection during its
+program should already be able to cope with a loss of a connection during its
 process, it should be able to tolerate to be served a broken connection:
 unpleasant but not the end of the world.</p>
 <div class="admonition warning">
@@ -391,8 +390,8 @@ connection. If any activity is detected you can call the pool
 briefly unavailable and run a quick check on them, returning them to the pool
 if they are still working or creating a new connection if they aren’t.</p>
 <p>If you set up a similar check in your program, in case the database connection
-is temporarily lost, we cannot do anything for the thread which had taken
-already a connection from the pool, but no other thread should be served a
+is temporarily lost, we cannot do anything for the thread which already had
+taken a connection from the pool, but no other thread should be served a
 broken connection, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code> would empty the pool and refill it with
 working connections, as soon as they are available.</p>
 <p>Faster than you can say poll. Or pool.</p>
@@ -402,7 +401,7 @@ working connections, as soon as they are available.</p>
 <p>The pool can return information about its usage using the methods
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> or <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.pop_stats" title="psycopg_pool.ConnectionPool.pop_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_stats()</span></code></a>. Both methods
 return the same values, but the latter reset the counters after its use. The
-values can be send to a monitoring system such as <a class="reference external" href="https://graphiteapp.org/">Graphite</a> or <a class="reference external" href="https://prometheus.io/">Prometheus</a>.</p>
+values can be sent to a monitoring system such as <a class="reference external" href="https://graphiteapp.org/">Graphite</a> or <a class="reference external" href="https://prometheus.io/">Prometheus</a>.</p>
 <p>The following values should be provided, but please don’t consider them as a
 rigid interface: it is possible that they might change. Keys whose value is 0
 may not be returned.</p>
@@ -528,7 +527,7 @@ server</p></td>
 <li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#connections-quality">Connections quality</a></li>
+<li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
 <li><a class="reference internal" href="#pool-stats">Pool stats</a></li>
 </ul>
 </li>

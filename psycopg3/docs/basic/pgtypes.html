@@ -327,7 +327,7 @@ composite components are registered as well:</p>
 <section id="range-adaptation">
 <span id="adapt-range"></span><span id="index-2"></span><h2>Range adaptation<a class="headerlink" href="#range-adaptation" title="Permalink to this headline">¶</a></h2>
 <p>PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/rangetypes.html">range types</a> are a family of data types representing a range of
-value between two elements. The type of the element is called the range
+values between two elements. The type of the element is called the range
 <em>subtype</em>. PostgreSQL offers a few built-in range types and allows the
 definition of custom ones.</p>
 <p>All the PostgreSQL range types are loaded as the <a class="reference internal" href="#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>
@@ -357,8 +357,8 @@ parameters, so, when they are fetched back, they will be found in the
 normal form (for instance ranges on integers will have <code class="xref py py-obj docutils literal notranslate"><span class="pre">[)</span></code> bounds).</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects are immutable, hashable, and support the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator
 (checking if an element is within the range). They can be tested for
-equivalence. Empty ranges evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> in boolean context,
-nonempty evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>.</p>
+equivalence. Empty ranges evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> in a boolean context,
+nonempty ones evaluate to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects have the following attributes:</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.types.range.Range.isempty">
@@ -479,7 +479,7 @@ can declare a variable to be <code class="xref py py-obj docutils literal notran
 you try to add it a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range[Decimal]</span></code>.</p>
 </dd></dl>
 <p>Like for <a class="reference internal" href="#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>, built-in multirange objects are adapted
-automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> objects contains <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> with
+automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> object contains <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> with
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a> bounds, it is dumped using the <code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> OID, and
 <code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> values are loaded back as <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange[date]</span></code>.</p>
 <p>If you have created your own range type you can use
@@ -551,7 +551,7 @@ database using:</p>
 </div>
 <p>Because <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> is distributed as a contrib module, its oid is not well
 known, so it is necessary to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> to query the database and get its oid. The
-resulting object you can use passed to
+resulting object can be passed to
 <a class="reference internal" href="#psycopg.types.hstore.register_hstore" title="psycopg.types.hstore.register_hstore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_hstore()</span></code></a> to configure dumping <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> to
 <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> and parsing <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> back to <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>, in the context where the
 adapter is registered.</p>

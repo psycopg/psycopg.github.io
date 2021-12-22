@@ -276,11 +276,11 @@ the objects used to perform the conversion from a Python object to a bytes
 sequence in a format understood by PostgreSQL. The string returned
 <em>shouldn’t be quoted</em>: the value will be passed to the database using
 functions such as <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-exec.html#LIBPQ-PQEXECPARAMS"><span class="pre">PQexecParams()</span></a></code> so quoting and quotes escaping is
-not necessary. The dumper usually also suggests the server what type to
+not necessary. The dumper usually also suggests to the server what type to
 use, via its <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.oid" title="psycopg.abc.Dumper.oid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oid</span></code></a> attribute.</p></li>
 <li><p>Loaders (objects implementing the <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> protocol) are
 the objects used to perform the opposite operation: reading a bytes
-sequence from PostgreSQL and create a Python object out of it.</p></li>
+sequence from PostgreSQL and creating a Python object out of it.</p></li>
 <li><p>Dumpers and loaders are instantiated on demand by a <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Transformer" title="psycopg.adapt.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a> object
 when a query is executed.</p></li>
 </ul>
@@ -296,7 +296,7 @@ created connections, not the ones already existing.</p>
 <section id="writing-a-custom-adapter-xml">
 <span id="adapt-example-xml"></span><h2>Writing a custom adapter: XML<a class="headerlink" href="#writing-a-custom-adapter-xml" title="Permalink to this headline">¶</a></h2>
 <p>Psycopg doesn’t provide adapters for the XML data type, because there are just
-too many ways of handling XML in Python.Creating a loader to parse the
+too many ways of handling XML in Python. Creating a loader to parse the
 <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-xml.html">PostgreSQL xml type</a> to <a class="reference external" href="https://docs.python.org/3/library/xml.etree.elementtree.html#module-xml.etree.ElementTree" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElementTree</span></code></a> is very simple, using the
 <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Loader</span></code></a> base class and implementing the
 <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method:</p>
@@ -323,7 +323,7 @@ too many ways of handling XML in Python.Creating a loader to parse the
 </pre></div>
 </div>
 <p>The opposite operation, converting Python objects to PostgreSQL, is performed
-by dumpers. The <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Dumper</span></code></a> base class makes easy to implement one:
+by dumpers. The <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Dumper</span></code></a> base class makes it easy to implement one:
 you only need to implement the <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.adapt</span> <span class="kn">import</span> <span class="n">Dumper</span>
 
@@ -386,7 +386,7 @@ PostgreSQL but not handled by Python:</p>
 <span class="gr">psycopg.DataError</span>: <span class="n">Python date doesn't support years after 9999: got infinity</span>
 </pre></div>
 </div>
-<p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> to PostgreSQL
+<p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> as PostgreSQL
 infinity. For this, let’s create a subclass for the dumper and the loader and
 register them in the working scope (globally or just on a connection or
 cursor):</p>

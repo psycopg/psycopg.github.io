@@ -261,7 +261,7 @@ reasonably small result sets.</p>
 </section>
 <section id="server-side-cursors">
 <span id="index-2"></span><span id="id3"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
-<p>PostgreSQL has also its own concept of <em>cursor</em> (sometimes also called
+<p>PostgreSQL also has its own concept of <em>cursor</em> (sometimes also called
 <em>portal</em>). When a database cursor is created, the query is not necessarily
 completely processed: the server might be able to produce results only as they
 are needed. Only the results requested are transmitted to the client: if the
@@ -278,7 +278,7 @@ behind the scene they send commands to control the state of the cursor on the
 server (for instance when fetching new records or when moving using
 <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.scroll" title="psycopg.Cursor.scroll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scroll()</span></code></a>).</p>
 <p>Using a server-side cursor it is possible to process datasets larger than what
-would fit in the client memory. However for small queries they are less
+would fit in the client’s memory. However for small queries they are less
 efficient because it takes more commands to receive their result, so you
 should use them only if you need to process huge results or if only a partial
 result is needed.</p>
@@ -309,7 +309,7 @@ runs behind the scene.</p>
 </pre></div>
 </div>
 <p>after which you can create a server-side cursor declared by the same name, and
-call directly the fetch methods, skipping the <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> call:</p>
+directly call the fetch methods, skipping the <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> call:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="s1">'curname'</span><span class="p">)</span>
 <span class="c1"># no cur.execute()</span>
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>  <span class="c1"># or cur.fetchone(), cur.fetchmany()...</span>

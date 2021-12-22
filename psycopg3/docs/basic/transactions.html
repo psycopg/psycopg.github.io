@@ -239,7 +239,7 @@
         <article role="main">
           <span class="target" id="index-0"></span><span class="target" id="index-1"></span><section id="transaction-management">
 <span id="transactions"></span><span id="index-2"></span><h1>Transaction management<a class="headerlink" href="#transaction-management" title="Permalink to this headline">¶</a></h1>
-<p>Psycopg has a behaviour that may result surprising compared to
+<p>Psycopg has a behaviour that may seem surprising compared to
 <strong class="program">psql</strong>: by default, any database operation will start a new
 transaction. As a consequence, changes made by any cursor of the connection
 will not be visible until <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> is called, and will be
@@ -298,14 +298,14 @@ sequence of database statements:</p>
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
     <span class="c1"># This statement is executed inside the transaction</span>
 
-<span class="c1"># No exception the end of the block:</span>
+<span class="c1"># No exception at the end of the block:</span>
 <span class="c1"># COMMIT is executed.</span>
 </pre></div>
 </div>
 <p>This way we don’t have to remember to call neither <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> nor <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code>
-and the database operation have actually a persistent effect. The code might
+and the database operations actually have a persistent effect. The code might
 still do something you don’t expect: keep a transaction from the first
-operation to the connection closure. You can have a finer control on the
+operation to the connection closure. You can have a finer control over the
 transactions using an <a class="reference internal" href="#autocommit"><span class="std std-ref">autocommit transaction</span></a> and/or
 <a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction contexts</span></a>.</p>
 <div class="admonition warning">
@@ -423,7 +423,7 @@ context.</p>
 <p class="admonition-title">Hint</p>
 <p>The interaction between non-autocommit transactions and transaction
 contexts is probably surprising. Although the non-autocommit default is
-what demanded by the DBAPI, the personal preference of several experienced
+what’s demanded by the DBAPI, the personal preference of several experienced
 developers is to:</p>
 <ul class="simple">
 <li><p>use a connection block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">psycopg.connect(...)</span> <span class="pre">as</span> <span class="pre">conn</span></code>;</p></li>
@@ -466,7 +466,7 @@ transaction block, by raising the <a class="reference internal" href="../api/con
 to the end of a transaction block, rolling back its transaction but allowing
 the program execution to continue from there. By default the exception rolls
 back the innermost transaction block, but any current block can be specified
-as the target. In the following example, an hypothetical <code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelCommand</span></code>
+as the target. In the following example, a hypothetical <code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelCommand</span></code>
 may stop the processing and cancel any operation previously performed,
 but not entirely committed yet.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Rollback</span>
@@ -489,8 +489,8 @@ but not entirely committed yet.</p>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
 transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
-both autocommit and non-autocommit transactions. Leaving these parameters to
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> will leave the behaviour to the server’s default (which is controlled
+both autocommit and non-autocommit transactions. Leaving these parameters as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> will use the server’s default behaviour (which is controlled
 by server settings such as <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION">default_transaction_isolation</a>).</p>
 <p>In order to set these parameters you can use the connection attributes
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.isolation_level" title="psycopg.Connection.isolation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isolation_level</span></code></a>, <a class="reference internal" href="../api/connections.html#psycopg.Connection.read_only" title="psycopg.Connection.read_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_only</span></code></a>,
