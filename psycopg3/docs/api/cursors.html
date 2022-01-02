@@ -317,24 +317,34 @@ queries.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.executemany">
-<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the same command with a sequence of input data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
-</dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
 <li><p><strong>params_seq</strong> (<em>Sequence of Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
+<li><p><strong>returning</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">false</span></code>, query results won’t be available to fetch</p></li>
 </ul>
 </dd>
 </dl>
 <p>This is more efficient than performing separate queries, but in case of
 several <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> (and with some SQL creativity for massive
 <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code> too) you may consider using <a class="reference internal" href="#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a>.</p>
+<p>If the queries return data (e.g. when executing an <code class="sql docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">...</span>
+<span class="pre">RETURNING</span></code> or a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> with a side-effect), the result will be
+available in the cursor’s state, using <a class="reference internal" href="#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a> and similar
+methods; results after the first will be available using <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>.
+In case this makes use of an unacceptable amount of memory you can use
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=False</span></code> to disable returning the results. This is not
+necessary if the queries return no data (e.g. on <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> without
+returning).</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>results are now available in the cursor state, added <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning</span></code>
+parameter to disable it.</p>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.copy">
@@ -453,7 +463,8 @@ an exception if used with operations that don’t return result, such as an
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.nextset">
 <span class="sig-name descname"><span class="pre">nextset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.nextset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Move to the next result set if <a class="reference internal" href="#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> returned more than one.</p>
+<dd><p>Move to the result set of the next query executed through <a class="reference internal" href="#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>
+or to the next result set if <a class="reference internal" href="#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> returned more than one.</p>
 <p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if a new result is available, which will be the one
 methods <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> will operate on.</p>
 <dl class="field-list simple">
@@ -628,13 +639,8 @@ open a new one with the same name.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.ServerCursor.executemany">
-<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ServerCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ServerCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method not implemented for server-side cursors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
-</dd>
-</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.ServerCursor.fetchone">
@@ -745,7 +751,7 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.executemany">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.copy">
@@ -856,7 +862,7 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncServerCursor.executemany">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncServerCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncServerCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncServerCursor.fetchone">

@@ -75,21 +75,37 @@ The `!Cursor` class
         See :ref:`query-parameters` for all the details about executing
         queries.
 
-    .. automethod:: executemany(query: Query, params_seq: Sequence[Args])
+    .. automethod:: executemany
 
         :param query: The query to execute
         :type query: `!str`, `!bytes`, or `sql.Composable`
         :param params_seq: The parameters to pass to the query
         :type params_seq: Sequence of Sequences or Mappings
+        :param returning: If `!false`, query results won't be available to fetch
+        :type returning: `!bool`
 
         This is more efficient than performing separate queries, but in case of
         several :sql:`INSERT` (and with some SQL creativity for massive
         :sql:`UPDATE` too) you may consider using `copy()`.
 
+        If the queries return data (e.g. when executing an :sql:`INSERT ...
+        RETURNING` or a :sql:`SELECT` with a side-effect), the result will be
+        available in the cursor's state, using `fetchone()` and similar
+        methods; results after the first will be available using `nextset()`.
+        In case this makes use of an unacceptable amount of memory you can use
+        `!returning=False` to disable returning the results. This is not
+        necessary if the queries return no data (e.g. on :sql:`INSERT` without
+        returning).
+
         See :ref:`query-parameters` for all the details about executing
         queries.
 
-    .. automethod:: copy(statement: Query) -> Copy
+        .. versionchanged:: 3.1
+
+            results are now available in the cursor state, added `!returning`
+            parameter to disable it.
+
+    .. automethod:: copy
 
         :param statement: The copy operation to execute
         :type statement: `!str`, `!bytes`, or `sql.Composable`
@@ -103,7 +119,7 @@ The `!Cursor` class
 
         See :ref:`copy` for information about :sql:`COPY`.
 
-    .. automethod:: stream(query, params=None) -> Iterable[Sequence[Any]]
+    .. automethod:: stream
 
         This command is similar to execute + iter; however it supports endless
         data streams. The feature is not available in PostgreSQL, but some
@@ -285,8 +301,7 @@ The `!ServerCursor` class
         Using `!execute()` more than once will close the previous cursor and
         open a new one with the same name.
 
-    .. automethod:: executemany(query: Query, params_seq: Sequence[Args])
-
+    .. automethod:: executemany
     .. automethod:: fetchone
     .. automethod:: fetchmany
     .. automethod:: fetchall
@@ -364,7 +379,7 @@ The `!AsyncCursor` class
                 async with cursor.copy() as copy:
                     ...
 
-    .. automethod:: stream(query, params=None) -> AsyncIterable[Sequence[Any]]
+    .. automethod:: stream
 
         .. note::
 
