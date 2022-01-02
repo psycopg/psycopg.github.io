@@ -295,12 +295,12 @@ gives a good idea of what is possible to do with them.</p>
 created in other ways than the <code class="sql docutils literal notranslate"><span class="pre">DECLARE</span></code> that <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor.execute()</span></code></a>
 runs behind the scene.</p>
 <p>For instance if you have a <a class="reference external" href="https://www.postgresql.org/docs/current/plpgsql-cursors.html">PL/pgSQL function returning a cursor</a>:</p>
-<div class="highlight-postgres notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">FUNCTION</span> <span class="n">reffunc</span><span class="p">(</span><span class="n">refcursor</span><span class="p">)</span> <span class="k">RETURNS</span> <span class="n">refcursor</span> <span class="k">AS</span> <span class="s">$$</span>
-<span class="k">BEGIN</span>
-    <span class="k">OPEN</span> <span class="nv">$1</span> <span class="k">FOR</span> <span class="k">SELECT</span> <span class="n">col</span> <span class="k">FROM</span> <span class="n">test</span><span class="p">;</span>
-    <span class="k">RETURN</span> <span class="nv">$1</span><span class="p">;</span>
-<span class="k">END</span><span class="p">;</span>
-<span class="s">$$</span> <span class="k">LANGUAGE</span> <span class="n">plpgsql</span><span class="p">;</span>
+<div class="highlight-postgres notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">reffunc</span><span class="p">(</span><span class="n">refcursor</span><span class="p">)</span><span class="w"> </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">refcursor</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">$$</span><span class="w"></span>
+<span class="k">BEGIN</span><span class="w"></span>
+<span class="w">    </span><span class="k">OPEN</span><span class="w"> </span><span class="nv">$1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">test</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">RETURN</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span><span class="w"></span>
+<span class="k">END</span><span class="p">;</span><span class="w"></span>
+<span class="s">$$</span><span class="w"> </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>you can run a one-off command in the same connection to call it (e.g. using
