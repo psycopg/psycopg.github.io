@@ -353,6 +353,40 @@ program, eventually adjusting the size of the pool using the
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
 </section>
 </section>
+<section id="zero-size-pools">
+<span id="null-pool"></span><h2>Zero-size pools<a class="headerlink" href="#zero-size-pools" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version psycopg_pool: </span>3.1</p>
+</div>
+<p>Starting from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> 3.1, it is possible to instantiate a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code> using <em>min_size</em> = 0. This creates a pool-like object,
+presenting the same pool interface to the program using it, but holding no
+connection in its state. This can be useful to write programs where the
+pool/non-pool behaviour can be selected at configuration time (for instance
+because it may be deployed either stand-alone or behind an external pooler
+such as PgBouncer).</p>
+<p>A <a class="reference internal" href="../api/pool.html#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a> (the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code> subclass managing the special
+case of <em>min_size</em> = 0) allows to leave most code unchanged switching your
+program between using or not using a connection pool (for instance leaving the
+same singleton objects and configuration hooks such as <em>configure()</em>).</p>
+<p>A null pool is not only a configuration convenience, but can also be used to
+regulate the access to the server by a client program. If <em>max_size</em> is set to
+a value greater than 0, the pool will make sure that no more than <em>max_size</em>
+connections are created at any given time. If more clients ask for further
+connections, they will be queued and served a connection as soon as a previous
+client has finished using it, like in a normal pool. Other mechanisms to
+throttle client requests (such as <em>timeout</em> or <em>max_waiting</em> are respected
+too).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Queued clients will be handed an already established connection, as soon
+as a previous client has finished using it (and after the pool has
+returned it to idle state and called <em>reset()</em> on it, if necessary).</p>
+</div>
+<p>Because normally (i.e. unless queued) every client will be served a new
+connection, the time to obtain the connection is paid by the waiting client;
+background workers are not normally involved in obtaining new connections.</p>
+</section>
 <section id="connection-quality">
 <h2>Connection quality<a class="headerlink" href="#connection-quality" title="Permalink to this headline">¶</a></h2>
 <p>The state of the connection is verified when a connection is returned to the
@@ -527,6 +561,7 @@ server</p></td>
 <li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#zero-size-pools">Zero-size pools</a></li>
 <li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
 <li><a class="reference internal" href="#pool-stats">Pool stats</a></li>
 </ul>
