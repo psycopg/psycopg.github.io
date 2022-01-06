@@ -46,7 +46,7 @@ The `!ConnectionPool` class
    :param min_size: The minimum number of connection the pool will hold. The
                    pool will actively try to create new connections if some
                    are lost (closed, broken) and will try to never go below
-                   *min_size*. If 0, create a `NullConnectionPool` instead.
+                   *min_size*
    :type min_size: `!int`, default: 4
 
    :param max_size: The maximum number of connections the pool will hold. If
@@ -222,14 +222,16 @@ The `!AsyncConnectionPool` class
 --------------------------------
 
 `!AsyncConnectionPool` has a very similar interface to the `ConnectionPool`
-class but its blocking methods are implemented as `async` coroutines. It
-returns instances of `~psycopg.AsyncConnection`, or of its subclass if
-specified so in the *connection_class* parameter.
+class but its blocking method are implemented as `async` coroutines. It
+returns `~psycopg.AsyncConnection` instances, or its subclasses if specified
+so in the *connection_class* parameter.
 
-Only the functions with different signature from `!ConnectionPool` are
+Only the function with different signature from `!ConnectionPool` are
 listed here.
 
 .. autoclass:: AsyncConnectionPool
+
+   All the other parameters are the same.
 
    :param connection_class: The class of the connections to serve. It should
                             be an `!AsyncConnection` subclass.
@@ -241,8 +243,6 @@ listed here.
    :param reset: A callback to reset a function after it has been returned to
                  the pool.
    :type reset: `async Callable[[AsyncConnection], None]`
-
-   All the other constructor parameters are the same of `!ConnectionPool`.
 
    .. automethod:: wait
    .. automethod:: connection
@@ -273,55 +273,3 @@ listed here.
    .. automethod:: check
    .. automethod:: getconn
    .. automethod:: putconn
-
-
-The `!NullConnectionPool` class
--------------------------------
-
-.. versionadded:: psycopg_pool 3.1
-
-The `!NullConnectionPool` is a `ConnectionPool` subclass normally created when
-`!ConnectionPool` is instantiated with *min_size* = 0. See :ref:`null-pool`
-for further details.
-
-The interface of the object is entirely compatible with the parent class. Its
-behaviour is similar, with the following differences:
-
-.. autoclass:: NullConnectionPool
-
-   All the other constructor parameters are the same as in `ConnectionPool`.
-
-   :param min_size: Always 0, cannot be changed.
-   :type min_size: `!int`, default: 0
-
-   :param max_size: If None or 0, create a new connection at every request,
-                    without a maximum. If greater than 0, don't create more
-                    than *max_size* connections and queue the waiting clients.
-   :type max_size: `!int`, default: None
-
-   :param reset: It is only called when there are waiting clients in the
-                 queue, before giving them a connection already open. If no
-                 client is waiting, the connection is closed and discarded
-                 without a fuss.
-   :type reset: `Callable[[Connection], None]`
-
-   :param max_idle: Unused, as the null pool doesn't leave idle connections
-                    sitting around.
-
-   .. automethod:: wait
-   .. automethod:: resize
-   .. automethod:: check
-
-
-The `!AsyncNullConnectionPool` class
-------------------------------------
-
-.. versionadded:: psycopg_pool 3.1
-
-The `!AsyncNullConnectionPool` is an `AsyncConnectionPool` subclass normally
-created when `!AsyncConnectionPool` is instantiated with *min_size* = 0.
-
-.. autoclass:: AsyncNullConnectionPool
-
-    The interface is the same of its parent class `AsyncConnectionPool`. The
-    behaviour is different in the same way described for `NullConnectionPool`.

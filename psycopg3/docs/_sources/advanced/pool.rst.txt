@@ -143,46 +143,6 @@ program, eventually adjusting the size of the pool using the
 `~ConnectionPool.resize()` method.
 
 
-.. _null-pool:
-
-Zero-size pools
----------------
-
-.. versionadded:: psycopg_pool 3.1
-
-Starting from `!psycopg_pool` 3.1, it is possible to instantiate a
-`!ConnectionPool` using *min_size* = 0. This creates a pool-like object,
-presenting the same pool interface to the program using it, but holding no
-connection in its state. This can be useful to write programs where the
-pool/non-pool behaviour can be selected at configuration time (for instance
-because it may be deployed either stand-alone or behind an external pooler
-such as PgBouncer).
-
-A `NullConnectionPool` (the `!ConnectionPool` subclass managing the special
-case of *min_size* = 0) allows to leave most code unchanged switching your
-program between using or not using a connection pool (for instance leaving the
-same singleton objects and configuration hooks such as *configure()*).
-
-A null pool is not only a configuration convenience, but can also be used to
-regulate the access to the server by a client program. If *max_size* is set to
-a value greater than 0, the pool will make sure that no more than *max_size*
-connections are created at any given time. If more clients ask for further
-connections, they will be queued and served a connection as soon as a previous
-client has finished using it, like in a normal pool. Other mechanisms to
-throttle client requests (such as *timeout* or *max_waiting* are respected
-too).
-
-.. note::
-
-    Queued clients will be handed an already established connection, as soon
-    as a previous client has finished using it (and after the pool has
-    returned it to idle state and called *reset()* on it, if necessary).
-
-Because normally (i.e. unless queued) every client will be served a new
-connection, the time to obtain the connection is paid by the waiting client;
-background workers are not normally involved in obtaining new connections.
-
-
 Connection quality
 ------------------
 
