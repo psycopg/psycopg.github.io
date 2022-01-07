@@ -260,6 +260,10 @@ conditions described above are met.</p></li>
 <li><p>You can disable the use of prepared statements on a connection by setting
 its <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code></a> attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>You can set <code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_threshold</span></code> as a <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> keyword
+parameter too.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>The <a class="reference external" href="https://www.postgresql.org/docs/current/sql-prepare.html">PREPARE</a> PostgreSQL documentation contains plenty of details about
@@ -267,6 +271,14 @@ prepared statements in PostgreSQL.</p>
 <p>Note however that Psycopg doesn’t use SQL statements such as
 <code class="sql docutils literal notranslate"><span class="pre">PREPARE</span></code> and <code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code>, but protocol level commands such as the
 ones exposed by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQSENDPREPARE"><span class="pre">PQsendPrepare</span></a></code>, <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQSENDQUERYPREPARED"><span class="pre">PQsendQueryPrepared</span></a></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using external connection poolers, such as PgBouncer, is not compatible
+with prepared statements, because the same client connection may change
+the server session it refers to. If such middleware is used you should
+disable connection pooling, by setting the <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a>
+attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </div>
 </section>
 
