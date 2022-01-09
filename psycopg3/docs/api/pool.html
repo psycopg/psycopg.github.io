@@ -239,7 +239,7 @@
         <article role="main">
           <section id="psycopg-pool-connection-pool-implementations">
 <h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> – Connection pool implementations<a class="headerlink" href="#psycopg-pool-connection-pool-implementations" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-psycopg_pool"><span id="index-0"></span></span><p>A connection pool is an object to create and maintain a specified amount of
+<span class="target" id="module-psycopg_pool"><span id="index-0"></span></span><p>A connection pool is an object used to create and maintain a limited amount of
 PostgreSQL connections, reducing the time requested by the program to obtain a
 working connection and allowing an arbitrary large number of concurrent
 threads or tasks to use a controlled amount of resources on the server. See
@@ -249,15 +249,13 @@ synchronous connection pool yielding <a class="reference internal" href="connect
 used by multithread applications. <a class="reference internal" href="#psycopg_pool.AsyncConnectionPool" title="psycopg_pool.AsyncConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a> has a similar
 interface, but with <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> functions replacing blocking functions, and
 yields <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> instances.</p>
-<p>The intended (but not mandatory) use is to create a single connection pool, as
-a global object exposed by a module in your application, and use the same
-instance from the rest of the code (especially the
-<a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool.connection()</span></code></a> method).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> package is distributed separately from the main
-<a class="reference internal" href="module.html#module-psycopg" title="psycopg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code></a> package: use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">psycopg[pool]</span></code> or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span>
-<span class="pre">psycopg_pool</span></code> to make it available. See <a class="reference internal" href="../basic/install.html#pool-installation"><span class="std std-ref">Installing the connection pool</span></a>.</p>
+<a class="reference internal" href="module.html#module-psycopg" title="psycopg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code></a> package: use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">psycopg[pool]</span></code>, or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span>
+<span class="pre">psycopg_pool</span></code>, to make it available. See <a class="reference internal" href="../basic/install.html#pool-installation"><span class="std std-ref">Installing the connection pool</span></a>.</p>
+<p>The version numbers indicated in this page refer to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code>
+package, not to <a class="reference internal" href="module.html#module-psycopg" title="psycopg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code></a>.</p>
 </div>
 <section id="the-connectionpool-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code> class<a class="headerlink" href="#the-connectionpool-class" title="Permalink to this headline">¶</a></h2>
@@ -289,8 +287,8 @@ been unused for more than <em>max_idle</em> seconds.</p></li>
 expanded as <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> keyword parameters.</p></li>
 <li><p><strong>connection_class</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code>, default: <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>) – The class of the connections to serve. It should
 be a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> subclass.</p></li>
-<li><p><strong>open</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">true</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">true</span></code>, open the pool, creating the required connections,
-on init. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">false</span></code>, open the pool when <code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code> is called or
+<li><p><strong>open</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, open the pool, creating the required connections,
+on init. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, open the pool when <code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code> is called or
 when the pool context is entered. See the <a class="reference internal" href="#psycopg_pool.ConnectionPool.open" title="psycopg_pool.ConnectionPool.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code></a> method
 documentation for more details.</p></li>
 <li><p><strong>configure</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable[[Connection],</span> <span class="pre">None]</span></code>) – A callback to configure a connection after creation.
@@ -345,13 +343,12 @@ they are returned to the pool.</p></li>
 </dd>
 </dl>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version psycopg_pool: </span>3.1</p>
-<p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code> parameter to init method.</p>
+<p><span class="versionmodified changed">Changed in version 3.1: </span>Added <em>open</em> parameter to init method.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In a future version, the deafult value for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code> parameter
-might be changed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">false</span></code>. If you rely on this behaviour (e.g. if
+<p>In a future version, the deafult value for the <em>open</em> parameter
+might be changed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>. If you rely on this behaviour (e.g. if
 you don’t use the pool as a context manager) you might want to specify
 this parameter explicitly.</p>
 </div>
@@ -391,7 +388,7 @@ method was already called, or because the pool context was entered, or
 because the pool was initialized with <em>open</em> = <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) but you cannot
 currently re-open a closed pool.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version psycopg_pool: </span>3.1</p>
+<p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
 </dd></dl>
 <dl class="py method">
