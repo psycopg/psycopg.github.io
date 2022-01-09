@@ -198,12 +198,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/rows.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows</span></code> – row factory implementations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/pool.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> – Connection pool implementations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/conninfo.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conninfo</span></code> – manipulate connection strings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/adapt.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/types.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code> – Types information and adapters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/abc.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc</span></code> – Psycopg abstract classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/pq.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq</span></code> – libpq wrapper module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/pool.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> – Connection pool implementations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/dns.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_dns</span></code> – DNS resolution utilities</a></li>
 </ul>
 </li>
@@ -254,57 +254,95 @@ from the main <a class="reference internal" href="../api/module.html#module-psyc
 </div>
 <section id="pool-life-cycle">
 <h2>Pool life cycle<a class="headerlink" href="#pool-life-cycle" title="Permalink to this headline">¶</a></h2>
-<p>A typical way to use the pool is to create a single instance of it, as a
+<p>A simple way to use the pool is to create a single instance of it, as a
 global object, and to use this object in the rest of the program, allowing
-other functions, modules, threads to use it. This is only a common use
-however, and not the necessary one; in particular the connection pool acts as
-a context manager and can be closed automatically at the end of its <code class="docutils literal notranslate"><span class="pre">with</span></code>
-block:</p>
+other functions, modules, threads to use it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># module db.py in your program</span>
+<span class="kn">from</span> <span class="nn">psycopg_pool</span> <span class="kn">import</span> <span class="n">ConnectionPool</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="c1"># the pool starts connecting immediately.</span>
+
+<span class="c1"># in another module</span>
+<span class="kn">from</span> <span class="nn">.db</span> <span class="kn">import</span> <span class="n">pool</span>
+
+<span class="k">def</span> <span class="nf">my_function</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">poolconnection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ideally you may want to call <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.close" title="psycopg_pool.ConnectionPool.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> when the use of the
+pool is finished. Failing to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> at the end of the program is not
+terribly bad: probably it will just result in some warnings printed on stderr.
+However, if you think that it’s sloppy, you could use the <a class="reference external" href="https://docs.python.org/3/library/atexit.html#module-atexit" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atexit</span></code></a> module to
+have <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> called at the end of the program.</p>
+<p>If you want to avoid starting to connect to the database at import time, and
+want to wait for the application to be ready, you can create the pool using
+<em>open</em> = <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, and call the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.open" title="psycopg_pool.ConnectionPool.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code></a> and
+<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.close" title="psycopg_pool.ConnectionPool.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> methods when the conditions are right. Certain
+frameworks provide callbacks triggered when the program is started and stopped
+(for instance <a class="reference external" href="https://fastapi.tiangolo.com/advanced/events/#events-startup-shutdown">FastAPI startup/shutdown events</a>): they are perfect to
+initiate and terminate the pool operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">"startup"</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">open_pool</span><span class="p">():</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">"shutdown"</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">close_pool</span><span class="p">():</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Creating a single pool as a global variable is not the mandatory use: your
+program can create more than one pool, which might be useful to connect to
+more than one database, or to provide different types of connections, for
+instance to provide separate read/write and read-only connections. The pool
+also acts as a context manager and is open and closed, if necessary, on
+entering and exiting the context block:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg_pool</span> <span class="kn">import</span> <span class="n">ConnectionPool</span>
 
-<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">my_pool</span><span class="p">:</span>
-    <span class="n">run_app</span><span class="p">(</span><span class="n">my_pool</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="n">run_app</span><span class="p">(</span><span class="n">pool</span><span class="p">)</span>
 
 <span class="c1"># the pool is now closed</span>
 </pre></div>
 </div>
-<p>If necessary, or convenient, your application may create more than one pool,
-for instance to connect to more than one database or to provide separate
-read-only and read/write connections.</p>
-<p>Once a pool is instantiated, the constructor returns immediately, while the
-background workers try to create the required number of connections to fill
-the pool. If your application is misconfigured, or the network is down, it
-means that the pool will be available but threads requesting a connection will
-fail with a <a class="reference internal" href="../api/pool.html#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> after the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> timeout is
-expired. If this behaviour is not desirable you should call the
-<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.wait" title="psycopg_pool.ConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a> method after creating the pool, which will block
-until the pool is full or will throw a <a class="reference internal" href="../api/pool.html#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> if the pool isn’t ready
-within an allocated time.</p>
+<p>When the pool is open, the pool’s background workers start creating the
+requested <em>min_size</em> connections, while the constructor (or the <code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code>
+method) returns immediately. This allows the program some leeway to start
+before the target database is up and running.  However, if your application is
+misconfigured, or the network is down, it means that the program will be able
+to start, but the threads requesting a connection will fail with a
+<a class="reference internal" href="../api/pool.html#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> only after the timeout on <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> is
+expired. If this behaviour is not desirable (and you prefer your program to
+crash hard and fast, if the surrounding conditions are not right, because
+something else will respawn it) you should call the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.wait" title="psycopg_pool.ConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a>
+method after creating the pool, or call <code class="xref py py-obj docutils literal notranslate"><span class="pre">open(wait=True)</span></code>: these methods will
+block until the pool is full, or will raise a <a class="reference internal" href="../api/pool.html#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> exception if the
+pool isn’t ready within the allocated time.</p>
+</section>
+<section id="connections-life-cycle">
+<h2>Connections life cycle<a class="headerlink" href="#connections-life-cycle" title="Permalink to this headline">¶</a></h2>
 <p>The pool background workers create connections according to the parameters
 <em>conninfo</em>, <em>kwargs</em>, and <em>connection_class</em> passed to <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>
-constructor. Once a connection is created it is also passed to the
+constructor, invoking something like <code class="samp docutils literal notranslate"><em><span class="pre">connection_class</span></em><span class="pre">(</span><em><span class="pre">conninfo</span></em><span class="pre">,</span>
+<span class="pre">**</span><em><span class="pre">kwargs</span></em><span class="pre">)</span></code>. Once a connection is created it is also passed to the
 <em>configure()</em> callback, if provided, after which it is put in the pool (or
-passed to a client requesting it, if someone is already knocking at the door).
-If a connection expires (it passes <em>max_lifetime</em>), or is returned to the pool
-in broken state, or is found closed by <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.check" title="psycopg_pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a>, then the
+passed to a client requesting it, if someone is already knocking at the door).</p>
+<p>If a connection expires (it passes <em>max_lifetime</em>), or is returned to the pool
+in broken state, or is found closed by <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.check" title="psycopg_pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a>), then the
 pool will dispose of it and will start a new connection attempt in the
 background.</p>
-<p>When the pool is no more to be used, you should call the
-<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.close" title="psycopg_pool.ConnectionPool.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> method (unless the <code class="docutils literal notranslate"><span class="pre">with</span></code> syntax was used). If the
-pool is a module-level object it may be unclear how to do so. Missing a call
-to <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> shouldn’t be a big problem, it should just result in a few
-warnings printed. However, if you think that’s sloppy, you can use the
-<a class="reference external" href="https://docs.python.org/3/library/atexit.html#module-atexit" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atexit</span></code></a> module to have the <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method called at the end of the
-program.</p>
 </section>
 <section id="using-connections-from-the-pool">
 <h2>Using connections from the pool<a class="headerlink" href="#using-connections-from-the-pool" title="Permalink to this headline">¶</a></h2>
-<p>The pool can be used to request connections from multiple threads - it is
-hardly useful otherwise! If more connections than the ones available in the
-pool are requested, the requesting threads are queued and are served a
-connection as soon as one is available again: either because another client
-has finished using it or because the pool is allowed to grow and a new
-connection is ready.</p>
+<p>The pool can be used to request connections from multiple threads or
+concurrent tasks - it is hardly useful otherwise! If more connections than the
+ones available in the pool are requested, the requesting threads are queued
+and are served a connection as soon as one is available, either because
+another client has finished using it or because the pool is allowed to grow
+(when <em>max_size</em> &gt; <em>min_size</em>) and a new connection is ready.</p>
 <p>The main way to use the pool is to obtain a connection using the
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> context, which returns a <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>
 or subclass:</p>
@@ -312,12 +350,15 @@ or subclass:</p>
     <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"what you want"</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code> context behaves like the <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> object
+context: at the end of the block, if there is a transaction open, it will be
+committed, or rolled back if the context is exited with as exception.</p>
 <p>At the end of the block the connection is returned to the pool and shouldn’t
 be used anymore by the code which obtained it. If a <em>reset()</em> function is
 specified in the pool constructor, it is called on the connection before
 returning it to the pool. Note that the <em>reset()</em> function is called in a
 worker thread, so that the thread which used the connection can keep its
-execution without being slowed down.</p>
+execution without being slowed down by it.</p>
 </section>
 <section id="pool-connection-and-sizing">
 <h2>Pool connection and sizing<a class="headerlink" href="#pool-connection-and-sizing" title="Permalink to this headline">¶</a></h2>
@@ -337,20 +378,20 @@ created, up to <em>max_size</em>. Note that the connections are always created b
 background workers, not by the thread asking for the connection: if a client
 requests a new connection, and a previous client terminates its job before the
 new connection is ready, the waiting client will be served the existing
-connection. This is especially useful in scenarios where the time to connect
-is longer than the time the connection is used (see <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/blob/dev/documents/Welcome-To-The-Jungle.md">this analysis</a>, for
-instance).</p>
+connection. This is especially useful in scenarios where the time to establish
+a connection dominates the time for which the connection is used (see <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/blob/dev/documents/Welcome-To-The-Jungle.md">this
+analysis</a>, for instance).</p>
 <p>If a pool grows above <em>min_size</em>, but its usage decreases afterwards, a number
-of connections are eventually closed: one each the <em>max_idle</em> time specified
-in the pool constructor.</p>
+of connections are eventually closed: one every time a connection is unused
+after the <em>max_idle</em> time specified in the pool constructor.</p>
 <section id="what-s-the-right-size-for-the-pool">
-<h3>What’s the right size for the pool<a class="headerlink" href="#what-s-the-right-size-for-the-pool" title="Permalink to this headline">¶</a></h3>
+<h3>What’s the right size for the pool?<a class="headerlink" href="#what-s-the-right-size-for-the-pool" title="Permalink to this headline">¶</a></h3>
 <p>Big question. Who knows. However, probably not as large as you imagine. Please
 take a look at <a class="reference external" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">this analysis</a> for some ideas.</p>
 <p>Something useful you can do is probably to use the
-<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> method and monitor the behaviour of your
-program, eventually adjusting the size of the pool using the
-<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
+<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> method and monitor the behaviour of your program
+to tune the configuration parameters. The size of the pool can also be changed
+at runtime using the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
 </section>
 </section>
 <section id="connection-quality">
@@ -383,28 +424,28 @@ check for the quality of a broken connection before your program notices it,
 it should be polling each connection even faster than your program uses them.
 Your database server wouldn’t be amused…</p>
 <p>Can you do something better than that? Of course you can, there is always a
-better way than polling. You can use the same recipe of <a class="reference internal" href="async.html#disconnections"><span class="std std-ref">Detecting disconnections</span></a>:
-you can dedicate a thread (and a connection) to listen for activity on the
-connection. If any activity is detected you can call the pool
-<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.check" title="psycopg_pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a> method, which will make every connection in the pool
-briefly unavailable and run a quick check on them, returning them to the pool
-if they are still working or creating a new connection if they aren’t.</p>
+better way than polling. You can use the same recipe of <a class="reference internal" href="async.html#disconnections"><span class="std std-ref">Detecting disconnections</span></a>,
+reserving a connection and using a thread to monitor for any activity
+happening on it. If any activity is detected, you can call the pool
+<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.check" title="psycopg_pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a> method, which will run a quick check on each
+connection in the pool, removing the ones found in broken state, and using the
+background workers to replace them with fresh ones.</p>
 <p>If you set up a similar check in your program, in case the database connection
-is temporarily lost, we cannot do anything for the thread which already had
-taken a connection from the pool, but no other thread should be served a
+is temporarily lost, we cannot do anything for the threads which had taken
+already a connection from the pool, but no other thread should be served a
 broken connection, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code> would empty the pool and refill it with
 working connections, as soon as they are available.</p>
 <p>Faster than you can say poll. Or pool.</p>
 </section>
 <section id="pool-stats">
-<span id="id5"></span><h2>Pool stats<a class="headerlink" href="#pool-stats" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>Pool stats<a class="headerlink" href="#pool-stats" title="Permalink to this headline">¶</a></h2>
 <p>The pool can return information about its usage using the methods
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> or <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.pop_stats" title="psycopg_pool.ConnectionPool.pop_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_stats()</span></code></a>. Both methods
 return the same values, but the latter reset the counters after its use. The
 values can be sent to a monitoring system such as <a class="reference external" href="https://graphiteapp.org/">Graphite</a> or <a class="reference external" href="https://prometheus.io/">Prometheus</a>.</p>
 <p>The following values should be provided, but please don’t consider them as a
-rigid interface: it is possible that they might change. Keys whose value is 0
-may not be returned.</p>
+rigid interface: it is possible that they might change in the future. Keys
+whose value is 0 may not be returned.</p>
 <div class="table-wrapper"><table class="docutils align-default">
 <colgroup>
 <col style="width: 30%"/>
@@ -522,9 +563,10 @@ server</p></td>
             <ul>
 <li><a class="reference internal" href="#">Connection pools</a><ul>
 <li><a class="reference internal" href="#pool-life-cycle">Pool life cycle</a></li>
+<li><a class="reference internal" href="#connections-life-cycle">Connections life cycle</a></li>
 <li><a class="reference internal" href="#using-connections-from-the-pool">Using connections from the pool</a></li>
 <li><a class="reference internal" href="#pool-connection-and-sizing">Pool connection and sizing</a><ul>
-<li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool</a></li>
+<li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
