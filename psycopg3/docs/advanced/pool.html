@@ -394,6 +394,45 @@ to tune the configuration parameters. The size of the pool can also be changed
 at runtime using the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> method.</p>
 </section>
 </section>
+<section id="null-connection-pools">
+<span id="null-pool"></span><h2>Null connection pools<a class="headerlink" href="#null-connection-pools" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<p>Sometimes you may want leave the choice of using or not using a connection
+pool as a configuration parameter of your application. For instance, you might
+want to use a pool if you are deploying a “large instance” of your application
+and can dedicate it a handful of connections; conversely you might not want to
+use it if you deploy the application in several instances, behind a load
+balancer, and/or using an external connection pool process such as PgBouncer.</p>
+<p>Switching between using or not using a pool requires some code change, because
+the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> API is different from the normal <a class="reference internal" href="../api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
+function and because the pool can perform additional connection configuration
+(in the <em>configure</em> parameter) that, if the pool is removed, should be
+performed in some different code path of your application.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> 3.1 package introduces the <a class="reference internal" href="../api/pool.html#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a> class.
+This class has the same interface, and largely the same behaviour, of the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code>, but doesn’t create any connection beforehand. When a
+connection is returned, unless there are other clients already waiting, it
+is closed immediately and not kept in the pool state.</p>
+<p>A null pool is not only a configuration convenience, but can also be used to
+regulate the access to the server by a client program. If <em>max_size</em> is set to
+a value greater than 0, the pool will make sure that no more than <em>max_size</em>
+connections are created at any given time. If more clients ask for further
+connections, they will be queued and served a connection as soon as a previous
+client has finished using it, like for the basic pool. Other mechanisms to
+throttle client requests (such as <em>timeout</em> or <em>max_waiting</em>) are respected
+too.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Queued clients will be handed an already established connection, as soon
+as a previous client has finished using it (and after the pool has
+returned it to idle state and called <em>reset()</em> on it, if necessary).</p>
+</div>
+<p>Because normally (i.e. unless queued) every client will be served a new
+connection, the time to obtain the connection is paid by the waiting client;
+background workers are not normally involved in obtaining new connections.</p>
+</section>
 <section id="connection-quality">
 <h2>Connection quality<a class="headerlink" href="#connection-quality" title="Permalink to this headline">¶</a></h2>
 <p>The state of the connection is verified when a connection is returned to the
@@ -569,6 +608,7 @@ server</p></td>
 <li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool?</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#null-connection-pools">Null connection pools</a></li>
 <li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
 <li><a class="reference internal" href="#pool-stats">Pool stats</a></li>
 </ul>
