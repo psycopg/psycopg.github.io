@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="conninfo – manipulate connection strings" href="conninfo.html" /><link rel="prev" title="errors – Package exceptions" href="errors.html" />
 
-    <meta name="generator" content="sphinx-4.3.2, furo 2021.11.23"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2021.11.23"/>
         <title>psycopg_pool – Connection pool implementations - psycopg 3.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
@@ -314,7 +314,7 @@ leaving the <em>reset()</em> function the connection must be left in
 identify it in the logs if more than one pool is used. if not
 specified pick a sequential name such as <code class="docutils literal notranslate"><span class="pre">pool-1</span></code>,
 <code class="docutils literal notranslate"><span class="pre">pool-2</span></code>, etc.</p></li>
-<li><p><strong>timeout</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default: 30 seconds) – The default maximum time in seconts that a client can wait
+<li><p><strong>timeout</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default: 30 seconds) – The default maximum time in seconds that a client can wait
 to receive a connection from the pool (using <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>
 or <a class="reference internal" href="#psycopg_pool.ConnectionPool.getconn" title="psycopg_pool.ConnectionPool.getconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getconn()</span></code></a>). Note that these methods allow to override
 the <em>timeout</em> default.</p></li>
@@ -356,7 +356,7 @@ they are returned to the pool.</p></li>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In a future version, the deafult value for the <em>open</em> parameter
+<p>In a future version, the default value for the <em>open</em> parameter
 might be changed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>. If you rely on this behaviour (e.g. if
 you don’t use the pool as a context manager) you might want to specify
 this parameter explicitly.</p>
@@ -487,7 +487,7 @@ dispose of it and create a new one.</p>
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.getconn">
 <span class="sig-name descname"><span class="pre">getconn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.getconn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Obtain a connection from the pool.</p>
-<p>You should preferrably use <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>. Use this function only if
+<p>You should preferably use <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>. Use this function only if
 it is not possible to use the connection as context manager.</p>
 <p>After using this function you <em>must</em> call a corresponding <a class="reference internal" href="#psycopg_pool.ConnectionPool.putconn" title="psycopg_pool.ConnectionPool.putconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">putconn()</span></code></a>:
 failing to do so will deplete the pool. A depleted pool is a sad pool:
