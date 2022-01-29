@@ -253,14 +253,14 @@ for.</p>
 passing a sequence of values as the second argument of the function. For
 example the Python function call:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
-<span class="s2">    INSERT INTO some_table (an_int, a_date, a_string)</span>
+<span class="s2">    INSERT INTO some_table (id, created_at, last_name)</span>
 <span class="s2">    VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">);</span>
 <span class="s2">    """</span><span class="p">,</span>
     <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="s2">"O'Reilly"</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>is <em>roughly</em> equivalent to the SQL command:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">some_table</span><span class="w"> </span><span class="p">(</span><span class="n">an_int</span><span class="p">,</span><span class="w"> </span><span class="n">a_date</span><span class="p">,</span><span class="w"> </span><span class="n">a_string</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">some_table</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">last_name</span><span class="p">)</span><span class="w"></span>
 <span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-11-18'</span><span class="p">,</span><span class="w"> </span><span class="s1">'O''Reilly'</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
@@ -272,10 +272,10 @@ query and specifying the values into a mapping.  Using named arguments allows
 to specify the values in any order and to repeat the same value in several
 places in the query:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
-<span class="s2">    INSERT INTO some_table (an_int, a_date, another_date, a_string)</span>
-<span class="s2">    VALUES (</span><span class="si">%(int)s</span><span class="s2">, </span><span class="si">%(date)s</span><span class="s2">, </span><span class="si">%(date)s</span><span class="s2">, </span><span class="si">%(str)s</span><span class="s2">);</span>
+<span class="s2">    INSERT INTO some_table (id, created_at, updated_at, last_name)</span>
+<span class="s2">    VALUES (</span><span class="si">%(id)s</span><span class="s2">, </span><span class="si">%(created)s</span><span class="s2">, </span><span class="si">%(created)s</span><span class="s2">, </span><span class="si">%(name)s</span><span class="s2">);</span>
 <span class="s2">    """</span><span class="p">,</span>
-    <span class="p">{</span><span class="s1">'int'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'str'</span><span class="p">:</span> <span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="s1">'date'</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)})</span>
+    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="s1">'created'</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)})</span>
 </pre></div>
 </div>
 <p>Using characters <code class="docutils literal notranslate"><span class="pre">%</span></code>, <code class="docutils literal notranslate"><span class="pre">(</span></code>, <code class="docutils literal notranslate"><span class="pre">)</span></code> in the argument names is not supported.</p>
