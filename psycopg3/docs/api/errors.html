@@ -271,9 +271,9 @@ use this to catch all errors with one single <code class="xref py py-obj docutil
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Error.sqlstate">
 <span class="sig-name descname"><span class="pre">sqlstate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#psycopg.Error.sqlstate" title="Permalink to this definition">¶</a></dt>
-<dd><p>The code of the error, if defined.</p>
-<p>This is a class attribute defined for all the
-<a class="reference internal" href="#sqlstate-exceptions"><span class="std std-ref">SQLSTATE exceptions</span></a> classes, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> for the base classes.</p>
+<dd><p>The code of the error, if received from the server.</p>
+<p>This attribute is also available as class attribute on the
+<a class="reference internal" href="#sqlstate-exceptions"><span class="std std-ref">SQLSTATE exceptions</span></a> classes.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py exception">
@@ -412,9 +412,10 @@ Every class in the module is named after what referred as “condition name” <
 the documentation</a>, converted to CamelCase: e.g. the error 22012,
 <code class="docutils literal notranslate"><span class="pre">division_by_zero</span></code> is exposed by this module as the class <code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionByZero</span></code>.
 There is a handful of… exceptions to this rule, required for disambiguate
-name clashes: please refer to the table below for all the classes defined.</p>
+name clashes: please refer to the <a class="reference internal" href="#exceptions-list"><span class="std std-ref">table below</span></a> for all
+the classes defined.</p>
 <p>Every exception class is a subclass of one of the <a class="reference internal" href="#dbapi-exceptions"><span class="std std-ref">standard DB-API
-exception</span></a> and expose the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code> interface.</p>
+exception</span></a>, thus exposing the <a class="reference internal" href="#psycopg.Error" title="psycopg.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a> interface.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="psycopg.errors.lookup">
 <span class="sig-prename descclassname"><span class="pre">psycopg.errors.</span></span><span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sqlstate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.errors.lookup" title="Permalink to this definition">¶</a></dt>
@@ -436,7 +437,10 @@ them to look up the exception class.</p>
 </pre></div>
 </div>
 </dd></dl>
-<p>These are all the classes defined and the DBAPI exception they derive from:</p>
+<section id="list-of-known-exceptions">
+<span id="exceptions-list"></span><h3>List of known exceptions<a class="headerlink" href="#list-of-known-exceptions" title="Permalink to this headline">¶</a></h3>
+<p>The following are all the SQLSTATE-related error classed defined by this
+module, together with the base DBAPI exception they derive from.</p>
 <div class="table-wrapper"><table class="docutils align-default">
 <colgroup>
 <col style="width: 11%"/>
@@ -1536,6 +1540,7 @@ them to look up the exception class.</p>
 </table></div>
 </section>
 </section>
+</section>
 
         </article>
       </div>
@@ -1586,7 +1591,10 @@ them to look up the exception class.</p>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a><ul>
 <li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a></li>
 <li><a class="reference internal" href="#error-diagnostics">Error diagnostics</a></li>
-<li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a></li>
+<li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a><ul>
+<li><a class="reference internal" href="#list-of-known-exceptions">List of known exceptions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
