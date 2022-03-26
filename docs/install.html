@@ -1,14 +1,14 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Installation &#8212; Psycopg 2.9.3 documentation</title>
-    <link rel="stylesheet" href="_static/better.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/better.css" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -16,10 +16,10 @@
       gtag('js', new Date());
       gtag('config', 'UA-19287248-2');
     </script>
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Basic module usage" href="usage.html" />
@@ -55,15 +55,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="installation">
+  <section id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Psycopg is a <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> adapter for the <a class="reference external" href="https://www.python.org/">Python</a> programming language. It is a
 wrapper for the <a class="reference external" href="https://www.postgresql.org/docs/current/static/libpq.html">libpq</a>, the official PostgreSQL client library.</p>
-<div class="section" id="quick-install">
+<section id="quick-install">
 <span id="binary-packages"></span><span id="index-0"></span><h2>Quick Install<a class="headerlink" href="#quick-install" title="Permalink to this headline">¶</a></h2>
 <p>For most operating systems, the quickest way to install Psycopg is using the
 <a class="reference external" href="https://pythonwheels.com/">wheel</a> package available on <a class="reference external" href="https://pypi.org/project/psycopg2-binary/">PyPI</a>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install psycopg2-binary
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install psycopg2-binary
 </pre></div>
 </div>
 <p>This will install a pre-compiled binary version of the module which does not
@@ -86,7 +86,7 @@ like <code class="docutils literal notranslate"><span class="pre">pip</span> <sp
 <span class="n">records</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="psycopg-vs-psycopg-binary">
+<section id="psycopg-vs-psycopg-binary">
 <h3>psycopg vs psycopg-binary<a class="headerlink" href="#psycopg-vs-psycopg-binary" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> package is meant for beginners to start playing
 with Python and PostgreSQL without the need to meet the build
@@ -100,16 +100,16 @@ libraries available on the client: upgrading the system libraries will not
 upgrade the libraries used by <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. Please build <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> from
 source if you want to maintain binary upgradeability.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> wheel package comes packaged, among the others, with its
+<p class="admonition-title">Warning</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> wheel package comes packaged, among the others, with its
 own <code class="docutils literal notranslate"><span class="pre">libssl</span></code> binary. This may create conflicts with other extension
 modules binding with <code class="docutils literal notranslate"><span class="pre">libssl</span></code> as well, for instance with the Python
 <a class="reference external" href="https://docs.python.org/3/library/ssl.html#module-ssl" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ssl</span></code></a> module: in some cases, under concurrency, the interaction between
 the two libraries may result in a segfault. In case of doubts you are
 advised to use a package built from source.</p>
 </div>
-</div>
-<div class="section" id="change-in-binary-packages-between-psycopg-2-7-and-2-8">
+</section>
+<section id="change-in-binary-packages-between-psycopg-2-7-and-2-8">
 <span id="disable-wheel"></span><span id="index-1"></span><h3>Change in binary packages between Psycopg 2.7 and 2.8<a class="headerlink" href="#change-in-binary-packages-between-psycopg-2-7-and-2-8" title="Permalink to this headline">¶</a></h3>
 <p>In version 2.7.x, <strong class="command">pip install psycopg2</strong> would have tried to install
 automatically the binary package of Psycopg. Because of concurrency problems
@@ -119,7 +119,7 @@ package.</p>
 <p>If you are using Psycopg 2.7 and you want to disable the use of wheel binary
 packages, relying on the system libraries available on your client, you
 can use the <strong class="command">pip</strong> <a class="reference external" href="https://pip.pypa.io/en/stable/reference/pip_install/#install-no-binary"><code class="docutils literal notranslate"><span class="pre">--no-binary</span></code> option</a>, e.g.:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install --no-binary :all: psycopg2
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install --no-binary :all: psycopg2
 </pre></div>
 </div>
 <p>which can be specified in your <code class="file docutils literal notranslate"><span class="pre">requirements.txt</span></code> files too, e.g. use:</p>
@@ -129,42 +129,39 @@ can use the <strong class="command">pip</strong> <a class="reference external" h
 <p>to use the last bugfix release of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> 2.7 package, specifying to
 always compile it from source. Of course in this case you will have to meet
 the <a class="reference internal" href="#build-prerequisites"><span class="std std-ref">build prerequisites</span></a>.</p>
-</div>
-</div>
-<div class="section" id="prerequisites">
+</section>
+</section>
+<section id="prerequisites">
 <span id="index-2"></span><h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>The current <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> implementation supports:</p>
 <ul class="simple">
-<li>Python versions from 3.6 to 3.10</li>
-<li>PostgreSQL server versions from 7.4 to 14</li>
-<li>PostgreSQL client library version from 9.1</li>
+<li><p>Python versions from 3.6 to 3.10</p></li>
+<li><p>PostgreSQL server versions from 7.4 to 14</p></li>
+<li><p>PostgreSQL client library version from 9.1</p></li>
 </ul>
-<div class="section" id="build-prerequisites">
+<section id="build-prerequisites">
 <span id="id3"></span><h3>Build prerequisites<a class="headerlink" href="#build-prerequisites" title="Permalink to this headline">¶</a></h3>
 <p>The build prerequisites are to be met in order to install Psycopg from source
 code, from a source distribution package, <a class="reference external" href="https://github.com/psycopg/psycopg2">GitHub</a> or from PyPI.</p>
 <p>Psycopg is a C wrapper around the <a class="reference external" href="https://www.postgresql.org/docs/current/static/libpq.html">libpq</a> PostgreSQL client library. To install
 it from sources you will need:</p>
 <ul>
-<li><p class="first">A C compiler.</p>
-</li>
-<li><p class="first">The Python header files. They are usually installed in a package such as
+<li><p>A C compiler.</p></li>
+<li><p>The Python header files. They are usually installed in a package such as
 <strong>python-dev</strong> or <strong>python3-dev</strong>. A message such as <em>error: Python.h: No
 such file or directory</em> is an indication that the Python headers are
-missing.</p>
-</li>
-<li><p class="first">The libpq header files. They are usually installed in a package such as
+missing.</p></li>
+<li><p>The libpq header files. They are usually installed in a package such as
 <strong>libpq-dev</strong>. If you get an <em>error: libpq-fe.h: No such file or directory</em>
-you are missing them.</p>
-</li>
-<li><p class="first">The <strong class="program">pg_config</strong> program: it is usually installed by the
+you are missing them.</p></li>
+<li><p>The <strong class="program">pg_config</strong> program: it is usually installed by the
 <strong>libpq-dev</strong> package but sometimes it is not in a <span class="target" id="index-3"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code> directory.
 Having it in the <span class="target" id="index-4"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code> greatly streamlines the installation, so try
 running <code class="docutils literal notranslate"><span class="pre">pg_config</span> <span class="pre">--version</span></code>: if it returns an error or an unexpected
 version number then locate the directory containing the <strong class="program">pg_config</strong>
 shipped with the right libpq version (usually
 <code class="docutils literal notranslate"><span class="pre">/usr/lib/postgresql/X.Y/bin/</span></code>) and add it to the <span class="target" id="index-5"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>/usr/lib/postgresql/X.Y/bin/:<span class="nv">$PATH</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>/usr/lib/postgresql/X.Y/bin/:<span class="nv">$PATH</span>
 </pre></div>
 </div>
 <p>You only need <strong class="program">pg_config</strong> to compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>, not for its
@@ -172,16 +169,16 @@ regular usage.</p>
 </li>
 </ul>
 <p>Once everything is in place it’s just a matter of running the standard:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install psycopg2
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install psycopg2
 </pre></div>
 </div>
 <p>or, from the directory containing the source code:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python setup.py build
-<span class="gp">$</span> python setup.py install
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python setup.py build
+<span class="gp">$ </span>python setup.py install
 </pre></div>
 </div>
-</div>
-<div class="section" id="runtime-requirements">
+</section>
+<section id="runtime-requirements">
 <h3>Runtime requirements<a class="headerlink" href="#runtime-requirements" title="Permalink to this headline">¶</a></h3>
 <p>Unless you compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> as a static library, or you install it from a
 self-contained wheel package, it will need the <a class="reference external" href="https://www.postgresql.org/docs/current/static/libpq.html">libpq</a> library at runtime
@@ -192,120 +189,122 @@ non-standard location you will have to tell Psycopg how to find it,
 which is OS-dependent (for instance setting a suitable
 <span class="target" id="index-6"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> on Linux).</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The libpq header files used to compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> should match the
+<p class="admonition-title">Note</p>
+<p>The libpq header files used to compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> should match the
 version of the library linked at runtime. If you get errors about missing
 or mismatching libraries when importing <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> check (e.g. using
 <strong class="program">ldd</strong>) if the module <code class="docutils literal notranslate"><span class="pre">psycopg2/_psycopg.so</span></code> is linked to the
 right <code class="docutils literal notranslate"><span class="pre">libpq.so</span></code>.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Whatever version of libpq <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is compiled with, it will be
+<p class="admonition-title">Note</p>
+<p>Whatever version of libpq <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is compiled with, it will be
 possible to connect to PostgreSQL servers of any supported version: just
 install the most recent libpq version or the most practical, without
 trying to match it to the version of the PostgreSQL server you will have
 to connect to.</p>
 </div>
-</div>
-</div>
-<div class="section" id="non-standard-builds">
+</section>
+</section>
+<section id="non-standard-builds">
 <span id="index-7"></span><h2>Non-standard builds<a class="headerlink" href="#non-standard-builds" title="Permalink to this headline">¶</a></h2>
 <p>If you have less standard requirements such as:</p>
 <ul class="simple">
-<li>creating a <a class="reference internal" href="#debug-build"><span class="std std-ref">debug build</span></a>,</li>
-<li>using <strong class="program">pg_config</strong> not in the <span class="target" id="index-8"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>,</li>
+<li><p>creating a <a class="reference internal" href="#debug-build"><span class="std std-ref">debug build</span></a>,</p></li>
+<li><p>using <strong class="program">pg_config</strong> not in the <span class="target" id="index-8"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>,</p></li>
 </ul>
 <p>then take a look at the <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file.</p>
 <p>Some of the options available in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> are also available as command
 line arguments of the <code class="docutils literal notranslate"><span class="pre">build_ext</span></code> sub-command. For instance you can specify
 an alternate <strong class="program">pg_config</strong> location using:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python setup.py build_ext --pg-config /path/to/pg_config build
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python setup.py build_ext --pg-config /path/to/pg_config build
 </pre></div>
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">build_ext</span> <span class="pre">--help</span></code> to get a list of the options
 supported.</p>
-<div class="section" id="creating-a-debug-build">
+<section id="creating-a-debug-build">
 <span id="debug-build"></span><span id="index-9"></span><h3>Creating a debug build<a class="headerlink" href="#creating-a-debug-build" title="Permalink to this headline">¶</a></h3>
 <p>In case of problems, Psycopg can be configured to emit detailed debug
 messages, which can be very useful for diagnostics and to report a bug. In
 order to create a debug package:</p>
 <ul class="simple">
-<li><a class="reference external" href="https://pypi.org/project/psycopg2/#files">Download</a> and unpack the Psycopg <em>source package</em> (the <code class="docutils literal notranslate"><span class="pre">.tar.gz</span></code>
-package).</li>
-<li>Edit the <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file adding the <code class="docutils literal notranslate"><span class="pre">PSYCOPG_DEBUG</span></code> flag to the
-<code class="docutils literal notranslate"><span class="pre">define</span></code> option.</li>
-<li><a class="reference internal" href="#build-prerequisites"><span class="std std-ref">Compile and install</span></a> the package.</li>
-<li>Set the <span class="target" id="index-10"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_DEBUG</span></code> environment variable:</li>
+<li><p><a class="reference external" href="https://pypi.org/project/psycopg2/#files">Download</a> and unpack the Psycopg <em>source package</em> (the <code class="docutils literal notranslate"><span class="pre">.tar.gz</span></code>
+package).</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file adding the <code class="docutils literal notranslate"><span class="pre">PSYCOPG_DEBUG</span></code> flag to the
+<code class="docutils literal notranslate"><span class="pre">define</span></code> option.</p></li>
+<li><p><a class="reference internal" href="#build-prerequisites"><span class="std std-ref">Compile and install</span></a> the package.</p></li>
+<li><p>Set the <span class="target" id="index-10"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_DEBUG</span></code> environment variable:</p></li>
 </ul>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">export</span> <span class="nv">PSYCOPG_DEBUG</span><span class="o">=</span><span class="m">1</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span> <span class="nv">PSYCOPG_DEBUG</span><span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li>Run your program (making sure that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> package imported is the
+<li><p>Run your program (making sure that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> package imported is the
 one you just compiled and not e.g. the system one): you will have a copious
-stream of informations printed on stderr.</li>
+stream of informations printed on stderr.</p></li>
 </ul>
-</div>
-<div class="section" id="non-standard-python-implementation">
+</section>
+<section id="non-standard-python-implementation">
 <h3>Non-standard Python Implementation<a class="headerlink" href="#non-standard-python-implementation" title="Permalink to this headline">¶</a></h3>
 <p>The <a class="reference internal" href="module.html#module-psycopg2" title="psycopg2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a> package is the current mature implementation of the adapter: it
 is a C extension and as such it is only compatible with <a class="reference external" href="https://en.wikipedia.org/wiki/CPython">CPython</a>. If you want
 to use Psycopg on a different Python implementation (PyPy, Jython, IronPython)
 there is a couple of alternative:</p>
 <ul class="simple">
-<li>a <a class="reference external" href="https://github.com/mvantellingen/psycopg2-ctypes">Ctypes port</a>, but it is not as mature as the C implementation yet
-and it is not as feature-complete;</li>
-<li>a <a class="reference external" href="https://github.com/chtd/psycopg2cffi">CFFI port</a> which is currently more used and reported more efficient on
+<li><p>a <a class="reference external" href="https://github.com/mvantellingen/psycopg2-ctypes">Ctypes port</a>, but it is not as mature as the C implementation yet
+and it is not as feature-complete;</p></li>
+<li><p>a <a class="reference external" href="https://github.com/chtd/psycopg2cffi">CFFI port</a> which is currently more used and reported more efficient on
 PyPy, but please be careful of its version numbers because they are not
-aligned to the official psycopg2 ones and some features may differ.</li>
+aligned to the official psycopg2 ones and some features may differ.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="running-the-test-suite">
+</section>
+</section>
+<section id="running-the-test-suite">
 <span id="test-suite"></span><span id="index-11"></span><h2>Running the test suite<a class="headerlink" href="#running-the-test-suite" title="Permalink to this headline">¶</a></h2>
 <p>Once <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is installed you can run the test suite to verify it is
 working correctly. From the source directory, you can run:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python -c <span class="s2">&quot;import tests; tests.unittest.main(defaultTest=&#39;tests.test_suite&#39;)&quot;</span> --verbose
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python -c <span class="s2">&quot;import tests; tests.unittest.main(defaultTest=&#39;tests.test_suite&#39;)&quot;</span> --verbose
 </pre></div>
 </div>
 <p>The tests run against a database called <code class="docutils literal notranslate"><span class="pre">psycopg2_test</span></code> on UNIX socket and
 the standard port. You can configure a different database to run the test by
 setting the environment variables:</p>
 <ul class="simple">
-<li><span class="target" id="index-12"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB</span></code></li>
-<li><span class="target" id="index-13"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_HOST</span></code></li>
-<li><span class="target" id="index-14"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_PORT</span></code></li>
-<li><span class="target" id="index-15"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_USER</span></code></li>
+<li><p><span class="target" id="index-12"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB</span></code></p></li>
+<li><p><span class="target" id="index-13"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_HOST</span></code></p></li>
+<li><p><span class="target" id="index-14"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_PORT</span></code></p></li>
+<li><p><span class="target" id="index-15"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG2_TESTDB_USER</span></code></p></li>
 </ul>
 <p>The database should already exist before running the tests.</p>
-</div>
-<div class="section" id="if-you-still-have-problems">
+</section>
+<section id="if-you-still-have-problems">
 <span id="other-problems"></span><h2>If you still have problems<a class="headerlink" href="#if-you-still-have-problems" title="Permalink to this headline">¶</a></h2>
 <p>Try the following. <em>In order:</em></p>
 <ul class="simple">
-<li>Read again the <a class="reference internal" href="#build-prerequisites"><span class="std std-ref">Build prerequisites</span></a>.</li>
-<li>Read the <a class="reference internal" href="faq.html#faq-compile"><span class="std std-ref">FAQ</span></a>.</li>
-<li>Google for <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <em>your error message</em>. Especially useful the week
-after the release of a new OS X version.</li>
-<li>Write to the <a class="reference external" href="https://www.postgresql.org/list/psycopg/">Mailing List</a>.</li>
-<li>If you think that you have discovered a bug, test failure or missing feature
-please raise a ticket in the <a class="reference external" href="https://github.com/psycopg/psycopg2/issues">bug tracker</a>.</li>
-<li>Complain on your blog or on Twitter that <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is the worst package
+<li><p>Read again the <a class="reference internal" href="#build-prerequisites"><span class="std std-ref">Build prerequisites</span></a>.</p></li>
+<li><p>Read the <a class="reference internal" href="faq.html#faq-compile"><span class="std std-ref">FAQ</span></a>.</p></li>
+<li><p>Google for <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <em>your error message</em>. Especially useful the week
+after the release of a new OS X version.</p></li>
+<li><p>Write to the <a class="reference external" href="https://www.postgresql.org/list/psycopg/">Mailing List</a>.</p></li>
+<li><p>If you think that you have discovered a bug, test failure or missing feature
+please raise a ticket in the <a class="reference external" href="https://github.com/psycopg/psycopg2/issues">bug tracker</a>.</p></li>
+<li><p>Complain on your blog or on Twitter that <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is the worst package
 ever and about the quality time you have wasted figuring out the correct
-<span class="target" id="index-16"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ARCHFLAGS</span></code>. Especially useful from the Starbucks near you.</li>
+<span class="target" id="index-16"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ARCHFLAGS</span></code>. Especially useful from the Starbucks near you.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#quick-install">Quick Install</a><ul>
 <li><a class="reference internal" href="#psycopg-vs-psycopg-binary">psycopg vs psycopg-binary</a></li>
@@ -328,6 +327,7 @@ ever and about the quality time you have wasted figuring out the correct
 </li>
 </ul>
 
+  </div>
 <h3>Quick search</h3>
 <form class="search" action="search.html" method="get">
   <input type="text" name="q"
