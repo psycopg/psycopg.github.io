@@ -272,10 +272,10 @@ the connection will be closed.</p>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>conninfo</strong> – The <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">connection string</a> (a <code class="docutils literal notranslate"><span class="pre">postgresql://</span></code> url or
-a list of <code class="docutils literal notranslate"><span class="pre">key=value</span> <span class="pre">pairs</span></code>) to specify where and
+a list of <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pairs) to specify where and
 how to connect.</p></li>
 <li><p><strong>kwargs</strong> – Further parameters specifying the connection string.
-They override the ones specified in <em>conninfo</em>.</p></li>
+They override the ones specified in <code class="docutils literal notranslate"><span class="pre">conninfo</span></code>.</p></li>
 <li><p><strong>autocommit</strong> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> don’t start transactions automatically.
 See <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transactions management</span></a> for details.</p></li>
 <li><p><strong>row_factory</strong> – The row factory specifying what type of records
@@ -306,7 +306,7 @@ further details.</p>
 </ul>
 </div>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 3.1: </span>Added <em>prepare_threshold</em> parameter.</p>
+<p><span class="versionmodified changed">Changed in version 3.1: </span>added <code class="docutils literal notranslate"><span class="pre">prepare_threshold</span></code> parameter.</p>
 </div>
 </dd></dl>
 <dl class="py method">
@@ -363,7 +363,7 @@ the server-side cursor created.</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A cursor of the class specified by <a class="reference internal" href="#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor_factory</span></code></a> (or
-<a class="reference internal" href="#psycopg.Connection.server_cursor_factory" title="psycopg.Connection.server_cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_cursor_factory</span></code></a> if <em>name</em> is specified).</p>
+<a class="reference internal" href="#psycopg.Connection.server_cursor_factory" title="psycopg.Connection.server_cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_cursor_factory</span></code></a> if <code class="docutils literal notranslate"><span class="pre">name</span></code> is specified).</p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -649,7 +649,7 @@ may have executed since the last <a class="reference internal" href="#psycopg.Co
 <p>Furthermore, it is an error to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code>
 within the TPC transaction: in this case a <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a>
 is raised.</p>
-<p>The <em>xid</em> may be either an object returned by the <a class="reference internal" href="#psycopg.Connection.xid" title="psycopg.Connection.xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xid()</span></code></a> method or a
+<p>The <code class="docutils literal notranslate"><span class="pre">xid</span></code> may be either an object returned by the <a class="reference internal" href="#psycopg.Connection.xid" title="psycopg.Connection.xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xid()</span></code></a> method or a
 plain string: the latter allows to create a transaction using the
 provided string as PostgreSQL transaction id. See also
 <a class="reference internal" href="#psycopg.Connection.tpc_recover" title="psycopg.Connection.tpc_recover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_recover()</span></code></a>.</p>
@@ -682,7 +682,7 @@ transaction previously prepared with <a class="reference internal" href="#psycop
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code> is called prior to <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code>, a single phase
 commit is performed.  A transaction manager may choose to do this if
 only a single resource is participating in the global transaction.</p>
-<p>When called with a transaction ID <em>xid</em>, the database commits the
+<p>When called with a transaction ID <code class="docutils literal notranslate"><span class="pre">xid</span></code>, the database commits the
 given transaction.  If an invalid transaction ID is provided, a
 <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> will be raised.  This form should be called outside
 of a transaction, and is intended for use in recovery.</p>
@@ -703,7 +703,7 @@ of a transaction, and is intended for use in recovery.</p>
 </dl>
 <p>When called with no arguments, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code> rolls back a TPC
 transaction.  It may be called before or after <a class="reference internal" href="#psycopg.Connection.tpc_prepare" title="psycopg.Connection.tpc_prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_prepare()</span></code></a>.</p>
-<p>When called with a transaction ID <em>xid</em>, it rolls back the given
+<p>When called with a transaction ID <code class="docutils literal notranslate"><span class="pre">xid</span></code>, it rolls back the given
 transaction.  If an invalid transaction ID is provided, a
 <a class="reference internal" href="errors.html#psycopg.ProgrammingError" title="psycopg.ProgrammingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a> is raised.  This form should be called outside of a
 transaction, and is intended for use in recovery.</p>
@@ -1145,9 +1145,9 @@ enclosing transactions contexts up to and including the one specified.</p>
 transaction block and continue the program after the block.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback()</span></code>: same effect as above</p></li>
 <li><p><code class="samp docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback(</span><em><span class="pre">tx</span></em><span class="pre">)</span></code>: roll back any operation that happened in
-the <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> <em>tx</em> (returned by a statement such as <code class="samp docutils literal notranslate"><span class="pre">with</span>
+the <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> <code class="docutils literal notranslate"><span class="pre">tx</span></code> (returned by a statement such as <code class="samp docutils literal notranslate"><span class="pre">with</span>
 <span class="pre">conn.transaction()</span> <span class="pre">as</span> <em><span class="pre">tx</span></em><span class="pre">:</span></code> and all the blocks nested within. The
-program will continue after the <em>tx</em> block.</p></li>
+program will continue after the <code class="docutils literal notranslate"><span class="pre">tx</span></code> block.</p></li>
 </ul>
 </dd></dl>
 <dl class="py class">

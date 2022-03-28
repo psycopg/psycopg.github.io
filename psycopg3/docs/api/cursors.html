@@ -242,7 +242,7 @@
 <p>The <a class="reference internal" href="#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> and <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> classes are the main objects to send commands
 to a PostgreSQL database session. They are normally created by the
 connection’s <a class="reference internal" href="connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method.</p>
-<p>Using the <em>name</em> parameter on <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> will create a <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> or
+<p>Using the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter on <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> will create a <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> or
 <a class="reference internal" href="#psycopg.AsyncServerCursor" title="psycopg.AsyncServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a>, which can be used to retrieve partial results from a
 database.</p>
 <p>A <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can create several cursors, but only one at time can perform
@@ -317,33 +317,30 @@ queries.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.executemany">
-<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the same command with a sequence of input data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
 <li><p><strong>params_seq</strong> (<em>Sequence of Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
-<li><p><strong>returning</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">false</span></code>, query results won’t be available to fetch</p></li>
+<li><p><strong>returning</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, fetch the results of the queries executed</p></li>
 </ul>
 </dd>
 </dl>
 <p>This is more efficient than performing separate queries, but in case of
 several <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> (and with some SQL creativity for massive
 <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code> too) you may consider using <a class="reference internal" href="#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a>.</p>
-<p>If the queries return data (e.g. when executing an <code class="sql docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">...</span>
-<span class="pre">RETURNING</span></code> or a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> with a side-effect), the result will be
-available in the cursor’s state, using <a class="reference internal" href="#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a> and similar
-methods; results after the first will be available using <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>.
-In case this makes use of an unacceptable amount of memory you can use
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=False</span></code> to disable returning the results. This is not
-necessary if the queries return no data (e.g. on <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> without
-returning).</p>
+<p>If the queries return data you want to read (e.g. when executing an
+<code class="sql docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">...</span> <span class="pre">RETURNING</span></code> or a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> with a side-effect),
+you can specify <code class="docutils literal notranslate"><span class="pre">returning=True</span></code>; the results will be available in
+the cursor’s state and can be read using <a class="reference internal" href="#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a> and similar
+methods. Each input parameter will produce a separate result set: use
+<a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> to read the results of the queries after the first one.</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 3.1: </span>results are now available in the cursor state, added <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning</span></code>
-parameter to disable it.</p>
+<p><span class="versionmodified changed">Changed in version 3.1: </span>added <code class="docutils literal notranslate"><span class="pre">returning</span></code> parameter to receive query results.</p>
 </div>
 </dd></dl>
 <dl class="py method">
@@ -559,7 +556,7 @@ is text or binary.</p></li>
 <dt class="sig sig-object py" id="psycopg.ServerCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">ServerCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scrollable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withhold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ServerCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class also implements a <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#cursor-objects">DBAPI-compliant interface</a>. It is created
-by <a class="reference internal" href="connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> specifying the <em>name</em> parameter. Using this
+by <a class="reference internal" href="connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> specifying the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter. Using this
 object results in the creation of an equivalent PostgreSQL cursor in the
 server. DBAPI-extension methods (such as <a class="reference internal" href="#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a> or
 <a class="reference internal" href="#psycopg.Cursor.stream" title="psycopg.Cursor.stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stream()</span></code></a>) are not implemented on this object: use a normal
@@ -629,7 +626,7 @@ format (<code class="xref py py-obj docutils literal notranslate"><span class="p
 </ul>
 </dd>
 </dl>
-<p>Create a server cursor with given <a class="reference internal" href="#psycopg.ServerCursor.name" title="psycopg.ServerCursor.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a> and the <em>query</em> in argument.</p>
+<p>Create a server cursor with given <a class="reference internal" href="#psycopg.ServerCursor.name" title="psycopg.ServerCursor.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a> and the <code class="docutils literal notranslate"><span class="pre">query</span></code> in argument.</p>
 <p>If using <code class="sql docutils literal notranslate"><span class="pre">DECLARE</span></code> is not appropriate (for instance because the
 cursor is returned by calling a stored procedure) you can avoid to use
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>, crete the cursor in other ways, and use directly the
@@ -751,7 +748,7 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.executemany">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_seq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.executemany" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.copy">
@@ -836,7 +833,7 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncServerCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scrollable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withhold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncServerCursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a DBAPI-inspired interface as the <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>
 does, but wraps a server-side cursor like the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> class. It is
-created by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.cursor" title="psycopg.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> specifying the <em>name</em> parameter.</p>
+created by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.cursor" title="psycopg.AsyncConnection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a> specifying the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter.</p>
 <p>The following are the methods exposing a different (async) interface from
 the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> counterpart, but sharing the same semantics.</p>
 <dl class="py method">
