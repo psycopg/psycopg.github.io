@@ -195,6 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="module.html">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cursors.html">Cursor classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objects.html">Other top-level objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rows.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows</span></code> – row factory implementations</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
@@ -350,8 +351,21 @@ statement, wrong number of parameters specified, etc.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="psycopg.NotSupportedError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">NotSupportedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pgconn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.NotSupportedError" title="Permalink to this definition">¶</a></dt>
-<dd><p>A method or database API was used which is not supported by the database,</p>
+<dd><p>A method or database API was used which is not supported by the database.</p>
 </dd></dl>
+<section id="other-psycopg-errors">
+<h3>Other Psycopg errors<a class="headerlink" href="#other-psycopg-errors" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the standard DB-API errors, Psycopg defines a few more specific
+ones.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="psycopg.errors.ConnectionTimeout">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.errors.</span></span><span class="sig-name descname"><span class="pre">ConnectionTimeout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pgconn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.errors.ConnectionTimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception raised on timeout of the <a class="reference internal" href="connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> method.</p>
+<p>The error is raised if the <code class="docutils literal notranslate"><span class="pre">connect_timeout</span></code> is specified and a
+connection is not obtained in useful time.</p>
+<p>Subclass of <a class="reference internal" href="#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a>.</p>
+</dd></dl>
+</section>
 </section>
 <section id="error-diagnostics">
 <span id="index-2"></span><h2>Error diagnostics<a class="headerlink" href="#error-diagnostics" title="Permalink to this headline">¶</a></h2>
@@ -1609,7 +1623,10 @@ module, together with the base DBAPI exception they derive from.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a><ul>
-<li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a></li>
+<li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a><ul>
+<li><a class="reference internal" href="#other-psycopg-errors">Other Psycopg errors</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#error-diagnostics">Error diagnostics</a></li>
 <li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a><ul>
 <li><a class="reference internal" href="#list-of-known-exceptions">List of known exceptions</a></li>

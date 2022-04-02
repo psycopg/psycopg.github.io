@@ -195,6 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/module.html">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/objects.html">Other top-level objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/rows.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows</span></code> – row factory implementations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/errors.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a></li>
@@ -244,7 +245,7 @@ one of the most efficient ways to load data into the database (and to modify
 it, with some SQL creativity).</p>
 <p>Copy is supported using the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> method, passing it a query of the
 form <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> or <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">TO</span> <span class="pre">STDOUT</span></code>, and managing the
-resulting <a class="reference internal" href="../api/cursors.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object in a <code class="docutils literal notranslate"><span class="pre">with</span></code> block:</p>
+resulting <a class="reference internal" href="../api/objects.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object in a <code class="docutils literal notranslate"><span class="pre">with</span></code> block:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY table_name (col1, col2) FROM STDIN"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="c1"># pass data to the 'copy' object using write()/write_row()</span>
 </pre></div>
@@ -266,7 +267,7 @@ have to commit the pending changes and you can still roll them back. See
 <p>Using a copy operation you can load data into the database from any Python
 iterable (a list of tuples, or any iterable of sequences): the Python values
 are adapted as they would be in normal querying. To perform such operation use
-a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> with <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and use <a class="reference internal" href="../api/cursors.html#psycopg.Copy.write_row" title="psycopg.Copy.write_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code></a>
+a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">FROM</span> <span class="pre">STDIN</span></code> with <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and use <a class="reference internal" href="../api/objects.html#psycopg.Copy.write_row" title="psycopg.Copy.write_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_row()</span></code></a>
 on the resulting object in a <code class="docutils literal notranslate"><span class="pre">with</span></code> block. On exiting the block the
 operation will be concluded:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">records</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"hello"</span><span class="p">),</span> <span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"world"</span><span class="p">)]</span>
@@ -290,13 +291,13 @@ must have a binary dumper registered (see <a class="reference internal" href="pa
 <p>Note that PostgreSQL is particularly finicky when loading data in binary mode
 and will apply <em>no cast rules</em>. This means that e.g. passing the value 100 to
 an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> column will fail because Psycopg will pass it as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code>
-value. You can work around the problem using the <a class="reference internal" href="../api/cursors.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> method of
+value. You can work around the problem using the <a class="reference internal" href="../api/objects.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> method of
 the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object and specify carefully the types to dump.</p>
 </section>
 <section id="reading-data-row-by-row">
 <span id="copy-out-row"></span><h2>Reading data row-by-row<a class="headerlink" href="#reading-data-row-by-row" title="Permalink to this headline">¶</a></h2>
 <p>You can also do the opposite, reading rows out of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">TO</span> <span class="pre">STDOUT</span></code>
-operation, by iterating on <a class="reference internal" href="../api/cursors.html#psycopg.Copy.rows" title="psycopg.Copy.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows()</span></code></a>. However this is not something you
+operation, by iterating on <a class="reference internal" href="../api/objects.html#psycopg.Copy.rows" title="psycopg.Copy.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows()</span></code></a>. However this is not something you
 may want to do normally: usually the normal query process will be easier to
 use.</p>
 <p>PostgreSQL, currently, doesn’t give complete type information on <code class="sql docutils literal notranslate"><span class="pre">COPY</span>
@@ -307,7 +308,7 @@ according to the format.</p>
         <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># return unparsed data: ('10', '2046-12-24')</span>
 </pre></div>
 </div>
-<p>You can improve the results by using <a class="reference internal" href="../api/cursors.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> before reading, but
+<p>You can improve the results by using <a class="reference internal" href="../api/objects.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> before reading, but
 you have to specify them yourselves.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cur</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY (VALUES (10::int, current_date)) TO STDOUT"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="n">copy</span><span class="o">.</span><span class="n">set_types</span><span class="p">([</span><span class="s2">"int4"</span><span class="p">,</span> <span class="s2">"date"</span><span class="p">])</span>
@@ -320,7 +321,7 @@ you have to specify them yourselves.</p>
 <span id="copy-block"></span><h2>Copying block-by-block<a class="headerlink" href="#copying-block-by-block" title="Permalink to this headline">¶</a></h2>
 <p>If data is already formatted in a way suitable for copy (for instance because
 it is coming from a file resulting from a previous <code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation) it can
-be loaded into the database using <a class="reference internal" href="../api/cursors.html#psycopg.Copy.write" title="psycopg.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code></a> instead.</p>
+be loaded into the database using <a class="reference internal" href="../api/objects.html#psycopg.Copy.write" title="psycopg.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy.write()</span></code></a> instead.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY data FROM STDIN"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
         <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">BLOCK_SIZE</span><span class="p">):</span>
@@ -332,7 +333,7 @@ input data is compatible. Data can be passed as <code class="xref py py-obj docu
 <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">TEXT</span></code>, or as <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, which works with both <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">TEXT</span></code>
 and <code class="sql docutils literal notranslate"><span class="pre">FORMAT</span> <span class="pre">BINARY</span></code>.</p>
 <p>In order to produce data in <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> format you can use a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">...</span> <span class="pre">TO</span>
-<span class="pre">STDOUT</span></code> statement and iterate over the resulting <a class="reference internal" href="../api/cursors.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object, which will
+<span class="pre">STDOUT</span></code> statement and iterate over the resulting <a class="reference internal" href="../api/objects.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> object, which will
 produce a stream of <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.out"</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY table_name TO STDOUT"</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
@@ -352,8 +353,8 @@ a fully-async copy operation could be:</p>
         <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCopy" title="psycopg.AsyncCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code></a> object documentation describes the signature of the
-asynchronous methods and the differences from its sync <a class="reference internal" href="../api/cursors.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> counterpart.</p>
+<p>The <a class="reference internal" href="../api/objects.html#psycopg.AsyncCopy" title="psycopg.AsyncCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code></a> object documentation describes the signature of the
+asynchronous methods and the differences from its sync <a class="reference internal" href="../api/objects.html#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> counterpart.</p>
 </section>
 </section>
 
