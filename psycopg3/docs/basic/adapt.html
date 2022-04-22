@@ -512,6 +512,161 @@ back.</p></li>
 </pre></div>
 </div>
 </section>
+<section id="enum-adaptation">
+<span id="adapt-enum"></span><h2>Enum adaptation<a class="headerlink" href="#enum-adaptation" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<p>Psycopg can adapt Python <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code></a> subclasses into PostgreSQL enum types
+(created with the <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-enum.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span> <span class="pre">...</span> <span class="pre">AS</span> <span class="pre">ENUM</span> <span class="pre">(...)</span></code></a> command).</p>
+<p>In order to set up a bidirectional enum mapping, you should get information
+about the PostgreSQL enum using the <a class="reference internal" href="#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a> class and
+register it using <a class="reference internal" href="#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a>. The behaviour of unregistered
+and registered enums is different.</p>
+<ul class="simple">
+<li><p>If the enum is not registered with <code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code>:</p>
+<ul>
+<li><p>Pure <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code> classes are dumped as normal strings, using their member
+names as value. The unknown oid is used, so PostgreSQL should be able to
+use this string in most contexts (such as an enum or a text field).</p></li>
+<li><p>Mix-in enums are dumped according to their mix-in type (because a <code class="xref py py-obj docutils literal notranslate"><span class="pre">class</span>
+<span class="pre">MyIntEnum(int,</span> <span class="pre">Enum)</span></code> is more specifically an <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> than an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code>, so
+it’s dumped by default according to <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> rules).</p></li>
+<li><p>PostgreSQL enums are loaded as Python strings. If you want to load arrays
+of such enums you will have to find their ids using
+<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types.TypeInfo.fetch()</span></code></a> and <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a>.</p></li>
+</ul>
+</li>
+<li><p>If the enum is registered (using <a class="reference internal" href="#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">.fetch()</span></code> and
+<a class="reference internal" href="#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a>):</p>
+<ul>
+<li><p>Enums classes, both pure and mixed-in, are dumped by name.</p></li>
+<li><p>The registered PostgreSQL enum is loaded back as the registered Python enum members.</p></li>
+</ul>
+</li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.types.enum.EnumInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.types.enum.</span></span><span class="sig-name descname"><span class="pre">EnumInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.enum.EnumInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage information about an enum type.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code> is a subclass of <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>: refer to the
+latter’s documentation for generic usage, especially the
+<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.types.enum.EnumInfo.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#psycopg.types.enum.EnumInfo.labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>After <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a>, it contains the labels defined
+in the PostgreSQL enum type.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.types.enum.EnumInfo.enum">
+<span class="sig-name descname"><span class="pre">enum</span></span><a class="headerlink" href="#psycopg.types.enum.EnumInfo.enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>After <a class="reference internal" href="#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a> is called, it will contain the Python type
+mapping to the registered enum.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="psycopg.types.enum.register_enum">
+<span class="sig-prename descclassname"><span class="pre">psycopg.types.enum.</span></span><span class="sig-name descname"><span class="pre">register_enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.types.enum.register_enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the adapters to load and dump a enum type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>info</strong> (<a class="reference internal" href="#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnumInfo</span></code></a>) – The object with the information about the enum to register.</p></li>
+<li><p><strong>context</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>]) – The context where to register the adapters. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>,
+register it globally.</p></li>
+<li><p><strong>enum</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">E</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a>)]]) – Python enum type matching to the PostgreSQL one. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>,
+a new enum will be generated and exposed as <a class="reference internal" href="#psycopg.types.enum.EnumInfo.enum" title="psycopg.types.enum.EnumInfo.enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo.enum</span></code></a>.</p></li>
+<li><p><strong>mapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">E</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">E</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – Override the mapping between <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum</span></code> members and <code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code>
+labels.</p></li>
+</ul>
+</dd>
+</dl>
+<p>After registering, fetching data of the registered enum will cast
+PostgreSQL enum labels into corresponding Python enum labels.</p>
+<p>If no <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum</span></code> is specified, a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code> is created based on
+PostgreSQL enum labels.</p>
+</dd></dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.enum</span> <span class="kn">import</span> <span class="n">EnumInfo</span><span class="p">,</span> <span class="n">register_enum</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">UserRole</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE user_role AS ENUM ('ADMIN', 'EDITOR', 'GUEST')"</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"user_role"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">UserRole</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">some_editor</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">enum</span><span class="o">.</span><span class="n">EDITOR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">some_editor</span>
+<span class="go">&lt;UserRole.EDITOR: 2&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"SELECT pg_typeof(</span><span class="si">%(editor)s</span><span class="s2">), </span><span class="si">%(editor)s</span><span class="s2">"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"editor"</span><span class="p">:</span> <span class="n">some_editor</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">('user_role', &lt;UserRole.EDITOR: 2&gt;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"SELECT ARRAY[</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">]"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">GUEST</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">[&lt;UserRole.ADMIN: 1&gt;, &lt;UserRole.GUEST: 3&gt;]</span>
+</pre></div>
+</div>
+<p>If the Python and the PostgreSQL enum don’t match 1:1 (for instance if members
+have a different name, or if more than one Python enum should map to the same
+PostgreSQL enum, or vice versa), you can specify the exceptions using the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code> parameter.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code> should be a dictionary with Python enum members as keys and the
+matching PostgreSQL enum labels as values, or a list of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(member,</span> <span class="pre">label)</span></code>
+pairs with the same meaning (useful when some members are repeated). Order
+matters: if an element on either side is specified more than once, the last
+pair in the sequence will take precedence:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Legacy roles, defined in medieval times.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="o">...</span>     <span class="s2">"CREATE TYPE abbey_role AS ENUM ('ABBOT', 'SCRIBE', 'MONK', 'GUEST')"</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"abbey_role"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">UserRole</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="p">[</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="s2">"ABBOT"</span><span class="p">),</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">"SCRIBE"</span><span class="p">),</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">"MONK"</span><span class="p">)])</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '{ABBOT,SCRIBE,MONK,GUEST}'::abbey_role[]"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">[</span><span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span>
+ <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">GUEST</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">::text[]"</span><span class="p">,</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">UserRole</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">'ABBOT'</span><span class="p">,</span> <span class="s1">'MONK'</span><span class="p">,</span> <span class="s1">'GUEST'</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A particularly useful case is when the PostgreSQL labels match the <em>values</em> of
+a <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>-based Enum. In this case it is possible to use something like <code class="docutils literal notranslate"><span class="pre">{m:</span>
+<span class="pre">m.value</span> <span class="pre">for</span> <span class="pre">m</span> <span class="pre">in</span> <span class="pre">enum}</span></code> as mapping:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">LowercaseRole</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">"admin"</span>
+<span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="s2">"editor"</span>
+<span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="s2">"guest"</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">"CREATE TYPE lowercase_role AS ENUM ('admin', 'editor', 'guest')"</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"lowercase_role"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_enum</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">LowercaseRole</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">LowercaseRole</span><span class="p">})</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'editor'::lowercase_role"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;LowercaseRole.EDITOR: 'editor'&gt;</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -570,6 +725,7 @@ back.</p></li>
 <li><a class="reference internal" href="#lists-adaptation">Lists adaptation</a></li>
 <li><a class="reference internal" href="#uuid-adaptation">UUID adaptation</a></li>
 <li><a class="reference internal" href="#network-data-types-adaptation">Network data types adaptation</a></li>
+<li><a class="reference internal" href="#enum-adaptation">Enum adaptation</a></li>
 </ul>
 </li>
 </ul>
