@@ -523,25 +523,31 @@ back.</p></li>
 about the PostgreSQL enum using the <a class="reference internal" href="#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a> class and
 register it using <a class="reference internal" href="#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a>. The behaviour of unregistered
 and registered enums is different.</p>
-<ul class="simple">
+<ul>
 <li><p>If the enum is not registered with <code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code>:</p>
 <ul>
 <li><p>Pure <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code> classes are dumped as normal strings, using their member
 names as value. The unknown oid is used, so PostgreSQL should be able to
-use this string in most contexts (such as an enum or a text field).</p></li>
+use this string in most contexts (such as an enum or a text field).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>In previous version dumping pure enums is not supported and raise a
+“cannot adapt” error.</p>
+</div>
+</li>
 <li><p>Mix-in enums are dumped according to their mix-in type (because a <code class="xref py py-obj docutils literal notranslate"><span class="pre">class</span>
 <span class="pre">MyIntEnum(int,</span> <span class="pre">Enum)</span></code> is more specifically an <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> than an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code>, so
 it’s dumped by default according to <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> rules).</p></li>
 <li><p>PostgreSQL enums are loaded as Python strings. If you want to load arrays
-of such enums you will have to find their ids using
-<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types.TypeInfo.fetch()</span></code></a> and <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a>.</p></li>
+of such enums you will have to find their OIDs using <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types.TypeInfo.fetch()</span></code></a>
+and register them using <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a>.</p></li>
 </ul>
 </li>
 <li><p>If the enum is registered (using <a class="reference internal" href="#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">.fetch()</span></code> and
 <a class="reference internal" href="#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a>):</p>
-<ul>
+<ul class="simple">
 <li><p>Enums classes, both pure and mixed-in, are dumped by name.</p></li>
-<li><p>The registered PostgreSQL enum is loaded back as the registered Python enum members.</p></li>
+<li><p>The registered PostgreSQL enum is loaded back as the registered Python
+enum members.</p></li>
 </ul>
 </li>
 </ul>

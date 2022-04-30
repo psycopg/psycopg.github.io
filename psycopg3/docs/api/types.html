@@ -314,7 +314,7 @@ name.</p></li>
 information, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
 </dd>
 </dl>
-<p>If the connection is async the function will behave as a coroutine and
+<p>If the connection is async, <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code> will behave as a coroutine and
 the caller will need to <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it to get the result:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="k">await</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">aconn</span><span class="p">,</span> <span class="s2">"mytype"</span><span class="p">)</span>
 </pre></div>
@@ -337,10 +337,11 @@ recognise automatically arrays of that type and load them from the
 database as a list of the base type.</p>
 </dd></dl>
 </dd></dl>
-<p>For recursive types, Psycopg offers a few <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses which can be
-used to extract more complete information, such as
-<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a>, <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>,
-<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.multirange.MultirangeInfo" title="psycopg.types.multirange.MultirangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a>.</p>
+<p>In order to get information about dynamic PostgreSQL types, Psycopg offers a
+few <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> subclasses, whose <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code> method can extract more complete
+information about the type, such as <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a>,
+<a class="reference internal" href="../basic/pgtypes.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>, <a class="reference internal" href="../basic/pgtypes.html#psycopg.types.multirange.MultirangeInfo" title="psycopg.types.multirange.MultirangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultirangeInfo</span></code></a>,
+<a class="reference internal" href="../basic/adapt.html#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a>.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> objects are collected in <a class="reference internal" href="#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a> instances, which help type
 information lookup. Every <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> exposes its type map on
 its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.types" title="psycopg.adapt.AdaptersMap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a> attribute.</p>
