@@ -189,6 +189,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../advanced/cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/adapt.html">Data adaptation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/prepare.html">Prepared statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/pipeline.html">Pipeline mode support</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Psycopg 3 API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -429,6 +430,30 @@ query requested, and returns it.</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.pipeline">
+<span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch the connection into pipeline mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterator" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code></a>[<a class="reference internal" href="objects.html#psycopg.Pipeline" title="psycopg.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>]</p>
+</dd>
+</dl>
+<p>The method is a context manager: you should call it using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>At the end of the block, a synchronization point is established and
+the connection returns in normal mode.</p>
+<p>You can call the method recursively from within a pipeline block.
+Innermost blocks will establish a synchronization point on exit, but
+pipeline mode will be kept until the outermost block exits.</p>
+<p>See <a class="reference internal" href="../advanced/pipeline.html#pipeline-mode"><span class="std std-ref">Pipeline mode support</span></a> for details.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+</dd></dl>
 <p class="rubric">Transaction management methods</p>
 <p>For details see <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transactions management</span></a>.</p>
 <dl class="py method">
@@ -609,16 +634,6 @@ functions waiting for readiness, such as the ones defined in the
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.Connection.pipeline">
-<span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Context manager to switch the connection into pipeline mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterator" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -824,6 +839,24 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 </dl>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.pipeline">
+<span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager to switch the connection into pipeline mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.AsyncIterator" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncIterator</span></code></a>[<a class="reference internal" href="objects.html#psycopg.AsyncPipeline" title="psycopg.AsyncPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncPipeline</span></code></a>]</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It must be called as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.commit">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.commit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -877,24 +910,6 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.set_deferrable">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_deferrable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.set_deferrable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Async version of the <a class="reference internal" href="#psycopg.Connection.deferrable" title="psycopg.Connection.deferrable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deferrable</span></code></a> setter.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.AsyncConnection.pipeline">
-<span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncConnection.pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Context manager to switch the connection into pipeline mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.AsyncIterator" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncIterator</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncPipeline</span></code>]</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>It must be called as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
-    <span class="o">...</span>
-</pre></div>
-</div>
-</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.tpc_prepare">

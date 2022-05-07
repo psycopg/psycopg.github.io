@@ -189,6 +189,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../advanced/cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/adapt.html">Data adaptation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/prepare.html">Prepared statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/pipeline.html">Pipeline mode support</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Psycopg 3 API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -609,6 +610,46 @@ to read its data row by row, using <code class="docutils literal notranslate"><s
 </dd></dl>
 </dd></dl>
 </section>
+<section id="pipeline-related-objects">
+<h2>Pipeline-related objects<a class="headerlink" href="#pipeline-related-objects" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="../advanced/pipeline.html#pipeline-mode"><span class="std std-ref">Pipeline mode support</span></a> for details.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.Pipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler for connection in pipeline mode.</p>
+<p>This objects is returned by <a class="reference internal" href="connections.html#psycopg.Connection.pipeline" title="psycopg.Connection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.pipeline()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Pipeline.sync">
+<span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Pipeline.sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sync the pipeline, send any pending command and receive and process
+all available results.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Pipeline.is_supported">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_supported</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Pipeline.is_supported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if the psycopg libpq wrapper suports pipeline mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.AsyncPipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler for async connection in pipeline mode.</p>
+<p>This objects is returned by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.pipeline" title="psycopg.AsyncConnection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.pipeline()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncPipeline.sync">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncPipeline.sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sync the pipeline, send any pending command and fetch and process
+all available results.</p>
+<p>This is called when exiting the pipeline, but can be used for other
+purposes (e.g. in nested pipelines).</p>
+</dd></dl>
+</dd></dl>
+</section>
 <section id="transaction-related-objects">
 <h2>Transaction-related objects<a class="headerlink" href="#transaction-related-objects" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transactions management</span></a> for details about these objects.</p>
@@ -779,6 +820,7 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
 <li><a class="reference internal" href="#the-description-column-object">The description <code class="xref py py-obj docutils literal notranslate"><span class="pre">Column</span></code> object</a></li>
 <li><a class="reference internal" href="#copy-related-objects">COPY-related objects</a></li>
 <li><a class="reference internal" href="#notifications">Notifications</a></li>
+<li><a class="reference internal" href="#pipeline-related-objects">Pipeline-related objects</a></li>
 <li><a class="reference internal" href="#transaction-related-objects">Transaction-related objects</a></li>
 <li><a class="reference internal" href="#two-phase-commit-related-objects">Two-Phase Commit related objects</a></li>
 </ul>

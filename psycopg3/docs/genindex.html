@@ -187,6 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced/cursors.html">Cursor types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced/adapt.html">Data adaptation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced/prepare.html">Prepared statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/pipeline.html">Pipeline mode support</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">Psycopg 3 API</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -352,6 +353,8 @@
         <li><a href="advanced/async.html#index-0">asyncio</a>
 </li>
         <li><a href="api/pool.html#psycopg_pool.AsyncNullConnectionPool">AsyncNullConnectionPool (class in psycopg_pool)</a>
+</li>
+        <li><a href="api/objects.html#psycopg.AsyncPipeline">AsyncPipeline (class in psycopg)</a>
 </li>
         <li><a href="api/rows.html#psycopg.rows.AsyncRowFactory">AsyncRowFactory (class in psycopg.rows)</a>
 </li>
@@ -986,10 +989,10 @@
 </li>
         <li><a href="api/errors.html#psycopg.InterfaceError">InterfaceError</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/errors.html#psycopg.errors.Diagnostic.internal_position">internal_position (psycopg.errors.Diagnostic attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pq.html#psycopg.pq.DiagnosticField.INTERNAL_POSITION">INTERNAL_POSITION (psycopg.pq.DiagnosticField attribute)</a>
 </li>
         <li><a href="api/errors.html#psycopg.errors.Diagnostic.internal_query">internal_query (psycopg.errors.Diagnostic attribute)</a>
@@ -1001,6 +1004,8 @@
         <li><a href="api/errors.html#psycopg.InternalError">InternalError</a>
 </li>
         <li><a href="api/pq.html#psycopg.pq.TransactionStatus.INTRANS">INTRANS (psycopg.pq.TransactionStatus attribute)</a>
+</li>
+        <li><a href="api/objects.html#psycopg.Pipeline.is_supported">is_supported() (psycopg.Pipeline static method)</a>
 </li>
         <li><a href="basic/pgtypes.html#psycopg.types.range.Range.isempty">isempty (psycopg.types.range.Range attribute)</a>
 </li>
@@ -1317,6 +1322,8 @@
 </li>
         <li><a href="api/pq.html#psycopg.pq.Ping">Ping (class in psycopg.pq)</a>
 </li>
+        <li><a href="api/objects.html#psycopg.Pipeline">Pipeline (class in psycopg)</a>
+</li>
         <li><a href="api/connections.html#psycopg.AsyncConnection.pipeline">pipeline() (psycopg.AsyncConnection method)</a>
 
         <ul>
@@ -1328,6 +1335,8 @@
         <li><a href="api/objects.html#psycopg.ConnectionInfo.pipeline_status">pipeline_status (psycopg.ConnectionInfo attribute)</a>
 </li>
         <li><a href="api/pq.html#psycopg.pq.ExecStatus.PIPELINE_SYNC">PIPELINE_SYNC (psycopg.pq.ExecStatus attribute)</a>
+</li>
+        <li><a href="api/errors.html#psycopg.errors.PipelineAborted">PipelineAborted</a>
 </li>
         <li><a href="api/pq.html#psycopg.pq.PipelineStatus">PipelineStatus (class in psycopg.pq)</a>
 </li>
@@ -1359,10 +1368,10 @@
           <li><a href="basic/pgtypes.html#index-5">Data types</a>
 </li>
         </ul></li>
-        <li><a href="api/objects.html#psycopg.Column.precision">precision (psycopg.Column attribute)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/objects.html#psycopg.Column.precision">precision (psycopg.Column attribute)</a>
+</li>
         <li><a href="api/connections.html#psycopg.Connection.prepare_threshold">prepare_threshold (psycopg.Connection attribute)</a>
 </li>
         <li><a href="api/objects.html#psycopg.Xid.prepared">prepared (psycopg.Xid attribute)</a>
@@ -1696,10 +1705,10 @@
 </li>
         <li><a href="api/errors.html#psycopg.errors.Diagnostic.severity_nonlocalized">severity_nonlocalized (psycopg.errors.Diagnostic attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pq.html#psycopg.pq.DiagnosticField.SEVERITY_NONLOCALIZED">SEVERITY_NONLOCALIZED (psycopg.pq.DiagnosticField attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pq.html#psycopg.pq.ExecStatus.SINGLE_TUPLE">SINGLE_TUPLE (psycopg.pq.ExecStatus attribute)</a>
 </li>
         <li><a href="api/errors.html#psycopg.errors.Diagnostic.source_file">source_file (psycopg.errors.Diagnostic attribute)</a>
@@ -1763,6 +1772,12 @@
 
         <ul>
           <li><a href="basic/adapt.html#index-3">Adaptation</a>
+</li>
+        </ul></li>
+        <li><a href="api/objects.html#psycopg.AsyncPipeline.sync">sync() (psycopg.AsyncPipeline method)</a>
+
+        <ul>
+          <li><a href="api/objects.html#psycopg.Pipeline.sync">(psycopg.Pipeline method)</a>
 </li>
         </ul></li>
     </ul></td>
