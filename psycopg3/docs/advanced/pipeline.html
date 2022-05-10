@@ -497,7 +497,7 @@ block just to call <code class="xref py py-obj docutils literal notranslate"><sp
 point is established by Psycopg:</p>
 <ul class="simple">
 <li><p>using the <a class="reference internal" href="../api/objects.html#psycopg.Pipeline.sync" title="psycopg.Pipeline.sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pipeline.sync()</span></code></a> method;</p></li>
-<li><p>on <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a>;</p></li>
+<li><p>on <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> or <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>;</p></li>
 <li><p>at the end of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Pipeline</span></code> block;</p></li>
 <li><p>using a fetch method such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.fetchone()</span></code></a> (which only flushes the
 query but doesn’t issue a Sync and doesn’t reset a pipeline state error).</p></li>
@@ -509,18 +509,22 @@ statements sent in pipeline mode in an implicit transaction, which will be
 only committed when the Sync is received. As such, a failure in a group of
 statements will probably invalidate the effect of statements executed after
 the previous Sync, and will propagate to the following Sync.</p>
-<p>For example, the following block:</p>
+<p>For example, in the following block:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"one"</span><span class="p">])</span>
-<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO no_such_table (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"two"</span><span class="p">])</span>
-<span class="gp">... </span>        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"three"</span><span class="p">])</span>
-<span class="gp">... </span>        <span class="n">p</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"one"</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO no_such_table (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"two"</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"three"</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">p</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">UndefinedTable</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">pass</span>
 <span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"four"</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>fails with the error <code class="docutils literal notranslate"><span class="pre">relation</span> <span class="pre">"no_such_table"</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist</span></code> and, at the
-end of the block, the table will contain:</p>
+<p>there will be an error in the block, <code class="docutils literal notranslate"><span class="pre">relation</span> <span class="pre">"no_such_table"</span> <span class="pre">does</span> <span class="pre">not</span>
+<span class="pre">exist</span></code> caused by the insert <code class="docutils literal notranslate"><span class="pre">two</span></code>, but probably raised by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">sync()</span></code>
+call. At at the end of the block, the table will contain:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=# SELECT * FROM mytable;
 +----+------+
 | id | data |
@@ -541,14 +545,14 @@ success after the Sync has terminated the failed transaction.</p></li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The exact Python statement where the exception is raised is somewhat
-arbitrary: it depends on when the server returns the error message. In the
-above example, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> of the statement <code class="docutils literal notranslate"><span class="pre">two</span></code> is not the one
-expected to raise the exception. The exception might be raised by the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">sync()</span></code>, or when leaving the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Pipeline</span></code> block.</p>
-<p>Do not rely on expectations of a precise point where the exception is
-raised; make sure to use transactions if you want to guarantee that a set
-of statements is handled atomically by the server.</p>
+<p>The exact Python statement where an exception caused by a server error is
+raised is somewhat arbitrary: it depends on when the server flushes its
+buffered result.</p>
+<p>If you want to make sure that a group of statements is applied atomically
+by the server, do make use of transaction methods such as
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code></a> or <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a>: these methods will
+also sync the pipeline and raise an exception if there was any error in
+the commands executed so far.</p>
 </div>
 </section>
 <section id="the-fine-prints">
