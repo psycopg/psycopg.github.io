@@ -352,14 +352,17 @@ using libpq 14 or newer.</p></li>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.copy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Cursor.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initiate a <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code> operation and return an object to manage it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="objects.html#psycopg.Copy" title="psycopg.Copy">Copy</a></p>
 </dd>
 <dt class="field-even">Parameters</dt>
-<dd class="field-even"><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p></li>
+<li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the statement, if any.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">
@@ -371,6 +374,9 @@ using libpq 14 or newer.</p></li>
 </div>
 </div>
 <p>See <a class="reference internal" href="../basic/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for information about <code class="sql docutils literal notranslate"><span class="pre">COPY</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>Added parameters support.</p>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.stream">
@@ -557,8 +563,49 @@ is text or binary.</p></li>
 </dd></dl>
 </dd></dl>
 </section>
+<section id="the-clientcursor-class">
+<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class<a class="headerlink" href="#the-clientcursor-class" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See <a class="reference internal" href="../advanced/cursors.html#client-side-binding-cursors"><span class="std std-ref">Client-side-binding cursors</span></a> for details.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.ClientCursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">ClientCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ClientCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This <a class="reference internal" href="#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> subclass has exactly the same interface of its parent class,
+but, instead of sending query and parameters separately to the server, it
+merges them on the client and sends them as a non-parametric query on the
+server. This allows, for instance, to execute parametrized data definition
+statements and other <a class="reference internal" href="../basic/from_pg2.html#server-side-binding"><span class="std std-ref">problematic queries</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.ClientCursor.mogrify">
+<span class="sig-name descname"><span class="pre">mogrify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ClientCursor.mogrify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the query and parameters merged.</p>
+<p>Parameters are adapted and merged to the query the same way that
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> would do.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute.</p></li>
+<li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</section>
 <section id="the-servercursor-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code> class<a class="headerlink" href="#the-servercursor-class" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See <a class="reference internal" href="../advanced/cursors.html#server-side-cursors"><span class="std std-ref">Server-side cursors</span></a> for details.</p>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.ServerCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">ServerCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scrollable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withhold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.ServerCursor" title="Permalink to this definition">¶</a></dt>
@@ -759,7 +806,7 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor.copy" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="objects.html#psycopg.AsyncCopy" title="psycopg.AsyncCopy">AsyncCopy</a></p>
@@ -830,6 +877,18 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 </pre></div>
 </div>
 <p>to iterate on the async cursor results.</p>
+</div>
+</dd></dl>
+</section>
+<section id="the-asyncclientcursor-class">
+<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class<a class="headerlink" href="#the-asyncclientcursor-class" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.AsyncClientCursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncClientCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncClientCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is the <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> equivalent of the <a class="reference internal" href="#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a>. The
+difference are the same shown in <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
 </dd></dl>
 </section>
@@ -959,8 +1018,10 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
             <ul>
 <li><a class="reference internal" href="#">Cursor classes</a><ul>
 <li><a class="reference internal" href="#the-cursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class</a></li>
+<li><a class="reference internal" href="#the-clientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class</a></li>
 <li><a class="reference internal" href="#the-servercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code> class</a></li>
 <li><a class="reference internal" href="#the-asynccursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class</a></li>
+<li><a class="reference internal" href="#the-asyncclientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class</a></li>
 <li><a class="reference internal" href="#the-asyncservercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class</a></li>
 </ul>
 </li>

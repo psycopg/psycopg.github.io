@@ -259,6 +259,13 @@ resulting <a class="reference internal" href="../api/objects.html#psycopg.Copy" 
     <span class="c1"># read data from the 'copy' object using read()/read_row()</span>
 </pre></div>
 </div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>You can also pass parameters to <code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code>, like in <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">cur</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">"COPY (SELECT * FROM table_name LIMIT </span><span class="si">%s</span><span class="s2">) TO STDOUT"</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,))</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
+    <span class="c1"># expect no more than three records</span>
+</pre></div>
+</div>
+</div>
 <p>The connection is subject to the usual transaction behaviour, so, unless the
 connection is in autocommit, at the end of the COPY operation you will still
 have to commit the pending changes and you can still roll them back. See

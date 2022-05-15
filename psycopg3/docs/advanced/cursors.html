@@ -261,9 +261,64 @@ transmitted completely to the client (with a time proportional to its size)
 and the client needs enough memory to hold it, so it is only suitable for
 reasonably small result sets.</p>
 </section>
+<section id="client-side-binding-cursors">
+<span id="index-2"></span><span id="id3"></span><h2>Client-side-binding cursors<a class="headerlink" href="#client-side-binding-cursors" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1.</span></p>
+</div>
+<p>The previously described <a class="reference internal" href="#client-side-cursors"><span class="std std-ref">client-side cursors</span></a> send
+the query and the parameters separately to the server. This is the most
+efficient way to process parametrised queries and allows to build several
+features and optimizations. However, not all types of queries can be bound
+server-side; in particular no Data Definition Language query can. See
+<a class="reference internal" href="../basic/from_pg2.html#server-side-binding"><span class="std std-ref">Server-side binding</span></a> for the description of these problems.</p>
+<p>The <a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a> (and its <a class="reference internal" href="../api/cursors.html#psycopg.AsyncClientCursor" title="psycopg.AsyncClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code></a> async counterpart) merge the
+query on the client and send the query and the parameters merged together to
+the server. This allows to parametrize any type of PostgreSQL statement, not
+only queries (<code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code>) and Data Manipulation statements (<code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code>,
+<code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">DELETE</span></code>).</p>
+<p>Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code>, Psycopg 3 behaviour will be more similar to <a class="reference external" href="https://www.psycopg.org/docs/module.html#module-psycopg2" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>
+(which only implements client-side binding) and could be useful to port
+Psycopg 2 programs more easily to Psycopg 3. The objects in the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code></a> module
+allow for greater flexibility (for instance to parametrize a table name too,
+not only values); however, for simple cases, a <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> could be the
+right object.</p>
+<p>In order to obtain <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> from a connection, you can set its
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor_factory</span></code></a> (at init time or changing its attribute
+afterwards):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="c1"># &lt;psycopg.ClientCursor [no result] [IDLE] (database=piro) at 0x7fd977ae2880&gt;</span>
+</pre></div>
+</div>
+<p>If you need to create a one-off client-side-binding cursor out of a normal
+connection, you can just use the <a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a> class passing the connection
+as argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Client-side cursors don’t support <a class="reference internal" href="../basic/params.html#binary-data"><span class="std std-ref">binary parameters and return
+values</span></a> and don’t support <a class="reference internal" href="prepare.html#prepared-statements"><span class="std std-ref">prepared statements</span></a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The best use for client-side binding cursors is probably to port large
+Psycopg 2 code to Psycopg 3, especially for programs making wide use of
+Data Definition Language statements.</p>
+<p>The <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module allows for more generic client-side query
+composition, to mix client- and server-side parameters binding, and allows
+to parametrize tables and fields names too, or entirely generic SQL
+snippets.</p>
+</div>
+</section>
 <section id="server-side-cursors">
-<span id="index-2"></span><span id="id3"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
-<p>PostgreSQL also has its own concept of <em>cursor</em> (sometimes also called
+<span id="index-3"></span><span id="id4"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
+<p>PostgreSQL has its own concept of <em>cursor</em> too (sometimes also called
 <em>portal</em>). When a database cursor is created, the query is not necessarily
 completely processed: the server might be able to produce results only as they
 are needed. Only the results requested are transmitted to the client: if the
@@ -290,9 +345,8 @@ result is needed.</p>
 commands such as <a class="reference external" href="https://www.postgresql.org/docs/current/sql-declare.html">DECLARE</a>, <a class="reference external" href="https://www.postgresql.org/docs/current/sql-fetch.html">FETCH</a>, <a class="reference external" href="https://www.postgresql.org/docs/current/sql-move.html">MOVE</a>. The PostgreSQL documentation
 gives a good idea of what is possible to do with them.</p>
 </div>
-</section>
 <section id="stealing-an-existing-cursor">
-<span id="cursor-steal"></span><h2>“Stealing” an existing cursor<a class="headerlink" href="#stealing-an-existing-cursor" title="Permalink to this headline">¶</a></h2>
+<span id="cursor-steal"></span><h3>“Stealing” an existing cursor<a class="headerlink" href="#stealing-an-existing-cursor" title="Permalink to this headline">¶</a></h3>
 <p>A Psycopg <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> can be also used to consume a cursor which was
 created in other ways than the <code class="sql docutils literal notranslate"><span class="pre">DECLARE</span></code> that <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor.execute()</span></code></a>
 runs behind the scene.</p>
@@ -318,6 +372,7 @@ directly call the fetch methods, skipping the <a class="reference internal" href
     <span class="c1"># do something with record</span>
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -369,8 +424,11 @@ directly call the fetch methods, skipping the <a class="reference internal" href
             <ul>
 <li><a class="reference internal" href="#">Cursor types</a><ul>
 <li><a class="reference internal" href="#client-side-cursors">Client-side cursors</a></li>
-<li><a class="reference internal" href="#server-side-cursors">Server-side cursors</a></li>
+<li><a class="reference internal" href="#client-side-binding-cursors">Client-side-binding cursors</a></li>
+<li><a class="reference internal" href="#server-side-cursors">Server-side cursors</a><ul>
 <li><a class="reference internal" href="#stealing-an-existing-cursor">“Stealing” an existing cursor</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
