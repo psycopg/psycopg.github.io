@@ -462,8 +462,27 @@ encoding. You can select an encoding at connection time using the
 connection by running a <code class="sql docutils literal notranslate"><span class="pre">SET</span> <span class="pre">client_encoding</span></code> statement… But why would
 you?</p>
 </section>
+<section id="no-default-infinity-dates-handling">
+<span id="infinity-datetime"></span><h2>No default infinity dates handling<a class="headerlink" href="#no-default-infinity-dates-handling" title="Permalink to this headline">¶</a></h2>
+<p>PostgreSQL can represent has a much wider range of dates and timestamps than
+Python. While Python dates are limited to the years between 1 and 9999
+(represented by constants such as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.min" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.min</span></code></a> and
+<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></a>), PostgreSQL dates extend to BC dates and past the year
+10K. Furthermore PostgreSQL can also represent symbolic dates “infinity”, in
+both directions.</p>
+<p>In psycopg2, by default, <a class="reference external" href="https://www.psycopg.org/docs/usage.html#infinite-dates-handling">infinity dates and timestamps map to ‘date.max’</a>
+and similar constants. This has the problem of creating a non-bijective
+mapping (two Postgres dates, infinity and 9999-12-31, both map to the same
+Python date). There is also the perversity that valid Postgres dates, greater
+than Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code> but arguably lesser than infinity, will still
+overflow.</p>
+<p>In Psycopg 3, every date greater than year 9999 will overflow, including
+infinity. If you would like to customize this mapping (for instance flattening
+every date past Y10K on <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code>) you can subclass and adapt the
+appropriate loaders: take a look at <a class="reference internal" href="../advanced/adapt.html#adapt-example-inf-date"><span class="std std-ref">this example</span></a> to see how.</p>
+</section>
 <section id="what-s-new-in-psycopg-3">
-<h2>What’s new in Psycopg 3<a class="headerlink" href="#what-s-new-in-psycopg-3" title="Permalink to this headline">¶</a></h2>
+<span id="whats-new"></span><h2>What’s new in Psycopg 3<a class="headerlink" href="#what-s-new-in-psycopg-3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../advanced/async.html#async"><span class="std std-ref">Asynchronous support</span></a></p></li>
 <li><p><a class="reference internal" href="#server-side-binding"><span class="std std-ref">Server-side parameters binding</span></a></p></li>
@@ -533,6 +552,7 @@ you?</p>
 <li><a class="reference internal" href="#with-connection"><code class="docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
 <li><a class="reference internal" href="#callproc-is-gone"><code class="docutils literal notranslate"><span class="pre">callproc()</span></code> is gone</a></li>
 <li><a class="reference internal" href="#client-encoding-is-gone"><code class="docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone</a></li>
+<li><a class="reference internal" href="#no-default-infinity-dates-handling">No default infinity dates handling</a></li>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-3">What’s new in Psycopg 3</a></li>
 </ul>
 </li>
