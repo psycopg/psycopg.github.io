@@ -389,6 +389,12 @@ argument of the <a class="reference internal" href="../api/cursors.html#psycopg.
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>  <span class="c1"># Note: no % operator</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Python static code checkers are not quite there yet, but, in the future,
+it will be possible to check your code for improper use of string
+expressions in queries. See <a class="reference internal" href="../advanced/typing.html#literal-string"><span class="std std-ref">Checking literal strings in queries</span></a> for details.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>Now that you know how to pass parameters to queries, you can take a look
@@ -430,7 +436,7 @@ the query using <a class="reference internal" href="../api/cursors.html#psycopg.
 requesting binary results is a clear winner is when you have large binary data
 in the database, such as images:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">"select image_data from images where id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">image_id</span><span class="p">],</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="s2">"SELECT image_data FROM images WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">image_id</span><span class="p">],</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>

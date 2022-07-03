@@ -301,7 +301,7 @@ terminate a transaction or a session though.</p>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The query to execute.</p></li>
 <li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any.</p></li>
 <li><p><strong>prepare</strong> – Force (<code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) or disallow (<code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) preparation of
 the query. By default (<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) prepare automatically. See
@@ -316,6 +316,12 @@ format (<code class="xref py py-obj docutils literal notranslate"><span class="p
 operation after the call.</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code> argument must be a <code class="xref py py-obj docutils literal notranslate"><span class="pre">StringLiteral</span></code>. If you
+need to compose a query dynamically, please use <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a> and
+related objects.</p>
+<p>See <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0675/"><strong>PEP 675</strong></a> for details.</p>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Cursor.executemany">
@@ -324,7 +330,7 @@ queries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The query to execute</p></li>
 <li><p><strong>params_seq</strong> (<em>Sequence of Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
 <li><p><strong>returning</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, fetch the results of the queries executed</p></li>
 </ul>
@@ -360,7 +366,7 @@ using libpq 14 or newer.</p></li>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The copy operation to execute</p></li>
+<li><p><strong>statement</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The copy operation to execute</p></li>
 <li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the statement, if any.</p></li>
 </ul>
 </dd>
@@ -592,7 +598,7 @@ statements and other <a class="reference internal" href="../basic/from_pg2.html#
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The query to execute.</p></li>
 <li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any.</p></li>
 </ul>
 </dd>
@@ -672,7 +678,7 @@ the block.</p>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, or <a class="reference internal" href="sql.html#psycopg.sql.Composable" title="psycopg.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composable</span></code></a>) – The query to execute.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The query to execute.</p></li>
 <li><p><strong>params</strong> (<em>Sequence</em><em> or </em><em>Mapping</em>) – The parameters to pass to the query, if any.</p></li>
 <li><p><strong>binary</strong> – Specify whether the server shoul return data in binary
 format (<code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) or in text format (<code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>). By default

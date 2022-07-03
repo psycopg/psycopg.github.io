@@ -342,6 +342,44 @@ any issue. Pydantic will also raise a runtime error in case the
 </pre></div>
 </div>
 </section>
+<section id="checking-literal-strings-in-queries">
+<span id="literal-string"></span><h2>Checking literal strings in queries<a class="headerlink" href="#checking-literal-strings-in-queries" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method and similar should only receive a literal
+string as input, according to <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0675/"><strong>PEP 675</strong></a>. This mean that the query should
+come from a literal string in your code, not from an arbitrary string
+expression.</p>
+<p>For instance, passing an argument to the query should be done via the second
+argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>, not by string composition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>  <span class="c1"># BAD!</span>
+    <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+<span class="c1"># the function should be implemented as:</span>
+
+<span class="k">def</span> <span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="nb">id</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you are composing a query dynamically you should use the <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a> object
+and similar to escape safely table and field names. The parameter of the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL()</span></code> object should be a literal string:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">"SELECT count(*) FROM </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">table</span>  <span class="c1"># BAD!</span>
+    <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># the function should be implemented as:</span>
+
+<span class="k">def</span> <span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM </span><span class="si">{}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>At the time of writing, no Python static analyzer implements this check (<a class="reference external" href="https://github.com/python/mypy/issues/12554">mypy
+doesn’t implement it</a>, <a class="reference external" href="https://pyre-check.org/">Pyre</a> does, but <a class="reference external" href="https://github.com/facebook/pyre-check/issues/636">doesn’t work with psycopg yet</a>).
+Once the type checkers support will be complete, the above bad statements
+should be reported as errors.</p>
+</section>
 </section>
 
         </article>
@@ -394,6 +432,7 @@ any issue. Pydantic will also raise a runtime error in case the
 <li><a class="reference internal" href="#generic-types">Generic types</a></li>
 <li><a class="reference internal" href="#type-of-rows-returned">Type of rows returned</a></li>
 <li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
+<li><a class="reference internal" href="#checking-literal-strings-in-queries">Checking literal strings in queries</a></li>
 </ul>
 </li>
 </ul>
