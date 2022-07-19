@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Using COPY TO and COPY FROM" href="copy.html" /><link rel="prev" title="Adapting other PostgreSQL types" href="pgtypes.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2021.11.23"/>
+    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
         <title>Transactions management - psycopg 3.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     <link rel="stylesheet" type="text/css" href="../_static/psycopg.css" />
     
     
@@ -22,38 +22,38 @@
   --admonition-font-size: 1rem;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
     }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
   }
 </style></head>
   <body>
+    
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
     </script>
     
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -62,14 +62,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -84,7 +84,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -92,7 +92,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -218,6 +218,7 @@
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -225,6 +226,12 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
@@ -241,7 +248,7 @@
         </div>
         <article role="main">
           <span class="target" id="index-0"></span><span class="target" id="index-1"></span><section id="transactions-management">
-<span id="transactions"></span><span id="index-2"></span><h1>Transactions management<a class="headerlink" href="#transactions-management" title="Permalink to this headline">¶</a></h1>
+<span id="transactions"></span><span id="index-2"></span><h1>Transactions management<a class="headerlink" href="#transactions-management" title="Permalink to this heading">#</a></h1>
 <p>Psycopg has a behaviour that may seem surprising compared to
 <strong class="program">psql</strong>: by default, any database operation will start a new
 transaction. As a consequence, changes made by any cursor of the connection
@@ -259,20 +266,20 @@ working with it.</p>
 disappointed by it), is likely:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<span class="c1"># Creating a cursor doesn't start a transaction or affect the connection</span>
+<span class="c1"># Creating a cursor doesn&#39;t start a transaction or affect the connection</span>
 <span class="c1"># in any way.</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
 <span class="c1"># - BEGIN</span>
 <span class="c1"># - SELECT count(*) FROM my_table</span>
 <span class="c1"># So now a transaction has started.</span>
 
 <span class="c1"># If your program spends a long time in this state, the server will keep</span>
-<span class="c1"># a connection "idle in transaction", which is likely something undesired</span>
+<span class="c1"># a connection &quot;idle in transaction&quot;, which is likely something undesired</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
 <span class="c1"># This statement is executed inside the transaction</span>
 
 <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -292,13 +299,13 @@ sequence of database statements:</p>
 </span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
     <span class="c1"># This function call executes:</span>
     <span class="c1"># - BEGIN</span>
     <span class="c1"># - SELECT count(*) FROM my_table</span>
     <span class="c1"># So now a transaction has started.</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
     <span class="c1"># This statement is executed inside the transaction</span>
 
 <span class="c1"># No exception at the end of the block:</span>
@@ -329,7 +336,7 @@ failed</strong> and the database session is in a state of error. You need to cal
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> if you want to keep on using the same connection.</p>
 </div>
 <section id="autocommit-transactions">
-<span id="autocommit"></span><h2>Autocommit transactions<a class="headerlink" href="#autocommit-transactions" title="Permalink to this headline">¶</a></h2>
+<span id="autocommit"></span><h2>Autocommit transactions<a class="headerlink" href="#autocommit-transactions" title="Permalink to this heading">#</a></h2>
 <p>The manual commit requirement can be suspended using <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
 either as connection attribute or as <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
 parameter. This may be required to run operations that cannot be executed
@@ -340,12 +347,12 @@ inside a transaction, such as <code class="sql docutils literal notranslate"><sp
 </span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
     <span class="c1"># This function call now only executes:</span>
     <span class="c1"># - SELECT count(*) FROM my_table</span>
     <span class="c1"># and no transaction starts.</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
     <span class="c1"># The result of this statement is persisted immediately by the database</span>
 
 <span class="c1"># The connection is closed at the end of the block but, because it is not</span>
@@ -360,7 +367,7 @@ certain operations inside a transaction, you can achieve that with an
 autocommit connection too, using an explicit <a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction block</span></a>.</p>
 </section>
 <section id="transaction-contexts">
-<span id="transaction-context"></span><h2>Transaction contexts<a class="headerlink" href="#transaction-contexts" title="Permalink to this headline">¶</a></h2>
+<span id="transaction-context"></span><h2>Transaction contexts<a class="headerlink" href="#transaction-contexts" title="Permalink to this heading">#</a></h2>
 <p>A more transparent way to make sure that transactions are finalised at the
 right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
 transaction context. When the context is entered, a transaction is started;
@@ -373,14 +380,14 @@ use a <code class="xref py py-obj docutils literal notranslate"><span class="pre
 
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
     <span class="c1"># The connection is autocommit, so no BEGIN executed.</span>
 
 <span class="hll">    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
 </span>        <span class="c1"># BEGIN is executed, a transaction started</span>
 
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO times VALUES (now())"</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO times VALUES (now())&quot;</span><span class="p">)</span>
         <span class="c1"># These two operation run atomically in the same transaction</span>
 
     <span class="c1"># COMMIT is executed at the end of the block.</span>
@@ -398,7 +405,7 @@ as explained in <a class="reference internal" href="#transactions"><span class="
 
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
 <span class="c1"># - BEGIN</span>
 <span class="c1"># - SELECT count(*) FROM my_table</span>
@@ -408,7 +415,7 @@ as explained in <a class="reference internal" href="#transactions"><span class="
     <span class="c1"># The block starts with a transaction already open, so it will execute</span>
     <span class="c1"># - SAVEPOINT</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
 
 <span class="c1"># The block was executing a sub-transaction so on exit it will only run:</span>
 <span class="c1"># - RELEASE SAVEPOINT</span>
@@ -438,7 +445,7 @@ needed.</p></li>
 </ul>
 </div>
 <section id="nested-transactions">
-<span id="id2"></span><h3>Nested transactions<a class="headerlink" href="#nested-transactions" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><h3>Nested transactions<a class="headerlink" href="#nested-transactions" title="Permalink to this heading">#</a></h3>
 <p>Transaction blocks can be also nested (internal transaction blocks are
 implemented using <a class="reference external" href="https://www.postgresql.org/docs/current/sql-savepoint.html">SAVEPOINT</a>): an exception raised inside an inner block
 has a chance of being handled and not completely fail outer operations. The
@@ -452,7 +459,7 @@ number of operations successfully processed.</p>
             <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx2</span><span class="p">:</span>
                 <span class="n">unreliable_operation</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num_ok</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -488,7 +495,7 @@ but not entirely committed yet.</p>
 </section>
 </section>
 <section id="transaction-characteristics">
-<span id="id4"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this heading">#</a></h2>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
 transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
@@ -516,7 +523,7 @@ caused the exception.</p>
 </div>
 </section>
 <section id="two-phase-commit-protocol-support">
-<span id="two-phase-commit"></span><span id="index-3"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this headline">¶</a></h2>
+<span id="two-phase-commit"></span><span id="index-3"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
@@ -579,10 +586,20 @@ transactions produced by a Java program.</p>
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2020, Daniele Varrazzo and The Psycopg Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
@@ -621,6 +638,7 @@ transactions produced by a Java program.</p>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
