@@ -2,10 +2,10 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Static Typing" href="typing.html" /><link rel="prev" title="More advanced topics" href="index.html" />
 
-    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>Asynchronous operations - psycopg 3.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -196,6 +196,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/module.html">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/connections.html">Connection classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/cursors.html">Cursor classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/copy.html">COPY-related objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/objects.html">Other top-level objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/sql.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> – SQL string composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/rows.html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rows</span></code> – row factory implementations</a></li>
@@ -267,12 +268,16 @@ here and there.</p>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a> performs DNS name resolution in a non-blocking
+way.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a> may still block on DNS name resolution.
-To avoid that you should <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">set the hostaddr connection parameter</a>.</p>
-<p>The <a class="reference internal" href="../api/dns.html#psycopg._dns.resolve_hostaddr_async" title="psycopg._dns.resolve_hostaddr_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_hostaddr_async()</span></code></a> is an experimental solution
-to help to do that. Feedback about the feature is welcome!</p>
+<p>Before version 3.1, <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a> may still block on DNS
+name resolution. To avoid that you should <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">set the hostaddr connection
+parameter</a>, or use the <a class="reference internal" href="../api/dns.html#psycopg._dns.resolve_hostaddr_async" title="psycopg._dns.resolve_hostaddr_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_hostaddr_async()</span></code></a> to
+do it automatically.</p>
+</div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -418,11 +423,11 @@ the <code class="docutils literal notranslate"><span class="pre">stop</span></co
 </pre></div>
 </div>
 <p>If you run some <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code> in a <strong class="program">psql</strong> session:</p>
-<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="gp">=#</span><span class="w"> </span><span class="k">notify</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hello&#39;</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hello&#39;</span><span class="p">;</span><span class="w"></span>
 <span class="go">NOTIFY</span>
-<span class="gp">=#</span><span class="w"> </span><span class="k">notify</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hey&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hey&#39;</span><span class="p">;</span><span class="w"></span>
 <span class="go">NOTIFY</span>
-<span class="gp">=#</span><span class="w"> </span><span class="k">notify</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stop&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stop&#39;</span><span class="p">;</span><span class="w"></span>
 <span class="go">NOTIFY</span>
 </pre></div>
 </div>
@@ -441,7 +446,7 @@ received immediately, but only during a connection operation, such as a query.</
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">add_notify_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;got this: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
 <span class="c1"># meanwhile in psql...</span>
-<span class="c1"># =# notify mychan, &#39;hey&#39;;</span>
+<span class="c1"># =# NOTIFY mychan, &#39;hey&#39;;</span>
 <span class="c1"># NOTIFY</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>

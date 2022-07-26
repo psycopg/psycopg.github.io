@@ -28,17 +28,20 @@ here and there.
             async for record in acur:
                 print(record)
 
+.. versionchanged:: 3.1
 
-.. warning::
+    `AsyncConnection.connect()` performs DNS name resolution in a non-blocking
+    way.
 
-    `AsyncConnection.connect()` may still block on DNS name resolution.
-    To avoid that you should `set the hostaddr connection parameter`__.
+    .. warning::
 
-    The `~psycopg._dns.resolve_hostaddr_async()` is an experimental solution
-    to help to do that. Feedback about the feature is welcome!
+        Before version 3.1, `AsyncConnection.connect()` may still block on DNS
+        name resolution. To avoid that you should `set the hostaddr connection
+        parameter`__, or use the `~psycopg._dns.resolve_hostaddr_async()` to
+        do it automatically.
 
-    .. __: https://www.postgresql.org/docs/current/libpq-connect.html
-           #LIBPQ-PARAMKEYWORDS
+        .. __: https://www.postgresql.org/docs/current/libpq-connect.html
+               #LIBPQ-PARAMKEYWORDS
 
 .. warning::
 
@@ -255,11 +258,11 @@ If you run some :sql:`NOTIFY` in a :program:`psql` session:
 
 .. code:: psql
 
-    =# notify mychan, 'hello';
+    =# NOTIFY mychan, 'hello';
     NOTIFY
-    =# notify mychan, 'hey';
+    =# NOTIFY mychan, 'hey';
     NOTIFY
-    =# notify mychan, 'stop';
+    =# NOTIFY mychan, 'stop';
     NOTIFY
 
 You may get output from the Python process such as::
@@ -280,7 +283,7 @@ received immediately, but only during a connection operation, such as a query.
     conn.add_notify_handler(lambda n: print(f"got this: {n}"))
 
     # meanwhile in psql...
-    # =# notify mychan, 'hey';
+    # =# NOTIFY mychan, 'hey';
     # NOTIFY
 
     print(conn.execute("SELECT 1").fetchone())
