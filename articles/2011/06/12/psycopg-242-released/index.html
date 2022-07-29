@@ -81,7 +81,7 @@
   
     <p>Psycopg 2.4.2 has been released: it brings a few small but interesting new features, and a lot of bug fixes.</p>
 <!-- CUT-HERE -->
-<p>Transaction control has been overhauled: a new connection method <a class="reference external" href="/docs/connection.html#connection.set_session">set_session()</a> allows setting all the session properties affecting the transactions behaviour: the <a class="reference external" href="http://www.postgresql.org/docs/9.1/static/transaction-iso.html">isolation level</a> but it can also be used to have auto-commit, read-only, and deferrable transactions. You can use for example:</p>
+<p>Transaction control has been overhauled: a new connection method <a class="reference external" href="/docs/connection.html#connection.set_session">set_session()</a> allows setting all the session properties affecting the transactions behaviour: the <a class="reference external" href="https://www.postgresql.org/docs/9.1/static/transaction-iso.html">isolation level</a> but it can also be used to have auto-commit, read-only, and deferrable transactions. You can use for example:</p>
 <pre class="code python literal-block">
 <span class="n">conn</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="s1">'read committed'</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -128,13 +128,13 @@ COMMIT
 <p>The new release also brings a lot of bug fixes, so we encourage updating soon, particularly if you use Psycopg in multithread programs:</p>
 <ul class="simple">
 <li>Fixed bug with multithread code potentially causing loss of sync
-with the server communication or lock of the client (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/55">ticket #55</a>).</li>
+with the server communication or lock of the client (<a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/55">ticket #55</a>).</li>
 <li>Don't fail import if mx.DateTime module can't be found, even if its
-support was built (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/53">ticket #53</a>): a fix for the &quot;ghost mx.DateTime&quot; issue reported in virtualenv.</li>
+support was built (<a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/53">ticket #53</a>): a fix for the &quot;ghost mx.DateTime&quot; issue reported in virtualenv.</li>
 <li>Fixed escape for negative numbers prefixed by minus operator
-(<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/57">ticket #57</a>).</li>
+(<a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/57">ticket #57</a>).</li>
 <li>Fixed GC race condition during copy in multithread programs, potentially resulting in refcount errors.  Fixed by Dave
-Malcolm (<a class="reference external" href="http://psycopg.lighthouseapp.com/projects/62710/tickets/58">ticket #58</a>, Red Hat <a class="reference external" href="https://bugzilla.redhat.com/show_bug.cgi?id=711095">Bug 711095</a>).</li>
+Malcolm (<a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/58">ticket #58</a>, Red Hat <a class="reference external" href="https://bugzilla.redhat.com/show_bug.cgi?id=711095">Bug 711095</a>).</li>
 <li>Trying to execute concurrent operations on the same connection
 through concurrent green thread results in an error instead of a
 deadlock.</li>
