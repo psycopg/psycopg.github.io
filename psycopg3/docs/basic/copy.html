@@ -355,11 +355,16 @@ statement. In order to import binary data using <a class="reference internal" hr
 types passed to the database must have a binary dumper registered; this is not
 necessary if the data is copied <a class="reference internal" href="#copy-block"><span class="std std-ref">block-by-block</span></a> using
 <a class="reference internal" href="../api/copy.html#psycopg.Copy.write" title="psycopg.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write()</span></code></a>.</p>
-<p>Note that PostgreSQL is particularly finicky when loading data in binary mode
-and will apply <em>no cast rules</em>. This means that e.g. passing the value 100 to
-an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> column will fail because Psycopg will pass it as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code>
-value. You can work around the problem using the <a class="reference internal" href="../api/copy.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> method of
-the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object and specify carefully the types to dump.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>PostgreSQL is particularly finicky when loading data in binary mode and
+will apply <strong>no cast rules</strong>. This means, for example, that passing the
+value 100 to an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> column <strong>will fail</strong>, because Psycopg will pass
+it as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code> value, and the server will reject it because its size
+doesn’t match what expected.</p>
+<p>You can work around the problem using the <a class="reference internal" href="../api/copy.html#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a> method of
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code> object and specifying carefully the types to load.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>See <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">Binary parameters and results</span></a> for further info about binary querying.</p>
