@@ -249,7 +249,7 @@
         </div>
         <article role="main">
           <section id="differences-from-psycopg2">
-<span id="index-0"></span><h1>Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this heading">#</a></h1>
+<span id="from-psycopg2"></span><span id="index-0"></span><h1>Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this heading">#</a></h1>
 <p>Psycopg 3 uses the common DBAPI structure of many other database adapters and
 tries to behave as close as possible to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. There are however a few
 differences to be aware of.</p>
@@ -342,15 +342,16 @@ the same <code class="xref py py-obj docutils literal notranslate"><span class="
 <p>One obvious way to work around the problem is to use several <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>
 calls.</p>
 <p>There is no such limitation if no parameters are used. As a consequence, you
-can use a <a class="reference internal" href="../advanced/cursors.html#client-side-binding-cursors"><span class="std std-ref">client-side binding cursor</span></a> or
-the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects to compose a multiple query on the client side and
-run them in the same <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call:</p>
+can compose a multiple query on the client side and run them all in the same
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call, using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">{}</span><span class="s2">); INSERT INTO foo values (</span><span class="si">{}</span><span class="s2">)&quot;</span>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or a <a class="reference internal" href="../advanced/cursors.html#client-side-binding-cursors"><span class="std std-ref">client-side binding cursor</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
