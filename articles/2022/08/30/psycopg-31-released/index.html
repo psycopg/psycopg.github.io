@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=09ddafbb">
+    <title>Psycopg 3.1 released — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sponsors/">Sponsors</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h1>Psycopg 3.1 released</h1>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2022-08-30
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="/articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>Hello,</p>
+<p>After several months of development, we are proud to release Psycopg 3.1!</p>
+<p>Psycopg 3.1 is a gradual improvement on Psycopg 3.0, introducing new exciting
+features, redefining what can be done on the boundary between Python and
+PostgreSQL.</p>
+<!-- CUT-HERE -->
+<div class="section" id="pipeline-mode">
+<h2>Pipeline mode</h2>
+<p>The <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html">pipeline mode</a>
+is by far the biggest feature introduced in Psycopg 3.1, largely the work of
+Denis Laxalde and supported by <a class="reference external" href="http://www.dalibo.com">Dalibo</a>. In
+pipeline mode, Psycopg will send batches of commands to the server without
+waiting for a response for every operation, resulting in a massive speed
+improvement.</p>
+<p>The pipeline mode is exposed to Python as a context block. Within the block,
+Psycopg will manage the pipeline in a transparent way, even allowing the use of
+features which break the pipeline flow, for instance to fetch results, or to
+manage transactions:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="p">[</span><span class="n">rec</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+    <span class="o">...</span>
+</pre>
+<p>Quantifying the speedup is difficult, as it depends on the network conditions
+and on the pattern of statements executed. In particularly bad conditions (250
+ms of ping time between client and server), we measured a loop of 100 inserts
+to take 25 s in normal mode and just 0.5 s in pipeline mode, for a 50x
+speedup. Testing the same operation on a localhost connection, we have
+measured a &gt;20x speedup (a 5000 inserts batch taking 0.3 s instead of 6.6 s).
+If the program requires results from the server before sending further
+statement (for instance to insert in a table and then use the new record's
+primary key to insert related records in different tables) you can expect
+less dramatic speedups.</p>
+</div>
+<div class="section" id="client-binding-cursors">
+<h2>Client-binding cursors</h2>
+<p>Psycopg 3 uses <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/from_pg2.html#server-side-binding">server-side binding</a>,
+passing the query and adapted arguments separately. This allows to use several
+features otherwise unavailable, such as prepared statements. However, many
+types of statements, especially data-definition, don't support server-side
+parameters. The <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html">'sql' module</a> allows to compose
+statements on the client, but using it might require many changes to programs
+making heavy use of data-definition statements.</p>
+<p>Psycopg 3.1 introduces a <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#client-side-binding-cursors">ClientCursor</a>
+object, which makes psycopg2 programs easier to port. This cursor reproduces
+psycopg2's way of composing queries, which is not the most efficient, but for
+certain programs it is exactly what is needed.</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>  <span class="c1"># this is a client-side binding cursor</span>
+    <span class="c1"># This statement doesn't support server-side parameters</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
+</pre>
+<p>As a bonus, the client cursor reintroduces the handy and often requested
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.ClientCursor.mogrify">mogrify()</a>
+method, which returns the query merged with the parameters the way it is
+passed to the server:</p>
+<pre class="code python literal-block">
+<span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hell'o&quot;</span><span class="p">])</span>
+<span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT 'hell''o'&quot;</span>
+</pre>
+</div>
+<div class="section" id="enum-adaptation">
+<h2>Enum adaptation</h2>
+<p>Python has <a class="reference external" href="https://docs.python.org/3/library/enum.html">enums</a>, PostgreSQL
+has <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-enum.html">enums</a>...
+Why not map them into each other? Well for a start because they are
+actually pretty different from each other (Python enums have a type and value,
+Postgres ones are just identities) and because often, in programs,
+differences between the enums in the db and the code creep in.</p>
+<p>Psycopg 3.1 introduces <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/adapt.html#enum-adaptation">a flexible adapter between Python and Postgres enums</a>.
+It can be used in a simple way when there is a one-to-one mapping between the
+enums:</p>
+<pre class="code literal-block">
+=# CREATE TYPE numbers AS ENUM ('ONE', 'TWO', 'THREE');
+</pre>
+<pre class="code python literal-block">
+<span class="k">class</span> <span class="nc">Numbers</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+<span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;numbers&quot;</span><span class="p">)</span>
+<span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">Numbers</span><span class="p">)</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 'TWO'::numbers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">Numbers</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Numbers</span><span class="o">.</span><span class="n">ONE</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s1">'numbers'</span>
+</pre>
+<p>The facility can also be customized in order to adapt enums when the mapping
+is not one-to-one:</p>
+<pre class="code python literal-block">
+<span class="k">class</span> <span class="nc">NumbersPlus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">THREE_PLUS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># has some meaning in the program, but it is not stored</span>
+
+<span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="p">,</span>
+    <span class="c1"># - Items not mentioned map naturally</span>
+    <span class="c1"># - This order gives THREE priority over THREE_PLUS when loading from db.</span>
+    <span class="n">mapping</span><span class="o">=</span><span class="p">[(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">)])</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span>
+    <span class="p">[[</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">ONE</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">]]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s1">'{ONE,THREE}'</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '{TWO,THREE}'::numbers[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">[</span><span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
+</pre>
+</div>
+<div class="section" id="in-partnership-with-cockroachdb">
+<h2>In partnership with CockroachDB</h2>
+<p><a class="reference external" href="https://www.cockroachlabs.com/">CockroachDB</a> is a distributed database
+presenting an SQL interface on top of a distributed key-value store. Although
+it is a completely independent implementation, it uses the same PostgreSQL
+client-server protocol.</p>
+<p>In the past few months, we have collaborated to create an even smoother
+integration, so that every PostgreSQL feature, also supported by CockroachDB,
+can be used in a transparent way: <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#server-side-cursors">server-side cursors</a>,
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html">pipeline mode</a>, CockroachDB
+data types are all supported out-of-the-box.</p>
+<p>CockroachDB also implements <a class="reference external" href="https://www.cockroachlabs.com/docs/stable/changefeed-for.html">CHANGEFEED</a>, a
+streaming query, which Psycopg can consume using its Cursor.stream() feature.
+This immediately receives every change happening in a database table, enabling
+interesting new ways to write distributed applications.</p>
+</div>
+<div class="section" id="executemany-improvements">
+<h2><tt class="docutils literal">executemany()</tt> improvements</h2>
+<p>The <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.executemany">executemany()</a>
+method now supports returning the executed statements' output. You can now for
+instance execute an <tt class="docutils literal">INSERT ... RETURNING</tt> on a batch of records and
+retrieve the ids associated to the newly inserted records.</p>
+<p><tt class="docutils literal">executemany()</tt> automatically uses <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html">the pipeline mode</a> already
+described, making use of pipeline mode speedups without changing any code in
+the programs using this method.</p>
+</div>
+<div class="section" id="and-many-more-improvements">
+<h2>And many more improvements</h2>
+<ul class="simple">
+<li>The <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/transactions.html#two-phase-commit">Two-phase commit protocol</a>
+is now available as per <a class="reference external" href="https://peps.python.org/pep-0249/#optional-two-phase-commit-extensions">DBAPI specification</a>.</li>
+<li>Asynchronous connections <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-operations">don't block on DNS names resolution on connect</a>.</li>
+<li><tt class="docutils literal">Cursor.copy()</tt> now <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.copy">takes parameters</a>,
+like a normal query.</li>
+<li>It is also possible to <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/copy.html#copy-writers">replace the writer of a 'Copy' object</a>, in
+order to use psycopg just to format data in COPY format and to do something
+else with the data produced, for instance save it to a file for later
+processing.</li>
+<li>...And many more improvements you can find in our <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-1">release notes</a>.</li>
+</ul>
+</div>
+<div class="section" id="thank-you-very-much">
+<h2>Thank you very much!</h2>
+<p>We hope you will enjoy to use Psycopg 3.1 and will benefit from its new
+features. Psycopg 3 is developed and maintained thanks to the support
+of <a class="reference external" href="https://www.psycopg.org/sponsors/">our sponsors</a>.</p>
+<p>If you are a Python and PostgreSQL user and would like to make sure that the
+interface between the two is well maintained and continuously improved, please
+consider <a class="reference external" href="https://github.com/sponsors/dvarrazzo">sponsoring the project 💜</a>.</p>
+<p>Thank you very much, happy hacking!</p>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>psycopg2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+    <li>
+      <a href="https://pypi.org/project/psycopg2/">
+        <i class="fa-li fa-lg fa fa-cloud-download" aria-hidden="true"></i>
+        Download</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>psycopg3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2022/">2022</a></li>
+  <li><a href="/articles/2021/">2021</a></li>
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2021 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+

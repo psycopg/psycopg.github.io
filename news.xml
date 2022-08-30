@@ -1,5 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>News</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/news.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2021-10-13T00:00:00Z</updated><author><name></name></author><entry><title>Psycopg 3.0 released</title><link href="https://www.psycopg.org/articles/2021/10/13/psycopg-30-released/" rel="alternate"></link><updated>2021-10-13T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:060c020e-db6c-391f-b8bc-af629192c059</id><content type="html">&lt;p&gt;Hello,&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>News</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/news.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2022-08-30T00:00:00Z</updated><author><name></name></author><entry><title>Psycopg 3.1 released</title><link href="https://www.psycopg.org/articles/2022/08/30/psycopg-31-released/" rel="alternate"></link><updated>2022-08-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:bca301bf-8fa7-306d-a4d6-022a4af604f5</id><content type="html">&lt;p&gt;Hello,&lt;/p&gt;
+&lt;p&gt;After several months of development, we are proud to release Psycopg 3.1!&lt;/p&gt;
+&lt;p&gt;Psycopg 3.1 is a gradual improvement on Psycopg 3.0, introducing new exciting
+features, redefining what can be done on the boundary between Python and
+PostgreSQL.&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class="section" id="pipeline-mode"&gt;
+&lt;h2&gt;Pipeline mode&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html"&gt;pipeline mode&lt;/a&gt;
+is by far the biggest feature introduced in Psycopg 3.1, largely the work of
+Denis Laxalde and supported by &lt;a class="reference external" href="http://www.dalibo.com"&gt;Dalibo&lt;/a&gt;. In
+pipeline mode, Psycopg will send batches of commands to the server without
+waiting for a response for every operation, resulting in a massive speed
+improvement.&lt;/p&gt;
+&lt;p&gt;The pipeline mode is exposed to Python as a context block. Within the block,
+Psycopg will manage the pipeline in a transparent way, even allowing the use of
+features which break the pipeline flow, for instance to fetch results, or to
+manage transactions:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pipeline&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;op&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;operations&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transaction&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+        &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;rec&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;rec&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Quantifying the speedup is difficult, as it depends on the network conditions
+and on the pattern of statements executed. In particularly bad conditions (250
+ms of ping time between client and server), we measured a loop of 100 inserts
+to take 25 s in normal mode and just 0.5 s in pipeline mode, for a 50x
+speedup. Testing the same operation on a localhost connection, we have
+measured a &amp;gt;20x speedup (a 5000 inserts batch taking 0.3 s instead of 6.6 s).
+If the program requires results from the server before sending further
+statement (for instance to insert in a table and then use the new record's
+primary key to insert related records in different tables) you can expect
+less dramatic speedups.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="client-binding-cursors"&gt;
+&lt;h2&gt;Client-binding cursors&lt;/h2&gt;
+&lt;p&gt;Psycopg 3 uses &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/from_pg2.html#server-side-binding"&gt;server-side binding&lt;/a&gt;,
+passing the query and adapted arguments separately. This allows to use several
+features otherwise unavailable, such as prepared statements. However, many
+types of statements, especially data-definition, don't support server-side
+parameters. The &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html"&gt;'sql' module&lt;/a&gt; allows to compose
+statements on the client, but using it might require many changes to programs
+making heavy use of data-definition statements.&lt;/p&gt;
+&lt;p&gt;Psycopg 3.1 introduces a &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#client-side-binding-cursors"&gt;ClientCursor&lt;/a&gt;
+object, which makes psycopg2 programs easier to port. This cursor reproduces
+psycopg2's way of composing queries, which is not the most efficient, but for
+certain programs it is exactly what is needed.&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;psycopg2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cursor_factory&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ClientCursor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;  &lt;span class="c1"&gt;# this is a client-side binding cursor&lt;/span&gt;
+    &lt;span class="c1"&gt;# This statement doesn't support server-side parameters&lt;/span&gt;
+    &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ALTER TABLE x ALTER y SET DEFAULT &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;hello&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;As a bonus, the client cursor reintroduces the handy and often requested
+&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.ClientCursor.mogrify"&gt;mogrify()&lt;/a&gt;
+method, which returns the query merged with the parameters the way it is
+passed to the server:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mogrify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ALTER TABLE x ALTER y SET DEFAULT &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;hell'o&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="s2"&gt;&amp;quot;ALTER TABLE x ALTER y SET DEFAULT 'hell''o'&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="enum-adaptation"&gt;
+&lt;h2&gt;Enum adaptation&lt;/h2&gt;
+&lt;p&gt;Python has &lt;a class="reference external" href="https://docs.python.org/3/library/enum.html"&gt;enums&lt;/a&gt;, PostgreSQL
+has &lt;a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-enum.html"&gt;enums&lt;/a&gt;...
+Why not map them into each other? Well for a start because they are
+actually pretty different from each other (Python enums have a type and value,
+Postgres ones are just identities) and because often, in programs,
+differences between the enums in the db and the code creep in.&lt;/p&gt;
+&lt;p&gt;Psycopg 3.1 introduces &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/adapt.html#enum-adaptation"&gt;a flexible adapter between Python and Postgres enums&lt;/a&gt;.
+It can be used in a simple way when there is a one-to-one mapping between the
+enums:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+=# CREATE TYPE numbers AS ENUM ('ONE', 'TWO', 'THREE');
+&lt;/pre&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Numbers&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;ONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;TWO&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;THREE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EnumInfo&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;numbers&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;register_enum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Numbers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT 'TWO'::numbers&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Numbers&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TWO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT pg_typeof(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Numbers&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ONE&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="s1"&gt;'numbers'&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The facility can also be customized in order to adapt enums when the mapping
+is not one-to-one:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;NumbersPlus&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;ONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;TWO&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;THREE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;THREE_PLUS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;auto&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;  &lt;span class="c1"&gt;# has some meaning in the program, but it is not stored&lt;/span&gt;
+
+&lt;span class="n"&gt;register_enum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="c1"&gt;# - Items not mentioned map naturally&lt;/span&gt;
+    &lt;span class="c1"&gt;# - This order gives THREE priority over THREE_PLUS when loading from db.&lt;/span&gt;
+    &lt;span class="n"&gt;mapping&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;THREE_PLUS&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;THREE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;THREE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;THREE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+
+&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;::text&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ONE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;THREE_PLUS&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="s1"&gt;'{ONE,THREE}'&lt;/span&gt;
+
+&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;select '{TWO,THREE}'::numbers[]&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TWO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;NumbersPlus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;THREE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="in-partnership-with-cockroachdb"&gt;
+&lt;h2&gt;In partnership with CockroachDB&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://www.cockroachlabs.com/"&gt;CockroachDB&lt;/a&gt; is a distributed database
+presenting an SQL interface on top of a distributed key-value store. Although
+it is a completely independent implementation, it uses the same PostgreSQL
+client-server protocol.&lt;/p&gt;
+&lt;p&gt;In the past few months, we have collaborated to create an even smoother
+integration, so that every PostgreSQL feature, also supported by CockroachDB,
+can be used in a transparent way: &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#server-side-cursors"&gt;server-side cursors&lt;/a&gt;,
+&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html"&gt;pipeline mode&lt;/a&gt;, CockroachDB
+data types are all supported out-of-the-box.&lt;/p&gt;
+&lt;p&gt;CockroachDB also implements &lt;a class="reference external" href="https://www.cockroachlabs.com/docs/stable/changefeed-for.html"&gt;CHANGEFEED&lt;/a&gt;, a
+streaming query, which Psycopg can consume using its Cursor.stream() feature.
+This immediately receives every change happening in a database table, enabling
+interesting new ways to write distributed applications.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="executemany-improvements"&gt;
+&lt;h2&gt;&lt;tt class="docutils literal"&gt;executemany()&lt;/tt&gt; improvements&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.executemany"&gt;executemany()&lt;/a&gt;
+method now supports returning the executed statements' output. You can now for
+instance execute an &lt;tt class="docutils literal"&gt;INSERT ... RETURNING&lt;/tt&gt; on a batch of records and
+retrieve the ids associated to the newly inserted records.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;executemany()&lt;/tt&gt; automatically uses &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html"&gt;the pipeline mode&lt;/a&gt; already
+described, making use of pipeline mode speedups without changing any code in
+the programs using this method.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="and-many-more-improvements"&gt;
+&lt;h2&gt;And many more improvements&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/transactions.html#two-phase-commit"&gt;Two-phase commit protocol&lt;/a&gt;
+is now available as per &lt;a class="reference external" href="https://peps.python.org/pep-0249/#optional-two-phase-commit-extensions"&gt;DBAPI specification&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Asynchronous connections &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-operations"&gt;don't block on DNS names resolution on connect&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;Cursor.copy()&lt;/tt&gt; now &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.copy"&gt;takes parameters&lt;/a&gt;,
+like a normal query.&lt;/li&gt;
+&lt;li&gt;It is also possible to &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/copy.html#copy-writers"&gt;replace the writer of a 'Copy' object&lt;/a&gt;, in
+order to use psycopg just to format data in COPY format and to do something
+else with the data produced, for instance save it to a file for later
+processing.&lt;/li&gt;
+&lt;li&gt;...And many more improvements you can find in our &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-1"&gt;release notes&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="thank-you-very-much"&gt;
+&lt;h2&gt;Thank you very much!&lt;/h2&gt;
+&lt;p&gt;We hope you will enjoy to use Psycopg 3.1 and will benefit from its new
+features. Psycopg 3 is developed and maintained thanks to the support
+of &lt;a class="reference external" href="https://www.psycopg.org/sponsors/"&gt;our sponsors&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you are a Python and PostgreSQL user and would like to make sure that the
+interface between the two is well maintained and continuously improved, please
+consider &lt;a class="reference external" href="https://github.com/sponsors/dvarrazzo"&gt;sponsoring the project 💜&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thank you very much, happy hacking!&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Psycopg 3.0 released</title><link href="https://www.psycopg.org/articles/2021/10/13/psycopg-30-released/" rel="alternate"></link><updated>2021-10-13T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:060c020e-db6c-391f-b8bc-af629192c059</id><content type="html">&lt;p&gt;Hello,&lt;/p&gt;
 &lt;p&gt;I am extremely excited to announce the first stable release of Psycopg 3!&lt;/p&gt;
 &lt;!-- CUT-HERE --&gt;
 &lt;p&gt;Psycopg 3 is a complete rewrite based on the experience accumulated with the
