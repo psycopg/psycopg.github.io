@@ -134,7 +134,7 @@ object, which makes psycopg2 programs easier to port. This cursor reproduces
 psycopg2's way of composing queries, which is not the most efficient, but for
 certain programs it is exactly what is needed.</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>  <span class="c1"># this is a client-side binding cursor</span>
     <span class="c1"># This statement doesn't support server-side parameters</span>
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
