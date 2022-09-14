@@ -388,6 +388,71 @@ but none was available.</p>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQCONNECTIONUSEDPASSWORD"><span class="pre">PQconnectionUsedPassword</span></a></code> for details.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.encrypt_password">
+<span class="sig-name descname"><span class="pre">encrypt_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">passwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.encrypt_password" title="Permalink to this definition">#</a></dt>
+<dd><p>Return the encrypted form of a PostgreSQL password.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-misc.html#LIBPQ-PQENCRYPTPASSWORDCONN"><span class="pre">PQencryptPasswordConn</span></a></code> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">enc</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">encrypted</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">encrypt_password</span><span class="p">(</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">rolename</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">))</span>
+<span class="go">b&#39;SCRAM-SHA-256$4096:...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.trace">
+<span class="sig-name descname"><span class="pre">trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileno</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.trace" title="Permalink to this definition">#</a></dt>
+<dd><p>Enable tracing of the client/server communication to a file stream.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQTRACE"><span class="pre">PQtrace</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.set_trace_flags">
+<span class="sig-name descname"><span class="pre">set_trace_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.set_trace_flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Configure tracing behavior of client/server communication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flags</strong> (<a class="reference internal" href="#psycopg.pq.Trace" title="psycopg.pq.Trace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trace</span></code></a>) – operating mode of tracing.</p>
+</dd>
+</dl>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.untrace">
+<span class="sig-name descname"><span class="pre">untrace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.untrace" title="Permalink to this definition">#</a></dt>
+<dd><p>Disable tracing, previously enabled through <a class="reference internal" href="#psycopg.pq.PGconn.trace" title="psycopg.pq.PGconn.trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trace()</span></code></a>.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQUNTRACE"><span class="pre">PQuntrace</span></a></code> for details.</p>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">set_trace_flags</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">SUPPRESS_TIMESTAMPS</span> <span class="o">|</span> <span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">REGRESS_MODE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select now()&quot;</span><span class="p">)</span>
+<span class="go">F       13      Parse    &quot;&quot; &quot;BEGIN&quot; 0</span>
+<span class="go">F       14      Bind     &quot;&quot; &quot;&quot; 0 0 1 0</span>
+<span class="go">F       6       Describe         P &quot;&quot;</span>
+<span class="go">F       9       Execute  &quot;&quot; 0</span>
+<span class="go">F       4       Sync</span>
+<span class="go">B       4       ParseComplete</span>
+<span class="go">B       4       BindComplete</span>
+<span class="go">B       4       NoData</span>
+<span class="go">B       10      CommandComplete  &quot;BEGIN&quot;</span>
+<span class="go">B       5       ReadyForQuery    T</span>
+<span class="go">F       17      Query    &quot;select now()&quot;</span>
+<span class="go">B       28      RowDescription   1 &quot;now&quot; NNNN 0 NNNN 8 -1 0</span>
+<span class="go">B       39      DataRow  1 29 &#39;2022-09-14 14:12:16.648035+02&#39;</span>
+<span class="go">B       13      CommandComplete  &quot;SELECT 1&quot;</span>
+<span class="go">B       5       ReadyForQuery    T</span>
+<span class="go">&lt;psycopg.Cursor [TUPLES_OK] [INTRANS] (database=postgres) at 0x7f18a18ba040&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">untrace</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py class">
@@ -721,6 +786,26 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.Ping.NO_ATTEMPT">
 <span class="sig-name descname"><span class="pre">NO_ATTEMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#psycopg.pq.Ping.NO_ATTEMPT" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.pq.Trace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">Trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.Trace" title="Permalink to this definition">#</a></dt>
+<dd><p>Enum to control tracing of the client/server communication.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for a description of these values.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.pq.Trace.SUPPRESS_TIMESTAMPS">
+<span class="sig-name descname"><span class="pre">SUPPRESS_TIMESTAMPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#psycopg.pq.Trace.SUPPRESS_TIMESTAMPS" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.pq.Trace.REGRESS_MODE">
+<span class="sig-name descname"><span class="pre">REGRESS_MODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#psycopg.pq.Trace.REGRESS_MODE" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
