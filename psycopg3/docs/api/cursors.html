@@ -415,6 +415,17 @@ implementations exist: Materialize <a class="reference external" href="https://m
 <p>The feature, and the API supporting it, are still experimental.
 Beware… 👀</p>
 <p>The parameters are the same of <a class="reference internal" href="#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Failing to consume the iterator entirely will result in a
+connection left in <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.transaction_status" title="psycopg.ConnectionInfo.transaction_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_status</span></code></a>
+<a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus.ACTIVE" title="psycopg.pq.TransactionStatus.ACTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ACTIVE</span></code></a> state: this connection will refuse
+to receive further commands (with a messge such as <em>another
+command is already in progress</em>).</p>
+<p>You can restore the connection to a working state by consuming
+the generator entirely: see <a class="reference external" href="https://github.com/psycopg/psycopg/issues/382#issuecomment-1253582340">this comment</a> to get a few ideas
+about how to do it.</p>
+</div>
 </dd></dl>
 
 <dl class="py attribute">
