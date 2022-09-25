@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="sql – SQL string composition" href="sql.html" /><link rel="prev" title="COPY-related objects" href="copy.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.0.post0, furo 2022.06.21"/>
         <title>Other top-level objects - psycopg 3.1.3.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -769,12 +769,96 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Other top-level objects</a><ul>
-<li><a class="reference internal" href="#connection-information">Connection information</a></li>
-<li><a class="reference internal" href="#the-description-column-object">The description <code class="xref py py-obj docutils literal notranslate"><span class="pre">Column</span></code> object</a></li>
-<li><a class="reference internal" href="#notifications">Notifications</a></li>
-<li><a class="reference internal" href="#pipeline-related-objects">Pipeline-related objects</a></li>
-<li><a class="reference internal" href="#transaction-related-objects">Transaction-related objects</a></li>
-<li><a class="reference internal" href="#two-phase-commit-related-objects">Two-Phase Commit related objects</a></li>
+<li><a class="reference internal" href="#connection-information">Connection information</a><ul>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.dsn"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.dsn</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.status"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.status</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.transaction_status"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.transaction_status</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.pipeline_status"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.pipeline_status</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.backend_pid"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.backend_pid</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.vendor"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.vendor</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.server_version"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.server_version</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.error_message"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.error_message</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.get_parameters"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.get_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.timezone"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.timezone</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.host"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.host</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.hostaddr"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.hostaddr</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.port"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.port</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.dbname"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.dbname</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.user"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.user</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.password"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.password</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.options"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.options</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.parameter_status"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.parameter_status()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ConnectionInfo.encoding"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.encoding</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-description-column-object">The description <code class="xref py py-obj docutils literal notranslate"><span class="pre">Column</span></code> object</a><ul>
+<li><a class="reference internal" href="#psycopg.Column"><code class="docutils literal notranslate"><span class="pre">Column</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Column.name"><code class="docutils literal notranslate"><span class="pre">Column.name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Column.type_code"><code class="docutils literal notranslate"><span class="pre">Column.type_code</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Column.display_size"><code class="docutils literal notranslate"><span class="pre">Column.display_size</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Column.internal_size"><code class="docutils literal notranslate"><span class="pre">Column.internal_size</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Column.precision"><code class="docutils literal notranslate"><span class="pre">Column.precision</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Column.scale"><code class="docutils literal notranslate"><span class="pre">Column.scale</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notifications">Notifications</a><ul>
+<li><a class="reference internal" href="#psycopg.Notify"><code class="docutils literal notranslate"><span class="pre">Notify</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Notify.channel"><code class="docutils literal notranslate"><span class="pre">Notify.channel</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Notify.payload"><code class="docutils literal notranslate"><span class="pre">Notify.payload</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Notify.pid"><code class="docutils literal notranslate"><span class="pre">Notify.pid</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pipeline-related-objects">Pipeline-related objects</a><ul>
+<li><a class="reference internal" href="#psycopg.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Pipeline.sync"><code class="docutils literal notranslate"><span class="pre">Pipeline.sync()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Pipeline.is_supported"><code class="docutils literal notranslate"><span class="pre">Pipeline.is_supported()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.AsyncPipeline"><code class="docutils literal notranslate"><span class="pre">AsyncPipeline</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncPipeline.sync"><code class="docutils literal notranslate"><span class="pre">AsyncPipeline.sync()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#transaction-related-objects">Transaction-related objects</a><ul>
+<li><a class="reference internal" href="#psycopg.IsolationLevel"><code class="docutils literal notranslate"><span class="pre">IsolationLevel</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.IsolationLevel.READ_UNCOMMITTED"><code class="docutils literal notranslate"><span class="pre">IsolationLevel.READ_UNCOMMITTED</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.IsolationLevel.READ_COMMITTED"><code class="docutils literal notranslate"><span class="pre">IsolationLevel.READ_COMMITTED</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.IsolationLevel.REPEATABLE_READ"><code class="docutils literal notranslate"><span class="pre">IsolationLevel.REPEATABLE_READ</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.IsolationLevel.SERIALIZABLE"><code class="docutils literal notranslate"><span class="pre">IsolationLevel.SERIALIZABLE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.Transaction"><code class="docutils literal notranslate"><span class="pre">Transaction</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Transaction.savepoint_name"><code class="docutils literal notranslate"><span class="pre">Transaction.savepoint_name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Transaction.connection"><code class="docutils literal notranslate"><span class="pre">Transaction.connection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction"><code class="docutils literal notranslate"><span class="pre">AsyncTransaction</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.connection"><code class="docutils literal notranslate"><span class="pre">AsyncTransaction.connection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.Rollback"><code class="docutils literal notranslate"><span class="pre">Rollback</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#two-phase-commit-related-objects">Two-Phase Commit related objects</a><ul>
+<li><a class="reference internal" href="#psycopg.Xid"><code class="docutils literal notranslate"><span class="pre">Xid</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Xid.format_id"><code class="docutils literal notranslate"><span class="pre">Xid.format_id</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Xid.gtrid"><code class="docutils literal notranslate"><span class="pre">Xid.gtrid</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Xid.bqual"><code class="docutils literal notranslate"><span class="pre">Xid.bqual</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Xid.prepared"><code class="docutils literal notranslate"><span class="pre">Xid.prepared</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Xid.owner"><code class="docutils literal notranslate"><span class="pre">Xid.owner</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Xid.database"><code class="docutils literal notranslate"><span class="pre">Xid.database</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -791,6 +875,7 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
 </html>

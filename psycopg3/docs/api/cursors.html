@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="COPY-related objects" href="copy.html" /><link rel="prev" title="Connection classes" href="connections.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.0.post0, furo 2022.06.21"/>
         <title>Cursor classes - psycopg 3.1.3.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -344,7 +344,7 @@ related objects.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, <a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>, or <a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Composed</span></code></a>) – The query to execute</p></li>
-<li><p><strong>params_seq</strong> (<em>Sequence of Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
+<li><p><strong>params_seq</strong> (<em>Sequence</em><em> of </em><em>Sequences</em><em> or </em><em>Mappings</em>) – The parameters to pass to the query</p></li>
 <li><p><strong>returning</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, fetch the results of the queries executed</p></li>
 </ul>
 </dd>
@@ -1108,12 +1108,89 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Cursor classes</a><ul>
-<li><a class="reference internal" href="#the-cursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class</a></li>
-<li><a class="reference internal" href="#the-clientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class</a></li>
-<li><a class="reference internal" href="#the-servercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code> class</a></li>
-<li><a class="reference internal" href="#the-asynccursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class</a></li>
-<li><a class="reference internal" href="#the-asyncclientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class</a></li>
-<li><a class="reference internal" href="#the-asyncservercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class</a></li>
+<li><a class="reference internal" href="#the-cursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.Cursor"><code class="docutils literal notranslate"><span class="pre">Cursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Cursor.connection"><code class="docutils literal notranslate"><span class="pre">Cursor.connection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.close"><code class="docutils literal notranslate"><span class="pre">Cursor.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.closed"><code class="docutils literal notranslate"><span class="pre">Cursor.closed</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.execute"><code class="docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.executemany"><code class="docutils literal notranslate"><span class="pre">Cursor.executemany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.copy"><code class="docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.stream"><code class="docutils literal notranslate"><span class="pre">Cursor.stream()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.format"><code class="docutils literal notranslate"><span class="pre">Cursor.format</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.row_factory"><code class="docutils literal notranslate"><span class="pre">Cursor.row_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.fetchone"><code class="docutils literal notranslate"><span class="pre">Cursor.fetchone()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">Cursor.fetchmany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.fetchall"><code class="docutils literal notranslate"><span class="pre">Cursor.fetchall()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.nextset"><code class="docutils literal notranslate"><span class="pre">Cursor.nextset()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.scroll"><code class="docutils literal notranslate"><span class="pre">Cursor.scroll()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.pgresult"><code class="docutils literal notranslate"><span class="pre">Cursor.pgresult</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.description"><code class="docutils literal notranslate"><span class="pre">Cursor.description</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.statusmessage"><code class="docutils literal notranslate"><span class="pre">Cursor.statusmessage</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.rowcount"><code class="docutils literal notranslate"><span class="pre">Cursor.rowcount</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.rownumber"><code class="docutils literal notranslate"><span class="pre">Cursor.rownumber</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor._query"><code class="docutils literal notranslate"><span class="pre">Cursor._query</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-clientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.ClientCursor"><code class="docutils literal notranslate"><span class="pre">ClientCursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.ClientCursor.mogrify"><code class="docutils literal notranslate"><span class="pre">ClientCursor.mogrify()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-servercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.ServerCursor"><code class="docutils literal notranslate"><span class="pre">ServerCursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.ServerCursor.name"><code class="docutils literal notranslate"><span class="pre">ServerCursor.name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.scrollable"><code class="docutils literal notranslate"><span class="pre">ServerCursor.scrollable</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.withhold"><code class="docutils literal notranslate"><span class="pre">ServerCursor.withhold</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.close"><code class="docutils literal notranslate"><span class="pre">ServerCursor.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.execute"><code class="docutils literal notranslate"><span class="pre">ServerCursor.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.executemany"><code class="docutils literal notranslate"><span class="pre">ServerCursor.executemany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.fetchone"><code class="docutils literal notranslate"><span class="pre">ServerCursor.fetchone()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">ServerCursor.fetchmany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.fetchall"><code class="docutils literal notranslate"><span class="pre">ServerCursor.fetchall()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.itersize"><code class="docutils literal notranslate"><span class="pre">ServerCursor.itersize</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ServerCursor.scroll"><code class="docutils literal notranslate"><span class="pre">ServerCursor.scroll()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-asynccursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncCursor"><code class="docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.connection"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.connection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.close"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.execute"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.executemany"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.executemany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.copy"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.stream"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.stream()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.fetchone"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchone()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchmany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.fetchall"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchall()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.scroll"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.scroll()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-asyncclientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncClientCursor"><code class="docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-asyncservercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.close"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.execute"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.executemany"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.executemany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.fetchone"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.fetchone()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.fetchmany()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.fetchall"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.fetchall()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncServerCursor.scroll"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.scroll()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1130,6 +1207,7 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Cursor classes" href="cursors.html" /><link rel="prev" title="The psycopg module" href="module.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.0.post0, furo 2022.06.21"/>
         <title>Connection classes - psycopg 3.1.3.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -1065,8 +1065,72 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Connection classes</a><ul>
-<li><a class="reference internal" href="#the-connection-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> class</a></li>
-<li><a class="reference internal" href="#the-asyncconnection-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> class</a></li>
+<li><a class="reference internal" href="#the-connection-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.Connection"><code class="docutils literal notranslate"><span class="pre">Connection</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Connection.connect"><code class="docutils literal notranslate"><span class="pre">Connection.connect()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.close"><code class="docutils literal notranslate"><span class="pre">Connection.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.closed"><code class="docutils literal notranslate"><span class="pre">Connection.closed</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.broken"><code class="docutils literal notranslate"><span class="pre">Connection.broken</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.cursor"><code class="docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.cursor_factory"><code class="docutils literal notranslate"><span class="pre">Connection.cursor_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.server_cursor_factory"><code class="docutils literal notranslate"><span class="pre">Connection.server_cursor_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.row_factory"><code class="docutils literal notranslate"><span class="pre">Connection.row_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.execute"><code class="docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.pipeline"><code class="docutils literal notranslate"><span class="pre">Connection.pipeline()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.commit"><code class="docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.rollback"><code class="docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.transaction"><code class="docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.autocommit"><code class="docutils literal notranslate"><span class="pre">Connection.autocommit</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.isolation_level"><code class="docutils literal notranslate"><span class="pre">Connection.isolation_level</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.read_only"><code class="docutils literal notranslate"><span class="pre">Connection.read_only</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.deferrable"><code class="docutils literal notranslate"><span class="pre">Connection.deferrable</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.pgconn"><code class="docutils literal notranslate"><span class="pre">Connection.pgconn</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.info"><code class="docutils literal notranslate"><span class="pre">Connection.info</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.prepare_threshold"><code class="docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.prepared_max"><code class="docutils literal notranslate"><span class="pre">Connection.prepared_max</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.cancel"><code class="docutils literal notranslate"><span class="pre">Connection.cancel()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.notifies"><code class="docutils literal notranslate"><span class="pre">Connection.notifies()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.add_notify_handler"><code class="docutils literal notranslate"><span class="pre">Connection.add_notify_handler()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.remove_notify_handler"><code class="docutils literal notranslate"><span class="pre">Connection.remove_notify_handler()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.add_notice_handler"><code class="docutils literal notranslate"><span class="pre">Connection.add_notice_handler()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.remove_notice_handler"><code class="docutils literal notranslate"><span class="pre">Connection.remove_notice_handler()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.fileno"><code class="docutils literal notranslate"><span class="pre">Connection.fileno()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.xid"><code class="docutils literal notranslate"><span class="pre">Connection.xid()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.tpc_begin"><code class="docutils literal notranslate"><span class="pre">Connection.tpc_begin()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.tpc_prepare"><code class="docutils literal notranslate"><span class="pre">Connection.tpc_prepare()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.tpc_commit"><code class="docutils literal notranslate"><span class="pre">Connection.tpc_commit()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.tpc_rollback"><code class="docutils literal notranslate"><span class="pre">Connection.tpc_rollback()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.tpc_recover"><code class="docutils literal notranslate"><span class="pre">Connection.tpc_recover()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-asyncconnection-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncConnection"><code class="docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.connect"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.close"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.close()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.cursor"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.cursor()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.cursor_factory"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.cursor_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.server_cursor_factory"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.server_cursor_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.row_factory"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.row_factory</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.execute"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.execute()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.pipeline"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.pipeline()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.commit"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.commit()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.rollback"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.rollback()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.transaction"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.notifies"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.notifies()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.set_autocommit"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_autocommit()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.set_isolation_level"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_isolation_level()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.set_read_only"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_read_only()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.set_deferrable"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_deferrable()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.tpc_prepare"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.tpc_prepare()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.tpc_commit"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.tpc_commit()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.tpc_rollback"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.tpc_rollback()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.tpc_recover"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.tpc_recover()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1083,6 +1147,7 @@ the async quirkness: see <a class="reference internal" href="../advanced/async.h
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
 </html>

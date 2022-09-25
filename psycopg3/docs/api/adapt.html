@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="types – Types information and adapters" href="types.html" /><link rel="prev" title="conninfo – manipulate connection strings" href="conninfo.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.0.post0, furo 2022.06.21"/>
         <title>adapt – Types adaptation - psycopg 3.1.3.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -606,8 +606,41 @@ optimised.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt</span></code> – Types adaptation</a><ul>
-<li><a class="reference internal" href="#dumpers-and-loaders">Dumpers and loaders</a></li>
-<li><a class="reference internal" href="#other-objects-used-in-adaptations">Other objects used in adaptations</a></li>
+<li><a class="reference internal" href="#dumpers-and-loaders">Dumpers and loaders</a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper"><code class="docutils literal notranslate"><span class="pre">Dumper</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper.dump"><code class="docutils literal notranslate"><span class="pre">Dumper.dump()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper.format"><code class="docutils literal notranslate"><span class="pre">Dumper.format</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper.quote"><code class="docutils literal notranslate"><span class="pre">Dumper.quote()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper.get_key"><code class="docutils literal notranslate"><span class="pre">Dumper.get_key()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.Dumper.upgrade"><code class="docutils literal notranslate"><span class="pre">Dumper.upgrade()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.adapt.Loader"><code class="docutils literal notranslate"><span class="pre">Loader</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.Loader.load"><code class="docutils literal notranslate"><span class="pre">Loader.load()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.Loader.format"><code class="docutils literal notranslate"><span class="pre">Loader.format</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-objects-used-in-adaptations">Other objects used in adaptations</a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.PyFormat"><code class="docutils literal notranslate"><span class="pre">PyFormat</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.PyFormat.AUTO"><code class="docutils literal notranslate"><span class="pre">PyFormat.AUTO</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.PyFormat.TEXT"><code class="docutils literal notranslate"><span class="pre">PyFormat.TEXT</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.PyFormat.BINARY"><code class="docutils literal notranslate"><span class="pre">PyFormat.BINARY</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap"><code class="docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.register_dumper"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.register_dumper()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.register_loader"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.register_loader()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.types"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.types</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.get_dumper"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.get_dumper()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.get_dumper_by_oid"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.get_dumper_by_oid()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.adapt.AdaptersMap.get_loader"><code class="docutils literal notranslate"><span class="pre">AdaptersMap.get_loader()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.adapt.Transformer"><code class="docutils literal notranslate"><span class="pre">Transformer</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -624,6 +657,7 @@ optimised.</p>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
 </html>

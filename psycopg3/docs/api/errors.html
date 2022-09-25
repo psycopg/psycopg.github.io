@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="psycopg_pool – Connection pool implementations" href="pool.html" /><link rel="prev" title="rows – row factory implementations" href="rows.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.0.post0, furo 2022.06.21"/>
         <title>errors – Package exceptions - psycopg 3.1.3.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -1666,11 +1666,55 @@ module, together with the base DBAPI exception they derive from.</p>
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code> – Package exceptions</a><ul>
 <li><a class="reference internal" href="#db-api-exceptions">DB-API exceptions</a><ul>
-<li><a class="reference internal" href="#other-psycopg-errors">Other Psycopg errors</a></li>
+<li><a class="reference internal" href="#psycopg.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Error.diag"><code class="docutils literal notranslate"><span class="pre">Error.diag</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Error.sqlstate"><code class="docutils literal notranslate"><span class="pre">Error.sqlstate</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Error.pgconn"><code class="docutils literal notranslate"><span class="pre">Error.pgconn</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Error.pgresult"><code class="docutils literal notranslate"><span class="pre">Error.pgresult</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#error-diagnostics">Error diagnostics</a></li>
+<li><a class="reference internal" href="#psycopg.Warning"><code class="docutils literal notranslate"><span class="pre">Warning</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.InterfaceError"><code class="docutils literal notranslate"><span class="pre">InterfaceError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.DatabaseError"><code class="docutils literal notranslate"><span class="pre">DatabaseError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.DataError"><code class="docutils literal notranslate"><span class="pre">DataError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.OperationalError"><code class="docutils literal notranslate"><span class="pre">OperationalError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.IntegrityError"><code class="docutils literal notranslate"><span class="pre">IntegrityError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.InternalError"><code class="docutils literal notranslate"><span class="pre">InternalError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.ProgrammingError"><code class="docutils literal notranslate"><span class="pre">ProgrammingError</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.NotSupportedError"><code class="docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a></li>
+<li><a class="reference internal" href="#other-psycopg-errors">Other Psycopg errors</a><ul>
+<li><a class="reference internal" href="#psycopg.errors.ConnectionTimeout"><code class="docutils literal notranslate"><span class="pre">ConnectionTimeout</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.PipelineAborted"><code class="docutils literal notranslate"><span class="pre">PipelineAborted</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-diagnostics">Error diagnostics</a><ul>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic"><code class="docutils literal notranslate"><span class="pre">Diagnostic</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.column_name"><code class="docutils literal notranslate"><span class="pre">Diagnostic.column_name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.constraint_name"><code class="docutils literal notranslate"><span class="pre">Diagnostic.constraint_name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.context"><code class="docutils literal notranslate"><span class="pre">Diagnostic.context</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.datatype_name"><code class="docutils literal notranslate"><span class="pre">Diagnostic.datatype_name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.internal_position"><code class="docutils literal notranslate"><span class="pre">Diagnostic.internal_position</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.internal_query"><code class="docutils literal notranslate"><span class="pre">Diagnostic.internal_query</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.message_detail"><code class="docutils literal notranslate"><span class="pre">Diagnostic.message_detail</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.message_hint"><code class="docutils literal notranslate"><span class="pre">Diagnostic.message_hint</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.message_primary"><code class="docutils literal notranslate"><span class="pre">Diagnostic.message_primary</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.schema_name"><code class="docutils literal notranslate"><span class="pre">Diagnostic.schema_name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.severity"><code class="docutils literal notranslate"><span class="pre">Diagnostic.severity</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.severity_nonlocalized"><code class="docutils literal notranslate"><span class="pre">Diagnostic.severity_nonlocalized</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.source_file"><code class="docutils literal notranslate"><span class="pre">Diagnostic.source_file</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.source_function"><code class="docutils literal notranslate"><span class="pre">Diagnostic.source_function</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.source_line"><code class="docutils literal notranslate"><span class="pre">Diagnostic.source_line</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.sqlstate"><code class="docutils literal notranslate"><span class="pre">Diagnostic.sqlstate</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.statement_position"><code class="docutils literal notranslate"><span class="pre">Diagnostic.statement_position</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.errors.Diagnostic.table_name"><code class="docutils literal notranslate"><span class="pre">Diagnostic.table_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#sqlstate-exceptions">SQLSTATE exceptions</a><ul>
+<li><a class="reference internal" href="#psycopg.errors.lookup"><code class="docutils literal notranslate"><span class="pre">lookup()</span></code></a></li>
 <li><a class="reference internal" href="#list-of-known-exceptions">List of known exceptions</a></li>
 </ul>
 </li>
@@ -1690,6 +1734,7 @@ module, together with the base DBAPI exception they derive from.</p>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     </body>
 </html>
