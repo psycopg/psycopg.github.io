@@ -422,9 +422,21 @@ connection left in <a class="reference internal" href="objects.html#psycopg.Conn
 <a class="reference internal" href="pq.html#psycopg.pq.TransactionStatus.ACTIVE" title="psycopg.pq.TransactionStatus.ACTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ACTIVE</span></code></a> state: this connection will refuse
 to receive further commands (with a message such as <em>another
 command is already in progress</em>).</p>
-<p>You can restore the connection to a working state by consuming
-the generator entirely: see <a class="reference external" href="https://github.com/psycopg/psycopg/issues/382#issuecomment-1253582340">this comment</a> to get a few ideas
-about how to do it.</p>
+<p>If there is a chance that the generator is not consumed entirely,
+in order to restore the connection to a working state you can call
+<a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.close" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a> on the generator object returned by <code class="xref py py-obj docutils literal notranslate"><span class="pre">stream()</span></code>. The
+<a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.closing" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextlib.closing</span></code></a> function might be particularly useful to make
+sure that <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> is called:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="s2">&quot;select generate_series(1, 10000)&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">gen</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">gen</span><span class="p">:</span>
+        <span class="n">something</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>  <span class="c1"># might fail</span>
+</pre></div>
+</div>
+<p>Without calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code>, in case of error, the connection will
+be <code class="xref py py-obj docutils literal notranslate"><span class="pre">ACTIVE</span></code> and unusable. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> is called, the connection
+might be <code class="xref py py-obj docutils literal notranslate"><span class="pre">INTRANS</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">INERROR</span></code>, depending on whether the server
+managed to send the entire resultset to the client. An autocommit
+connection will be <code class="xref py py-obj docutils literal notranslate"><span class="pre">IDLE</span></code> instead.</p>
 </div>
 </dd></dl>
 
