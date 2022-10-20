@@ -235,6 +235,13 @@ tuples or mappings found in the sequence <em>vars_list</em>.</p>
 any result set returned by the query is discarded.</p>
 <p>Parameters are bounded to the query using the same rules described in
 the <a class="reference internal" href="#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nums</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s2">&quot;INSERT INTO test (num) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">nums</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuples</span> <span class="o">=</span> <span class="p">((</span><span class="mi">123</span><span class="p">,</span> <span class="s2">&quot;foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="s2">&quot;baz&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">tuples</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>In its current implementation this method is not faster than

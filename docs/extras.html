@@ -1406,6 +1406,13 @@ fewer multi-statement commands, each one containing at most <em>page_size</em>
 statements, resulting in a reduced number of server roundtrips.</p>
 <p>After the execution of the function the <a class="reference internal" href="cursor.html#cursor.rowcount" title="cursor.rowcount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.rowcount</span></code></a> property will
 <strong>not</strong> contain a total result.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nums</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_batch</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="s2">&quot;INSERT INTO test (num) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">nums</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuples</span> <span class="o">=</span> <span class="p">((</span><span class="mi">123</span><span class="p">,</span> <span class="s2">&quot;foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="s2">&quot;baz&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_batch</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">tuples</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.7.</span></p>
 </div>
