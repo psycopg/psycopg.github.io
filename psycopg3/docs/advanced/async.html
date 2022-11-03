@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../basic/pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/transactions.html">Transactions management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/copy.html">Using COPY TO and COPY FROM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -251,9 +251,9 @@
           <section id="asynchronous-operations">
 <span id="async"></span><span id="index-0"></span><h1>Asynchronous operations<a class="headerlink" href="#asynchronous-operations" title="Permalink to this heading">#</a></h1>
 <p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
-<a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
+<a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
-ones: in order to use them you will only have to scatter the <code class="docutils literal notranslate"><span class="pre">await</span></code> keyword
+ones: in order to use them you will only have to scatter the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword
 here and there.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
         <span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
@@ -282,15 +282,15 @@ do it automatically.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>On Windows, Psycopg is not compatible with the default
-<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProactorEventLoop</span></code></a>. Please use a different loop, for instance
-the <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorEventLoop</span></code></a>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProactorEventLoop</span></code></a>. Please use a different loop, for instance
+the <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorEventLoop</span></code></a>.</p>
 <p>For instance, you can use, early in your program:</p>
-<pre class="literal-block"><a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.set_event_loop_policy" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.set_event_loop_policy</span></code></a>(
-    <a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.WindowsSelectorEventLoopPolicy" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.WindowsSelectorEventLoopPolicy</span></code></a>()
+<pre class="literal-block"><a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.set_event_loop_policy" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.set_event_loop_policy</span></code></a>(
+    <a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.WindowsSelectorEventLoopPolicy" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.WindowsSelectorEventLoopPolicy</span></code></a>()
 )</pre>
 </div>
 <section id="with-async-connections">
-<span id="async-with"></span><span id="index-1"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this heading">#</a></h2>
+<span id="async-with"></span><span id="index-1"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this heading">#</a></h2>
 <p>As seen in <a class="reference internal" href="../basic/usage.html#usage"><span class="std std-ref">the basic usage</span></a>, connections and cursors can act as
 context managers, so you can run:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -403,14 +403,14 @@ mode if you wish to receive or send notifications in a timely manner.</p>
 <p>Notifications are received as instances of <a class="reference internal" href="../api/objects.html#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a>. If you are reserving a
 connection only to receive notifications, the simplest way is to consume the
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies</span></code></a> generator. The generator can be stopped using
-<code class="docutils literal notranslate"><span class="pre">close()</span></code>.</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You don’t need an <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> to handle notifications: a normal
 blocking <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> is perfectly valid.</p>
 </div>
 <p>The following example will print notifications and stop when one containing
-the <code class="docutils literal notranslate"><span class="pre">stop</span></code> message is received.</p>
+the <code class="docutils literal notranslate"><span class="pre">&quot;stop&quot;</span></code> message is received.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg</span>
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN mychan&quot;</span><span class="p">)</span>
@@ -468,7 +468,7 @@ an additional connection and wait for a notification from the OS that this
 connection has something to say: only then you can run some checks. You
 can dedicate a thread (or an asyncio task) to wait on this connection: such
 thread will perform no activity until awaken by the OS.</p>
-<p>In a normal (non asyncio) program you can use the <a class="reference external" href="https://docs.python.org/3/library/selectors.html#module-selectors" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selectors</span></code></a> module. Because
+<p>In a normal (non asyncio) program you can use the <a class="reference external" href="https://docs.python.org/3/library/selectors.html#module-selectors" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selectors</span></code></a> module. Because
 the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> implements a <a class="reference internal" href="../api/connections.html#psycopg.Connection.fileno" title="psycopg.Connection.fileno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fileno()</span></code></a> method you can just
 register it as a file-like object. You can run such code in a dedicated thread
 (and using a dedicated connection) if the rest of the program happens to have
@@ -490,8 +490,8 @@ something else to do too.</p>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> program you can dedicate a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code></a> instead and do
-something similar using <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_reader" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_reader</span></code></a>:</p>
+<p>In an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> program you can dedicate a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code></a> instead and do
+something similar using <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_reader" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_reader</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 
 <span class="n">ev</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
@@ -572,7 +572,7 @@ something similar using <a class="reference external" href="https://docs.python.
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Asynchronous operations</a><ul>
-<li><a class="reference internal" href="#with-async-connections"><code class="docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
+<li><a class="reference internal" href="#with-async-connections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
 <li><a class="reference internal" href="#interrupting-async-operations-using-ctrl-c">Interrupting async operations using Ctrl-C</a></li>
 <li><a class="reference internal" href="#server-messages">Server messages</a></li>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>

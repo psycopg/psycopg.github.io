@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -249,7 +249,7 @@
         </div>
         <article role="main">
           <section id="differences-from-psycopg2">
-<span id="from-psycopg2"></span><span id="index-0"></span><h1>Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this heading">#</a></h1>
+<span id="from-psycopg2"></span><span id="index-0"></span><h1>Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code><a class="headerlink" href="#differences-from-psycopg2" title="Permalink to this heading">#</a></h1>
 <p>Psycopg 3 uses the common DBAPI structure of many other database adapters and
 tries to behave as close as possible to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>. There are however a few
 differences to be aware of.</p>
@@ -390,7 +390,7 @@ result of the last statement is returned:</p>
 </div>
 <p>In Psycopg 3 instead, all the results are available. After running the query,
 the first result will be readily available in the cursor and can be consumed
-using the usual <code class="docutils literal notranslate"><span class="pre">fetch*()</span></code> methods. In order to access the following
+using the usual <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> methods. In order to access the following
 results, you can use the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.nextset()</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1; SELECT 2&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
@@ -441,7 +441,7 @@ array:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p>Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">ANY()</span></code> can be used with <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> too, and has the advantage of
+<p>Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">ANY()</span></code> can be used with <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> too, and has the advantage of
 accepting an empty list of values too as argument, which is not supported by
 the <code class="sql docutils literal notranslate"><span class="pre">IN</span></code> operator instead.</p>
 </section>
@@ -476,7 +476,7 @@ usage pattern also enables <code class="sql docutils literal notranslate"><span 
 </div>
 </section>
 <section id="with-connection">
-<span id="diff-with"></span><h2><code class="docutils literal notranslate"><span class="pre">with</span></code> connection<a class="headerlink" href="#with-connection" title="Permalink to this heading">#</a></h2>
+<span id="diff-with"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> connection<a class="headerlink" href="#with-connection" title="Permalink to this heading">#</a></h2>
 <p>In <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>, using the syntax <a class="reference external" href="https://www.psycopg.org/docs/usage.html#with" title="(in Psycopg v2.9)"><span class="xref std std-ref">with connection</span></a>,
 only the transaction is closed, not the connection. This behaviour is
 surprising for people used to several other Python classes wrapping resources,
@@ -493,18 +493,18 @@ instance to use nested transactions.</p>
 </div>
 </section>
 <section id="callproc-is-gone">
-<span id="diff-callproc"></span><h2><code class="docutils literal notranslate"><span class="pre">callproc()</span></code> is gone<a class="headerlink" href="#callproc-is-gone" title="Permalink to this heading">#</a></h2>
+<span id="diff-callproc"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">callproc()</span></code> is gone<a class="headerlink" href="#callproc-is-gone" title="Permalink to this heading">#</a></h2>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.callproc()</span></code> is not implemented. The method has a simplistic semantic
 which doesn’t account for PostgreSQL positional parameters, procedures,
 set-returning functions… Use a normal <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> with <code class="sql docutils literal notranslate"><span class="pre">SELECT</span>
 <span class="pre">function_name(...)</span></code> or <code class="sql docutils literal notranslate"><span class="pre">CALL</span> <span class="pre">procedure_name(...)</span></code> instead.</p>
 </section>
 <section id="client-encoding-is-gone">
-<span id="diff-client-encoding"></span><h2><code class="docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone<a class="headerlink" href="#client-encoding-is-gone" title="Permalink to this heading">#</a></h2>
+<span id="diff-client-encoding"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone<a class="headerlink" href="#client-encoding-is-gone" title="Permalink to this heading">#</a></h2>
 <p>Psycopg automatically uses the database client encoding to decode data to
 Unicode strings. Use <a class="reference internal" href="../api/objects.html#psycopg.ConnectionInfo.encoding" title="psycopg.ConnectionInfo.encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionInfo.encoding</span></code></a> if you need to read the
 encoding. You can select an encoding at connection time using the
-<code class="docutils literal notranslate"><span class="pre">client_encoding</span></code> connection parameter and you can change the encoding of a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code> connection parameter and you can change the encoding of a
 connection by running a <code class="sql docutils literal notranslate"><span class="pre">SET</span> <span class="pre">client_encoding</span></code> statement… But why would
 you?</p>
 </section>
@@ -512,8 +512,8 @@ you?</p>
 <span id="infinity-datetime"></span><h2>No default infinity dates handling<a class="headerlink" href="#no-default-infinity-dates-handling" title="Permalink to this heading">#</a></h2>
 <p>PostgreSQL can represent a much wider range of dates and timestamps than
 Python. While Python dates are limited to the years between 1 and 9999
-(represented by constants such as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.min" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.min</span></code></a> and
-<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></a>), PostgreSQL dates extend to BC dates and past the year
+(represented by constants such as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.min" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.min</span></code></a> and
+<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></a>), PostgreSQL dates extend to BC dates and past the year
 10K. Furthermore PostgreSQL can also represent symbolic dates “infinity”, in
 both directions.</p>
 <p>In psycopg2, by default, <a class="reference external" href="https://www.psycopg.org/docs/usage.html#infinite-dates-handling">infinity dates and timestamps map to ‘date.max’</a>
@@ -598,7 +598,7 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a><ul>
+<li><a class="reference internal" href="#">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a><ul>
 <li><a class="reference internal" href="#server-side-binding">Server-side binding</a></li>
 <li><a class="reference internal" href="#multiple-statements-in-the-same-query">Multiple statements in the same query</a></li>
 <li><a class="reference internal" href="#multiple-results-returned-from-multiple-statements">Multiple results returned from multiple statements</a></li>
@@ -606,9 +606,9 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
 <li><a class="reference internal" href="#you-cannot-use-in-s-with-a-tuple">You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple</a></li>
 <li><a class="reference internal" href="#different-adaptation-system">Different adaptation system</a></li>
 <li><a class="reference internal" href="#copy-is-no-longer-file-based">Copy is no longer file-based</a></li>
-<li><a class="reference internal" href="#with-connection"><code class="docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
-<li><a class="reference internal" href="#callproc-is-gone"><code class="docutils literal notranslate"><span class="pre">callproc()</span></code> is gone</a></li>
-<li><a class="reference internal" href="#client-encoding-is-gone"><code class="docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone</a></li>
+<li><a class="reference internal" href="#with-connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
+<li><a class="reference internal" href="#callproc-is-gone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">callproc()</span></code> is gone</a></li>
+<li><a class="reference internal" href="#client-encoding-is-gone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone</a></li>
 <li><a class="reference internal" href="#no-default-infinity-dates-handling">No default infinity dates handling</a></li>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-3">What’s new in Psycopg 3</a></li>
 </ul>

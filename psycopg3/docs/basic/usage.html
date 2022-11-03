@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -252,7 +252,7 @@
 <span id="module-usage"></span><h1>Basic module usage<a class="headerlink" href="#basic-module-usage" title="Permalink to this heading">#</a></h1>
 <p>The basic Psycopg usage is common to all the database adapters implementing
 the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API</a> protocol. Other database adapters, such as the builtin
-<a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#module-sqlite3" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlite3</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/module.html#module-psycopg2" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>, have roughly the same pattern of interaction.</p>
+<a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#module-sqlite3" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqlite3</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/module.html#module-psycopg2" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>, have roughly the same pattern of interaction.</p>
 <section id="main-objects-in-psycopg-3">
 <span id="usage"></span><span id="index-0"></span><h2>Main objects in Psycopg 3<a class="headerlink" href="#main-objects-in-psycopg-3" title="Permalink to this heading">#</a></h2>
 <p>Here is an interactive session showing some of the basic commands:</p>
@@ -298,7 +298,7 @@ relate to each other:</p>
 <ul class="simple">
 <li><p>The function <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> creates a new database session and
 returns a new <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> instance. <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
-creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
+creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
 <li><p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
 <ul>
 <li><p>create new <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
@@ -315,7 +315,7 @@ and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execu
 such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchmany" title="psycopg.Cursor.fetchmany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchmany()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>.</p></li>
 </ul>
 </li>
-<li><p>Using these objects as context managers (i.e. using <code class="docutils literal notranslate"><span class="pre">with</span></code>) will make sure
+<li><p>Using these objects as context managers (i.e. using <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code>) will make sure
 to close them and free their resources at the end of the block (notice that
 <a class="reference internal" href="from_pg2.html#diff-with"><span class="std std-ref">this is different from psycopg2</span></a>).</p></li>
 </ul>
@@ -400,7 +400,7 @@ equivalent of:</p>
 <p class="admonition-title">Note</p>
 <p>This behaviour is not what <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> does: in <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> <a class="reference external" href="https://www.psycopg.org/docs/usage.html#with" title="(in Psycopg v2.9)"><span class="xref std std-ref">there is
 no final close()</span></a> and the connection can be used in several
-<code class="docutils literal notranslate"><span class="pre">with</span></code> statements to manage different transactions. This behaviour has
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> statements to manage different transactions. This behaviour has
 been considered non-standard and surprising so it has been replaced by the
 more explicit <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a> block.</p>
 </div>
@@ -412,18 +412,18 @@ developer is free to use (and responsible for calling) <a class="reference inter
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>If a connection is just left to go out of scope, the way it will behave
-with or without the use of a <code class="docutils literal notranslate"><span class="pre">with</span></code> block is different:</p>
+with or without the use of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block is different:</p>
 <ul class="simple">
-<li><p>if the connection is used without a <code class="docutils literal notranslate"><span class="pre">with</span></code> block, the server will find
+<li><p>if the connection is used without a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block, the server will find
 a connection closed INTRANS and roll back the current transaction;</p></li>
-<li><p>if the connection is used with a <code class="docutils literal notranslate"><span class="pre">with</span></code> block, there will be an
+<li><p>if the connection is used with a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block, there will be an
 explicit COMMIT and the operations will be finalised.</p></li>
 </ul>
-<p>You should use a <code class="docutils literal notranslate"><span class="pre">with</span></code> block when your intention is just to execute a
+<p>You should use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block when your intention is just to execute a
 set of operations and then committing the result, which is the most usual
 thing to do with a connection. If your connection life cycle and
 transaction pattern is different, and want more control on it, the use
-without <code class="docutils literal notranslate"><span class="pre">with</span></code> might be more convenient.</p>
+without <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> might be more convenient.</p>
 <p>See <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transactions management</span></a> for more information.</p>
 </div>
 <p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
@@ -435,7 +435,7 @@ but be careful about its quirkiness: see <a class="reference internal" href="../
 the adapter. Psycopg can be customised in several ways, to allow the smoothest
 integration between your Python program and your PostgreSQL database:</p>
 <ul class="simple">
-<li><p>If your program is concurrent and based on <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> instead of on
+<li><p>If your program is concurrent and based on <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> instead of on
 threads/processes, you can use <a class="reference internal" href="../advanced/async.html#async"><span class="std std-ref">async connections and cursors</span></a>.</p></li>
 <li><p>If you want to customise the objects that the cursor returns, instead of
 receiving tuples, you can specify your <a class="reference internal" href="../advanced/rows.html#row-factories"><span class="std std-ref">row factories</span></a>.</p></li>

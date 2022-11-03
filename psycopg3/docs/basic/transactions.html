@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Transactions management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="copy.html">Using COPY TO and COPY FROM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="from_pg2.html">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -370,7 +370,7 @@ autocommit connection too, using an explicit <a class="reference internal" href=
 <section id="transaction-contexts">
 <span id="transaction-context"></span><h2>Transaction contexts<a class="headerlink" href="#transaction-contexts" title="Permalink to this heading">#</a></h2>
 <p>A more transparent way to make sure that transactions are finalised at the
-right time is to use <code class="docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
+right time is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> to create a
 transaction context. When the context is entered, a transaction is started;
 when leaving the context the transaction is committed, or it is rolled back if
 an exception is raised inside the block.</p>
@@ -438,7 +438,7 @@ what’s demanded by the DBAPI, the personal preference of several experienced
 developers is to:</p>
 <ul class="simple">
 <li><p>use a connection block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">psycopg.connect(...)</span> <span class="pre">as</span> <span class="pre">conn</span></code>;</p></li>
-<li><p>use an autocommit connection, either passing <code class="docutils literal notranslate"><span class="pre">autocommit=True</span></code> as
+<li><p>use an autocommit connection, either passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit=True</span></code> as
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> parameter or setting the attribute <code class="docutils literal notranslate"><span class="pre">conn.autocommit</span> <span class="pre">=</span>
 <span class="pre">True</span></code>;</p></li>
 <li><p>use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span> <span class="pre">conn.transaction()</span></code> blocks to manage transactions only where
@@ -469,7 +469,7 @@ number of operations successfully processed.</p>
 </div>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">unreliable_operation()</span></code> causes an error, including an operation causing a
 database error, all its changes will be reverted. The exception bubbles up
-outside the block: in the example it is intercepted by the <code class="docutils literal notranslate"><span class="pre">try</span></code> so that the
+outside the block: in the example it is intercepted by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">try</span></code> so that the
 loop can complete. The outermost block is unaffected (unless other errors
 happen there).</p>
 <p>You can also write code to explicitly roll back any currently active

@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../basic/pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/transactions.html">Transactions management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/copy.html">Using COPY TO and COPY FROM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/from_pg2.html">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -286,10 +286,10 @@ mode and about errors management and interaction with transactions.</p>
 <p>In order to understand better how the pipeline mode works, we should take a
 closer look at the <a class="reference external" href="https://www.postgresql.org/docs/current/protocol-flow.html">PostgreSQL client-server message flow</a>.</p>
 <p>During normal querying, each statement is transmitted by the client to the
-server as a stream of request messages, terminating with a <em>Sync</em> message to
+server as a stream of request messages, terminating with a <strong>Sync</strong> message to
 tell it that it should process the messages sent so far. The server will
 execute the statement and describe the results back as a stream of messages,
-terminating with a <em>ReadyForQuery</em>, telling the client that it may now send a
+terminating with a <strong>ReadyForQuery</strong>, telling the client that it may now send a
 new query.</p>
 <p>For example, the statement (returning no result):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
