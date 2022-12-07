@@ -92,7 +92,7 @@ pushes it into PostgreSQL is a very contrived operation, requiring to write
 a blocking file-like object;</li>
 <li>there is no support for <a class="reference external" href="https://github.com/psycopg/psycopg2/issues/428">asynchronous copy</a>.</li>
 </ul>
-<p><a class="reference external" href="/psycopg3/">psycopg3</a> addresses these shortcomings and makes it easy to write Python
+<p><a class="reference external" href="/psycopg3/">psycopg3</a> <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/copy.html#copy">addresses these shortcomings</a> and makes it easy to write Python
 programs producing data and pushing it efficiently to the database using the
 <tt class="docutils literal">COPY</tt> protocol.</p>
 <!-- CUT-HERE -->
@@ -115,7 +115,7 @@ and to pass</p>
 O'Reilly\t2020-11-15\n
 </pre>
 <p>to the server. The mechanism to do so is exposed to Python by a new context
-manager, returned by the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/cursor.html#psycopg3.Cursor.copy">Cursor.copy()</a> method, which enables to write:</p>
+manager, returned by the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.copy">Cursor.copy()</a> method, which enables to write:</p>
 <pre class="code python literal-block">
 <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
     <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">((</span><span class="s2">&quot;O'Reilly&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
@@ -154,7 +154,7 @@ source and writes it to the destination:</p>
     <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span>
 
 <span class="c1"># From the database to a file</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span>
 </pre>
 <p>This way of operating is not lost, but now the responsibility of moving data
@@ -166,7 +166,7 @@ from one stream to the other is left to the user's code:</p>
             <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">copy</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre>
