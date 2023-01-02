@@ -79,12 +79,12 @@
   
     <p>In many script I write, there are functions requiring database operations. Every time I need them, I try to write such code in functions like:</p>
 <pre class="code python literal-block">
-<span class="nd">&#64;with_connection</span>
-<span class="k">def</span> <span class="nf">do_some_job</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">))</span> <span class="c1"># or something else</span>
+<span class="nd">&#64;with_connection</span><span class="w">
+</span><span class="k">def</span> <span class="nf">do_some_job</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">))</span> <span class="c1"># or something else</span><span class="w">
 
-<span class="n">do_some_job</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">'hi'</span><span class="p">)</span>
+</span><span class="n">do_some_job</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">'hi'</span><span class="p">)</span>
 </pre>
 <!-- CUT-HERE -->
 <p>There are many benefits for this pattern:</p>
@@ -95,23 +95,23 @@
 </ul>
 <p>Implementation of such a decorator is straightforward, but because of the many possible variation it never made its way into a proper library. It goes something like:</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">with_connection</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">with_connection_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># or use a pool, or a factory function...</span>
-        <span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">rv</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">cnn</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
-            <span class="k">raise</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cnn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c1"># or maybe not</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">cnn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">with_connection</span><span class="p">(</span><span class="n">f</span><span class="p">):</span><span class="w">
+</span>    <span class="k">def</span> <span class="nf">with_connection_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span><span class="w">
+</span>        <span class="c1"># or use a pool, or a factory function...</span><span class="w">
+</span>        <span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span><span class="w">
+</span>        <span class="k">try</span><span class="p">:</span><span class="w">
+</span>            <span class="n">rv</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="w">
+</span>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span><span class="w">
+</span>            <span class="n">cnn</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span><span class="w">
+</span>            <span class="k">raise</span><span class="w">
+</span>        <span class="k">else</span><span class="p">:</span><span class="w">
+</span>            <span class="n">cnn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c1"># or maybe not</span><span class="w">
+</span>        <span class="k">finally</span><span class="p">:</span><span class="w">
+</span>            <span class="n">cnn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span><span class="w">
 
-        <span class="k">return</span> <span class="n">rv</span>
+</span>        <span class="k">return</span> <span class="n">rv</span><span class="w">
 
-    <span class="k">return</span> <span class="n">with_connection_</span>
+</span>    <span class="k">return</span> <span class="n">with_connection_</span>
 </pre>
 <p>There may be many variations: you may use use a connection pooler, you may want a read only or an autocommit connection... Best strategy I've found is just to keep one or a few decorator like this in the project I'm working at and use it for a consistent management of the database communications in the desired scope (the project, a package, a module...)</p>
 

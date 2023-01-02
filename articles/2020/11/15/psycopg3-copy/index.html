@@ -117,15 +117,15 @@ O'Reilly\t2020-11-15\n
 <p>to the server. The mechanism to do so is exposed to Python by a new context
 manager, returned by the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.copy">Cursor.copy()</a> method, which enables to write:</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">((</span><span class="s2">&quot;O'Reilly&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>    <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">((</span><span class="s2">&quot;O'Reilly&quot;</span><span class="p">,</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
 </pre>
 <p>Any list of tuples of values, or generator of sequences of values, can be used
 to push data into Postgres:</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_generator</span><span class="p">():</span>
-        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_generator</span><span class="p">():</span><span class="w">
+</span>        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre>
 <p>The copy operation is concluded as soon as the <tt class="docutils literal">with</tt> block is exited and,
 in case a Python exception is raised, the error is pushed to the server, which
@@ -135,9 +135,9 @@ will cancel the COPY operation in progress.</p>
 <p>The <tt class="docutils literal">Copy</tt> object is also able to write data in <a class="reference external" href="https://www.postgresql.org/docs/13/sql-copy.html#id-1.9.3.55.9.4">binary format</a>: at Python
 level this is entirely transparent:</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
-        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span><span class="w">
+</span>        <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre>
 <p>which might be more efficient than the textual format, but requires more care
 with the data types, as the server will not even perform an innocent
@@ -149,26 +149,26 @@ with the data types, as the server will not even perform an innocent
 file-like objects: behind the scenes it reads one block of data from the
 source and writes it to the destination:</p>
 <pre class="code python literal-block">
-<span class="c1"># From a file to the database</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span>
+<span class="c1"># From a file to the database</span><span class="w">
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span><span class="w">
 
-<span class="c1"># From the database to a file</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span>
+</span><span class="c1"># From the database to a file</span><span class="w">
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cursor2</span><span class="o">.</span><span class="n">copy_expert</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span>
 </pre>
 <p>This way of operating is not lost, but now the responsibility of moving data
 from one stream to the other is left to the user's code:</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">SIZE</span><span class="p">):</span>
-            <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.data&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">SIZE</span><span class="p">):</span><span class="w">
+</span>            <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w">
 
-<span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">copy</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span class="k">with</span> <span class="n">cursor3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable TO STDOUT&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.data&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="n">copy</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="w">
+</span>            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre>
 <p>While the new pattern is more verbose, it allows to produce and consume data
 with interfaces different than the file one, whereas previously it would have
@@ -182,14 +182,14 @@ asynchronous operations, it is now possible to combine it asynchronously with
 COPY using exactly the same pattern as the sync code, only sprinkling the
 magic words here and there:</p>
 <pre class="code python literal-block">
-<span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_async_generator</span><span class="p">():</span>
-        <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN (FORMAT BINARY)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>    <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">my_async_generator</span><span class="p">():</span><span class="w">
+</span>        <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">record</span><span class="p">)</span><span class="w">
 
-<span class="k">async</span> <span class="k">with</span> <span class="n">async_producer</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span>
-        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span class="k">async</span> <span class="k">with</span> <span class="n">async_producer</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>    <span class="k">async</span> <span class="k">with</span> <span class="n">cursor</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;COPY mytable FROM STDIN&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">copy</span><span class="p">:</span><span class="w">
+</span>        <span class="k">while</span> <span class="n">data</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="w">
+</span>            <span class="k">await</span> <span class="n">copy</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre>
 <p>which covers an important use case pretty much impossible to introduce in
 <tt class="docutils literal">psycopg2</tt>.</p>

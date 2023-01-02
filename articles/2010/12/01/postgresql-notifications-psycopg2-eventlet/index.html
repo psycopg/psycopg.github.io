@@ -92,43 +92,43 @@
 <p>This example shows how hook the notifications system into Eventlet: using it with a <a class="reference external" href="https://en.wikipedia.org/wiki/WebSockets">WebSocket</a> it is possible to send an event from the database to the application and up to a web browser, all in push mode! The example requires PostgreSQL 9.0 and Psycopg 2.3 as it uses notification payloads.</p>
 <p>This function handles a WebSocket connection in a green thread: it creates a <tt class="docutils literal">Queue</tt> and opens a database connection (calling the <tt class="docutils literal">dblisten()</tt> function), then blocks on the queue waiting to receive notifications: as soon as any is received, its payload is forwarded to the browser. This is obviously just an example: a database connection for every browser wouldn't scale very much...</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">eventlet</span>
-<span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">wsgi</span>
-<span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">websocket</span>
+<span class="kn">import</span> <span class="nn">eventlet</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">wsgi</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">websocket</span><span class="w">
 
-<span class="nd">&#64;websocket</span><span class="o">.</span><span class="n">WebSocketWSGI</span>
-<span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;
+</span><span class="nd">&#64;websocket</span><span class="o">.</span><span class="n">WebSocketWSGI</span><span class="w">
+</span><span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span><span class="w">
+    </span><span class="sd">&quot;&quot;&quot;
     Receive a connection and send it database notifications.
-    &quot;&quot;&quot;</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">eventlet</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
-    <span class="n">eventlet</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">dblisten</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="n">n</span>
-        <span class="n">ws</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+    &quot;&quot;&quot;</span><span class="w">
+</span>    <span class="n">q</span> <span class="o">=</span> <span class="n">eventlet</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span><span class="w">
+</span>    <span class="n">eventlet</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">dblisten</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span><span class="w">
+</span>    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span><span class="w">
+</span>        <span class="n">n</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="w">
+</span>        <span class="nb">print</span> <span class="n">n</span><span class="w">
+</span>        <span class="n">ws</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </pre>
 <p>When <tt class="docutils literal">handle()</tt> blocks on the queue the control of the program switches to a different green thread, allowing the rest of the program to keep on running even if single-threaded.</p>
 <p>The <tt class="docutils literal">dblisten</tt> function sets up the listening database connection:</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span>
-<span class="kn">from</span> <span class="nn">eventlet.hubs</span> <span class="kn">import</span> <span class="n">trampoline</span>
+<span class="kn">import</span> <span class="nn">psycopg2</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">eventlet.hubs</span> <span class="kn">import</span> <span class="n">trampoline</span><span class="w">
 
-<span class="k">def</span> <span class="nf">dblisten</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;
+</span><span class="k">def</span> <span class="nf">dblisten</span><span class="p">(</span><span class="n">q</span><span class="p">):</span><span class="w">
+    </span><span class="sd">&quot;&quot;&quot;
     Open a db connection and add notifications to *q*.
-    &quot;&quot;&quot;</span>
-    <span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span>
-    <span class="n">cnn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span><span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="p">)</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN data;&quot;</span><span class="p">)</span>
-    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">trampoline</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">cnn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
-        <span class="k">while</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    &quot;&quot;&quot;</span><span class="w">
+</span>    <span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span><span class="w">
+</span>    <span class="n">cnn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span><span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="p">)</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN data;&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span><span class="w">
+</span>        <span class="n">trampoline</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span>        <span class="n">cnn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span><span class="w">
+</span>        <span class="k">while</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="p">:</span><span class="w">
+</span>            <span class="n">n</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">notifies</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="w">
+</span>            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 </pre>
 <p>The connection is set in <a class="reference external" href="/docs/usage.html#transactions-control">autocommit mode</a>, otherwise the notification would be postponed until the end of the transaction. The <em>trampoline</em> is the Eventlet function that schedules a green thread switch: we ask it to return us the control when the file descriptor underlying the connection will have something to read. Once the system wakes up again we use <tt class="docutils literal">poll()</tt> to parse eventual notifications received, that will be added to the queue and thus passed to the client.</p>
 <p>The rest of the example is not shown here: it only consists in a static page and the web server setup. You can <a class="reference external" href="pushdemo.py">download the complete example</a>.</p>

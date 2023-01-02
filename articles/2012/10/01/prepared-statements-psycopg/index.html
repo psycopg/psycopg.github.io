@@ -81,36 +81,36 @@
 <!-- CUT-HERE -->
 <p>Whenever you have a loop where the same parametrized query or command is executed:</p>
 <pre class="code python literal-block">
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-        <span class="s2">&quot;select * from tables where i = </span><span class="si">%s</span><span class="s2"> and j = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
-        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="w">
+</span>        <span class="s2">&quot;select * from tables where i = </span><span class="si">%s</span><span class="s2"> and j = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre>
 <p>you can actually ask PostgreSQL to prepare the plan in advance and use it, saving time in the inner loop:</p>
 <pre class="code python literal-block">
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">&quot;prepare myplan as &quot;</span>
-    <span class="s2">&quot;select * from tables where i = $1 and j = $2&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;execute myplan (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
-        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;prepare myplan as &quot;</span><span class="w">
+</span>    <span class="s2">&quot;select * from tables where i = $1 and j = $2&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;execute myplan (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre>
 <p>The time saved could be relevant for complex queries which are fast to execute; for queries that instead take several seconds to complete, the planning time is probably negligible so there wouldn't be much to save. Note that the query passed to <tt class="docutils literal">PREPARE</tt> uses Postgres-style placeholders (<tt class="docutils literal">$1</tt>, <tt class="docutils literal">$2</tt>...) instead of the familiar Python-style <tt class="docutils literal">%s</tt> or <tt class="docutils literal">%(name)s</tt>.</p>
 <p>So is psycopg useless in this case? Is the burden of executing <tt class="docutils literal">PREPARE</tt> on the poor user? Well, it's actually easy to write a <a class="reference external" href="https://gist.github.com/3797445">cursor subclass implementing prepared statements</a>. The proposed <tt class="docutils literal">PreparingCursor</tt> doesn't <tt class="docutils literal">PREPARE</tt> each statement passed to <tt class="docutils literal">execute()</tt>: this would be harmful as it involves an extra roundtrip to the server and the plan for a prepared statements is sometimes less efficient than one calculated with the knowledge of the real parameters used. So the proposed class exposes an explicit <tt class="docutils literal">prepare()</tt> method: it takes a query (written with Python-style placeholders, so exactly the one you would have used with <tt class="docutils literal">execute()</tt>), replaces it with Postgres-style placeholders and <tt class="docutils literal">PREPARE</tt>s it. In further calls to <tt class="docutils literal">execute()</tt> the query can be omitted: in this case (or if the query is the one prepared) the prepared statement is executed instead.</p>
 <p>Using the <tt class="docutils literal">PreparingCursor</tt> the above example could be written as:</p>
 <pre class="code python literal-block">
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">cursor_factory</span><span class="o">=</span><span class="n">PreparingCursor</span><span class="p">)</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span>
-    <span class="s2">&quot;select * from tables where i = </span><span class="si">%s</span><span class="s2"> and j = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
-        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">cursor_factory</span><span class="o">=</span><span class="n">PreparingCursor</span><span class="p">)</span><span class="w">
+</span><span class="n">cur</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;select * from tables where i = </span><span class="si">%s</span><span class="s2"> and j = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">do_something_with</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre>
 <p>The preparing cursor also overrides <tt class="docutils literal">executemany()</tt>: in this case the query is always prepared as it is assumed that it will be executed more than once. Other extensions are a <tt class="docutils literal">prepared</tt> attribute, returning the prepared statement if any, and a <tt class="docutils literal">deallocate()</tt> method to release the prepared statement (which would be deleted anyway at the end of the session).</p>
 <p>The preparing cursor may find its way into a future psycopg2 release, but its design is not finalized yet and several details, both in the interface and the implementation, could be done in different ways. So please use it and give us feedback: we'll use it to design the optimal implementation for Psycopg!</p>

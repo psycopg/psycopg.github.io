@@ -98,16 +98,16 @@ Psycopg will manage the pipeline in a transparent way, even allowing the use of
 features which break the pipeline flow, for instance to fetch results, or to
 manage transactions:</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="w">
 
-    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span>
-        <span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="p">[</span><span class="n">rec</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
-    <span class="o">...</span>
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span><span class="w">
+</span>        <span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="p">[</span><span class="n">rec</span><span class="o">.</span><span class="n">id</span><span class="p">])</span><span class="w">
+</span>    <span class="o">...</span>
 </pre>
 <p>Quantifying the speedup is difficult, as it depends on the network conditions
 and on the pattern of statements executed. In particularly bad conditions (250
@@ -134,18 +134,18 @@ object, which makes psycopg2 programs easier to port. This cursor reproduces
 psycopg2's way of composing queries, which is not the most efficient, but for
 certain programs it is exactly what is needed.</p>
 <pre class="code python literal-block">
-<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>  <span class="c1"># this is a client-side binding cursor</span>
-    <span class="c1"># This statement doesn't support server-side parameters</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>  <span class="c1"># this is a client-side binding cursor</span><span class="w">
+</span>    <span class="c1"># This statement doesn't support server-side parameters</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
 </pre>
 <p>As a bonus, the client cursor reintroduces the handy and often requested
 <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.ClientCursor.mogrify">mogrify()</a>
 method, which returns the query merged with the parameters the way it is
 passed to the server:</p>
 <pre class="code python literal-block">
-<span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hell'o&quot;</span><span class="p">])</span>
-<span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT 'hell''o'&quot;</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hell'o&quot;</span><span class="p">])</span><span class="w">
+</span><span class="s2">&quot;ALTER TABLE x ALTER y SET DEFAULT 'hell''o'&quot;</span>
 </pre>
 </div>
 <div class="section" id="enum-adaptation">
@@ -163,41 +163,41 @@ enums:</p>
 =# CREATE TYPE numbers AS ENUM ('ONE', 'TWO', 'THREE');
 </pre>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">Numbers</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+<span class="k">class</span> <span class="nc">Numbers</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span><span class="w">
+</span>    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
+</span>    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
+</span>    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
 
-<span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;numbers&quot;</span><span class="p">)</span>
-<span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">Numbers</span><span class="p">)</span>
+</span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;numbers&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">Numbers</span><span class="p">)</span><span class="w">
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 'TWO'::numbers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="o">&lt;</span><span class="n">Numbers</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span>
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 'TWO'::numbers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">Numbers</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="w">
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Numbers</span><span class="o">.</span><span class="n">ONE</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s1">'numbers'</span>
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Numbers</span><span class="o">.</span><span class="n">ONE</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="s1">'numbers'</span>
 </pre>
 <p>The facility can also be customized in order to adapt enums when the mapping
 is not one-to-one:</p>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">NumbersPlus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
-    <span class="n">THREE_PLUS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># has some meaning in the program, but it is not stored</span>
+<span class="k">class</span> <span class="nc">NumbersPlus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span><span class="w">
+</span>    <span class="n">ONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
+</span>    <span class="n">TWO</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
+</span>    <span class="n">THREE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span><span class="w">
+</span>    <span class="n">THREE_PLUS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># has some meaning in the program, but it is not stored</span><span class="w">
 
-<span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="p">,</span>
-    <span class="c1"># - Items not mentioned map naturally</span>
-    <span class="c1"># - This order gives THREE priority over THREE_PLUS when loading from db.</span>
-    <span class="n">mapping</span><span class="o">=</span><span class="p">[(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">)])</span>
+</span><span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="p">,</span><span class="w">
+</span>    <span class="c1"># - Items not mentioned map naturally</span><span class="w">
+</span>    <span class="c1"># - This order gives THREE priority over THREE_PLUS when loading from db.</span><span class="w">
+</span>    <span class="n">mapping</span><span class="o">=</span><span class="p">[(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">)])</span><span class="w">
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span>
-    <span class="p">[[</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">ONE</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">]]</span>
-<span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s1">'{ONE,THREE}'</span>
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="p">[[</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">ONE</span><span class="p">,</span> <span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE_PLUS</span><span class="p">]]</span><span class="w">
+</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="s1">'{ONE,THREE}'</span><span class="w">
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '{TWO,THREE}'::numbers[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="p">[</span><span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '{TWO,THREE}'::numbers[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="p">[</span><span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">TWO</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">NumbersPlus</span><span class="o">.</span><span class="n">THREE</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
 </pre>
 </div>
 <div class="section" id="in-partnership-with-cockroachdb">

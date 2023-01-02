@@ -81,38 +81,38 @@
 <!-- CUT-HERE -->
 <p>Using psycopg in <a class="reference external" href="/docs/advanced.html#support-for-coroutine-libraries">green mode</a> moves the waiting from the libpq C code to Python: this gives Python some chance of interaction: it is possible for instance to catch a ctrl-c and send a cancel request:</p>
 <pre class="code python literal-block">
-<span class="kn">from</span> <span class="nn">select</span> <span class="kn">import</span> <span class="n">select</span>
-<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">POLL_OK</span><span class="p">,</span> <span class="n">POLL_READ</span><span class="p">,</span> <span class="n">POLL_WRITE</span>
+<span class="kn">from</span> <span class="nn">select</span> <span class="kn">import</span> <span class="n">select</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">POLL_OK</span><span class="p">,</span> <span class="n">POLL_READ</span><span class="p">,</span> <span class="n">POLL_WRITE</span><span class="w">
 
-<span class="k">def</span> <span class="nf">wait_select_inter</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
-    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_OK</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_READ</span><span class="p">:</span>
-                <span class="n">select</span><span class="p">([</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[],</span> <span class="p">[])</span>
-            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_WRITE</span><span class="p">:</span>
-                <span class="n">select</span><span class="p">([],</span> <span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">conn</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">(</span>
-                    <span class="s2">&quot;bad state from poll: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">state</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="n">conn</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-            <span class="c1"># the loop will be broken by a server error</span>
-            <span class="k">continue</span>
+</span><span class="k">def</span> <span class="nf">wait_select_inter</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span><span class="w">
+</span>    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span><span class="w">
+</span>        <span class="k">try</span><span class="p">:</span><span class="w">
+</span>            <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span><span class="w">
+</span>            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_OK</span><span class="p">:</span><span class="w">
+</span>                <span class="k">break</span><span class="w">
+</span>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_READ</span><span class="p">:</span><span class="w">
+</span>                <span class="n">select</span><span class="p">([</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[],</span> <span class="p">[])</span><span class="w">
+</span>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">POLL_WRITE</span><span class="p">:</span><span class="w">
+</span>                <span class="n">select</span><span class="p">([],</span> <span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span> <span class="p">[])</span><span class="w">
+</span>            <span class="k">else</span><span class="p">:</span><span class="w">
+</span>                <span class="k">raise</span> <span class="n">conn</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">(</span><span class="w">
+</span>                    <span class="s2">&quot;bad state from poll: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">state</span><span class="p">)</span><span class="w">
+</span>        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span><span class="w">
+</span>            <span class="n">conn</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span><span class="w">
+</span>            <span class="c1"># the loop will be broken by a server error</span><span class="w">
+</span>            <span class="k">continue</span><span class="w">
 
-<span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">set_wait_callback</span><span class="p">(</span><span class="n">wait_select_inter</span><span class="p">)</span>
+</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">set_wait_callback</span><span class="p">(</span><span class="n">wait_select_inter</span><span class="p">)</span>
 </pre>
 <p>An interactive session would look like:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(10)&quot;</span><span class="p">)</span>
-<span class="go">^C
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span><span class="w">
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(10)&quot;</span><span class="p">)</span><span class="w">
+</span><span class="go">^C
 </span><span class="gt">Traceback (most recent call last):
-</span>  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-<span class="gr">QueryCanceledError</span>: <span class="n">canceling statement due to user request</span>
+</span>  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span><span class="w">
+</span><span class="gr">QueryCanceledError</span>: <span class="n">canceling statement due to user request</span>
 </pre>
 <p>The connection is now in error state, but a <tt class="docutils literal">cnn.rollback()</tt> would make it working again.</p>
 

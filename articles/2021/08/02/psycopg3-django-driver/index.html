@@ -131,19 +131,19 @@ think that <tt class="docutils literal">text</tt> is the best PostgreSQL data ty
 to? I wish it was so simple. Below is an experiment with the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html">psycopg.pq</a> objects,
 the low level libpq wrapper that Psycopg 3 exposes:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.postgres</span> <span class="kn">import</span> <span class="n">types</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table testjson (id serial primary key, data jsonb)&quot;</span><span class="p">)</span>
-<span class="go"># &lt;psycopg.Cursor [COMMAND_OK] [INTRANS] (database=piro) at 0x7f92d43d7b80&gt;
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.postgres</span> <span class="kn">import</span> <span class="n">types</span><span class="w">
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table testjson (id serial primary key, data jsonb)&quot;</span><span class="p">)</span><span class="w">
+</span><span class="go"># &lt;psycopg.Cursor [COMMAND_OK] [INTRANS] (database=piro) at 0x7f92d43d7b80&gt;
 
 # Note: $1, $2... are the low level Postgres placeholders.
 # In a normal Psycopg query you would use classic '%s'.
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;insert into testjson (data) values ($1)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span>
-<span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92cec70a90&gt;
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span><span class="w">
+</span><span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;insert into testjson (data) values ($1)&quot;</span><span class="p">,</span><span class="w">
+</span><span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span><span class="w">
+</span><span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92cec70a90&gt;
 
-</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
-<span class="go"># ERROR:  column &quot;data&quot; is of type jsonb but expression is of type text
+</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span><span class="w">
+</span><span class="go"># ERROR:  column &quot;data&quot; is of type jsonb but expression is of type text
 # LINE 1: insert into testjson (data) values ($1)
 #                                             ^
 # HINT:  You will need to rewrite or cast the expression.</span>
@@ -156,15 +156,15 @@ literal</em>. <a class="reference external" href="https://www.postgresql.org/doc
 the parameter (see the <tt class="docutils literal">paramTypes[]</tt> description). But it seems this isn't
 always the case. For instance:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
-<span class="go"># ...becomes...
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92d43db4d0&gt;
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span><span class="w">
+</span><span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span><span class="w">
+</span><span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span><span class="w">
+</span><span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="w">
+</span><span class="go"># &lt;psycopg_c.pq.PGresult [FATAL_ERROR] at 0x7f92d43db4d0&gt;
 
-</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
-<span class="go"># ERROR:  could not determine data type of parameter $1</span>
+</span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span><span class="w">
+</span><span class="go"># ERROR:  could not determine data type of parameter $1</span>
 </pre>
 <p>This problem doesn't happen with every function: it seems to be only a problem
 with &quot;variadic&quot; functions, such as <tt class="docutils literal">concat()</tt> or <tt class="docutils literal">json_build_object()</tt>. As
@@ -180,15 +180,15 @@ merit and one might be easier to use than the other in different contexts.</p>
 your query, it is possible to disambiguate the type where &quot;unknown&quot; doesn't
 work:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
-<span class="go"># ...becomes...
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1::text, $2::text)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfb630&gt;
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span><span class="w">
+</span><span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span><span class="w">
+</span><span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1::text, $2::text)&quot;</span><span class="p">,</span><span class="w">
+</span><span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="w">
+</span><span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfb630&gt;
 
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="go"># b'foobar'</span>
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="w">
+</span><span class="go"># b'foobar'</span>
 </pre>
 <p>One place in Django where this was needed is <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-b6a6632418c964155865691be58c9f76717ef512ced704d461f41cc3612a1db3">in array comparisons</a>,
 because they follow stricter rules than the base type comparisons and may
@@ -197,15 +197,15 @@ require an explicit cast to work.</p>
 <li><p class="first">The other option is to use a different type than the Python <tt class="docutils literal">str</tt> and
 handle it using a different dumper.</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)])</span>
-<span class="go"># ...becomes...
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span>
-<span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfbbd0&gt;
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select concat(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)])</span><span class="w">
+</span><span class="go"># ...becomes...
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">exec_params</span><span class="p">(</span><span class="w">
+</span><span class="gp">... </span>    <span class="sa">b</span><span class="s2">&quot;select concat($1, $2)&quot;</span><span class="p">,</span><span class="w">
+</span><span class="gp">... </span>    <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">])</span><span class="w">
+</span><span class="go"># &lt;psycopg_c.pq.PGresult [TUPLES_OK] at 0x7f92cebfbbd0&gt;
 
-</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="go"># b'foobar'</span>
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="w">
+</span><span class="go"># b'foobar'</span>
 </pre>
 <p>This is <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-76917634c6c088f56f8dec9493294c657953e61b01e38e33b02d876d5e96dd3a">proposed in Django</a> and used, for instance, <a class="reference external" href="https://github.com/django/django/compare/stable/3.2.x...dvarrazzo:psycopg3-support#diff-444d9c5689a90ceeb46dc42d947ff042d67d5fa229e633734afbe1235604ec28">in the concat()
 case</a>.</p>
@@ -221,8 +221,8 @@ to apply the same conversion rules used for the vanilla strings.</p>
 <p>Argument binding on the server only works for queries that select and modify
 data, but it doesn't work in the Data Definition Language. For example:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
-<span class="go"># Traceback (most recent call last):
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span><span class="w">
+</span><span class="go"># Traceback (most recent call last):
 #     ...
 # psycopg.errors.UndefinedParameter: there is no parameter $1
 # LINE 1: create table test (id int default $1)
@@ -232,10 +232,10 @@ data, but it doesn't work in the Data Definition Language. For example:</p>
 explicitly generate a query client-side and send it to the server without
 parameters:</p>
 <pre class="code pycon literal-block">
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
-<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="w">
+</span><span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;create table test (id int default </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="w">
+</span><span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span><span class="w">
+</span><span class="gp">... </span><span class="p">)</span>
 </pre>
 <p>A similar module is <a class="reference external" href="https://www.psycopg.org/docs/sql.html">available in psycopg2 too</a> so it is easy to write code
 that works for both versions: it's just the <tt class="docutils literal">import</tt> statement that needs
@@ -263,8 +263,8 @@ query like:</p>
     FROM people
     GROUP BY left(name, </span><span class="si">%s</span><span class="s2">)
     ORDER BY left(name, </span><span class="si">%s</span><span class="s2">)
-    &quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    &quot;&quot;&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 </pre>
 <p>If composed by the client, this query presents no problem, because the server
 query parser can clearly see the same expression in the output column and in
@@ -287,8 +287,8 @@ named parameters instead of positional ones. I would personally write:</p>
     FROM people
     GROUP BY left(name, </span><span class="si">%(len)s</span><span class="s2">)
     ORDER BY left(name, </span><span class="si">%(len)s</span><span class="s2">)
-    &quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="p">{</span><span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+    &quot;&quot;&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="p">{</span><span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 </pre>
 <p>which is transformed in a query with a single <tt class="docutils literal">$1</tt> placeholder used three
 times, and parsed successfully. Unfortunately Django only uses positional
