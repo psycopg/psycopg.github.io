@@ -358,6 +358,10 @@ you can specify <code class="xref py py-obj docutils literal notranslate"><span 
 the cursor’s state and can be read using <a class="reference internal" href="#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a> and similar
 methods. Each input parameter will produce a separate result set: use
 <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> to read the results of the queries after the first one.</p>
+<p>The value of <a class="reference internal" href="#psycopg.Cursor.rowcount" title="psycopg.Cursor.rowcount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rowcount</span></code></a> is set to the cumulated number of rows
+affected by queries; except when using <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=True</span></code>, in which
+case it is set to the number of rows in the current result set (i.e.
+the first one, until <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> gets called).</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 <div class="versionchanged">
@@ -575,6 +579,8 @@ a successful command, such as <code class="docutils literal notranslate"><span c
 <dt class="sig sig-object py" id="psycopg.Cursor.rowcount">
 <span class="sig-name descname"><span class="pre">rowcount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#psycopg.Cursor.rowcount" title="Permalink to this definition">#</a></dt>
 <dd><p>Number of records affected by the precedent operation.</p>
+<p>From <a class="reference internal" href="#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>, unless called with <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=True</span></code>, this is
+the cumulated number of rows affected by executed commands.</p>
 </dd></dl>
 
 <dl class="py attribute">
