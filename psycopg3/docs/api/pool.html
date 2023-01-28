@@ -281,7 +281,7 @@ package, not to <a class="reference internal" href="module.html#module-psycopg" 
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code> class<a class="headerlink" href="#the-connectionpool-class" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">ConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.Connection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">ConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.Connection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size=4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_waiting=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lifetime=3600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_idle=600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_timeout=300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_failed=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers=3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool" title="Permalink to this definition">#</a></dt>
 <dd><p>This class implements a connection pool serving <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>
 instances (or subclasses). The constructor has <em>alot</em> of arguments, but
 only <code class="xref py py-obj docutils literal notranslate"><span class="pre">conninfo</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">min_size</span></code> are the fundamental ones, all the other
@@ -377,7 +377,7 @@ this parameter explicitly.</p>
 <span class="sig-name descname"><span class="pre">connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.connection" title="Permalink to this definition">#</a></dt>
 <dd><p>Context manager to obtain a connection from the pool.</p>
 <p>Return the connection immediately if available, otherwise wait up to
-<em>timeout</em> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.timeout</span></code> seconds and throw <a class="reference internal" href="#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a> if a
+<em>timeout</em> or <cite>self.timeout</cite> seconds and throw <cite>PoolTimeout</cite> if a
 connection is not available in time.</p>
 <p>Upon context exit, return the connection to the pool. Apply the normal
 <a class="reference internal" href="../basic/usage.html#with-connection"><span class="std std-ref">connection context behaviour</span></a> (commit/rollback
@@ -400,13 +400,13 @@ in working state, replace it with a new one.</p>
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.open">
 <span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.open" title="Permalink to this definition">#</a></dt>
 <dd><p>Open the pool by starting connecting and and accepting clients.</p>
-<p>If <em>wait</em> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, return immediately and let the background worker
-fill the pool if <a class="reference internal" href="#psycopg_pool.ConnectionPool.min_size" title="psycopg_pool.ConnectionPool.min_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_size</span></code></a> &gt; 0. Otherwise wait up to <em>timeout</em> seconds
-for the requested number of connections to be ready (see <a class="reference internal" href="#psycopg_pool.ConnectionPool.wait" title="psycopg_pool.ConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a> for
+<p>If <em>wait</em> is <cite>!False</cite>, return immediately and let the background worker
+fill the pool if <cite>min_size</cite> &gt; 0. Otherwise wait up to <em>timeout</em> seconds
+for the requested number of connections to be ready (see <cite>wait()</cite> for
 details).</p>
-<p>It is safe to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code> again on a pool already open (because the
+<p>It is safe to call <cite>!open()</cite> again on a pool already open (because the
 method was already called, or because the pool context was entered, or
-because the pool was initialized with <em>open</em> = <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) but you cannot
+because the pool was initialized with <em>open</em> = <cite>!True</cite>) but you cannot
 currently re-open a closed pool.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.1.</span></p>
@@ -418,7 +418,7 @@ currently re-open a closed pool.</p>
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.close" title="Permalink to this definition">#</a></dt>
 <dd><p>Close the pool and make it unavailable to new clients.</p>
 <p>All the waiting and future clients will fail to acquire a connection
-with a <a class="reference internal" href="#psycopg_pool.PoolClosed" title="psycopg_pool.PoolClosed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolClosed</span></code></a> exception. Currently used connections will not be
+with a <cite>PoolClosed</cite> exception. Currently used connections will not be
 closed until returned to the pool.</p>
 <p>Wait <em>timeout</em> seconds for threads to terminate their job, if positive.
 If the timeout expires the pool is closed anyway, although it may raise
@@ -437,8 +437,8 @@ be opened (if necessary) on entering the block and closed on exiting it:</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.wait">
 <span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.wait" title="Permalink to this definition">#</a></dt>
-<dd><p>Wait for the pool to be full (with <a class="reference internal" href="#psycopg_pool.ConnectionPool.min_size" title="psycopg_pool.ConnectionPool.min_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_size</span></code></a> connections) after creation.</p>
-<p>Close the pool, and raise <a class="reference internal" href="#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a>, if not ready within <em>timeout</em>
+<dd><p>Wait for the pool to be full (with <cite>min_size</cite> connections) after creation.</p>
+<p>Close the pool, and raise <cite>PoolTimeout</cite>, if not ready within <em>timeout</em>
 sec.</p>
 <p>Calling this method is not mandatory: you can try and use the pool
 immediately after its creation. The first client will be served as soon
@@ -462,7 +462,7 @@ set.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.max_size">
 <span class="sig-name descname"><span class="pre">max_size</span></span><a class="headerlink" href="#psycopg_pool.ConnectionPool.max_size" title="Permalink to this definition">#</a></dt>
-<dd><p>The current minimum and maximum size of the pool. Use <a class="reference internal" href="#psycopg_pool.ConnectionPool.resize" title="psycopg_pool.ConnectionPool.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize()</span></code></a> to
+<dd><p>The current minimum and maximum size of the pool. Use <cite>resize()</cite> to
 change them at runtime.</p>
 </dd></dl>
 
@@ -509,9 +509,9 @@ dispose of it and create a new one.</p>
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.getconn">
 <span class="sig-name descname"><span class="pre">getconn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.getconn" title="Permalink to this definition">#</a></dt>
 <dd><p>Obtain a connection from the pool.</p>
-<p>You should preferably use <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>. Use this function only if
+<p>You should preferably use <cite>connection()</cite>. Use this function only if
 it is not possible to use the connection as context manager.</p>
-<p>After using this function you <em>must</em> call a corresponding <a class="reference internal" href="#psycopg_pool.ConnectionPool.putconn" title="psycopg_pool.ConnectionPool.putconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">putconn()</span></code></a>:
+<p>After using this function you <em>must</em> call a corresponding <cite>putconn()</cite>:
 failing to do so will deplete the pool. A depleted pool is a sad pool:
 you don’t want a depleted pool.</p>
 <dl class="field-list simple">
@@ -525,8 +525,8 @@ you don’t want a depleted pool.</p>
 <dt class="sig sig-object py" id="psycopg_pool.ConnectionPool.putconn">
 <span class="sig-name descname"><span class="pre">putconn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.ConnectionPool.putconn" title="Permalink to this definition">#</a></dt>
 <dd><p>Return a connection to the loving hands of its pool.</p>
-<p>Use this function only paired with a <a class="reference internal" href="#psycopg_pool.ConnectionPool.getconn" title="psycopg_pool.ConnectionPool.getconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getconn()</span></code></a>. You don’t need to use
-it if you use the much more comfortable <a class="reference internal" href="#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> context manager.</p>
+<p>Use this function only paired with a <cite>getconn()</cite>. You don’t need to use
+it if you use the much more comfortable <cite>connection()</cite> context manager.</p>
 </dd></dl>
 
 </dd></dl>
@@ -538,42 +538,42 @@ it if you use the much more comfortable <a class="reference internal" href="#psy
 <dt class="sig sig-object py" id="psycopg_pool.PoolTimeout">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">PoolTimeout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pgconn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.PoolTimeout" title="Permalink to this definition">#</a></dt>
 <dd><p>The pool couldn’t provide a connection in acceptable time.</p>
-<p>Subclass of <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a></p>
+<p>Subclass of <cite>~psycopg.OperationalError</cite></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.PoolClosed">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">PoolClosed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pgconn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.PoolClosed" title="Permalink to this definition">#</a></dt>
 <dd><p>Attempt to get a connection from a closed pool.</p>
-<p>Subclass of <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a></p>
+<p>Subclass of <cite>~psycopg.OperationalError</cite></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.TooManyRequests">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">TooManyRequests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pgconn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.TooManyRequests" title="Permalink to this definition">#</a></dt>
 <dd><p>Too many requests in the queue waiting for a connection from the pool.</p>
-<p>Subclass of <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a></p>
+<p>Subclass of <cite>~psycopg.OperationalError</cite></p>
 </dd></dl>
 
 </section>
 <section id="the-asyncconnectionpool-class">
-<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code> class<a class="headerlink" href="#the-asyncconnectionpool-class" title="Permalink to this heading">#</a></h2>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code> has a very similar interface to the <a class="reference internal" href="#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>
-class but its blocking methods are implemented as <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> coroutines. It
-returns instances of <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>, or of its subclass if
-specified so in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code> parameter.</p>
-<p>Only the functions with different signature from <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code> are
+<h2>The <cite>!AsyncConnectionPool</cite> class<a class="headerlink" href="#the-asyncconnectionpool-class" title="Permalink to this heading">#</a></h2>
+<p><cite>!AsyncConnectionPool</cite> has a very similar interface to the <cite>ConnectionPool</cite>
+class but its blocking methods are implemented as <cite>!async</cite> coroutines. It
+returns instances of <cite>~psycopg.AsyncConnection</cite>, or of its subclass if
+specified so in the <cite>!connection_class</cite> parameter.</p>
+<p>Only the functions with different signature from <cite>!ConnectionPool</cite> are
 listed here.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.AsyncConnectionPool">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">AsyncConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.AsyncConnection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.AsyncConnectionPool" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">AsyncConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.AsyncConnection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size=4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_waiting=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lifetime=3600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_idle=600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_timeout=300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_failed=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers=3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.AsyncConnectionPool" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>connection_class</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code>, default: <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>) – The class of the connections to serve. It should
-be an <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> subclass.</p></li>
-<li><p><strong>configure</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">Callable[[AsyncConnection],</span> <span class="pre">None]</span></code>) – A callback to configure a connection after creation.</p></li>
-<li><p><strong>reset</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">Callable[[AsyncConnection],</span> <span class="pre">None]</span></code>) – A callback to reset a function after it has been returned to
+<li><p><strong>connection_class</strong> (<cite>!type</cite>, default: <cite>~psycopg.AsyncConnection</cite>) – The class of the connections to serve. It should
+be an <cite>!AsyncConnection</cite> subclass.</p></li>
+<li><p><strong>configure</strong> (<cite>async Callable[[AsyncConnection], None]</cite>) – A callback to configure a connection after creation.</p></li>
+<li><p><strong>reset</strong> (<cite>async Callable[[AsyncConnection], None]</cite>) – A callback to reset a function after it has been returned to
 the pool.</p></li>
 </ul>
 </dd>
@@ -614,7 +614,7 @@ exiting it:</p>
 </pre></div>
 </div>
 </div>
-<p>All the other constructor parameters are the same of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code>.</p>
+<p>All the other constructor parameters are the same of <cite>!ConnectionPool</cite>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg_pool.AsyncConnectionPool.wait">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.AsyncConnectionPool.wait" title="Permalink to this definition">#</a></dt>
@@ -653,23 +653,23 @@ exiting it:</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
-<p>The <a class="reference internal" href="#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a> is a <a class="reference internal" href="#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> subclass which doesn’t create
+<p>The <cite>NullConnectionPool</cite> is a <cite>ConnectionPool</cite> subclass which doesn’t create
 connections preemptively and doesn’t keep unused connections in its state. See
 <a class="reference internal" href="../advanced/pool.html#null-pool"><span class="std std-ref">Null connection pools</span></a> for further details.</p>
 <p>The interface of the object is entirely compatible with its parent class. Its
 behaviour is similar, with the following differences:</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.NullConnectionPool">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">NullConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.NullConnectionPool" title="Permalink to this definition">#</a></dt>
-<dd><p>All the other constructor parameters are the same as in <a class="reference internal" href="#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a>.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">NullConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.Connection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_waiting=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lifetime=3600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_idle=600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_timeout=300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_failed=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers=3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.NullConnectionPool" title="Permalink to this definition">#</a></dt>
+<dd><p>All the other constructor parameters are the same as in <cite>ConnectionPool</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>min_size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default: 0) – Always 0, cannot be changed.</p></li>
-<li><p><strong>max_size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default: None) – If None or 0, create a new connection at every request,
+<li><p><strong>min_size</strong> (<cite>!int</cite>, default: 0) – Always 0, cannot be changed.</p></li>
+<li><p><strong>max_size</strong> (<cite>!int</cite>, default: None) – If None or 0, create a new connection at every request,
 without a maximum. If greater than 0, don’t create more
-than <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_size</span></code> connections and queue the waiting clients.</p></li>
-<li><p><strong>reset</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable[[Connection],</span> <span class="pre">None]</span></code>) – It is only called when there are waiting clients in the
+than <cite>!max_size</cite> connections and queue the waiting clients.</p></li>
+<li><p><strong>reset</strong> (<cite>Callable[[Connection], None]</cite>) – It is only called when there are waiting clients in the
 queue, before giving them a connection already open. If no
 client is waiting, the connection is closed and discarded
 without a fuss.</p></li>
@@ -685,7 +685,7 @@ sitting around.</p></li>
 <p>Calling this function will verify that the connectivity with the
 database works as expected. However the connection will not be stored
 in the pool.</p>
-<p>Close the pool, and raise <a class="reference internal" href="#psycopg_pool.PoolTimeout" title="psycopg_pool.PoolTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolTimeout</span></code></a>, if not ready within <em>timeout</em>
+<p>Close the pool, and raise <cite>PoolTimeout</cite>, if not ready within <em>timeout</em>
 sec.</p>
 </dd></dl>
 
@@ -704,13 +704,13 @@ sec.</p>
 
 </dd></dl>
 
-<p>The <a class="reference internal" href="#psycopg_pool.AsyncNullConnectionPool" title="psycopg_pool.AsyncNullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncNullConnectionPool</span></code></a> is, similarly, an <a class="reference internal" href="#psycopg_pool.AsyncConnectionPool" title="psycopg_pool.AsyncConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a> subclass
-with the same behaviour of the <a class="reference internal" href="#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a>.</p>
+<p>The <cite>AsyncNullConnectionPool</cite> is, similarly, an <cite>AsyncConnectionPool</cite> subclass
+with the same behaviour of the <cite>NullConnectionPool</cite>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg_pool.AsyncNullConnectionPool">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">AsyncNullConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.AsyncNullConnectionPool" title="Permalink to this definition">#</a></dt>
-<dd><p>The interface is the same of its parent class <a class="reference internal" href="#psycopg_pool.AsyncConnectionPool" title="psycopg_pool.AsyncConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a>. The
-behaviour is different in the same way described for <a class="reference internal" href="#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a>.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg_pool.</span></span><span class="sig-name descname"><span class="pre">AsyncNullConnectionPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conninfo=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_class=&lt;class</span> <span class="pre">'psycopg.AsyncConnection'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configure=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_waiting=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lifetime=3600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_idle=600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_timeout=300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_failed=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers=3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg_pool.AsyncNullConnectionPool" title="Permalink to this definition">#</a></dt>
+<dd><p>The interface is the same of its parent class <cite>AsyncConnectionPool</cite>. The
+behaviour is different in the same way described for <cite>NullConnectionPool</cite>.</p>
 </dd></dl>
 
 </section>
@@ -798,7 +798,7 @@ behaviour is different in the same way described for <a class="reference interna
 <li><a class="reference internal" href="#psycopg_pool.TooManyRequests"><code class="docutils literal notranslate"><span class="pre">TooManyRequests</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-asyncconnectionpool-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code> class</a><ul>
+<li><a class="reference internal" href="#the-asyncconnectionpool-class">The <cite>!AsyncConnectionPool</cite> class</a><ul>
 <li><a class="reference internal" href="#psycopg_pool.AsyncConnectionPool"><code class="docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg_pool.AsyncConnectionPool.connection"><code class="docutils literal notranslate"><span class="pre">AsyncConnectionPool.connection()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg_pool.AsyncConnectionPool.open"><code class="docutils literal notranslate"><span class="pre">AsyncConnectionPool.open()</span></code></a></li>
