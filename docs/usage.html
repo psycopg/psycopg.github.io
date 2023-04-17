@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Basic module usage &#8212; Psycopg 2.9.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -17,9 +17,8 @@
       gtag('config', 'UA-19287248-2');
     </script>
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The psycopg2 module content" href="module.html" />
@@ -56,7 +55,7 @@
           <div class="body" role="main">
             
   <section id="basic-module-usage">
-<span id="usage"></span><h1>Basic module usage<a class="headerlink" href="#basic-module-usage" title="Permalink to this headline">¶</a></h1>
+<span id="usage"></span><h1>Basic module usage<a class="headerlink" href="#basic-module-usage" title="Permalink to this heading">¶</a></h1>
 <p id="index-0">The basic Psycopg usage is common to all the database adapters implementing
 the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB API 2.0</a> protocol. Here is an interactive session showing some of the
 basic commands:</p>
@@ -112,7 +111,7 @@ using methods such as <a class="reference internal" href="cursor.html#cursor.fet
 </li>
 </ul>
 <section id="passing-parameters-to-sql-queries">
-<span id="query-parameters"></span><span id="index-1"></span><h2>Passing parameters to SQL queries<a class="headerlink" href="#passing-parameters-to-sql-queries" title="Permalink to this headline">¶</a></h2>
+<span id="query-parameters"></span><span id="index-1"></span><h2>Passing parameters to SQL queries<a class="headerlink" href="#passing-parameters-to-sql-queries" title="Permalink to this heading">¶</a></h2>
 <p>Psycopg converts Python variables to SQL values using their types: the Python
 type determines the function used to convert the object into a string
 representation suitable for PostgreSQL.  Many standard Python types are
@@ -129,8 +128,8 @@ example the Python function call:</p>
 </pre></div>
 </div>
 <p>is converted into a SQL command similar to:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">some_table</span><span class="w"> </span><span class="p">(</span><span class="n">an_int</span><span class="p">,</span><span class="w"> </span><span class="n">a_date</span><span class="p">,</span><span class="w"> </span><span class="n">a_string</span><span class="p">)</span><span class="w"></span>
-<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;2005-11-18&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;O&#39;&#39;Reilly&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">some_table</span><span class="w"> </span><span class="p">(</span><span class="n">an_int</span><span class="p">,</span><span class="w"> </span><span class="n">a_date</span><span class="p">,</span><span class="w"> </span><span class="n">a_string</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;2005-11-18&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;O&#39;&#39;Reilly&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Named arguments are supported too using <code class="samp docutils literal notranslate"><span class="pre">%(</span><em><span class="pre">name</span></em><span class="pre">)s</span></code> placeholders in the
@@ -202,7 +201,7 @@ you can use the facilities provided by the <a class="reference internal" href="s
 </li>
 </ul>
 <section id="the-problem-with-the-query-parameters">
-<span id="sql-injection"></span><span id="index-2"></span><h3>The problem with the query parameters<a class="headerlink" href="#the-problem-with-the-query-parameters" title="Permalink to this headline">¶</a></h3>
+<span id="sql-injection"></span><span id="index-2"></span><h3>The problem with the query parameters<a class="headerlink" href="#the-problem-with-the-query-parameters" title="Permalink to this heading">¶</a></h3>
 <p>The SQL representation of many data types is often different from their Python
 string representation. The typical example is with single quotes in strings:
 in SQL single quotes are used as string literal delimiters, so the ones
@@ -244,7 +243,7 @@ argument of the <a class="reference internal" href="cursor.html#cursor.execute" 
 </div>
 </section>
 <section id="values-containing-backslashes-and-like">
-<h3>Values containing backslashes and LIKE<a class="headerlink" href="#values-containing-backslashes-and-like" title="Permalink to this headline">¶</a></h3>
+<h3>Values containing backslashes and LIKE<a class="headerlink" href="#values-containing-backslashes-and-like" title="Permalink to this heading">¶</a></h3>
 <p>Unlike in Python, the backslash (<code class="xref py py-obj docutils literal notranslate"><span class="pre">\</span></code>) is not used as an escape
 character <em>except</em> in patterns used with <code class="xref py py-obj docutils literal notranslate"><span class="pre">LIKE</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">ILIKE</span></code> where they
 are needed to escape the <code class="xref py py-obj docutils literal notranslate"><span class="pre">%</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_</span></code> characters.</p>
@@ -264,17 +263,12 @@ in your <code class="xref py py-obj docutils literal notranslate"><span class="p
 </section>
 </section>
 <section id="adaptation-of-python-values-to-sql-types">
-<span id="python-types-adaptation"></span><span id="index-3"></span><h2>Adaptation of Python values to SQL types<a class="headerlink" href="#adaptation-of-python-values-to-sql-types" title="Permalink to this headline">¶</a></h2>
+<span id="python-types-adaptation"></span><span id="index-3"></span><h2>Adaptation of Python values to SQL types<a class="headerlink" href="#adaptation-of-python-values-to-sql-types" title="Permalink to this heading">¶</a></h2>
 <p>Many standard Python types are adapted into SQL and returned as Python
 objects when a query is executed.</p>
 <p>The following table shows the default mapping between Python and PostgreSQL
 types:</p>
 <table class="data-types docutils align-default">
-<colgroup>
-<col style="width: 28%" />
-<col style="width: 35%" />
-<col style="width: 37%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Python</p></th>
 <th class="head"><p>PostgreSQL</p></th>
@@ -407,7 +401,7 @@ objects</p></td>
 <a class="reference internal" href="advanced.html#type-casting-from-sql-to-python"><span class="std std-ref">Type casting of SQL types into Python objects</span></a>.  You can also find a few other
 specialized adapters in the <a class="reference internal" href="extras.html#module-psycopg2.extras" title="psycopg2.extras"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras</span></code></a> module.</p>
 <section id="constants-adaptation">
-<span id="adapt-consts"></span><span id="index-4"></span><h3>Constants adaptation<a class="headerlink" href="#constants-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-consts"></span><span id="index-4"></span><h3>Constants adaptation<a class="headerlink" href="#constants-adaptation" title="Permalink to this heading">¶</a></h3>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> and boolean values <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> are converted into the
 proper SQL literals:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
@@ -416,7 +410,7 @@ proper SQL literals:</p>
 </div>
 </section>
 <section id="numbers-adaptation">
-<span id="adapt-numbers"></span><span id="index-5"></span><h3>Numbers adaptation<a class="headerlink" href="#numbers-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-numbers"></span><span id="index-5"></span><h3>Numbers adaptation<a class="headerlink" href="#numbers-adaptation" title="Permalink to this heading">¶</a></h3>
 <p>Python numeric objects <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">long</span></code>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> are
 converted into a PostgreSQL numerical representation:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="n">L</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;10.00&quot;</span><span class="p">)))</span>
@@ -439,7 +433,7 @@ This of course may imply a loss of precision.</p>
 </div>
 </section>
 <section id="strings-adaptation">
-<span id="adapt-string"></span><span id="index-6"></span><h3>Strings adaptation<a class="headerlink" href="#strings-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-string"></span><span id="index-6"></span><h3>Strings adaptation<a class="headerlink" href="#strings-adaptation" title="Permalink to this heading">¶</a></h3>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> are converted into the SQL string syntax.
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> objects (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> in Python 3) are encoded in the connection
 <a class="reference internal" href="connection.html#connection.encoding" title="connection.encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code></a> before sending to the backend: trying to send a
@@ -448,7 +442,7 @@ usually received as <code class="xref py py-obj docutils literal notranslate"><s
 on Python 2). However it is possible to receive <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> on Python 2 too:
 see <a class="reference internal" href="#unicode-handling"><span class="std std-ref">Unicode handling</span></a>.</p>
 <section id="unicode-handling">
-<span id="index-7"></span><span id="id6"></span><h4>Unicode handling<a class="headerlink" href="#unicode-handling" title="Permalink to this headline">¶</a></h4>
+<span id="index-7"></span><span id="id6"></span><h4>Unicode handling<a class="headerlink" href="#unicode-handling" title="Permalink to this heading">¶</a></h4>
 <p>Psycopg can exchange Unicode data with a PostgreSQL database.  Python
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">unicode</span></code> objects are automatically <em>encoded</em> in the client encoding
 defined on the database connection (the <a class="reference external" href="https://www.postgresql.org/docs/current/static/multibyte.html">PostgreSQL encoding</a>, available in
@@ -525,7 +519,7 @@ the data in the database is in mixed encoding. The
 </section>
 </section>
 <section id="binary-adaptation">
-<span id="adapt-binary"></span><span id="index-8"></span><h3>Binary adaptation<a class="headerlink" href="#binary-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-binary"></span><span id="index-8"></span><h3>Binary adaptation<a class="headerlink" href="#binary-adaptation" title="Permalink to this heading">¶</a></h3>
 <p>Python types representing binary objects are converted into PostgreSQL binary
 string syntax, suitable for <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> fields.   Such types are <code class="xref py py-obj docutils literal notranslate"><span class="pre">buffer</span></code>
 (only available in Python 2), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoryview</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytearray</span></code></a>, and <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a> (only in
@@ -563,7 +557,7 @@ server configuration file or in the client session (using a query such as
 </div>
 </section>
 <section id="date-time-objects-adaptation">
-<span id="adapt-date"></span><span id="index-9"></span><h3>Date/Time objects adaptation<a class="headerlink" href="#date-time-objects-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-date"></span><span id="index-9"></span><h3>Date/Time objects adaptation<a class="headerlink" href="#date-time-objects-adaptation" title="Permalink to this heading">¶</a></h3>
 <p>Python builtin <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>,  <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timedelta</span></code></a> are converted into PostgreSQL’s
 <code class="sql docutils literal notranslate"><span class="pre">timestamp[tz]</span></code>, <code class="sql docutils literal notranslate"><span class="pre">date</span></code>, <code class="sql docutils literal notranslate"><span class="pre">time[tz]</span></code>, <code class="sql docutils literal notranslate"><span class="pre">interval</span></code> data types.
@@ -586,7 +580,7 @@ Time zones are supported too.</p>
 <p><a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-datetime.html">PostgreSQL date/time types</a></p>
 </div>
 <section id="time-zones-handling">
-<span id="tz-handling"></span><span id="index-10"></span><h4>Time zones handling<a class="headerlink" href="#time-zones-handling" title="Permalink to this headline">¶</a></h4>
+<span id="tz-handling"></span><span id="index-10"></span><h4>Time zones handling<a class="headerlink" href="#time-zones-handling" title="Permalink to this heading">¶</a></h4>
 <p>The PostgreSQL type <code class="sql docutils literal notranslate"><span class="pre">timestamp</span> <span class="pre">with</span> <span class="pre">time</span> <span class="pre">zone</span></code> (a.k.a.
 <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code>) is converted into Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> objects.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TIME ZONE &#39;Europe/Rome&#39;&quot;</span><span class="p">)</span>  <span class="c1"># UTC + 1 hour</span>
@@ -625,7 +619,7 @@ timezones raised an error.</p>
 </div>
 </section>
 <section id="infinite-dates-handling">
-<span id="index-11"></span><span id="id12"></span><h4>Infinite dates handling<a class="headerlink" href="#infinite-dates-handling" title="Permalink to this headline">¶</a></h4>
+<span id="index-11"></span><span id="id12"></span><h4>Infinite dates handling<a class="headerlink" href="#infinite-dates-handling" title="Permalink to this heading">¶</a></h4>
 <p>PostgreSQL can store the representation of an “infinite” date, timestamp, or
 interval. Infinite dates are not available to Python, so these objects are
 mapped to <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.max</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">interval.max</span></code>. Unfortunately the
@@ -651,7 +645,7 @@ to map <code class="xref py py-obj docutils literal notranslate"><span class="pr
 database anymore: <code class="sql docutils literal notranslate"><span class="pre">infinity</span></code> will be stored instead.</p>
 </section>
 <section id="time-handling">
-<span id="id13"></span><h4>Time handling<a class="headerlink" href="#time-handling" title="Permalink to this headline">¶</a></h4>
+<span id="id13"></span><h4>Time handling<a class="headerlink" href="#time-handling" title="Permalink to this heading">¶</a></h4>
 <p>The PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">time</span></code> and Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> types are not
 fully bidirectional.</p>
 <p>Within PostgreSQL, the <code class="sql docutils literal notranslate"><span class="pre">time</span></code> type’s maximum value of <code class="docutils literal notranslate"><span class="pre">24:00:00</span></code> is
@@ -671,7 +665,7 @@ Retrieving a value of <code class="docutils literal notranslate"><span class="pr
 </section>
 </section>
 <section id="lists-adaptation">
-<span id="adapt-list"></span><h3>Lists adaptation<a class="headerlink" href="#lists-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-list"></span><h3>Lists adaptation<a class="headerlink" href="#lists-adaptation" title="Permalink to this heading">¶</a></h3>
 <p id="index-12">Python lists are converted into PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">ARRAY</span></code>s:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">;&quot;</span><span class="p">,</span> <span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">))</span>
 <span class="go">&#39;SELECT ARRAY[10,20,30];&#39;</span>
@@ -698,7 +692,7 @@ easily create a typecaster for <a class="reference internal" href="extensions.ht
 </div>
 </section>
 <section id="tuples-adaptation">
-<span id="adapt-tuple"></span><h3>Tuples adaptation<a class="headerlink" href="#tuples-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-tuple"></span><h3>Tuples adaptation<a class="headerlink" href="#tuples-adaptation" title="Permalink to this heading">¶</a></h3>
 <p id="index-13">Python tuples are converted into a syntax suitable for the SQL <code class="sql docutils literal notranslate"><span class="pre">IN</span></code>
 operator and to represent a composite type:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2"> IN </span><span class="si">%s</span><span class="s2">;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)))</span>
@@ -729,7 +723,7 @@ can thus be used to represent composite types.</p>
 </section>
 </section>
 <section id="transactions-control">
-<span id="index-14"></span><span id="id15"></span><h2>Transactions control<a class="headerlink" href="#transactions-control" title="Permalink to this headline">¶</a></h2>
+<span id="index-14"></span><span id="id15"></span><h2>Transactions control<a class="headerlink" href="#transactions-control" title="Permalink to this heading">¶</a></h2>
 <p>In Psycopg transactions are handled by the <a class="reference internal" href="connection.html#connection" title="connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> class. By
 default, the first time a command is sent to the database (using one of the
 <a class="reference internal" href="cursor.html#cursor" title="cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a>s created by the connection), a new transaction is created.
@@ -767,7 +761,7 @@ use an autocommit connection.</p>
 change the isolation level. See the <a class="reference internal" href="connection.html#connection.set_session" title="connection.set_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_session()</span></code></a> method for all
 the details.</p>
 <section id="with-statement">
-<span id="with"></span><span id="index-15"></span><h3><code class="docutils literal notranslate"><span class="pre">with</span></code> statement<a class="headerlink" href="#with-statement" title="Permalink to this headline">¶</a></h3>
+<span id="with"></span><span id="index-15"></span><h3><code class="docutils literal notranslate"><span class="pre">with</span></code> statement<a class="headerlink" href="#with-statement" title="Permalink to this heading">¶</a></h3>
 <p>Starting from version 2.5, psycopg2’s connections and cursors are <em>context
 managers</em> and can be used with the <code class="docutils literal notranslate"><span class="pre">with</span></code> statement:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -815,7 +809,7 @@ a certain point, you should still use a try-catch block:</p>
 </section>
 </section>
 <section id="server-side-cursors">
-<span id="index-16"></span><span id="id17"></span><h2>Server side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this headline">¶</a></h2>
+<span id="index-16"></span><span id="id17"></span><h2>Server side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this heading">¶</a></h2>
 <p>When a database query is executed, the Psycopg <a class="reference internal" href="cursor.html#cursor" title="cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a> usually fetches
 all the records returned by the backend, transferring them to the client
 process. If the query returned an huge amount of data, a proportionally large
@@ -859,12 +853,12 @@ lifetime extends well after <a class="reference internal" href="connection.html#
 in some other way than using the <code class="sql docutils literal notranslate"><span class="pre">DECLARE</span></code> executed by
 <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>. For example, you may have a PL/pgSQL function
 returning a cursor:</p>
-<div class="highlight-postgres notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">reffunc</span><span class="p">(</span><span class="n">refcursor</span><span class="p">)</span><span class="w"> </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">refcursor</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">$$</span><span class="w"></span>
-<span class="k">BEGIN</span><span class="w"></span>
-<span class="w">    </span><span class="k">OPEN</span><span class="w"> </span><span class="nv">$1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">test</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">RETURN</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span><span class="w"></span>
-<span class="k">END</span><span class="p">;</span><span class="w"></span>
-<span class="s">$$</span><span class="w"> </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-postgres notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">reffunc</span><span class="p">(</span><span class="n">refcursor</span><span class="p">)</span><span class="w"> </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">refcursor</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">$$</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">OPEN</span><span class="w"> </span><span class="nv">$1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">test</span><span class="p">;</span>
+<span class="w">    </span><span class="k">RETURN</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="k">END</span><span class="p">;</span>
+<span class="s">$$</span><span class="w"> </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>You can read the cursor content by calling the function with a regular,
@@ -883,7 +877,7 @@ non-named, Psycopg cursor:</p>
 </div>
 </section>
 <section id="thread-and-process-safety">
-<span id="thread-safety"></span><span id="index-17"></span><h2>Thread and process safety<a class="headerlink" href="#thread-and-process-safety" title="Permalink to this headline">¶</a></h2>
+<span id="thread-safety"></span><span id="index-17"></span><h2>Thread and process safety<a class="headerlink" href="#thread-and-process-safety" title="Permalink to this heading">¶</a></h2>
 <p>The Psycopg module and the <a class="reference internal" href="connection.html#connection" title="connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> objects are <em>thread-safe</em>: many
 threads can access the same database either using separate sessions and
 creating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> per thread or using the same
@@ -903,7 +897,7 @@ forking web deploy method such as FastCGI make sure to create the connections
 <a class="reference internal" href="advanced.html#green-support"><span class="std std-ref">Support for coroutine libraries</span></a> for further details.</p>
 </section>
 <section id="using-copy-to-and-copy-from">
-<span id="copy"></span><span id="index-18"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this headline">¶</a></h2>
+<span id="copy"></span><span id="index-18"></span><h2>Using COPY TO and COPY FROM<a class="headerlink" href="#using-copy-to-and-copy-from" title="Permalink to this heading">¶</a></h2>
 <p>Psycopg <a class="reference internal" href="cursor.html#cursor" title="cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a> objects provide an interface to the efficient
 PostgreSQL <a class="reference internal" href="#copy"><code class="sql docutils literal notranslate"><span class="pre">COPY</span></code></a> command to move data from files to tables and back.</p>
 <p>Currently no adaptation is provided between Python and PostgreSQL types on
@@ -927,7 +921,7 @@ features available in PostgreSQL.</p>
 examples.</p>
 </section>
 <section id="access-to-postgresql-large-objects">
-<span id="large-objects"></span><span id="index-19"></span><h2>Access to PostgreSQL large objects<a class="headerlink" href="#access-to-postgresql-large-objects" title="Permalink to this headline">¶</a></h2>
+<span id="large-objects"></span><span id="index-19"></span><h2>Access to PostgreSQL large objects<a class="headerlink" href="#access-to-postgresql-large-objects" title="Permalink to this heading">¶</a></h2>
 <p>PostgreSQL offers support for <a class="reference external" href="https://www.postgresql.org/docs/current/static/largeobjects.html">large objects</a>, which provide stream-style
 access to user data that is stored in a special large-object structure. They
 are useful with data values too large to be manipulated conveniently as a
@@ -954,7 +948,7 @@ several <code class="xref py py-obj docutils literal notranslate"><span class="p
 </div>
 </section>
 <section id="two-phase-commit-protocol-support">
-<span id="tpc"></span><span id="index-20"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this headline">¶</a></h2>
+<span id="tpc"></span><span id="index-20"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this heading">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.3.</span></p>
 </div>

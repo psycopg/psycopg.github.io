@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Frequently Asked Questions &#8212; Psycopg 2.9.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -17,9 +17,8 @@
       gtag('config', 'UA-19287248-2');
     </script>
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Release notes" href="news.html" />
@@ -56,12 +55,12 @@
           <div class="body" role="main">
             
   <section id="frequently-asked-questions">
-<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this heading">¶</a></h1>
 <p>Here are a few gotchas you may encounter using <a class="reference internal" href="module.html#module-psycopg2" title="psycopg2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a>.  Feel free to
 suggest new entries!</p>
 <section id="meta">
-<h2>Meta<a class="headerlink" href="#meta" title="Permalink to this headline">¶</a></h2>
-<dl class="faq simple" id="faq-question">
+<h2>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">¶</a></h2>
+<dl class="simple faq" id="faq-question">
 <dt>How do I ask a question?</dt><dd><ul class="simple">
 <li><p>Have you first checked if your question is answered already in the
 documentation?</p></li>
@@ -76,7 +75,7 @@ questions. You will only get piro grumpy.</p></li>
 </dl>
 </section>
 <section id="problems-with-transactions-handling">
-<span id="faq-transactions"></span><h2>Problems with transactions handling<a class="headerlink" href="#problems-with-transactions-handling" title="Permalink to this headline">¶</a></h2>
+<span id="faq-transactions"></span><h2>Problems with transactions handling<a class="headerlink" href="#problems-with-transactions-handling" title="Permalink to this heading">¶</a></h2>
 <dl class="faq" id="faq-idle-in-transaction">
 <dt>Why does <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> leave database sessions “idle in transaction”?</dt><dd><p>Psycopg normally starts a new transaction the first time a query is
 executed, e.g. calling <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.execute()</span></code></a>, even if the command is a
@@ -90,7 +89,7 @@ connection in <a class="reference internal" href="connection.html#connection.aut
 be started at the first command.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-transaction-aborted">
+<dl class="simple faq" id="faq-transaction-aborted">
 <dt>I receive the error <em>current transaction is aborted, commands ignored until end of transaction block</em> and can’t do anything else!</dt><dd><p>There was a problem <em>in the previous</em> command to the database, which
 resulted in an error.  The database will not recover automatically from
 this condition: you must run a <a class="reference internal" href="connection.html#connection.rollback" title="connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> before sending
@@ -98,7 +97,7 @@ new commands to the session (if this seems too harsh, remember that
 PostgreSQL supports nested transactions using the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-savepoint.html"><code class="sql docutils literal notranslate"><span class="pre">SAVEPOINT</span></code></a> command).</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-transaction-aborted-multiprocess">
+<dl class="simple faq" id="faq-transaction-aborted-multiprocess">
 <dt>Why do I get the error <em>current transaction is aborted, commands ignored until end of transaction block</em> when I use <code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code> (or any other forking system) and not when use <code class="xref py py-obj docutils literal notranslate"><span class="pre">threading</span></code>?</dt><dd><p>Psycopg’s connections can’t be shared across processes (but are thread
 safe).  If you are forking the Python process make sure to create a new
 connection in each forked child. See <a class="reference internal" href="usage.html#thread-safety"><span class="std std-ref">Thread and process safety</span></a> for further
@@ -107,8 +106,8 @@ informations.</p>
 </dl>
 </section>
 <section id="problems-with-type-conversions">
-<span id="faq-types"></span><h2>Problems with type conversions<a class="headerlink" href="#problems-with-type-conversions" title="Permalink to this headline">¶</a></h2>
-<dl class="faq simple" id="faq-cant-adapt">
+<span id="faq-types"></span><h2>Problems with type conversions<a class="headerlink" href="#problems-with-type-conversions" title="Permalink to this heading">¶</a></h2>
+<dl class="simple faq" id="faq-cant-adapt">
 <dt>Why does <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor.execute()</span></code> raise the exception <em>can’t adapt</em>?</dt><dd><p>Psycopg converts Python objects in a SQL string representation by looking
 at the object class.  The exception is raised when you are trying to pass
 as query parameter an object for which there is no adapter registered for
@@ -207,7 +206,7 @@ by the <a class="reference internal" href="sql.html#module-psycopg2.sql" title="
 </div>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-bytea-9-0">
+<dl class="simple faq" id="faq-bytea-9-0">
 <dt>Transferring binary data from PostgreSQL 9.0 doesn’t work.</dt><dd><p>PostgreSQL 9.0 uses by default <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-binary.html">the “hex” format</a> to transfer
 <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> data: the format can’t be parsed by the libpq 8.4 and
 earlier. The problem is solved in Psycopg 2.4.1, that uses its own parser
@@ -221,7 +220,7 @@ session before reading binary data;</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-array">
+<dl class="simple faq" id="faq-array">
 <dt>Arrays of <em>TYPE</em> are not casted to list.</dt><dd><p>Arrays are only casted to list when their oid is known, and an array
 typecaster is registered for them. If there is no typecaster, the array is
 returned unparsed from PostgreSQL (e.g. <code class="docutils literal notranslate"><span class="pre">{a,b,c}</span></code>). It is easy to create
@@ -231,8 +230,8 @@ provided in the <a class="reference internal" href="extensions.html#psycopg2.ext
 </dl>
 </section>
 <section id="best-practices">
-<span id="faq-best-practices"></span><h2>Best practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
-<dl class="faq simple" id="faq-reuse-cursors">
+<span id="faq-best-practices"></span><h2>Best practices<a class="headerlink" href="#best-practices" title="Permalink to this heading">¶</a></h2>
+<dl class="simple faq" id="faq-reuse-cursors">
 <dt>When should I save and re-use a cursor as opposed to creating a new one as needed?</dt><dd><p>Cursors are lightweight objects and creating lots of them should not pose
 any kind of problem. But note that cursors used to fetch result sets will
 cache the data and use memory in proportion to the result set size. Our
@@ -242,7 +241,7 @@ them.) The only exception are tight loops where one usually use the same
 cursor for a whole bunch of <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code>s or <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code>s.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-reuse-connections">
+<dl class="simple faq" id="faq-reuse-connections">
 <dt>When should I save and re-use a connection as opposed to creating a new one as needed?</dt><dd><p>Creating a connection can be slow (think of SSL over TCP) so the best
 practice is to create a single connection and keep it open as long as
 required. It is also good practice to rollback or commit frequently (even
@@ -251,7 +250,7 @@ left “idle in transaction”.  See also <a class="reference internal" href="po
 connection pooling.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-named-cursors">
+<dl class="simple faq" id="faq-named-cursors">
 <dt>What are the advantages or disadvantages of using named cursors?</dt><dd><p>The only disadvantages is that they use up resources on the server and
 that there is a little overhead because at least two queries (one to
 create the cursor and one to fetch the initial result set) are issued to
@@ -286,20 +285,20 @@ can handle a <kbd class="kbd compound docutils literal notranslate"><kbd class="
 </dl>
 </section>
 <section id="problems-compiling-and-installing-psycopg2">
-<span id="faq-compile"></span><h2>Problems compiling and installing psycopg2<a class="headerlink" href="#problems-compiling-and-installing-psycopg2" title="Permalink to this headline">¶</a></h2>
-<dl class="faq simple" id="faq-wheels">
+<span id="faq-compile"></span><h2>Problems compiling and installing psycopg2<a class="headerlink" href="#problems-compiling-and-installing-psycopg2" title="Permalink to this heading">¶</a></h2>
+<dl class="simple faq" id="faq-wheels">
 <dt>Psycopg 2.8 fails to install, Psycopg 2.7 was working fine.</dt><dd><p>With Psycopg 2.7 you were installing binary packages, but they have proven
 unreliable so now you have to install them explicitly using the
 <code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> package. See <a class="reference internal" href="install.html#binary-packages"><span class="std std-ref">Quick Install</span></a> for all the
 details.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-python-h">
+<dl class="simple faq" id="faq-python-h">
 <dt>I can’t compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>: the compiler says <em>error: Python.h: No such file or directory</em>. What am I missing?</dt><dd><p>You need to install a Python development package: it is usually called
 <code class="docutils literal notranslate"><span class="pre">python-dev</span></code> or <code class="docutils literal notranslate"><span class="pre">python3-dev</span></code> according to your Python version.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-libpq-fe-h">
+<dl class="simple faq" id="faq-libpq-fe-h">
 <dt>I can’t compile <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>: the compiler says <em>error: libpq-fe.h: No such file or directory</em>. What am I missing?</dt><dd><p>You need to install the development version of the libpq: the package is
 usually called <code class="docutils literal notranslate"><span class="pre">libpq-dev</span></code>.</p>
 </dd>
@@ -313,7 +312,7 @@ lo_truncate64</em> it means that Psycopg was built with large objects 64 bits
 API support (<em>i.e.</em> the libpq used at compile time was at least 9.3) but
 at runtime an older libpq dynamic library is found.</p>
 <p>You can use:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ldd /path/to/packages/psycopg2/_psycopg.so <span class="p">|</span> grep libpq
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ldd<span class="w"> </span>/path/to/packages/psycopg2/_psycopg.so<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>libpq
 </pre></div>
 </div>
 <p>to find what is the libpq dynamic library used at runtime.</p>
@@ -321,7 +320,7 @@ at runtime an older libpq dynamic library is found.</p>
 <strong class="program">pg_config</strong> at install time and the libpq at runtime.</p>
 </dd>
 </dl>
-<dl class="faq simple" id="faq-import-mod-wsgi">
+<dl class="simple faq" id="faq-import-mod-wsgi">
 <dt>Psycopg raises <em>ImportError: cannot import name tz</em> on import in mod_wsgi / ASP, but it works fine otherwise.</dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> is installed in an <a class="reference external" href="http://peak.telecommunity.com/DevCenter/PythonEggs">egg</a> (e.g. because installed by
 <strong class="program">easy_install</strong>), the user running the program may be unable to
 write in the <a class="reference external" href="https://stackoverflow.com/questions/2192323/what-is-the-python-egg-cache-python-egg-cache">eggs cache</a>. Set the env variable

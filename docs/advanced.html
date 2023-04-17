@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>More advanced topics &#8212; Psycopg 2.9.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -17,9 +17,8 @@
       gtag('config', 'UA-19287248-2');
     </script>
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="psycopg2.extensions – Extensions to the DB API" href="extensions.html" />
@@ -56,9 +55,9 @@
           <div class="body" role="main">
             
   <section id="more-advanced-topics">
-<h1>More advanced topics<a class="headerlink" href="#more-advanced-topics" title="Permalink to this headline">¶</a></h1>
+<h1>More advanced topics<a class="headerlink" href="#more-advanced-topics" title="Permalink to this heading">¶</a></h1>
 <section id="connection-and-cursor-factories">
-<span id="subclassing-cursor"></span><span id="subclassing-connection"></span><span id="index-0"></span><h2>Connection and cursor factories<a class="headerlink" href="#connection-and-cursor-factories" title="Permalink to this headline">¶</a></h2>
+<span id="subclassing-cursor"></span><span id="subclassing-connection"></span><span id="index-0"></span><h2>Connection and cursor factories<a class="headerlink" href="#connection-and-cursor-factories" title="Permalink to this heading">¶</a></h2>
 <p>Psycopg exposes two new-style classes that can be sub-classed and expanded to
 adapt them to the needs of the programmer: <a class="reference internal" href="extensions.html#psycopg2.extensions.cursor" title="psycopg2.extensions.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.cursor</span></code></a>
 and <a class="reference internal" href="extensions.html#psycopg2.extensions.connection" title="psycopg2.extensions.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.connection</span></code></a>.  The <a class="reference internal" href="connection.html#connection" title="connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> class is
@@ -98,9 +97,9 @@ of creating a new <code class="xref py py-obj docutils literal notranslate"><spa
 </div>
 </section>
 <section id="adapting-new-python-types-to-sql-syntax">
-<span id="adapting-new-types"></span><span id="index-2"></span><h2>Adapting new Python types to SQL syntax<a class="headerlink" href="#adapting-new-python-types-to-sql-syntax" title="Permalink to this headline">¶</a></h2>
+<span id="adapting-new-types"></span><span id="index-2"></span><h2>Adapting new Python types to SQL syntax<a class="headerlink" href="#adapting-new-python-types-to-sql-syntax" title="Permalink to this heading">¶</a></h2>
 <p>Any Python class or type can be adapted to an SQL string.  Adaptation mechanism
-is similar to the Object Adaptation proposed in the <span class="target" id="index-3"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0246"><strong>PEP 246</strong></a> and is exposed
+is similar to the Object Adaptation proposed in the <span class="target" id="index-3"></span><a class="pep reference external" href="https://peps.python.org/pep-0246/"><strong>PEP 246</strong></a> and is exposed
 by the <a class="reference internal" href="extensions.html#psycopg2.extensions.adapt" title="psycopg2.extensions.adapt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.adapt()</span></code></a> function.</p>
 <p>The <a class="reference internal" href="cursor.html#cursor.execute" title="cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method adapts its arguments to the
 <a class="reference internal" href="extensions.html#psycopg2.extensions.ISQLQuote" title="psycopg2.extensions.ISQLQuote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ISQLQuote</span></code></a> protocol.  Objects that conform to this
@@ -157,7 +156,7 @@ geometric type:</p>
 </div>
 </section>
 <section id="type-casting-of-sql-types-into-python-objects">
-<span id="type-casting-from-sql-to-python"></span><span id="index-5"></span><h2>Type casting of SQL types into Python objects<a class="headerlink" href="#type-casting-of-sql-types-into-python-objects" title="Permalink to this headline">¶</a></h2>
+<span id="type-casting-from-sql-to-python"></span><span id="index-5"></span><h2>Type casting of SQL types into Python objects<a class="headerlink" href="#type-casting-of-sql-types-into-python-objects" title="Permalink to this heading">¶</a></h2>
 <p>PostgreSQL objects read from the database can be adapted to Python objects
 through an user-defined adapting function.  An adapter function takes two
 arguments: the object string representation as returned by PostgreSQL and the
@@ -191,7 +190,7 @@ namespace for system objects is <code class="sql docutils literal notranslate"><
 <span class="gp">... </span><span class="s2">   SELECT pg_type.oid</span>
 <span class="gp">... </span><span class="s2">     FROM pg_type JOIN pg_namespace</span>
 <span class="gp">... </span><span class="s2">            ON typnamespace = pg_namespace.oid</span>
-<span class="gp">... </span><span class="s2">    WHERE typname = </span><span class="si">%(typename)s</span><span class="s2"></span>
+<span class="gp">... </span><span class="s2">    WHERE typname = </span><span class="si">%(typename)s</span>
 <span class="gp">... </span><span class="s2">      AND nspname = </span><span class="si">%(namespace)s</span><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="p">{</span><span class="s1">&#39;typename&#39;</span><span class="p">:</span> <span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="s1">&#39;pg_catalog&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">point_oid</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
@@ -220,7 +219,7 @@ read:</p>
 PostgreSQL array into a Python list.</p>
 </section>
 <section id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this headline">¶</a></h2>
+<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">¶</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form of
@@ -286,7 +285,7 @@ example would be to use a <a class="reference external" href="https://docs.pytho
 </div>
 </section>
 <section id="asynchronous-support">
-<span id="async-support"></span><span id="index-7"></span><h2>Asynchronous support<a class="headerlink" href="#asynchronous-support" title="Permalink to this headline">¶</a></h2>
+<span id="async-support"></span><span id="index-7"></span><h2>Asynchronous support<a class="headerlink" href="#asynchronous-support" title="Permalink to this heading">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>
 </div>
@@ -362,7 +361,7 @@ objects</span></a>, <a class="reference internal" href="usage.html#server-side-c
 this will be probably implemented in a future release.</p>
 </section>
 <section id="support-for-coroutine-libraries">
-<span id="green-support"></span><span id="index-8"></span><h2>Support for coroutine libraries<a class="headerlink" href="#support-for-coroutine-libraries" title="Permalink to this headline">¶</a></h2>
+<span id="green-support"></span><span id="index-8"></span><h2>Support for coroutine libraries<a class="headerlink" href="#support-for-coroutine-libraries" title="Permalink to this heading">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>
 </div>
@@ -426,7 +425,7 @@ not compatible with asynchronous connections.</p>
 </div>
 </section>
 <section id="replication-protocol-support">
-<span id="replication-support"></span><span id="index-9"></span><h2>Replication protocol support<a class="headerlink" href="#replication-protocol-support" title="Permalink to this headline">¶</a></h2>
+<span id="replication-support"></span><span id="index-9"></span><h2>Replication protocol support<a class="headerlink" href="#replication-protocol-support" title="Permalink to this heading">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.7.</span></p>
 </div>
@@ -443,7 +442,7 @@ The replication protocol can be operated on both synchronous and
 </ul>
 </div>
 <section id="logical-replication-quick-start">
-<h3>Logical replication Quick-Start<a class="headerlink" href="#logical-replication-quick-start" title="Permalink to this headline">¶</a></h3>
+<h3>Logical replication Quick-Start<a class="headerlink" href="#logical-replication-quick-start" title="Permalink to this heading">¶</a></h3>
 <p>You must be using PostgreSQL server version 9.4 or above to run this quick
 start.</p>
 <p>Make sure that replication connections are permitted for user <code class="docutils literal notranslate"><span class="pre">postgres</span></code> in

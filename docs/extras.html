@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>psycopg2.extras – Miscellaneous goodies for Psycopg 2 &#8212; Psycopg 2.9.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -17,9 +17,8 @@
       gtag('config', 'UA-19287248-2');
     </script>
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="psycopg2.errors – Exception classes mapping PostgreSQL errors" href="errors.html" />
@@ -56,11 +55,11 @@
           <div class="body" role="main">
             
   <section id="module-psycopg2.extras">
-<span id="psycopg2-extras-miscellaneous-goodies-for-psycopg-2"></span><h1><a class="reference internal" href="#module-psycopg2.extras" title="psycopg2.extras"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras</span></code></a> – Miscellaneous goodies for Psycopg 2<a class="headerlink" href="#module-psycopg2.extras" title="Permalink to this headline">¶</a></h1>
+<span id="psycopg2-extras-miscellaneous-goodies-for-psycopg-2"></span><h1><a class="reference internal" href="#module-psycopg2.extras" title="psycopg2.extras"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras</span></code></a> – Miscellaneous goodies for Psycopg 2<a class="headerlink" href="#module-psycopg2.extras" title="Permalink to this heading">¶</a></h1>
 <p>This module is a generic place used to hold little helper functions and
 classes until a better place in the distribution is found.</p>
 <section id="connection-and-cursor-subclasses">
-<span id="cursor-subclasses"></span><h2>Connection and cursor subclasses<a class="headerlink" href="#connection-and-cursor-subclasses" title="Permalink to this headline">¶</a></h2>
+<span id="cursor-subclasses"></span><h2>Connection and cursor subclasses<a class="headerlink" href="#connection-and-cursor-subclasses" title="Permalink to this heading">¶</a></h2>
 <p>A few objects that change the way the results are returned by the cursor or
 modify the object behavior in some other way. Typically <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code> subclasses
 are passed as <em>cursor_factory</em> argument to <a class="reference internal" href="module.html#psycopg2.connect" title="psycopg2.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> so that the
@@ -70,7 +69,7 @@ as the <em>cursor_factory</em> argument to the <code class="xref py py-obj docut
 <p>If you want to use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> subclass you can pass it as the
 <em>connection_factory</em> argument of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> function.</p>
 <section id="dictionary-like-cursor">
-<span id="dict-cursor"></span><span id="index-0"></span><h3>Dictionary-like cursor<a class="headerlink" href="#dictionary-like-cursor" title="Permalink to this headline">¶</a></h3>
+<span id="dict-cursor"></span><span id="index-0"></span><h3>Dictionary-like cursor<a class="headerlink" href="#dictionary-like-cursor" title="Permalink to this heading">¶</a></h3>
 <p>The dict cursors allow to access to the attributes of retrieved records
 using an interface similar to the Python dictionaries instead of the tuples.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">cursor_factory</span><span class="o">=</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">DictCursor</span><span class="p">)</span>
@@ -115,7 +114,7 @@ using an interface similar to the Python dictionaries instead of the tuples.</p>
 
 </section>
 <section id="real-dictionary-cursor">
-<h3>Real dictionary cursor<a class="headerlink" href="#real-dictionary-cursor" title="Permalink to this headline">¶</a></h3>
+<h3>Real dictionary cursor<a class="headerlink" href="#real-dictionary-cursor" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg2.extras.RealDictCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">RealDictCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.RealDictCursor" title="Permalink to this definition">¶</a></dt>
@@ -145,7 +144,7 @@ the generic <a class="reference internal" href="#psycopg2.extras.DictCursor" tit
 
 </section>
 <section id="namedtuple-cursor">
-<span id="index-1"></span><h3><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor<a class="headerlink" href="#namedtuple-cursor" title="Permalink to this headline">¶</a></h3>
+<span id="index-1"></span><h3><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor<a class="headerlink" href="#namedtuple-cursor" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.3.</span></p>
 </div>
@@ -181,7 +180,7 @@ attributes.</p>
 
 </section>
 <section id="logging-cursor">
-<span id="index-2"></span><h3>Logging cursor<a class="headerlink" href="#logging-cursor" title="Permalink to this headline">¶</a></h3>
+<span id="index-2"></span><h3>Logging cursor<a class="headerlink" href="#logging-cursor" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg2.extras.LoggingConnection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">LoggingConnection</span></span><a class="headerlink" href="#psycopg2.extras.LoggingConnection" title="Permalink to this definition">¶</a></dt>
@@ -253,7 +252,7 @@ instance from the standard logging module.</p>
 </section>
 </section>
 <section id="replication-support-objects">
-<span id="replication-objects"></span><h2>Replication support objects<a class="headerlink" href="#replication-support-objects" title="Permalink to this headline">¶</a></h2>
+<span id="replication-objects"></span><h2>Replication support objects<a class="headerlink" href="#replication-support-objects" title="Permalink to this heading">¶</a></h2>
 <p>See <a class="reference internal" href="advanced.html#replication-support"><span class="std std-ref">Replication protocol support</span></a> for an introduction to the topic.</p>
 <p>The following replication types are defined:</p>
 <dl class="py data">
@@ -353,7 +352,7 @@ when the message was sent.</p>
 <span class="sig-name descname"><span class="pre">create_replication_slot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_plugin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.create_replication_slot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create streaming replication slot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>slot_name</strong> – name of the replication slot to be created</p></li>
 <li><p><strong>slot_type</strong> – type of replication: should be either
@@ -389,7 +388,7 @@ version 9.4.</p>
 <span class="sig-name descname"><span class="pre">drop_replication_slot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.drop_replication_slot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Drop streaming replication slot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>slot_name</strong> – name of the replication slot to drop</p>
 </dd>
 </dl>
@@ -407,7 +406,7 @@ version 9.4.</p>
 <span class="sig-name descname"><span class="pre">start_replication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_lsn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.start_replication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start replication on the connection.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>slot_name</strong> – name of the replication slot to use; required for
 logical replication, physical replication can work
@@ -480,7 +479,7 @@ server messages use <a class="reference internal" href="#psycopg2.extras.Replica
 <dd><p>Start replication on the connection using provided
 <a class="reference external" href="https://www.postgresql.org/docs/current/static/protocol-replication.html"><code class="sql docutils literal notranslate"><span class="pre">START_REPLICATION</span></code></a> command.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>command</strong> – The full replication command. It can be a string or a
 <a class="reference internal" href="sql.html#psycopg2.sql.Composable" title="psycopg2.sql.Composable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code></a> instance for dynamic generation.</p></li>
@@ -499,7 +498,7 @@ performed on messages received from the server.</p></li>
 <dt class="sig sig-object py" id="psycopg2.extras.ReplicationCursor.consume_stream">
 <span class="sig-name descname"><span class="pre">consume_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepalive_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.consume_stream" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>consume</strong> – a callable object with signature <code class="samp docutils literal notranslate"><span class="pre">consume(</span><em><span class="pre">msg</span></em><span class="pre">)</span></code></p></li>
 <li><p><strong>keepalive_interval</strong> – interval (in seconds) to send keepalive
@@ -561,7 +560,7 @@ changes via all of the currently open replication slots.</p>
 <dt class="sig sig-object py" id="psycopg2.extras.ReplicationCursor.send_feedback">
 <span class="sig-name descname"><span class="pre">send_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">write_lsn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flush_lsn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_lsn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.ReplicationCursor.send_feedback" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>write_lsn</strong> – a LSN position up to which the client has written the data locally</p></li>
 <li><p><strong>flush_lsn</strong> – a LSN position up to which the client has processed the
@@ -696,9 +695,9 @@ error.</p>
 
 </section>
 <section id="additional-data-types">
-<span id="index-7"></span><h2>Additional data types<a class="headerlink" href="#additional-data-types" title="Permalink to this headline">¶</a></h2>
+<span id="index-7"></span><h2>Additional data types<a class="headerlink" href="#additional-data-types" title="Permalink to this heading">¶</a></h2>
 <section id="json-adaptation">
-<span id="adapt-json"></span><span id="index-8"></span><h3><a class="reference external" href="https://www.json.org/">JSON</a> adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-json"></span><span id="index-8"></span><h3><a class="reference external" href="https://www.json.org/">JSON</a> adaptation<a class="headerlink" href="#json-adaptation" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.5.</span></p>
 </div>
@@ -805,7 +804,7 @@ customized JSON wrapper.</p>
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create and register typecasters converting <code class="sql docutils literal notranslate"><span class="pre">json</span></code> type to Python objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>conn_or_curs</strong> – a connection or cursor used to find the <code class="sql docutils literal notranslate"><span class="pre">json</span></code>
 and <code class="sql docutils literal notranslate"><span class="pre">json[]</span></code> oids; the typecasters are registered in a scope
@@ -858,7 +857,7 @@ meaning of <a class="reference internal" href="#psycopg2.extras.register_json" t
 
 </section>
 <section id="hstore-data-type">
-<span id="adapt-hstore"></span><span id="index-9"></span><h3>Hstore data type<a class="headerlink" href="#hstore-data-type" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-hstore"></span><span id="index-9"></span><h3>Hstore data type<a class="headerlink" href="#hstore-data-type" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.3.</span></p>
 </div>
@@ -878,7 +877,7 @@ can be enabled using the <a class="reference internal" href="#psycopg2.extras.re
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_hstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_oid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_hstore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register adapter and typecaster for <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>-<code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> conversions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>conn_or_curs</strong> – a connection or cursor: the typecaster will be
 registered only on this object unless <em>globally</em> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></p></li>
@@ -918,7 +917,7 @@ schema.</p>
 
 </section>
 <section id="composite-types-casting">
-<span id="adapt-composite"></span><span id="index-10"></span><h3>Composite types casting<a class="headerlink" href="#composite-types-casting" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-composite"></span><span id="index-10"></span><h3>Composite types casting<a class="headerlink" href="#composite-types-casting" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.4.</span></p>
 </div>
@@ -972,7 +971,7 @@ into a Python dictionary you can use:</p>
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_composite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_composite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a typecaster to convert a composite type into a tuple.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – the name of a PostgreSQL composite type, e.g. created using
 the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> command</p></li>
@@ -985,7 +984,7 @@ object, unless <em>globally</em> is set to <code class="xref py py-obj docutils 
 it to <a class="reference internal" href="#custom-composite"><span class="std std-ref">customize how to cast composite types</span></a></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the registered <a class="reference internal" href="#psycopg2.extras.CompositeCaster" title="psycopg2.extras.CompositeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeCaster</span></code></a> or <em>factory</em> instance
 responsible for the conversion</p>
 </dd>
@@ -1070,7 +1069,7 @@ components. Otherwise it is just the <code class="xref py py-obj docutils litera
 
 </section>
 <section id="range-data-types">
-<span id="adapt-range"></span><span id="index-11"></span><h3>Range data types<a class="headerlink" href="#range-data-types" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-range"></span><span id="index-11"></span><h3>Range data types<a class="headerlink" href="#range-data-types" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.5.</span></p>
 </div>
@@ -1082,7 +1081,7 @@ user-defined <code class="sql docutils literal notranslate"><span class="pre">ra
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">Range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'[)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.Range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Python representation for a PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/rangetypes.html"><code class="sql docutils literal notranslate"><span class="pre">range</span></code></a> type.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lower</strong> – lower bound for the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> means unbound</p></li>
 <li><p><strong>upper</strong> – upper bound for the range. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> means unbound</p></li>
@@ -1205,7 +1204,7 @@ adapted to a custom <a class="reference internal" href="#psycopg2.extras.Range" 
 <dd><p>Create and register an adapter and the typecasters to convert between
 a PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/static/rangetypes.html"><code class="sql docutils literal notranslate"><span class="pre">range</span></code></a> type and a PostgreSQL <a class="reference internal" href="#psycopg2.extras.Range" title="psycopg2.extras.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> subclass.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pgrange</strong> – the name of the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">range</span></code> type. Can be
 schema-qualified</p></li>
@@ -1218,7 +1217,7 @@ to this object, unless <em>globally</em> is set to <code class="xref py py-obj d
 <em>conn_or_curs</em>, otherwise register it globally</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#psycopg2.extras.RangeCaster" title="psycopg2.extras.RangeCaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeCaster</span></code></a> instance responsible for the conversion</p>
 </dd>
 </dl>
@@ -1268,7 +1267,7 @@ this case the oids must be provided.</p>
 
 </section>
 <section id="uuid-data-type">
-<span id="adapt-uuid"></span><span id="index-12"></span><h3>UUID data type<a class="headerlink" href="#uuid-data-type" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-uuid"></span><span id="index-12"></span><h3>UUID data type<a class="headerlink" href="#uuid-data-type" title="Permalink to this heading">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.0.9.</span></p>
 </div>
@@ -1295,7 +1294,7 @@ this case the oids must be provided.</p>
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_uuid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the UUID type and an uuid.UUID adapter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>oids</strong> – oid for the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">uuid</span></code> type, or 2-items sequence
 with oids of the type and the array. If not specified, use PostgreSQL
@@ -1315,7 +1314,7 @@ register it globally.</p></li>
 
 </section>
 <section id="networking-data-types">
-<span id="adapt-network"></span><span id="index-13"></span><h3>Networking data types<a class="headerlink" href="#networking-data-types" title="Permalink to this headline">¶</a></h3>
+<span id="adapt-network"></span><span id="index-13"></span><h3>Networking data types<a class="headerlink" href="#networking-data-types" title="Permalink to this heading">¶</a></h3>
 <p>By default Psycopg casts the PostgreSQL networking data types (<code class="sql docutils literal notranslate"><span class="pre">inet</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code>, <code class="sql docutils literal notranslate"><span class="pre">macaddr</span></code>) into ordinary strings; array of such types are
 converted into lists of strings.</p>
@@ -1327,7 +1326,7 @@ converted into lists of strings.</p>
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_ipaddress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_ipaddress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register conversion support between <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#module-ipaddress" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipaddress</span></code></a> objects and <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-net-types.html">network types</a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>conn_or_curs</strong> – the scope where to register the type casters.
 If <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> register them globally.</p>
 </dd>
@@ -1343,7 +1342,7 @@ objects, <code class="sql docutils literal notranslate"><span class="pre">cidr</
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">register_inet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_or_curs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.register_inet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the INET type and an Inet adapter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>oid</strong> – oid for the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> type, or 2-items sequence
 with oids of the type and the array. If not specified, use PostgreSQL
@@ -1387,7 +1386,7 @@ future versions.</p>
 </section>
 </section>
 <section id="fast-execution-helpers">
-<span id="fast-exec"></span><h2>Fast execution helpers<a class="headerlink" href="#fast-execution-helpers" title="Permalink to this headline">¶</a></h2>
+<span id="fast-exec"></span><h2>Fast execution helpers<a class="headerlink" href="#fast-execution-helpers" title="Permalink to this heading">¶</a></h2>
 <p>The current implementation of <a class="reference internal" href="cursor.html#cursor.executemany" title="cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> is (using an extremely
 charitable understatement) not particularly performing. These functions can
 be used to speed up the repeated execution of a statement against a set of
@@ -1445,7 +1444,7 @@ longer, statement).</p>
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">execute_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cur</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argslist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.execute_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a statement using <code class="sql docutils literal notranslate"><span class="pre">VALUES</span></code> with a sequence of parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cur</strong> – the cursor to use to execute the query.</p></li>
 <li><p><strong>sql</strong> – the query to execute. It must contain a single <code class="docutils literal notranslate"><span class="pre">%s</span></code>
@@ -1507,7 +1506,7 @@ possible to use it with other statements, for example:</p>
 
 </section>
 <section id="coroutine-support">
-<span id="index-14"></span><h2>Coroutine support<a class="headerlink" href="#coroutine-support" title="Permalink to this headline">¶</a></h2>
+<span id="index-14"></span><h2>Coroutine support<a class="headerlink" href="#coroutine-support" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="psycopg2.extras.wait_select">
 <span class="sig-prename descclassname"><span class="pre">psycopg2.extras.</span></span><span class="sig-name descname"><span class="pre">wait_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg2.extras.wait_select" title="Permalink to this definition">¶</a></dt>
@@ -1537,24 +1536,148 @@ therefore is able to handle/receive SIGINT/KeyboardInterrupt.</p>
     <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras</span></code> – Miscellaneous goodies for Psycopg 2</a><ul>
 <li><a class="reference internal" href="#connection-and-cursor-subclasses">Connection and cursor subclasses</a><ul>
-<li><a class="reference internal" href="#dictionary-like-cursor">Dictionary-like cursor</a></li>
-<li><a class="reference internal" href="#real-dictionary-cursor">Real dictionary cursor</a></li>
-<li><a class="reference internal" href="#namedtuple-cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor</a></li>
-<li><a class="reference internal" href="#logging-cursor">Logging cursor</a></li>
+<li><a class="reference internal" href="#dictionary-like-cursor">Dictionary-like cursor</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.DictCursor"><code class="docutils literal notranslate"><span class="pre">DictCursor</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.DictConnection"><code class="docutils literal notranslate"><span class="pre">DictConnection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.DictRow"><code class="docutils literal notranslate"><span class="pre">DictRow</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#replication-support-objects">Replication support objects</a></li>
+<li><a class="reference internal" href="#real-dictionary-cursor">Real dictionary cursor</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.RealDictCursor"><code class="docutils literal notranslate"><span class="pre">RealDictCursor</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RealDictConnection"><code class="docutils literal notranslate"><span class="pre">RealDictConnection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RealDictRow"><code class="docutils literal notranslate"><span class="pre">RealDictRow</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#namedtuple-cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code> cursor</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.NamedTupleCursor"><code class="docutils literal notranslate"><span class="pre">NamedTupleCursor</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.NamedTupleConnection"><code class="docutils literal notranslate"><span class="pre">NamedTupleConnection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging-cursor">Logging cursor</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.LoggingConnection"><code class="docutils literal notranslate"><span class="pre">LoggingConnection</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.LoggingConnection.filter"><code class="docutils literal notranslate"><span class="pre">LoggingConnection.filter()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.LoggingConnection.initialize"><code class="docutils literal notranslate"><span class="pre">LoggingConnection.initialize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg2.extras.LoggingCursor"><code class="docutils literal notranslate"><span class="pre">LoggingCursor</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection"><code class="docutils literal notranslate"><span class="pre">MinTimeLoggingConnection</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection.filter"><code class="docutils literal notranslate"><span class="pre">MinTimeLoggingConnection.filter()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.MinTimeLoggingConnection.initialize"><code class="docutils literal notranslate"><span class="pre">MinTimeLoggingConnection.initialize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg2.extras.MinTimeLoggingCursor"><code class="docutils literal notranslate"><span class="pre">MinTimeLoggingCursor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#replication-support-objects">Replication support objects</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.REPLICATION_LOGICAL"><code class="docutils literal notranslate"><span class="pre">REPLICATION_LOGICAL</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.REPLICATION_PHYSICAL"><code class="docutils literal notranslate"><span class="pre">REPLICATION_PHYSICAL</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.LogicalReplicationConnection"><code class="docutils literal notranslate"><span class="pre">LogicalReplicationConnection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.PhysicalReplicationConnection"><code class="docutils literal notranslate"><span class="pre">PhysicalReplicationConnection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.payload"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.payload</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.data_size"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.data_size</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.data_start"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.data_start</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.wal_end"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.wal_end</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.send_time"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.send_time</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationMessage.cursor"><code class="docutils literal notranslate"><span class="pre">ReplicationMessage.cursor</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.create_replication_slot"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.create_replication_slot()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.drop_replication_slot"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.drop_replication_slot()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.start_replication()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.start_replication_expert"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.start_replication_expert()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.consume_stream"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.consume_stream()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.send_feedback"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.send_feedback()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.read_message"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.read_message()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.fileno"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.fileno()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.io_timestamp"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.io_timestamp</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.feedback_timestamp"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.feedback_timestamp</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.ReplicationCursor.wal_end"><code class="docutils literal notranslate"><span class="pre">ReplicationCursor.wal_end</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg2.extras.StopReplication"><code class="docutils literal notranslate"><span class="pre">StopReplication</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#additional-data-types">Additional data types</a><ul>
-<li><a class="reference internal" href="#json-adaptation">JSON adaptation</a></li>
-<li><a class="reference internal" href="#hstore-data-type">Hstore data type</a></li>
-<li><a class="reference internal" href="#composite-types-casting">Composite types casting</a></li>
-<li><a class="reference internal" href="#range-data-types">Range data types</a></li>
-<li><a class="reference internal" href="#uuid-data-type">UUID data type</a></li>
-<li><a class="reference internal" href="#networking-data-types">Networking data types</a></li>
+<li><a class="reference internal" href="#json-adaptation">JSON adaptation</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.Json"><code class="docutils literal notranslate"><span class="pre">Json</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.Json.dumps"><code class="docutils literal notranslate"><span class="pre">Json.dumps()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#fast-execution-helpers">Fast execution helpers</a></li>
-<li><a class="reference internal" href="#coroutine-support">Coroutine support</a></li>
+<li><a class="reference internal" href="#psycopg2.extras.register_json"><code class="docutils literal notranslate"><span class="pre">register_json()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.register_default_json"><code class="docutils literal notranslate"><span class="pre">register_default_json()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.register_default_jsonb"><code class="docutils literal notranslate"><span class="pre">register_default_jsonb()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hstore-data-type">Hstore data type</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.register_hstore"><code class="docutils literal notranslate"><span class="pre">register_hstore()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#composite-types-casting">Composite types casting</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.register_composite"><code class="docutils literal notranslate"><span class="pre">register_composite()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster"><code class="docutils literal notranslate"><span class="pre">CompositeCaster</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.make"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.make()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.name"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.name</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.schema"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.schema</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.oid"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.oid</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.array_oid"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.array_oid</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.type"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.type</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.attnames"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.attnames</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.CompositeCaster.atttypes"><code class="docutils literal notranslate"><span class="pre">CompositeCaster.atttypes</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#range-data-types">Range data types</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.Range"><code class="docutils literal notranslate"><span class="pre">Range</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.Range.isempty"><code class="docutils literal notranslate"><span class="pre">Range.isempty</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.lower"><code class="docutils literal notranslate"><span class="pre">Range.lower</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.upper"><code class="docutils literal notranslate"><span class="pre">Range.upper</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.lower_inc"><code class="docutils literal notranslate"><span class="pre">Range.lower_inc</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.upper_inc"><code class="docutils literal notranslate"><span class="pre">Range.upper_inc</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.lower_inf"><code class="docutils literal notranslate"><span class="pre">Range.lower_inf</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Range.upper_inf"><code class="docutils literal notranslate"><span class="pre">Range.upper_inf</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg2.extras.NumericRange"><code class="docutils literal notranslate"><span class="pre">NumericRange</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.DateRange"><code class="docutils literal notranslate"><span class="pre">DateRange</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.DateTimeRange"><code class="docutils literal notranslate"><span class="pre">DateTimeRange</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.DateTimeTZRange"><code class="docutils literal notranslate"><span class="pre">DateTimeTZRange</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.register_range"><code class="docutils literal notranslate"><span class="pre">register_range()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RangeCaster"><code class="docutils literal notranslate"><span class="pre">RangeCaster</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.RangeCaster.range"><code class="docutils literal notranslate"><span class="pre">RangeCaster.range</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RangeCaster.adapter"><code class="docutils literal notranslate"><span class="pre">RangeCaster.adapter</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RangeCaster.typecaster"><code class="docutils literal notranslate"><span class="pre">RangeCaster.typecaster</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.RangeCaster.array_typecaster"><code class="docutils literal notranslate"><span class="pre">RangeCaster.array_typecaster</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#uuid-data-type">UUID data type</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.register_uuid"><code class="docutils literal notranslate"><span class="pre">register_uuid()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.UUID_adapter"><code class="docutils literal notranslate"><span class="pre">UUID_adapter</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#networking-data-types">Networking data types</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.register_ipaddress"><code class="docutils literal notranslate"><span class="pre">register_ipaddress()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.register_inet"><code class="docutils literal notranslate"><span class="pre">register_inet()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.Inet"><code class="docutils literal notranslate"><span class="pre">Inet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fast-execution-helpers">Fast execution helpers</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.execute_batch"><code class="docutils literal notranslate"><span class="pre">execute_batch()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg2.extras.execute_values"><code class="docutils literal notranslate"><span class="pre">execute_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coroutine-support">Coroutine support</a><ul>
+<li><a class="reference internal" href="#psycopg2.extras.wait_select"><code class="docutils literal notranslate"><span class="pre">wait_select()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
