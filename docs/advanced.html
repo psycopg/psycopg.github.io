@@ -211,7 +211,7 @@ is automatically performed when a column whose type is a registered OID is
 read:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;(10.2,20.3)&#39;::point&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">point</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">),</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">),</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 <span class="go">&lt;class &#39;Point&#39;&gt; 10.2 20.3</span>
 </pre></div>
 </div>
@@ -251,15 +251,15 @@ something to read:</p>
 <span class="n">curs</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 <span class="n">curs</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN test;&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="s2">&quot;Waiting for notifications on channel &#39;test&#39;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for notifications on channel &#39;test&#39;&quot;</span><span class="p">)</span>
 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">conn</span><span class="p">],[],[],</span><span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="p">([],[],[]):</span>
-        <span class="nb">print</span> <span class="s2">&quot;Timeout&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Timeout&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">:</span>
             <span class="n">notify</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="nb">print</span> <span class="s2">&quot;Got NOTIFY:&quot;</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">payload</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Got NOTIFY:&quot;</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">notify</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Running the script and executing a command such as <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span> <span class="pre">test,</span> <span class="pre">'hello'</span></code>
