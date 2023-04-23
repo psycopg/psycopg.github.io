@@ -270,15 +270,15 @@ it doesn’t work with <code class="sql docutils literal notranslate"><span clas
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
-<span class="go">LINE 1: SET TimeZone TO $1</span>
-<span class="go">                        ^</span>
+<span class="x">LINE 1: SET TimeZone TO $1</span>
+<span class="x">                        ^</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;NOTIFY </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;chan&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
-<span class="go">LINE 1: NOTIFY $1, $2</span>
-<span class="go">               ^</span>
+<span class="x">LINE 1: NOTIFY $1, $2</span>
+<span class="x">               ^</span>
 </pre></div>
 </div>
 <p>and with any data definition statement:</p>
@@ -286,8 +286,8 @@ it doesn’t work with <code class="sql docutils literal notranslate"><span clas
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.UndefinedParameter</span>: <span class="n">there is no parameter $1</span>
-<span class="go">LINE 1: CREATE TABLE foo (id int DEFAULT $1)</span>
-<span class="go">                                         ^</span>
+<span class="x">LINE 1: CREATE TABLE foo (id int DEFAULT $1)</span>
+<span class="x">                                         ^</span>
 </pre></div>
 </div>
 <p>Sometimes, PostgreSQL offers an alternative: for instance the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET">set_config()</a>
@@ -431,8 +431,8 @@ find a function candidate for the given data types:</p>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
-<span class="go">LINE 1: SELECT * FROM foo WHERE id IN $1</span>
-<span class="go">                                      ^</span>
+<span class="x">LINE 1: SELECT * FROM foo WHERE id IN $1</span>
+<span class="x">                                      ^</span>
 </pre></div>
 </div>
 <p>What you can do is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparisons.html#id-1.5.8.30.16">= ANY()</a> construct and pass the candidate
