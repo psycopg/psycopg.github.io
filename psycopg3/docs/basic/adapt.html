@@ -388,6 +388,22 @@ attribute:</p>
 <span class="go">datetime.datetime(2048, 7, 8, 12, 0, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/London&#39;))</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>PostgreSQL date and time objects can represent values that cannot be
+represented by the Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> objects:</p>
+<ul class="simple">
+<li><p>dates and timestamps after the year 9999, the special value “infinity”;</p></li>
+<li><p>dates and timestamps before the year 1, the special value “-infinity”;</p></li>
+<li><p>the time 24:00:00.</p></li>
+</ul>
+<p>Loading these values will raise a <a class="reference internal" href="../api/errors.html#psycopg.DataError" title="psycopg.DataError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></a>.</p>
+<p>If you need to handle these values you can define your own mapping (for
+instance mapping every value greater than <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code>, or the time 24:00 to 00:00) and write a subclass of the
+default loaders implementing the added capability; please see
+<a class="reference internal" href="../advanced/adapt.html#adapt-example-inf-date"><span class="std std-ref">this example</span></a> for a reference.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> doesn’t store “a timestamp with a timezone
