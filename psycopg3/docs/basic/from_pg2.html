@@ -445,6 +445,35 @@ array:</p>
 accepting an empty list of values too as argument, which is not supported by
 the <code class="sql docutils literal notranslate"><span class="pre">IN</span></code> operator instead.</p>
 </section>
+<section id="you-cannot-use-is-s">
+<span id="is-null"></span><h2>You cannot use <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code><a class="headerlink" href="#you-cannot-use-is-s" title="Permalink to this heading">#</a></h2>
+<p>You cannot use <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code> or <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">%s</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE field IS </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+<span class="x">LINE 1: SELECT * FROM foo WHERE field IS $1</span>
+<span class="x">                                     ^</span>
+</pre></div>
+</div>
+<p>This is probably caused by the fact that <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> is not a binary operator in
+PostgreSQL; rather, <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NULL</span></code> and <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></code> are unary operators
+and you cannot use <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> with anything else on the right hand side.
+Testing in psql:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=# SELECT 10 IS 10;
+ERROR:  syntax error at or near &quot;10&quot;
+LINE 1: select 10 is 10;
+                     ^
+</pre></div>
+</div>
+<p>What you can do instead is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparison.html">IS DISTINCT FROM operator</a>, which
+will gladly accept a placeholder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE field IS NOT DISTINCT FROM </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Analogously you can use <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">%s</span></code> as a parametric version of
+<code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">%s</span></code>.</p>
+</section>
 <section id="different-adaptation-system">
 <span id="diff-adapt"></span><h2>Different adaptation system<a class="headerlink" href="#different-adaptation-system" title="Permalink to this heading">#</a></h2>
 <p>The adaptation system has been completely rewritten, in order to address
@@ -604,6 +633,7 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
 <li><a class="reference internal" href="#multiple-results-returned-from-multiple-statements">Multiple results returned from multiple statements</a></li>
 <li><a class="reference internal" href="#different-cast-rules">Different cast rules</a></li>
 <li><a class="reference internal" href="#you-cannot-use-in-s-with-a-tuple">You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple</a></li>
+<li><a class="reference internal" href="#you-cannot-use-is-s">You cannot use <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code></a></li>
 <li><a class="reference internal" href="#different-adaptation-system">Different adaptation system</a></li>
 <li><a class="reference internal" href="#copy-is-no-longer-file-based">Copy is no longer file-based</a></li>
 <li><a class="reference internal" href="#with-connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
