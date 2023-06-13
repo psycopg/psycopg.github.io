@@ -258,6 +258,10 @@
 <li><p>Fix prepared statement cache validation when exiting pipeline mode (or
 <a class="reference internal" href="api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>) in case an error occurred within the pipeline
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/585">#585</a>).</p></li>
+<li><p>Fix <a class="reference internal" href="api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> to avoid “leaking” an open <a class="reference internal" href="api/pq.html#psycopg.pq.PGconn" title="psycopg.pq.PGconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn</span></code></a> attached to the
+<a class="reference internal" href="api/errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a> in case of connection failure. <a class="reference internal" href="api/errors.html#psycopg.Error.pgconn" title="psycopg.Error.pgconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.pgconn</span></code></a> is now a
+shallow copy of the real libpq connection, and the latter is closed before
+the exception propagates (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/565">#565</a>).</p></li>
 </ul>
 </section>
 </section>
