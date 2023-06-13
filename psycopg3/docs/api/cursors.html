@@ -354,14 +354,42 @@ several <code class="sql docutils literal notranslate"><span class="pre">INSERT<
 <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code> too) you may consider using <cite>copy()</cite>.</p>
 <p>If the queries return data you want to read (e.g. when executing an
 <code class="sql docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">...</span> <span class="pre">RETURNING</span></code> or a <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> with a side-effect),
-you can specify <cite>!returning=True</cite>; the results will be available in
-the cursor’s state and can be read using <cite>fetchone()</cite> and similar
-methods. Each input parameter will produce a separate result set: use
-<cite>nextset()</cite> to read the results of the queries after the first one.</p>
-<p>The value of <cite>rowcount</cite> is set to the cumulated number of rows
-affected by queries; except when using <cite>!returning=True</cite>, in which
-case it is set to the number of rows in the current result set (i.e.
-the first one, until <cite>nextset()</cite> gets called).</p>
+you can specify <cite>!returning=True</cite>. This is equivalent of calling
+<cite>~Cursor.execute()</cite> as many times as the number of items in
+<cite>!params_seq</cite>, and to store all the results in the cursor’s state.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using the usual <cite>~Cursor.fetchone()</cite>, <cite>~Cursor.fetchall()</cite>, you
+will be able to read the records returned <em>by the first query
+executed only</em>. In order to read the results of the following
+queries you can call <cite>~Cursor.nextset()</cite> to move to the following
+result set.</p>
+<p>A typical use case for <cite>!executemany(returning=True)</cite> might be to
+insert a bunch of records and to retrieve the primary keys
+inserted, taken from a PostgreSQL sequence. In order to do so, you
+may execute a query such as <code class="sql docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">INTO</span> <span class="pre">table</span> <span class="pre">VALUES</span> <span class="pre">(...)</span>
+<span class="pre">RETURNING</span> <span class="pre">id</span></code>. Because every <code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code> is guaranteed to insert
+exactly a single record, you can obtain the list of the new ids
+using a pattern such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">records</span><span class="p">)</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cur</span><span class="o">.</span><span class="n">nextset</span><span class="p">():</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>More explicitly, <cite>!fetchall()</cite> alone will not return all the
+values returned! You must iterate on the results using
+<cite>!nextset()</cite>.</p>
+</div>
+<p>If <cite>!returning=False</cite>, the value of <cite>rowcount</cite> is set to the cumulated
+number of rows affected by queries. If <cite>!returning=True</cite>, <cite>!rowcount</cite>
+is set to the number of rows in the current result set (i.e. the first
+one, until <cite>nextset()</cite> gets called).</p>
 <p>See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> for all the details about executing
 queries.</p>
 <div class="versionchanged">
