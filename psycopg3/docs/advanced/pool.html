@@ -486,9 +486,32 @@ already a connection from the pool, but no other thread should be served a
 broken connection, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code> would empty the pool and refill it with
 working connections, as soon as they are available.</p>
 <p>Faster than you can say poll. Or pool.</p>
+<section id="pool-and-idle-session-timeout-setting">
+<span id="idle-session-timeout"></span><h3>Pool and <code class="docutils literal notranslate"><span class="pre">idle_session_timeout</span></code> setting<a class="headerlink" href="#pool-and-idle-session-timeout-setting" title="Permalink to this heading">#</a></h3>
+<p>Using a connection pool is fundamentally incompatible with setting an
+<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-IDLE-SESSION-TIMEOUT">idle_session_timeout</a> on the connection: the pool is designed precisely to
+keep connections idle and readily available.</p>
+<p>The current implementation doesn’t keep <code class="docutils literal notranslate"><span class="pre">idle_session_timeout</span></code> into account,
+so, if this setting is used, clients might be served broken connections and
+fail with an error such as <em>terminating connection due to idle-session
+timeout</em>.</p>
+<p>In order to avoid the problem, please disable <code class="docutils literal notranslate"><span class="pre">idle_session_timeout</span></code> for the
+pool connections. Note that, even if your server is configured with a nonzero
+<code class="docutils literal notranslate"><span class="pre">idle_session_timeout</span></code> default, you can still obtain pool connections
+without timeout, by using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code> keyword argument, for instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="s2">&quot;-c idle_session_timeout=0&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_idle</span></code> parameter is currently only used to shrink the pool if
+there are unused connections; it is not designed to fight against a server
+configured to close connections under its feet.</p>
+</div>
+</section>
 </section>
 <section id="pool-stats">
-<span id="id6"></span><h2>Pool stats<a class="headerlink" href="#pool-stats" title="Permalink to this heading">#</a></h2>
+<span id="id7"></span><h2>Pool stats<a class="headerlink" href="#pool-stats" title="Permalink to this heading">#</a></h2>
 <p>The pool can return information about its usage using the methods
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.get_stats" title="psycopg_pool.ConnectionPool.get_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stats()</span></code></a> or <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.pop_stats" title="psycopg_pool.ConnectionPool.pop_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_stats()</span></code></a>. Both methods
 return the same values, but the latter reset the counters after its use. The
@@ -628,7 +651,10 @@ server</p></td>
 </ul>
 </li>
 <li><a class="reference internal" href="#null-connection-pools">Null connection pools</a></li>
-<li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
+<li><a class="reference internal" href="#connection-quality">Connection quality</a><ul>
+<li><a class="reference internal" href="#pool-and-idle-session-timeout-setting">Pool and <code class="docutils literal notranslate"><span class="pre">idle_session_timeout</span></code> setting</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#pool-stats">Pool stats</a></li>
 </ul>
 </li>
