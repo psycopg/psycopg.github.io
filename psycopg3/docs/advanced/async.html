@@ -325,24 +325,25 @@ two steps instead, as in</p>
 (it never performs I/O), so you don’t need an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> on it; as a consequence
 you can use the normal <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> context manager.</p>
 </section>
-<section id="interrupting-async-operations-using-ctrl-c">
-<span id="async-ctrl-c"></span><span id="index-2"></span><h2>Interrupting async operations using Ctrl-C<a class="headerlink" href="#interrupting-async-operations-using-ctrl-c" title="Permalink to this heading">#</a></h2>
+<section id="interrupting-async-operations">
+<span id="async-ctrl-c"></span><span id="index-2"></span><h2>Interrupting async operations<a class="headerlink" href="#interrupting-async-operations" title="Permalink to this heading">#</a></h2>
 <p>If a long running operation is interrupted by a Ctrl-C on a normal connection
 running in the main thread, the operation will be cancelled and the connection
 will be put in error state, from which can be recovered with a normal
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>.</p>
-<p>If the query is running in an async connection, a Ctrl-C will be likely
-intercepted by the async loop and interrupt the whole program. In order to
-emulate what normally happens with blocking connections, you can use
-<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_signal_handler">asyncio’s add_signal_handler()</a>, to call <a class="reference internal" href="../api/connections.html#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cancel()</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">signal</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-    <span class="n">loop</span><span class="o">.</span><span class="n">add_signal_handler</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
-    <span class="o">...</span>
-</pre></div>
-</div>
+<p>An async connection provides similar behavior in that if the async task is
+cancelled, any operation on the connection will similarly be cancelled.  This
+can happen either indirectly via Ctrl-C or similar signal, or directly by
+cancelling the Python Task via the normal way.  Psycopg will ask the
+PostgreSQL postmaster to cancel the operation when it encounters the standard
+Python <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#task-cancellation">CancelledError</a>.</p>
+<p>Remember that cancelling the Python Task does not guarantee that the operation
+will not complete, even if the task ultimately exits prematurely due to
+CancelledError.  If you need to know the ultimate outcome of the statement,
+then consider calling <a class="reference internal" href="../api/connections.html#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cancel()</span></code></a> as an alternative to cancelling
+the task.</p>
+<p>Previous versions of Psycopg recommended setting up signal handlers to
+manually cancel connections.  This should no longer be necessary.</p>
 </section>
 <section id="server-messages">
 <span id="async-messages"></span><span id="index-3"></span><h2>Server messages<a class="headerlink" href="#server-messages" title="Permalink to this heading">#</a></h2>
@@ -573,7 +574,7 @@ something similar using <a class="reference external" href="https://docs.python.
             <ul>
 <li><a class="reference internal" href="#">Asynchronous operations</a><ul>
 <li><a class="reference internal" href="#with-async-connections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
-<li><a class="reference internal" href="#interrupting-async-operations-using-ctrl-c">Interrupting async operations using Ctrl-C</a></li>
+<li><a class="reference internal" href="#interrupting-async-operations">Interrupting async operations</a></li>
 <li><a class="reference internal" href="#server-messages">Server messages</a></li>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
 <li><a class="reference internal" href="#detecting-disconnections">Detecting disconnections</a></li>
