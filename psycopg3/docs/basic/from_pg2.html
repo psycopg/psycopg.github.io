@@ -538,6 +538,17 @@ encoding. You can select an encoding at connection time using the
 connection by running a <code class="sql docutils literal notranslate"><span class="pre">SET</span> <span class="pre">client_encoding</span></code> statement… But why would
 you?</p>
 </section>
+<section id="transaction-characteristics-attributes-don-t-affect-autocommit-sessions">
+<span id="transaction-characteristics-and-autocommit"></span><h2>Transaction characteristics attributes don’t affect autocommit sessions<a class="headerlink" href="#transaction-characteristics-attributes-don-t-affect-autocommit-sessions" title="Permalink to this heading">#</a></h2>
+<p><a class="reference internal" href="transactions.html#transaction-characteristics"><span class="std std-ref">Transactions characteristics attributes</span></a>
+such as <a class="reference internal" href="../api/connections.html#psycopg.Connection.read_only" title="psycopg.Connection.read_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_only</span></code></a> don’t affect automatically autocommit
+sessions: they only affect the implicit transactions started by non-autocommit
+sessions and the transactions created by the <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a>
+block (for both autocommit and non-autocommit connections).</p>
+<p>If you want to put an autocommit transaction in read-only mode, please use the
+<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY">default_transaction_read_only</a> GUC, for instance executing the statement
+<code class="sql docutils literal notranslate"><span class="pre">SET</span> <span class="pre">default_transaction_read_only</span> <span class="pre">TO</span> <span class="pre">true</span></code>.</p>
+</section>
 <section id="no-default-infinity-dates-handling">
 <span id="infinity-datetime"></span><h2>No default infinity dates handling<a class="headerlink" href="#no-default-infinity-dates-handling" title="Permalink to this heading">#</a></h2>
 <p>PostgreSQL can represent a much wider range of dates and timestamps than
@@ -640,6 +651,7 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
 <li><a class="reference internal" href="#with-connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
 <li><a class="reference internal" href="#callproc-is-gone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">callproc()</span></code> is gone</a></li>
 <li><a class="reference internal" href="#client-encoding-is-gone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_encoding</span></code> is gone</a></li>
+<li><a class="reference internal" href="#transaction-characteristics-attributes-don-t-affect-autocommit-sessions">Transaction characteristics attributes don’t affect autocommit sessions</a></li>
 <li><a class="reference internal" href="#no-default-infinity-dates-handling">No default infinity dates handling</a></li>
 <li><a class="reference internal" href="#what-s-new-in-psycopg-3">What’s new in Psycopg 3</a></li>
 </ul>

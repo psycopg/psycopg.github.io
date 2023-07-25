@@ -500,9 +500,15 @@ but not entirely committed yet.</p>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
 transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
-both autocommit and non-autocommit transactions. Leaving these parameters as
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> will use the server’s default behaviour (which is controlled
-by server settings such as <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION">default_transaction_isolation</a>).</p>
+both autocommit and non-autocommit transactions.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Transaction parameters <a class="reference internal" href="from_pg2.html#transaction-characteristics-and-autocommit"><span class="std std-ref">don’t affect autocommit connections</span></a>, unless a <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code>
+block is explicitly used.</p>
+</div>
+<p>Leaving these parameters as <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> will use the server’s default behaviour
+(which is controlled by server settings such as
+<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION">default_transaction_isolation</a>).</p>
 <p>In order to set these parameters you can use the connection attributes
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.isolation_level" title="psycopg.Connection.isolation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isolation_level</span></code></a>, <a class="reference internal" href="../api/connections.html#psycopg.Connection.read_only" title="psycopg.Connection.read_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_only</span></code></a>,
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.deferrable" title="psycopg.Connection.deferrable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deferrable</span></code></a>. For async connections you must use the equivalent
