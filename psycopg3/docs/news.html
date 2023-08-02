@@ -257,6 +257,11 @@
 <ul class="simple">
 <li><p>Add support for libpq functions to close prepared statements and portals
 introduced in libpq v17 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/603">#603</a>).</p></li>
+<li><p>Disable receiving more than one result on the same cursor in pipeline mode,
+to iterate through <a class="reference internal" href="api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>. The behaviour was different than
+in non-pipeline mode and not totally reliable (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/604">#604</a>).
+The <a class="reference internal" href="api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> now only preserves the results set of the last
+<a class="reference internal" href="api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>, consistently with non-pipeline mode.</p></li>
 </ul>
 </section>
 <section id="psycopg-3-1-10-unreleased">

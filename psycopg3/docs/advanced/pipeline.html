@@ -454,24 +454,8 @@ several operations, using <a class="reference internal" href="../api/connections
 </div>
 <p>Unlike in normal mode, Psycopg will not wait for the server to receive the
 result of each query; the client will receive results in batches when the
-server flushes it output buffer.</p>
-<p>When a flush (or a sync) is performed, all pending results are sent back to
-the cursors which executed them. If a cursor had run more than one query, it
-will receive more than one result; results after the first will be available,
-in their execution order, using <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
-<span class="gp">... </span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-<span class="gp">... </span>       <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">) RETURNING *&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
-<span class="gp">... </span>       <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">) RETURNING *&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;world&quot;</span><span class="p">])</span>
-<span class="gp">... </span>       <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="gp">... </span>           <span class="nb">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">())</span>
-<span class="gp">... </span>           <span class="k">if</span> <span class="ow">not</span> <span class="n">cur</span><span class="o">.</span><span class="n">nextset</span><span class="p">():</span>
-<span class="gp">... </span>               <span class="k">break</span>
-
-<span class="go">[(1, &#39;hello&#39;)]</span>
-<span class="go">[(2, &#39;world&#39;)]</span>
-</pre></div>
-</div>
+server flushes it output buffer. You can receive more than a single result
+by using more than one cursor in the same pipeline.</p>
 <p>If any statement encounters an error, the server aborts the current
 transaction and will not execute any subsequent command in the queue until the
 next <a class="reference internal" href="#pipeline-sync"><span class="std std-ref">synchronization point</span></a>; a <a class="reference internal" href="../api/errors.html#psycopg.errors.PipelineAborted" title="psycopg.errors.PipelineAborted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PipelineAborted</span></code></a>
