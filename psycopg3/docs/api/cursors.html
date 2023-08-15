@@ -643,6 +643,24 @@ is text or binary.</p></li>
 </dd></dl>
 
 </section>
+<section id="the-rawcursor-class">
+<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code> class<a class="headerlink" href="#the-rawcursor-class" title="Permalink to this heading">#</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See <a class="reference internal" href="../advanced/cursors.html#raw-query-cursors"><span class="std std-ref">Raw Query Cursors</span></a> for details.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.RawCursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">RawCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><span class="pre">RowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.RawCursor" title="Permalink to this definition">#</a></dt>
+<dd><p>This <a class="reference internal" href="#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> subclass has the same interface of the parent class but
+supports placeholders in PostgreSQL format (<code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code>…) rather than
+in Python format (<code class="docutils literal notranslate"><span class="pre">%s</span></code>). Only positional parameters are supported.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+</dd></dl>
+
+</section>
 <section id="the-clientcursor-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class<a class="headerlink" href="#the-clientcursor-class" title="Permalink to this heading">#</a></h2>
 <div class="admonition seealso">
@@ -852,8 +870,11 @@ when it happens, but it might rather stop at the cursor boundary.</p>
 </dd></dl>
 
 </section>
-<section id="the-asynccursor-class">
-<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class<a class="headerlink" href="#the-asynccursor-class" title="Permalink to this heading">#</a></h2>
+<section id="async-cursor-classes">
+<h2>Async cursor classes<a class="headerlink" href="#async-cursor-classes" title="Permalink to this heading">#</a></h2>
+<p>Every <a class="reference internal" href="#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> class has an equivalent <code class="xref py py-obj docutils literal notranslate"><span class="pre">Async</span></code> version exposing the same
+semantic with an <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> interface. The main interface is described in
+<a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rows.html#psycopg.rows.AsyncRowFactory" title="psycopg.rows.AsyncRowFactory"><span class="pre">AsyncRowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncCursor" title="Permalink to this definition">#</a></dt>
@@ -953,22 +974,26 @@ methods, but should be called using the <code class="xref py py-obj docutils lit
 </div>
 </dd></dl>
 
-</section>
-<section id="the-asyncclientcursor-class">
-<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class<a class="headerlink" href="#the-asyncclientcursor-class" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.AsyncRawCursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncRawCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rows.html#psycopg.rows.AsyncRowFactory" title="psycopg.rows.AsyncRowFactory"><span class="pre">AsyncRowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncRawCursor" title="Permalink to this definition">#</a></dt>
+<dd><p>This class is the <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> equivalent of <a class="reference internal" href="#psycopg.RawCursor" title="psycopg.RawCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code></a>. The differences
+w.r.t. the sync counterpart are the same described in <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.AsyncClientCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncClientCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rows.html#psycopg.rows.AsyncRowFactory" title="psycopg.rows.AsyncRowFactory"><span class="pre">AsyncRowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncClientCursor" title="Permalink to this definition">#</a></dt>
-<dd><p>This class is the <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> equivalent of the <a class="reference internal" href="#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a>. The
-difference are the same shown in <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
+<dd><p>This class is the <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span></code> equivalent of <a class="reference internal" href="#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a>. The differences
+w.r.t. the sync counterpart are the same described in <a class="reference internal" href="#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
 </dd></dl>
 
-</section>
-<section id="the-asyncservercursor-class">
-<h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class<a class="headerlink" href="#the-asyncservercursor-class" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.AsyncServerCursor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncServerCursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rows.html#psycopg.rows.AsyncRowFactory" title="psycopg.rows.AsyncRowFactory"><span class="pre">AsyncRowFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Row</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scrollable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withhold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncServerCursor" title="Permalink to this definition">#</a></dt>
@@ -1116,6 +1141,10 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#the-rawcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.RawCursor"><code class="docutils literal notranslate"><span class="pre">RawCursor</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#the-clientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> class</a><ul>
 <li><a class="reference internal" href="#psycopg.ClientCursor"><code class="docutils literal notranslate"><span class="pre">ClientCursor</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.ClientCursor.mogrify"><code class="docutils literal notranslate"><span class="pre">ClientCursor.mogrify()</span></code></a></li>
@@ -1140,7 +1169,7 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-asynccursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#async-cursor-classes">Async cursor classes</a><ul>
 <li><a class="reference internal" href="#psycopg.AsyncCursor"><code class="docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.AsyncCursor.connection"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.connection</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncCursor.close"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.close()</span></code></a></li>
@@ -1154,13 +1183,8 @@ the <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.Se
 <li><a class="reference internal" href="#psycopg.AsyncCursor.scroll"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.scroll()</span></code></a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-asyncclientcursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code> class</a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncRawCursor"><code class="docutils literal notranslate"><span class="pre">AsyncRawCursor</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncClientCursor"><code class="docutils literal notranslate"><span class="pre">AsyncClientCursor</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-asyncservercursor-class">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code> class</a><ul>
 <li><a class="reference internal" href="#psycopg.AsyncServerCursor"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.AsyncServerCursor.close"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.close()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncServerCursor.execute"><code class="docutils literal notranslate"><span class="pre">AsyncServerCursor.execute()</span></code></a></li>

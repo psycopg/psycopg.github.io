@@ -383,6 +383,44 @@ directly call the fetch methods, skipping the <a class="reference internal" href
 </div>
 </section>
 </section>
+<section id="raw-query-cursors">
+<span id="id6"></span><h2>Raw Query Cursors<a class="headerlink" href="#raw-query-cursors" title="Permalink to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+<p>The <a class="reference internal" href="../api/cursors.html#psycopg.RawCursor" title="psycopg.RawCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.AsyncRawCursor" title="psycopg.AsyncRawCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncRawCursor</span></code></a> classes allow users to use PostgreSQL
+native placeholders (<code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code>, etc.) in their queries instead of the
+standard <code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholder. This can be useful when it’s desirable to pass
+the query unmodified to PostgreSQL and rely on PostgreSQL’s placeholder
+functionality, such as when dealing with a very complex query containing
+<code class="docutils literal notranslate"><span class="pre">%s</span></code> inside strings, dollar-quoted strings or elsewhere.</p>
+<p>One important note is that raw query cursors only accept positional arguments
+in the form of a list or tuple. This means you cannot use named arguments
+(i.e., dictionaries).</p>
+<p>There are two ways to use raw query cursors:</p>
+<ol class="arabic simple">
+<li><p>Using the cursor factory:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
+
+<span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">RawCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT $1, $2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Instantiating a cursor:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
+
+<span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">RawCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT $1, $2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -448,6 +486,7 @@ directly call the fetch methods, skipping the <a class="reference internal" href
 <li><a class="reference internal" href="#stealing-an-existing-cursor">“Stealing” an existing cursor</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#raw-query-cursors">Raw Query Cursors</a></li>
 </ul>
 </li>
 </ul>
