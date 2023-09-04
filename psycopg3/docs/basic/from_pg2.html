@@ -475,6 +475,30 @@ will gladly accept a placeholder:</p>
 <p>Analogously you can use <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">%s</span></code> as a parametric version of
 <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">%s</span></code>.</p>
 </section>
+<section id="cursors-subclasses">
+<span id="diff-cursors"></span><h2>Cursors subclasses<a class="headerlink" href="#cursors-subclasses" title="Permalink to this heading">#</a></h2>
+<p>In <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>, a few cursor subclasses allowed to return data in different
+form than tuples. In Psycopg 3 the same can be achieved by setting a <a class="reference internal" href="../advanced/rows.html#row-factories"><span class="std std-ref">row
+factory</span></a>:</p>
+<ul class="simple">
+<li><p>instead of <a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.RealDictCursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RealDictCursor</span></code></a> you can use
+<a class="reference internal" href="../api/rows.html#psycopg.rows.dict_row" title="psycopg.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row</span></code></a>;</p></li>
+<li><p>instead of <a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.NamedTupleCursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTupleCursor</span></code></a> you can use
+<a class="reference internal" href="../api/rows.html#psycopg.rows.namedtuple_row" title="psycopg.rows.namedtuple_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple_row</span></code></a>.</p></li>
+</ul>
+<p>Other row factories are available in the <a class="reference internal" href="../api/rows.html#module-psycopg.rows" title="psycopg.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code></a> module. There isn’t an
+object behaving like <a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.DictCursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DictCursor</span></code></a> (whose results are
+indexable both by column position and by column name).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">dict_row</span><span class="p">,</span> <span class="n">namedtuple_row</span>
+
+<span class="c1"># By default, every cursor will return dicts.</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
+
+<span class="c1"># You can set a row factory on a single cursor too.</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">namedtuple_row</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 <section id="different-adaptation-system">
 <span id="diff-adapt"></span><h2>Different adaptation system<a class="headerlink" href="#different-adaptation-system" title="Permalink to this heading">#</a></h2>
 <p>The adaptation system has been completely rewritten, in order to address
@@ -646,6 +670,7 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
 <li><a class="reference internal" href="#different-cast-rules">Different cast rules</a></li>
 <li><a class="reference internal" href="#you-cannot-use-in-s-with-a-tuple">You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple</a></li>
 <li><a class="reference internal" href="#you-cannot-use-is-s">You cannot use <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code></a></li>
+<li><a class="reference internal" href="#cursors-subclasses">Cursors subclasses</a></li>
 <li><a class="reference internal" href="#different-adaptation-system">Different adaptation system</a></li>
 <li><a class="reference internal" href="#copy-is-no-longer-file-based">Copy is no longer file-based</a></li>
 <li><a class="reference internal" href="#with-connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> connection</a></li>
