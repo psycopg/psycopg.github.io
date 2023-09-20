@@ -370,6 +370,65 @@ specified in the pool constructor, it is called on the connection before
 returning it to the pool. Note that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">reset()</span></code> function is called in a
 worker thread, so that the thread which used the connection can keep its
 execution without being slowed down by it.</p>
+<section id="debugging-pool-usage">
+<h3>Debugging pool usage<a class="headerlink" href="#debugging-pool-usage" title="Permalink to this heading">#</a></h3>
+<p>The pool uses the <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging</span></code></a> module to log some key operations to the
+<code class="docutils literal notranslate"><span class="pre">psycopg.pool</span></code> logger. If you are trying to debug the pool behaviour you may
+try to log at least the <code class="docutils literal notranslate"><span class="pre">INFO</span></code> operations on that logger.</p>
+<p>For example, the script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+<span class="kn">from</span> <span class="nn">psycopg_pool</span> <span class="kn">import</span> <span class="n">ConnectionPool</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;psycopg.pool&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">min_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pool</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;pool ready&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2"> * </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The square of </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+    <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+        <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>might print something like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2023-09-20 11:02:39,718 INFO psycopg.pool: waiting for pool &#39;pool-1&#39; initialization
+2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
+2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
+2023-09-20 11:02:39,720 INFO psycopg.pool: pool &#39;pool-1&#39; is ready to use
+2023-09-20 11:02:39,720 INFO root: pool ready
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by &#39;pool-1&#39;
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by &#39;pool-1&#39;
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
+2023-09-20 11:02:39,722 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
+2023-09-20 11:02:40,724 INFO root: The square of 0 is 0.
+2023-09-20 11:02:40,724 INFO root: The square of 1 is 1.
+2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
+2023-09-20 11:02:40,725 INFO psycopg.pool: connection given by &#39;pool-1&#39;
+2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
+2023-09-20 11:02:40,726 INFO psycopg.pool: connection given by &#39;pool-1&#39;
+2023-09-20 11:02:41,728 INFO root: The square of 3 is 9.
+2023-09-20 11:02:41,729 INFO root: The square of 2 is 4.
+2023-09-20 11:02:41,729 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
+2023-09-20 11:02:41,730 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
+</pre></div>
+</div>
+<p>Please do not rely on the messages generated to remain unchanged across
+versions: they don’t constitute a stable interface.</p>
+</section>
 </section>
 <section id="pool-connection-and-sizing">
 <h2>Pool connection and sizing<a class="headerlink" href="#pool-connection-and-sizing" title="Permalink to this heading">#</a></h2>
@@ -645,7 +704,10 @@ server</p></td>
 <li><a class="reference internal" href="#">Connection pools</a><ul>
 <li><a class="reference internal" href="#pool-life-cycle">Pool life cycle</a></li>
 <li><a class="reference internal" href="#connections-life-cycle">Connections life cycle</a></li>
-<li><a class="reference internal" href="#using-connections-from-the-pool">Using connections from the pool</a></li>
+<li><a class="reference internal" href="#using-connections-from-the-pool">Using connections from the pool</a><ul>
+<li><a class="reference internal" href="#debugging-pool-usage">Debugging pool usage</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#pool-connection-and-sizing">Pool connection and sizing</a><ul>
 <li><a class="reference internal" href="#what-s-the-right-size-for-the-pool">What’s the right size for the pool?</a></li>
 </ul>
