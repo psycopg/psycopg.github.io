@@ -145,7 +145,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -242,7 +242,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -251,39 +251,66 @@
           <section id="how-to-make-a-psycopg-release">
 <h1>How to make a psycopg release<a class="headerlink" href="#how-to-make-a-psycopg-release" title="Permalink to this heading">#</a></h1>
 <ul>
-<li><p>Change version number in:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">psycopg_c/psycopg_c/version.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">psycopg/psycopg/version.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">psycopg_pool/psycopg_pool/version.py</span></code></p></li>
-</ul>
+<li><p>Check if there is a new version or <a class="reference external" href="https://www.postgresql.org/ftp/source/">libpq</a> or <a class="reference external" href="https://www.openssl.org/source/">OpenSSL</a>; in such case
+update <code class="docutils literal notranslate"><span class="pre">LIBPQ_VERSION</span></code> and/or <code class="docutils literal notranslate"><span class="pre">OPENSSL_VERSION</span></code> in
+<code class="docutils literal notranslate"><span class="pre">.github/workflows/packages-bin.yml</span></code>.</p>
+<blockquote>
+<div></div></blockquote>
 </li>
-<li><p>Change docs/news.rst to drop the “unreleased” mark from the version</p></li>
+<li><p>Check if there is a new <a class="reference external" href="https://github.com/pypa/cibuildwheel/releases">cibuildwheel release</a>; if so, upgrade it in
+<code class="docutils literal notranslate"><span class="pre">.github/workflows/packages-bin.yml</span></code>.</p>
+</li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">tools/bump_version.py</span></code> to upgrade package version numbers.</p></li>
 <li><p>Push to GitHub to run <a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/tests.yml">the tests workflow</a>.</p>
 </li>
-<li><p>Build the packages by triggering manually the <a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/packages.yml">Build packages workflow</a>.</p>
+<li><p>Build the packages by triggering manually the ones requested among:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/packages-src.yml">Source packages</a></p></li>
+<li><p><a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/packages-bin.yml">Binary packages</a></p></li>
+<li><p><a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/packages-pool.yml">Pool packages</a></p></li>
+</ul>
 </li>
-<li><p>If all went fine, create a tag named after the version:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="o">-</span><span class="n">a</span> <span class="o">-</span><span class="n">s</span> <span class="mf">3.0</span><span class="o">.</span><span class="n">dev1</span>
-<span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">tags</span>
+<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">wheelhouse</span></code> directory there is one.</p></li>
+<li><p>Build m1 packages by running <code class="docutils literal notranslate"><span class="pre">./tools/build/run_build_macos_arm64.sh</span> <span class="pre">BRANCH</span></code>.
+On successful completion it will save built packages in <code class="docutils literal notranslate"><span class="pre">wheelhouse</span></code></p></li>
+<li><p>If all packages were built ok, push the new tag created by <code class="docutils literal notranslate"><span class="pre">bump_version.py</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">tags</span>
 </pre></div>
 </div>
 </li>
 <li><p>Download the <code class="docutils literal notranslate"><span class="pre">artifacts.zip</span></code> package from the last Packages workflow run.</p></li>
-<li><p>Unpack the packages locally:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">tmp</span>
-<span class="n">cd</span> <span class="n">tmp</span>
+<li><p>Unpack the packages in the wheelhouse dir:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">wheelhouse</span>
+<span class="n">cd</span> <span class="n">wheelhouse</span>
 <span class="n">unzip</span> <span class="o">~/</span><span class="n">Downloads</span><span class="o">/</span><span class="n">artifact</span><span class="o">.</span><span class="n">zip</span>
 </pre></div>
 </div>
 </li>
 <li><p>If the package is a testing one, upload it on TestPyPI with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ twine upload -s -r testpypi *
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ twine upload -r testpypi *
 </pre></div>
 </div>
 </li>
-<li><p>If the package is stable, omit <code class="docutils literal notranslate"><span class="pre">-r</span> <span class="pre">testpypi</span></code>.</p></li>
+<li><p>If the package is stable, omit <code class="docutils literal notranslate"><span class="pre">-r</span> <span class="pre">testpypi</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ twine upload *
+</pre></div>
+</div>
+</li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">tools/bump_version.py</span> <span class="pre">-l</span> <span class="pre">dev</span></code> to bump to the next dev version.</p></li>
 </ul>
+<section id="when-a-new-postgresql-major-version-is-released">
+<h2>When a new PostgreSQL major version is released<a class="headerlink" href="#when-a-new-postgresql-major-version-is-released" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Add the new version to <code class="docutils literal notranslate"><span class="pre">tools/update_errors.py</span></code> and run the script to add
+new error classes.</p></li>
+<li><p>Run the script <code class="docutils literal notranslate"><span class="pre">tools/update_oids.py</span></code> to add new oids. Use <code class="docutils literal notranslate"><span class="pre">-h</span></code> to get
+an example docker command line to run a server locally.</p></li>
+<li><p>Bump <code class="docutils literal notranslate"><span class="pre">PG_VERSION</span></code> in the <code class="docutils literal notranslate"><span class="pre">macos</span></code> job of
+<code class="docutils literal notranslate"><span class="pre">.github/workflows/packages-bin.yml</span></code>.</p></li>
+<li><p>Bump <code class="docutils literal notranslate"><span class="pre">pg_version</span></code> in <code class="docutils literal notranslate"><span class="pre">tools/build/build_macos_arm64.sh</span></code>.</p></li>
+<li><p>Bump the version in <code class="docutils literal notranslate"><span class="pre">tools/build/wheel_win32_before_build.bat</span></code>.</p></li>
+</ul>
+</section>
 </section>
 
         </article>
@@ -312,8 +339,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to make a psycopg release</a><ul>
+<li><a class="reference internal" href="#when-a-new-postgresql-major-version-is-released">When a new PostgreSQL major version is released</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
