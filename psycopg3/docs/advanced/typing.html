@@ -295,6 +295,56 @@ cursors and annotate the returned objects accordingly. See
 </pre></div>
 </div>
 </section>
+<section id="generic-pool-types">
+<span id="pool-generic"></span><h2>Generic pool types<a class="headerlink" href="#generic-pool-types" title="Permalink to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+<p>The <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> class and similar are generic on their
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code> argument. The <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>
+method is annotated as returning a connection of that type, and the record
+returned will follow the rule as in <a class="reference internal" href="#row-factory-static"><span class="std std-ref">Type of rows returned</span></a>.</p>
+<p>Note that, at the moment, if you use a generic class as <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code>,
+you will need to specify a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> consistently in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>,
+otherwise the typing system and the runtime will not agree.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">DictRow</span><span class="p">,</span> <span class="n">dict_row</span>
+
+<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span>
+    <span class="n">connection_class</span><span class="o">=</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">],</span>   <span class="c1"># provides type hinting</span>
+    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;row_factory&quot;</span><span class="p">:</span> <span class="n">dict_row</span><span class="p">},</span>       <span class="c1"># works at runtime</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="c1"># reveal_type(pool): ConnectionPool[Connection[dict[str, Any]]]</span>
+
+    <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="c1"># reveal_type(conn): Connection[dict[str, Any]]</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT now()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="c1"># reveal_type(row): Optional[dict[str, Any]]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {&quot;now&quot;: datetime.datetime(...)}</span>
+</pre></div>
+</div>
+<p>If a non-generic <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> subclass is used (one whose returned row
+type is not parametric) then it’s not necessary to specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;row_factory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_row</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">connection_class</span><span class="o">=</span><span class="n">MyConnection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">])</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="c1"># reveal_type(pool): ConnectionPool[MyConnection]</span>
+
+    <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="c1"># reveal_type(conn): MyConnection</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT now()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="c1"># reveal_type(row): Optional[dict[str, Any]]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {&quot;now&quot;: datetime.datetime(...)}</span>
+</pre></div>
+</div>
+</section>
 <section id="example-returning-records-as-pydantic-models">
 <span id="example-pydantic"></span><h2>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Permalink to this heading">#</a></h2>
 <p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
@@ -450,6 +500,7 @@ should be reported as errors.</p>
 <li><a class="reference internal" href="#">Static Typing</a><ul>
 <li><a class="reference internal" href="#generic-types">Generic types</a></li>
 <li><a class="reference internal" href="#type-of-rows-returned">Type of rows returned</a></li>
+<li><a class="reference internal" href="#generic-pool-types">Generic pool types</a></li>
 <li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
 <li><a class="reference internal" href="#checking-literal-strings-in-queries">Checking literal strings in queries</a></li>
 </ul>
