@@ -384,7 +384,7 @@ time and more bandwidth. See <a class="reference internal" href="params.html#bin
 <code class="sql docutils literal notranslate"><span class="pre">interval</span></code>.</p></li>
 </ul>
 <p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> values are returned with a timezone set to the
-<a class="reference external" href="https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES">connection TimeZone setting</a>, which is available as a Python
+<a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-TIMEZONE">connection TimeZone setting</a>, which is available as a Python
 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.ZoneInfo" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoneInfo</span></code></a> object in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info</span></code>.<a class="reference internal" href="../api/objects.html#psycopg.ConnectionInfo.timezone" title="psycopg.ConnectionInfo.timezone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a>
 attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timezone</span>
@@ -400,14 +400,39 @@ attribute:</p>
 attached”: it stores a timestamp always in UTC, which is converted, on
 output, to the connection TimeZone setting:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TIMEZONE to &#39;Europe/Rome&#39;&quot;</span><span class="p">)</span>  <span class="c1"># UTC+2 in summer</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-07-01 12:00Z&#39;::timestamptz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># UTC input</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-07-01 12:00Z&#39;::timestamptz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># UTC input</span>
 <span class="go">datetime.datetime(2042, 7, 1, 14, 0, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/Rome&#39;))</span>
 </pre></div>
 </div>
-<p>Check out the <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-TIMEZONE">PostgreSQL documentation about timezones</a> for all the
+<p>Check out the <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES">PostgreSQL documentation about timezones</a> for all the
 details.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Times with timezone are silly objects, because you cannot know the offset
+of a timezone with daylight saving time rules without knowing the date
+too.</p>
+<p>Although silly, times with timezone are supported both by Python and by
+PostgreSQL. However they are only supported with fixed offset timezones:
+Postgres <code class="sql docutils literal notranslate"><span class="pre">timetz</span></code> values loaded from the database will result in
+Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code> objects with <code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code> attributes specified as fixed
+offset, for instance by a <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timezone" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a> value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TIMEZONE to &#39;Europe/Rome&#39;&quot;</span><span class="p">)</span>
+
+<span class="go"># UTC+1 in winter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-01-01 12:00Z&#39;::timestamptz::timetz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">datetime.time(13, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600)))</span>
+
+<span class="go"># UTC+2 in summer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-07-01 12:00Z&#39;::timestamptz::timetz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">datetime.time(14, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)))</span>
+</pre></div>
+</div>
+<p>Dumping Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code> objects is only supported with fixed offset
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code>, such as the ones returned by Postgres, or by whatever
+<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code></a> implementation resulting in the time’s
+<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time.utcoffset" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utcoffset</span></code></a> returning a value.</p>
 </div>
 <section id="dates-and-times-limits-in-python">
 <span id="date-time-limits"></span><h3>Dates and times limits in Python<a class="headerlink" href="#dates-and-times-limits-in-python" title="Permalink to this heading">#</a></h3>
