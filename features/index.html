@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
-    <link rel="stylesheet" href="/css/psycopg.css?h=8ef2c935">
+    <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
     <title>Psycopg features — Psycopg</title>
   </head>
   <body>
@@ -62,29 +62,112 @@
         <div id="content" class="col-sm-8 sidebar">
         
   <h1>Psycopg features</h1>
-  <p>Psycopg is written mostly in C and wraps the <a class="reference external" href="https://www.postgresql.org/docs/current/libpq.html">libpq</a> library with the result of being both fast and secure.</p>
-<!-- Please keep consistent with install.rst and setup.py -->
+  <p>Psycopg is a wrapper around the <a class="reference external" href="https://www.postgresql.org/docs/current/libpq.html">libpq</a> library, the official PostgreSQL
+client library. This makes it complete, performing, reliable, secure.</p>
 <ul class="simple">
-<li>Currently supports Python from 3.7 to 3.12 (older versions
-are supported by previous psycopg versions: check the <a class="reference external" href="/docs/news.html">change log</a> for
-details)</li>
-<li>Supports PostgreSQL versions from 7.4 to 16</li>
-<li>Fully compliant implementation of the Python <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB API specification</a> for
-database adapters</li>
-<li>Thread-safe: threads can use different connections or share the same
-connection</li>
-<li><a class="reference external" href="/docs/advanced.html#asynchronous-support">Asynchronous nonblocking I/O</a>, also integrated with <a class="reference external" href="/docs/advanced.html#support-to-coroutine-libraries">coroutine-based
-libraries</a> (<a class="reference external" href="https://www.gevent.org/">gevent</a>, <a class="reference external" href="https://eventlet.net/">Eventlet</a>, <a class="reference external" href="https://uwsgi-docs.readthedocs.io/en/latest/uGreen.html">uGreen</a>)</li>
-<li><a class="reference external" href="/docs/usage.html#adaptation-of-python-values-to-sql-types">Adaptation</a> of many Python objects to database type: tuples to records,
-lists to array, dictionaries to hstore, flexible JSON support</li>
-<li>Extendible with <a class="reference external" href="/docs/advanced.html#adapting-new-python-types-to-sql-syntax">new adapters</a> to convert Python objects to SQL syntax and
-<a class="reference external" href="/docs/advanced.html#type-casting-of-sql-types-into-python-objects">typecasters</a> to convert PostgreSQL types back into Python objects</li>
-<li><a class="reference external" href="/docs/usage.html#server-side-cursors">Server-side cursors</a></li>
-<li><a class="reference external" href="/docs/usage.html#using-copy-to-and-copy-from"><tt class="docutils literal">COPY</tt></a> support</li>
-<li><a class="reference external" href="/docs/usage.html#access-to-postgresql-large-objects">Large objects</a> support</li>
-<li>Can send and receive <a class="reference external" href="/docs/advanced.html#asynchronous-notifications">asynchronous notification</a></li>
-<li>Support for <a class="reference external" href="/docs/usage.html#two-phase-commit-protocol-support">two-phase commit</a></li>
+<li><a class="reference external" href="/psycopg3/docs/">Psycopg 2</a> is still the most used implementation, as it was first
+released in 2006. It is still actively maintained, although no new features
+are planned. Use it if you are maintaining previously written code.</li>
+<li><a class="reference external" href="/docs/">Psycopg 3</a> was first released in 2021 and supports many new Python
+features (static typing, asyncio) and PostgreSQL features (binary protocol,
+pipeline mode) compared to Psycopg 2. Use it if you are developing something
+new!</li>
 </ul>
+<!-- Please keep consistent with install.rst and setup.py -->
+<table border="1" class="features docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Psycopg 2 features</th>
+<th class="head">Psycopg 3 features</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Written mostly in C.</td>
+<td>Written mostly in Python, with C speed-up module.</td>
+</tr>
+<tr><td><div class="first last line-block">
+<div class="line">Supports Python 3.7 to 3.12</div>
+<div class="line">(check the <a class="reference external" href="/docs/news.html">changelog</a> for older versions support).</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Supports Python 3.7 to 3.12</div>
+<div class="line">(check the <a class="reference external" href="/psycopg3/docs/news.html">changelog</a> for older versions support).</div>
+</div>
+</td>
+</tr>
+<tr><td>Supports PostgreSQL from 7.4 to 16.</td>
+<td>Supports PostgreSQL from 10 to 16.</td>
+</tr>
+<tr><td><a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API 2.0</a> compliant.</td>
+<td>DB-API 2.0 compliant.</td>
+</tr>
+<tr><td>Thread-safe: threads can share the same connection.</td>
+<td>Thread-safe: threads can share the same connection.</td>
+</tr>
+<tr class="better-right"><td>Low-level <a class="reference external" href="/docs/advanced.html#asynchronous-support">asynchronous I/O</a>. No native <tt class="docutils literal">asyncio</tt> support.</td>
+<td>Native <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html">asyncio support</a>.</td>
+</tr>
+<tr class="better-left"><td>Integration with <a class="reference external" href="/docs/advanced.html#support-to-coroutine-libraries">coroutine-based libraries</a>
+(<a class="reference external" href="https://www.gevent.org/">gevent</a>, <a class="reference external" href="https://eventlet.net/">Eventlet</a>, <a class="reference external" href="https://uwsgi-docs.readthedocs.io/en/latest/uGreen.html">uGreen</a>).</td>
+<td>Coroutine libraries support <a class="reference external" href="https://github.com/psycopg/psycogreen/issues/9">on its way</a>.</td>
+</tr>
+<tr class="better-right"><td>Built-in <a class="reference external" href="/docs/usage.html#adaptation-of-python-values-to-sql-types">adaptation</a> between many Python objects to database types.</td>
+<td>Native support for <a class="reference external" href="/psycopg3/docs/basic/adapt.html">more Python types</a> (such as Enums) and
+<a class="reference external" href="/psycopg3/docs/basic/pgtypes.html">PostgreSQL types</a> (such as multirange, geometric types).</td>
+</tr>
+<tr class="better-right"><td>Adaptation extendible with <a class="reference external" href="/docs/advanced.html#adapting-new-python-types-to-sql-syntax">new adapters</a> to convert Python objects
+to SQL syntax.</td>
+<td>More flexible and complete <a class="reference external" href="/psycopg3/docs/advanced/adapt.html">adaptation customization</a>.</td>
+</tr>
+<tr class="better-right"><td><ul class="first last simple">
+<li>Client-side parameters binding</li>
+<li><a class="reference external" href="/docs/usage.html#server-side-cursors">Server-side cursors</a></li>
+</ul>
+</td>
+<td><ul class="first last simple">
+<li><a class="reference external" href="/psycopg3/docs/basic/from_pg2.html#server-side-binding">Default server-side parameters binding</a></li>
+<li><a class="reference external" href="/psycopg3/docs/advanced/cursors.html#client-side-binding-cursors">Optional client-side parameters binding</a></li>
+<li><a class="reference external" href="/psycopg3/docs/advanced/cursors.html#server-side-cursors">Server-side cursors</a></li>
+</ul>
+</td>
+</tr>
+<tr class="better-right"><td>Text-only parameters and query results.</td>
+<td>Text and <a class="reference external" href="/psycopg3/docs/basic/params.html#binary-data">binary</a> parameters and query results.</td>
+</tr>
+<tr class="better-right"><td>No prepared statements support.</td>
+<td>Automatic or opt-in <a class="reference external" href="/psycopg3/docs/advanced/prepare.html">prepared statements</a>.</td>
+</tr>
+<tr class="better-right"><td>No pipeline/batch mode support.</td>
+<td><a class="reference external" href="/psycopg3/docs/advanced/pipeline.html">Pipeline/batch mode support</a>.</td>
+</tr>
+<tr class="better-right"><td>File-based <a class="reference external" href="/docs/usage.html#using-copy-to-and-copy-from">COPY support</a>, synchronous only.</td>
+<td><a class="reference external" href="/psycopg3/docs/basic/copy.html#copying-block-by-block">File-based</a> and <a class="reference external" href="/psycopg3/docs/basic/copy.html#writing-data-row-by-row">Python objects-based</a> COPY support.
+<a class="reference external" href="/psycopg3/docs/basic/copy.html#asynchronous-copy-support">Asynchronous copy</a> support.</td>
+</tr>
+<tr class="better-left"><td><a class="reference external" href="/docs/advanced.html#replication-protocol-support">Replication support</a>.</td>
+<td>Replication support <a class="reference external" href="https://github.com/psycopg/psycopg/issues/71">planned</a>.</td>
+</tr>
+<tr class="better-right"><td>Very basic <a class="reference external" href="/docs/pool.html">connection pool</a>.</td>
+<td>A much more <a class="reference external" href="/psycopg3/docs/advanced/pool.html">advanced connection pool</a>.</td>
+</tr>
+<tr class="better-right"><td>No static typing support.</td>
+<td><a class="reference external" href="/psycopg3/docs/advanced/typing.html#static-typing">Static typing support</a>.</td>
+</tr>
+<tr class="better-left"><td><a class="reference external" href="/docs/usage.html#access-to-postgresql-large-objects">Large objects</a> support.</td>
+<td>Large objects support <a class="reference external" href="https://github.com/psycopg/psycopg/issues/73">planned</a>.</td>
+</tr>
+<tr><td>Support for <a class="reference external" href="/docs/advanced.html#asynchronous-notifications">asynchronous notifications</a>.</td>
+<td>Support for <a class="reference external" href="/psycopg3/docs/advanced/async.html#asynchronous-notifications">asynchronous notifications</a>.</td>
+</tr>
+<tr><td>Support for <a class="reference external" href="/docs/usage.html#two-phase-commit-protocol-support">two-phase commit</a>.</td>
+<td>Support for <a class="reference external" href="/psycopg3/docs/basic/transactions.html#two-phase-commit">two-phase commit</a>.</td>
+</tr>
+</tbody>
+</table>
 
 
         </div>
@@ -102,34 +185,7 @@ lists to array, dictionaries to hstore, flexible JSON support</li>
 
 <div class="dashed-top">
 
-  <h3>psycopg2</h3>
-
-  <ul class="fa-ul links">
-    <li>
-      <a href="/docs/">
-        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
-        Documentation</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg2/">
-        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
-        Source code</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg2/issues">
-        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
-        Bug tracker</a>
-    </li>
-    <li>
-      <a href="https://pypi.org/project/psycopg2/">
-        <i class="fa-li fa-lg fa fa-cloud-download" aria-hidden="true"></i>
-        Download</a>
-    </li>
-  </ul>
-</div>
-
-<div class="dashed-top">
-  <h3>psycopg3</h3>
+  <h3>Psycopg 3</h3>
 
   <ul class="fa-ul links">
     <li>
@@ -149,6 +205,28 @@ lists to array, dictionaries to hstore, flexible JSON support</li>
     </li>
     <li>
       <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Psycopg 2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
         <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
         Bug tracker</a>
     </li>
