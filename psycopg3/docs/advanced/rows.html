@@ -296,6 +296,15 @@ they return:</p>
 <span class="go">Person(name=&#39;John Doe&#39;, age=33, weight=None)</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The choice of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> in a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> or a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>
+constructor affects how the object is annotated for static type checking.</p>
+<p>For instance, declaring a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory=dict_row</span></code> will result in the
+cursors’ <code class="xref py py-obj docutils literal notranslate"><span class="pre">executeany()</span></code> annotated as returning <code class="xref py py-obj docutils literal notranslate"><span class="pre">list[dict[str,</span> <span class="pre">Any]]</span></code>
+instead of <code class="xref py py-obj docutils literal notranslate"><span class="pre">list[tuple[Any,</span> <span class="pre">...]]</span></code>.</p>
+<p>Please check <a class="reference internal" href="typing.html#static-typing"><span class="std std-ref">Static Typing</span></a> for more details.</p>
+</div>
 <section id="creating-new-row-factories">
 <span id="row-factory-create"></span><span id="index-1"></span><h2>Creating new row factories<a class="headerlink" href="#creating-new-row-factories" title="Permalink to this heading">#</a></h2>
 <p>A <em>row factory</em> is a callable that accepts a <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> object and returns

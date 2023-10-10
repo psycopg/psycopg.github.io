@@ -258,20 +258,22 @@ by the database.</p>
 <section id="generic-types">
 <h2>Generic types<a class="headerlink" href="#generic-types" title="Permalink to this heading">#</a></h2>
 <p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects are <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> objects and
-support a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> parameter which is the type of the records returned.</p>
-<p>By default methods such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.fetchall()</span></code></a> return normal tuples of unknown
-size and content. As such, the <a class="reference internal" href="../api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> function returns an object of type
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Connection[Tuple[Any,</span> <span class="pre">...]]</span></code> and <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> returns an
-object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Cursor[Tuple[Any,</span> <span class="pre">...]]</span></code>. If you are writing generic
-plumbing code it might be practical to use annotations such as
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection[Any]</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor[Any]</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="c1"># type is psycopg.Connection[Tuple[Any, ...]]</span>
+support a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> parameter which is the type of the records returned. The
+parameter can be configured by passing a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> parameter to the
+constructor or to the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method.</p>
+<p>By default, methods producing records such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.fetchall()</span></code></a> return
+normal tuples of unknown size and content. As such, the <a class="reference internal" href="../api/module.html#psycopg.connect" title="psycopg.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> function
+returns an object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Connection[tuple[Any,</span> <span class="pre">...]]</span></code> and
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor()</span></code></a> returns an object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Cursor[tuple[Any,</span>
+<span class="pre">...]]</span></code>. If you are writing generic plumbing code it might be practical to use
+annotations such as <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection[Any]</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor[Any]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="c1"># type is psycopg.Connection[tuple[Any, ...]]</span>
 
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>      <span class="c1"># type is psycopg.Cursor[Tuple[Any, ...]]</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>      <span class="c1"># type is psycopg.Cursor[tuple[Any, ...]]</span>
 
-<span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>     <span class="c1"># type is Optional[Tuple[Any, ...]]</span>
+<span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>     <span class="c1"># type is Optional[tuple[Any, ...]]</span>
 
-<span class="n">recs</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>    <span class="c1"># type is List[Tuple[Any, ...]]</span>
+<span class="n">recs</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>    <span class="c1"># type is List[tuple[Any, ...]]</span>
 </pre></div>
 </div>
 </section>
@@ -284,14 +286,14 @@ will control what type of record is returned by the fetch methods of the
 cursors and annotate the returned objects accordingly. See
 <a class="reference internal" href="rows.html#row-factories"><span class="std std-ref">Row factories</span></a> for more details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dconn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
-<span class="c1"># dconn type is psycopg.Connection[Dict[str, Any]]</span>
+<span class="c1"># dconn type is psycopg.Connection[dict[str, Any]]</span>
 
 <span class="n">dcur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
 <span class="n">dcur</span> <span class="o">=</span> <span class="n">dconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="c1"># dcur type is psycopg.Cursor[Dict[str, Any]] in both cases</span>
+<span class="c1"># dcur type is psycopg.Cursor[dict[str, Any]] in both cases</span>
 
 <span class="n">drec</span> <span class="o">=</span> <span class="n">dcur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># drec type is Optional[Dict[str, Any]]</span>
+<span class="c1"># drec type is Optional[dict[str, Any]]</span>
 </pre></div>
 </div>
 </section>
@@ -332,7 +334,7 @@ type is not parametric) then it’s not necessary to specify <code class="xref p
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;row_factory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_row</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">connection_class</span><span class="o">=</span><span class="n">MyConnection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">])</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">connection_class</span><span class="o">=</span><span class="n">MyConnection</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
     <span class="c1"># reveal_type(pool): ConnectionPool[MyConnection]</span>
 
     <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
