@@ -270,17 +270,19 @@ The <a class="reference internal" href="api/cursors.html#psycopg.Cursor" title="
 <a class="reference internal" href="api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>, consistently with non-pipeline mode.</p></li>
 </ul>
 </section>
-</section>
-<section id="current-release">
-<h2>Current release<a class="headerlink" href="#current-release" title="Permalink to this heading">#</a></h2>
 <section id="psycopg-3-1-13-unreleased">
 <h3>Psycopg 3.1.13 (unreleased)<a class="headerlink" href="#psycopg-3-1-13-unreleased" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Raise <a class="reference internal" href="api/errors.html#psycopg.DataError" title="psycopg.DataError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataError</span></code></a> instead of whatever internal failure trying to dump a
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> object with with a <code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code> specified as
 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.ZoneInfo" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoneInfo</span></code></a> (ambiguous offset, see ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/652">#652</a>).</p></li>
+<li><p>Handle gracefully EINTR on signals instead of raising <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#InterruptedError" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InterruptedError</span></code></a>,
+consistently with <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0475/"><strong>PEP 475</strong></a> guideline (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/667">#667</a>).</p></li>
 </ul>
 </section>
+</section>
+<section id="current-release">
+<h2>Current release<a class="headerlink" href="#current-release" title="Permalink to this heading">#</a></h2>
 <section id="psycopg-3-1-12">
 <h3>Psycopg 3.1.12<a class="headerlink" href="#psycopg-3-1-12" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -443,7 +445,7 @@ results (ticket <a class="reference external" href="https://github.com/psycopg/p
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">prepare_threshold</span></code> parameter to <a class="reference internal" href="api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> init (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/200">#200</a>).</p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">cursor_factory</span></code> parameter to <a class="reference internal" href="api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> init.</p></li>
 <li><p>Add <a class="reference internal" href="api/errors.html#psycopg.Error.pgconn" title="psycopg.Error.pgconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.pgconn</span></code></a> and <a class="reference internal" href="api/errors.html#psycopg.Error.pgresult" title="psycopg.Error.pgresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error.pgresult</span></code></a> attributes (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/242">#242</a>).</p></li>
-<li><p>Restrict queries to be <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.LiteralString" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LiteralString</span></code></a> as per <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0675/"><strong>PEP 675</strong></a>
+<li><p>Restrict queries to be <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.LiteralString" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LiteralString</span></code></a> as per <span class="target" id="index-2"></span><a class="pep reference external" href="https://peps.python.org/pep-0675/"><strong>PEP 675</strong></a>
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/323">#323</a>).</p></li>
 <li><p>Add explicit type cast to values converted by <a class="reference internal" href="api/sql.html#psycopg.sql.Literal" title="psycopg.sql.Literal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Literal</span></code></a> (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/205">#205</a>).</p></li>
 <li><p>Drop support for Python 3.6.</p></li>
@@ -687,10 +689,10 @@ it, and a <code class="sql docutils literal notranslate"><span class="pre">SET</
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">psycopg</span></code> release notes</a><ul>
 <li><a class="reference internal" href="#future-releases">Future releases</a><ul>
 <li><a class="reference internal" href="#psycopg-3-2-unreleased">Psycopg 3.2 (unreleased)</a></li>
+<li><a class="reference internal" href="#psycopg-3-1-13-unreleased">Psycopg 3.1.13 (unreleased)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#current-release">Current release</a><ul>
-<li><a class="reference internal" href="#psycopg-3-1-13-unreleased">Psycopg 3.1.13 (unreleased)</a></li>
 <li><a class="reference internal" href="#psycopg-3-1-12">Psycopg 3.1.12</a></li>
 <li><a class="reference internal" href="#psycopg-3-1-11">Psycopg 3.1.11</a></li>
 <li><a class="reference internal" href="#psycopg-3-1-10">Psycopg 3.1.10</a></li>
