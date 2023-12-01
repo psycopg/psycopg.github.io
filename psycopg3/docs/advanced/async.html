@@ -345,8 +345,22 @@ the task.</p>
 <p>Previous versions of Psycopg recommended setting up signal handlers to
 manually cancel connections.  This should no longer be necessary.</p>
 </section>
+<section id="gevent-support">
+<span id="gevent"></span><span id="index-3"></span><h2>Gevent support<a class="headerlink" href="#gevent-support" title="Permalink to this heading">#</a></h2>
+<p>Psycopg 3 supports <a class="reference external" href="https://www.gevent.org/">gevent</a> out of the box. If the
+<a class="reference external" href="https://docs.python.org/3/library/socket.html#module-socket" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">socket</span></code></a> module is found patched by functions such as
+<a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_select">gevent.monkey.patch_select()</a> or <a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_all">patch_all()</a>, psycopg will behave in a
+collaborative way.</p>
+<p>Unlike with <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>, using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycogreen</span></code> module is not required.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>gevent support was initially accidental, and was accidentally broken in
+psycopg 3.1.4.</p>
+<p>gevent is officially supported only starting from psycopg 3.1.14.</p>
+</div>
+</section>
 <section id="server-messages">
-<span id="async-messages"></span><span id="index-3"></span><h2>Server messages<a class="headerlink" href="#server-messages" title="Permalink to this heading">#</a></h2>
+<span id="async-messages"></span><span id="index-4"></span><h2>Server messages<a class="headerlink" href="#server-messages" title="Permalink to this heading">#</a></h2>
 <p>PostgreSQL can send, together with the query results, <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS">informative messages</a>
 about the operation just performed, such as warnings or debug information.
 Notices may be raised even if the operations are successful and don’t indicate
@@ -393,7 +407,7 @@ forwarding the whole <code class="xref py py-obj docutils literal notranslate"><
 </div>
 </section>
 <section id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-4"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">#</a></h2>
+<span id="async-notify"></span><span id="index-5"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">#</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form
@@ -457,7 +471,7 @@ received immediately, but only during a connection operation, such as a query.</
 </div>
 </section>
 <section id="detecting-disconnections">
-<span id="disconnections"></span><span id="index-5"></span><h2>Detecting disconnections<a class="headerlink" href="#detecting-disconnections" title="Permalink to this heading">#</a></h2>
+<span id="disconnections"></span><span id="index-6"></span><h2>Detecting disconnections<a class="headerlink" href="#detecting-disconnections" title="Permalink to this heading">#</a></h2>
 <p>Sometimes it is useful to detect immediately when the connection with the
 database is lost. One brutal way to do so is to poll a connection in a loop
 running an endless stream of <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">1</span></code>… <em>Don’t</em> do so: polling is <em>so</em>
@@ -575,6 +589,7 @@ something similar using <a class="reference external" href="https://docs.python.
 <li><a class="reference internal" href="#">Asynchronous operations</a><ul>
 <li><a class="reference internal" href="#with-async-connections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
 <li><a class="reference internal" href="#interrupting-async-operations">Interrupting async operations</a></li>
+<li><a class="reference internal" href="#gevent-support">Gevent support</a></li>
 <li><a class="reference internal" href="#server-messages">Server messages</a></li>
 <li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
 <li><a class="reference internal" href="#detecting-disconnections">Detecting disconnections</a></li>
