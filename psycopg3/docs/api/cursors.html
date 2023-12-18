@@ -182,7 +182,7 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../advanced/index.html">More advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/async.html">Asynchronous operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced/async.html">Concurrent operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/typing.html">Static Typing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../advanced/pool.html">Connection pools</a></li>
@@ -256,11 +256,11 @@ connection’s <a class="reference internal" href="connections.html#psycopg.Conn
 <p>Using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code> parameter on <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> will create a <a class="reference internal" href="#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a> or
 <a class="reference internal" href="#psycopg.AsyncServerCursor" title="psycopg.AsyncServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncServerCursor</span></code></a>, which can be used to retrieve partial results from a
 database.</p>
-<p>A <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can create several cursors, but only one at time can perform
-operations, so they are not the best way to achieve parallelism (you may want
-to operate with several connections instead). All the cursors on the same
-connection have a view of the same session, so they can see each other’s
-uncommitted data.</p>
+<p>Other cursor classes can be created by directly instantiating them, or can be
+set as <a class="reference internal" href="connections.html#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor_factory</span></code></a> to require them on <code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code> call.</p>
+<p>This page describe the details of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class interface. Please refer
+to <a class="reference internal" href="../advanced/cursors.html#cursor-types"><span class="std std-ref">Cursor types</span></a> for general information about the different types of
+cursors available in Psycopg.</p>
 <section id="the-cursor-class">
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code> class<a class="headerlink" href="#the-cursor-class" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
@@ -644,7 +644,7 @@ is text or binary.</p></li>
 <h2>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code> class<a class="headerlink" href="#the-rawcursor-class" title="Permalink to this heading">#</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>See <a class="reference internal" href="../advanced/cursors.html#raw-query-cursors"><span class="std std-ref">Raw Query Cursors</span></a> for details.</p>
+<p>See <a class="reference internal" href="../advanced/cursors.html#raw-query-cursors"><span class="std std-ref">Raw query cursors</span></a> for details.</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.RawCursor">

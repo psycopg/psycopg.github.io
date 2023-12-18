@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Static Typing" href="typing.html" /><link rel="prev" title="More advanced topics" href="index.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.06.21"/>
-        <title>Asynchronous operations - psycopg 3.2.0.dev1 documentation</title>
+        <title>Concurrent operations - psycopg 3.2.0.dev1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -182,7 +182,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Asynchronous operations</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Concurrent operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typing.html">Static Typing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Connection pools</a></li>
@@ -248,8 +248,62 @@
           </label>
         </div>
         <article role="main">
-          <section id="asynchronous-operations">
-<span id="async"></span><span id="index-0"></span><h1>Asynchronous operations<a class="headerlink" href="#asynchronous-operations" title="Permalink to this heading">#</a></h1>
+          <section id="concurrent-operations">
+<span id="concurrency"></span><span id="index-0"></span><h1>Concurrent operations<a class="headerlink" href="#concurrent-operations" title="Permalink to this heading">#</a></h1>
+<p>Psycopg allows to write <em>concurrent</em> code, executing more than one operation
+at time.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> objects <em>are thread-safe</em>: more than one thread at time can use
+the same connection. Different thread can use the same connection by
+creating different cursors.</p></li>
+<li><p><a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects <em>are not thread-safe</em>, and are not designed to be used by
+several threads at the same time. However, cursors are lightweight objects:
+different threads can create each one its own cursor to use independently
+from other threads.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All the cursors that share the same connection <em>will also share the same
+transaction</em>. This means that, if a thread starts a transaction, every
+cursor on the same connection will execute their queries in the same
+transaction and, if one thread causes a database server error, all the
+other cursors will be in error state until transaction rollback.</p>
+<p>It also means that every cursor will see changes made in the same session
+by other cursors, even if the transaction is still uncommitted. This
+effect might be desirable or not, and is something to consider when
+deciding whether to share a connection or not.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Should you use many cursors or many connections?</p>
+<p>Query execution and results retrieval on a connection is serialized: only
+one cursor at time will be able to run a query on the same connection (the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> object will coordinate different cursors’ access). If your
+program runs a mix of database and non-database operations in several
+threads, then these threads might be able to share the same connection.
+However, if you expect to execute massively parallel operations on the
+database, it might be useful to use more than one connection at time,
+rather than many cursors on the same connection (or a mix of both).</p>
+<p>Using several connections, however, has an impact on the server’s
+performance and usually the number of connections that a server can handle
+is limited by grumpy sysadmins with long beards and a strict control on
+the <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-connection.html#GUC-MAX-CONNECTIONS">max_connections</a> server setting.</p>
+<p>If you want to use more than one connection at time, but still avoid to
+create too many connections and starve the server, you might want to use a
+<a class="reference internal" href="pool.html#connection-pools"><span class="std std-ref">connection pool</span></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>Connections are not process-safe</em> and cannot be shared across processes,
+for instance using the facilities of the <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
+<p>If you are using Psycopg in a forking framework (for instance in a web
+server that implements concurrency using multiprocessing), you should make
+sure that the database connections are created after the worker process is
+forked. Failing to do so you will probably find the connection in broken
+state.</p>
+</div>
+<section id="asynchronous-operations">
+<span id="async"></span><span id="index-1"></span><h2>Asynchronous operations<a class="headerlink" href="#asynchronous-operations" title="Permalink to this heading">#</a></h2>
 <p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
 <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
@@ -268,6 +322,10 @@ here and there.</p>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>An <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> can be used by several <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.Task</span></code></a> at the same time.
+However, as with threads, all the <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> on the same connection will
+share the same session and will have their access to the connection
+serialized.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 3.1: </span><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a> performs DNS name resolution in a non-blocking
 way.</p>
@@ -289,8 +347,9 @@ the <a class="reference external" href="https://docs.python.org/3/library/asynci
     <a class="reference external" href="https://docs.python.org/3/library/asyncio-policy.html#asyncio.WindowsSelectorEventLoopPolicy" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.WindowsSelectorEventLoopPolicy</span></code></a>()
 )</pre>
 </div>
+</section>
 <section id="with-async-connections">
-<span id="async-with"></span><span id="index-1"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this heading">#</a></h2>
+<span id="async-with"></span><span id="index-2"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Permalink to this heading">#</a></h2>
 <p>As seen in <a class="reference internal" href="../basic/usage.html#usage"><span class="std std-ref">the basic usage</span></a>, connections and cursors can act as
 context managers, so you can run:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -326,7 +385,7 @@ two steps instead, as in</p>
 you can use the normal <code class="xref py py-obj docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> context manager.</p>
 </section>
 <section id="interrupting-async-operations">
-<span id="async-ctrl-c"></span><span id="index-2"></span><h2>Interrupting async operations<a class="headerlink" href="#interrupting-async-operations" title="Permalink to this heading">#</a></h2>
+<span id="async-ctrl-c"></span><span id="index-3"></span><h2>Interrupting async operations<a class="headerlink" href="#interrupting-async-operations" title="Permalink to this heading">#</a></h2>
 <p>If a long running operation is interrupted by a Ctrl-C on a normal connection
 running in the main thread, the operation will be cancelled and the connection
 will be put in error state, from which can be recovered with a normal
@@ -346,7 +405,7 @@ the task.</p>
 manually cancel connections.  This should no longer be necessary.</p>
 </section>
 <section id="gevent-support">
-<span id="gevent"></span><span id="index-3"></span><h2>Gevent support<a class="headerlink" href="#gevent-support" title="Permalink to this heading">#</a></h2>
+<span id="gevent"></span><span id="index-4"></span><h2>Gevent support<a class="headerlink" href="#gevent-support" title="Permalink to this heading">#</a></h2>
 <p>Psycopg 3 supports <a class="reference external" href="https://www.gevent.org/">gevent</a> out of the box. If the
 <a class="reference external" href="https://docs.python.org/3/library/select.html#module-select" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select</span></code></a> module is found patched by functions such as
 <a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_select">gevent.monkey.patch_select()</a> or <a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_all">patch_all()</a>, psycopg will behave in a
@@ -360,7 +419,7 @@ psycopg 3.1.4.</p>
 </div>
 </section>
 <section id="server-messages">
-<span id="async-messages"></span><span id="index-4"></span><h2>Server messages<a class="headerlink" href="#server-messages" title="Permalink to this heading">#</a></h2>
+<span id="async-messages"></span><span id="index-5"></span><h2>Server messages<a class="headerlink" href="#server-messages" title="Permalink to this heading">#</a></h2>
 <p>PostgreSQL can send, together with the query results, <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS">informative messages</a>
 about the operation just performed, such as warnings or debug information.
 Notices may be raised even if the operations are successful and don’t indicate
@@ -407,7 +466,7 @@ forwarding the whole <code class="xref py py-obj docutils literal notranslate"><
 </div>
 </section>
 <section id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-5"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">#</a></h2>
+<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">#</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form
@@ -471,7 +530,7 @@ received immediately, but only during a connection operation, such as a query.</
 </div>
 </section>
 <section id="detecting-disconnections">
-<span id="disconnections"></span><span id="index-6"></span><h2>Detecting disconnections<a class="headerlink" href="#detecting-disconnections" title="Permalink to this heading">#</a></h2>
+<span id="disconnections"></span><span id="index-7"></span><h2>Detecting disconnections<a class="headerlink" href="#detecting-disconnections" title="Permalink to this heading">#</a></h2>
 <p>Sometimes it is useful to detect immediately when the connection with the
 database is lost. One brutal way to do so is to poll a connection in a loop
 running an endless stream of <code class="sql docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">1</span></code>… <em>Don’t</em> do so: polling is <em>so</em>
@@ -586,7 +645,8 @@ something similar using <a class="reference external" href="https://docs.python.
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Asynchronous operations</a><ul>
+<li><a class="reference internal" href="#">Concurrent operations</a><ul>
+<li><a class="reference internal" href="#asynchronous-operations">Asynchronous operations</a></li>
 <li><a class="reference internal" href="#with-async-connections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections</a></li>
 <li><a class="reference internal" href="#interrupting-async-operations">Interrupting async operations</a></li>
 <li><a class="reference internal" href="#gevent-support">Gevent support</a></li>

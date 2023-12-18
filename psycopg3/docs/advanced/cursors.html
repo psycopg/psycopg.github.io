@@ -182,7 +182,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">More advanced topics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async.html">Concurrent operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typing.html">Static Typing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rows.html">Row factories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Connection pools</a></li>
@@ -250,9 +250,69 @@
         <article role="main">
           <section id="cursor-types">
 <span id="index-0"></span><span id="id1"></span><h1>Cursor types<a class="headerlink" href="#cursor-types" title="Permalink to this heading">#</a></h1>
-<p>Psycopg can manage kinds of “cursors” which differ in where the state of a
-query being processed is stored: <a class="reference internal" href="#client-side-cursors"><span class="std std-ref">Client-side cursors</span></a> and
-<a class="reference internal" href="#server-side-cursors"><span class="std std-ref">Server-side cursors</span></a>.</p>
+<p>Cursors are objects used to send commands to a PostgreSQL connection and to
+manage the results returned by it. They are normally created by the
+connection’s <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method.</p>
+<p>Psycopg can manage different kinds of “cursors”, the objects used to send
+queries and retrieve results from the server. They differ from each other in
+aspects such as:</p>
+<ul class="simple">
+<li><p>Are the parameters bound on the client or on the server?
+<a class="reference internal" href="../basic/from_pg2.html#server-side-binding"><span class="std std-ref">Server-side binding</span></a> can offer better performance (for instance
+allowing to use prepared statements) and reduced memory footprint, but may
+require stricter query definition and certain queries that work in
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> might need to be adapted.</p></li>
+<li><p>Is the query result stored on the client or on the server? Server-side
+cursors allow partial retrieval of large datasets, but they might offer less
+performance in everyday usage.</p></li>
+<li><p>Are queries manipulated by Python (to handle placeholders in <code class="docutils literal notranslate"><span class="pre">%s</span></code> and
+<code class="docutils literal notranslate"><span class="pre">%(name)s</span></code> Python-style) or sent as they are to the PostgreSQL server
+(which only supports <code class="docutils literal notranslate"><span class="pre">$1</span></code>, <code class="docutils literal notranslate"><span class="pre">$2</span></code> parameters)?</p></li>
+</ul>
+<p>Psycopg exposes the following classes to implement the different strategies.
+All the classes are exposed by the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> package. Every class has
+also an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Async</span></code>-prefixed counterparts, designed to be used in conjunction
+with <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> in <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> programs.</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Binding</p></th>
+<th class="head"><p>Storage</p></th>
+<th class="head"><p>Placeholders</p></th>
+<th class="head"><p>See also</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a></p></td>
+<td><p>server-side</p></td>
+<td><p>client-side</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%(name)s</span></code></p></td>
+<td><p><a class="reference internal" href="#client-side-cursors"><span class="std std-ref">Client-side cursors</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a></p></td>
+<td><p>cient-side</p></td>
+<td><p>client-side</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%(name)s</span></code></p></td>
+<td><p><a class="reference internal" href="#client-side-binding-cursors"><span class="std std-ref">Client-side-binding cursors</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor" title="psycopg.ServerCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServerCursor</span></code></a></p></td>
+<td><p>server-side</p></td>
+<td><p>server-side</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%(name)s</span></code></p></td>
+<td><p><a class="reference internal" href="#server-side-cursors"><span class="std std-ref">Server-side cursors</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/cursors.html#psycopg.RawCursor" title="psycopg.RawCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawCursor</span></code></a></p></td>
+<td><p>server-side</p></td>
+<td><p>client-side</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$1</span></code></p></td>
+<td><p><a class="reference internal" href="#raw-query-cursors"><span class="std std-ref">Raw query cursors</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If not specified by a <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor_factory</span></code></a>, <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a>
+will usually produce <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects.</p>
 <section id="client-side-cursors">
 <span id="index-1"></span><span id="id2"></span><h2>Client-side cursors<a class="headerlink" href="#client-side-cursors" title="Permalink to this heading">#</a></h2>
 <p>Client-side cursors are what Psycopg uses in its normal querying process.
@@ -384,7 +444,7 @@ directly call the fetch methods, skipping the <a class="reference internal" href
 </section>
 </section>
 <section id="raw-query-cursors">
-<span id="id6"></span><h2>Raw Query Cursors<a class="headerlink" href="#raw-query-cursors" title="Permalink to this heading">#</a></h2>
+<span id="id6"></span><h2>Raw query cursors<a class="headerlink" href="#raw-query-cursors" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.2.</span></p>
 </div>
@@ -486,7 +546,7 @@ in the form of a list or tuple. This means you cannot use named arguments
 <li><a class="reference internal" href="#stealing-an-existing-cursor">“Stealing” an existing cursor</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#raw-query-cursors">Raw Query Cursors</a></li>
+<li><a class="reference internal" href="#raw-query-cursors">Raw query cursors</a></li>
 </ul>
 </li>
 </ul>
