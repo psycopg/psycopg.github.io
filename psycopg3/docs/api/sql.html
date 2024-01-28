@@ -358,8 +358,29 @@ will be a <a class="reference internal" href="#psycopg.sql.Composed" title="psyc
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code> instance containing the left argument repeated as many times as
 requested.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.sql.Composable.as_string">
+<span class="sig-name descname"><span class="pre">as_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><span class="pre">AdaptContext</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#psycopg.sql.Composable.as_string" title="Permalink to this definition">#</a></dt>
+<dd><p>Return the value of the object as string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/cursor.html#cursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a>) – the context to evaluate the string into.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.2: </span>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">context</span></code> parameter is optional.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If a context is not specified, the results are “generic” and not
+tailored for a specific target connection. Details such as the
+connection encoding and escaping style will not be taken into
+account.</p>
+</div>
+</div>
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.sql.Composable.as_bytes">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><span class="pre">AdaptContext</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="headerlink" href="#psycopg.sql.Composable.as_bytes" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><span class="pre">AdaptContext</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="headerlink" href="#psycopg.sql.Composable.as_bytes" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the value of the object as bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -371,17 +392,9 @@ requested.</p>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Composable</span></code> is passed instead of the query string.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="psycopg.sql.Composable.as_string">
-<span class="sig-name descname"><span class="pre">as_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><span class="pre">AdaptContext</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#psycopg.sql.Composable.as_string" title="Permalink to this definition">#</a></dt>
-<dd><p>Return the value of the object as string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<a class="reference external" href="https://www.psycopg.org/docs/connection.html#connection" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> or <a class="reference external" href="https://www.psycopg.org/docs/cursor.html#cursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a>) – the context to evaluate the string into.</p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.2: </span>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">context</span></code> parameter is optional. See <a class="reference internal" href="#psycopg.sql.Composable.as_string" title="psycopg.sql.Composable.as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_string</span></code></a> for details.</p>
+</div>
 </dd></dl>
 
 <dl class="py class">
@@ -670,8 +683,8 @@ rules used, otherwise only global rules are used.</p>
 <li><a class="reference internal" href="#module-usage">Module usage</a></li>
 <li><a class="reference internal" href="#sql-objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql</span></code> objects</a><ul>
 <li><a class="reference internal" href="#psycopg.sql.Composable"><code class="docutils literal notranslate"><span class="pre">Composable</span></code></a><ul>
-<li><a class="reference internal" href="#psycopg.sql.Composable.as_bytes"><code class="docutils literal notranslate"><span class="pre">Composable.as_bytes()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.sql.Composable.as_string"><code class="docutils literal notranslate"><span class="pre">Composable.as_string()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.sql.Composable.as_bytes"><code class="docutils literal notranslate"><span class="pre">Composable.as_bytes()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psycopg.sql.SQL"><code class="docutils literal notranslate"><span class="pre">SQL</span></code></a><ul>
