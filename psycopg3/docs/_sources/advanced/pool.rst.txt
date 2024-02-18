@@ -131,70 +131,105 @@ context stared by `~ConnectionPool.connection()`):
   the queue, to the first client waiting.
 
 
-Debugging pool usage
---------------------
+Other ways to create a pool
+---------------------------
 
-The pool uses the `logging` module to log some key operations to the
-``psycopg.pool`` logger. If you are trying to debug the pool behaviour you may
-try to log at least the ``INFO`` operations on that logger.
+Using the pool as a context manager is not mandatory: pools can be created and
+used without using the context pattern. However, using the context is the
+safest way to manage its resources.
 
-For example, the script:
+When the pool is created, if its `!open` parameter is `!True`, the connection
+process starts immediately. In a simple program you might create a pool as a
+global object and use it from the rest of your code::
 
-.. code:: python
-
-    import time
-    import logging
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    # module db.py in your program
     from psycopg_pool import ConnectionPool
 
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-    )
-    logging.getLogger("psycopg.pool").setLevel(logging.INFO)
+    pool = ConnectionPool(..., open=True, ...)
+    # the pool starts connecting immediately.
 
-    pool = ConnectionPool(min_size=2)
-    pool.wait()
-    logging.info("pool ready")
+    # in another module
+    from .db import pool
 
-    def square(n):
+    def my_function():
         with pool.connection() as conn:
-            time.sleep(1)
-            rec = conn.execute("SELECT %s * %s", (n, n)).fetchone()
-            logging.info(f"The square of {n} is {rec[0]}.")
+            conn.execute(...)
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(square, n) for n in range(4)]
-        for future in as_completed(futures):
-            future.result()
+Using this pattern, the pool will start the connection process already at
+import time. If that's too early, and you want to delay opening connections
+until the application is ready, you can specify to create a closed pool and
+call the `~ConnectionPool.open()` method (and optionally the
+`~ClonnectionPool.close()` method) at application startup/shutdown. For
+example, in FastAPI, you can use `startup/shutdown events`__::
 
-might print something like:
+    pool = AsyncConnectionPool(..., open=False, ...)
 
-.. code:: text
+    @app.on_event("startup")
+    async def open_pool():
+        await pool.open()
 
-    2023-09-20 11:02:39,718 INFO psycopg.pool: waiting for pool 'pool-1' initialization
-    2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
-    2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
-    2023-09-20 11:02:39,720 INFO psycopg.pool: pool 'pool-1' is ready to use
-    2023-09-20 11:02:39,720 INFO root: pool ready
-    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
-    2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
-    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
-    2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
-    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
-    2023-09-20 11:02:39,722 INFO psycopg.pool: connection requested from 'pool-1'
-    2023-09-20 11:02:40,724 INFO root: The square of 0 is 0.
-    2023-09-20 11:02:40,724 INFO root: The square of 1 is 1.
-    2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
-    2023-09-20 11:02:40,725 INFO psycopg.pool: connection given by 'pool-1'
-    2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
-    2023-09-20 11:02:40,726 INFO psycopg.pool: connection given by 'pool-1'
-    2023-09-20 11:02:41,728 INFO root: The square of 3 is 9.
-    2023-09-20 11:02:41,729 INFO root: The square of 2 is 4.
-    2023-09-20 11:02:41,729 INFO psycopg.pool: returning connection to 'pool-1'
-    2023-09-20 11:02:41,730 INFO psycopg.pool: returning connection to 'pool-1'
+    @app.on_event("shutdown")
+    async def close_pool():
+        await pool.close()
 
-Please do not rely on the messages generated to remain unchanged across
-versions: they don't constitute a stable interface.
+.. __: https://fastapi.tiangolo.com/advanced/events/#events-startup-shutdown
+
+.. warning::
+    The current default for the `!open` parameter is `!True`. However this
+    proved to be not the best idea and, in future releases, the default might
+    be changed to `!False`. As a consequence, if you rely on the pool to be
+    opened on creation, you should specify `!open=True` explicitly.
+
+.. warning::
+    Opening an async pool in the constructor is deprecated and will be removed
+    in the future. When using `AsyncConnectionPool` you should call `await
+    pool.open()` or `async with ... as pool` explicitly.
+
+
+.. _null-pool:
+
+Null connection pools
+---------------------
+
+.. versionadded:: 3.1
+
+Sometimes you may want leave the choice of using or not using a connection
+pool as a configuration parameter of your application. For instance, you might
+want to use a pool if you are deploying a "large instance" of your application
+and can dedicate it a handful of connections; conversely you might not want to
+use it if you deploy the application in several instances, behind a load
+balancer, and/or using an external connection pool process such as PgBouncer.
+
+Switching between using or not using a pool requires some code change, because
+the `ConnectionPool` API is different from the normal `~psycopg.connect()`
+function and because the pool can perform additional connection configuration
+(in the `!configure` parameter) that, if the pool is removed, should be
+performed in some different code path of your application.
+
+The `!psycopg_pool` 3.1 package introduces the `NullConnectionPool` class.
+This class has the same interface, and largely the same behaviour, of the
+`!ConnectionPool`, but doesn't create any connection beforehand. When a
+connection is returned, unless there are other clients already waiting, it
+is closed immediately and not kept in the pool state.
+
+A null pool is not only a configuration convenience, but can also be used to
+regulate the access to the server by a client program. If `!max_size` is set to
+a value greater than 0, the pool will make sure that no more than `!max_size`
+connections are created at any given time. If more clients ask for further
+connections, they will be queued and served a connection as soon as a previous
+client has finished using it, like for the basic pool. Other mechanisms to
+throttle client requests (such as `!timeout` or `!max_waiting`) are respected
+too.
+
+.. note::
+
+    Queued clients will be handed an already established connection, as soon
+    as a previous client has finished using it (and after the pool has
+    returned it to idle state and called `!reset()` on it, if necessary).
+
+Because normally (i.e. unless queued) every client will be served a new
+connection, the time to obtain the connection is paid by the waiting client;
+background workers are not normally involved in obtaining new connections.
 
 
 Pool connection and sizing
@@ -273,100 +308,72 @@ A simple implementation is available as the static method
         ...
 
 
-Other ways to create a pool
----------------------------
+.. _pool-logging:
 
-Using the pool as a context manager is not mandatory: pools can be created and
-used without using the context pattern. However, using the context is the
-safest way to manage its resources.
+Pool operations logging
+-----------------------
 
-When the pool is created, if its `!open` parameter is `!True`, the connection
-process starts immediately. In a simple program you might create a pool as a
-global object and use it from the rest of your code::
+The pool uses the `logging` module to log some key operations to the
+``psycopg.pool`` logger. If you are trying to debug the pool behaviour you may
+try to log at least the ``INFO`` operations on that logger.
 
-    # module db.py in your program
+For example, the script:
+
+.. code:: python
+
+    import time
+    import logging
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     from psycopg_pool import ConnectionPool
 
-    pool = ConnectionPool(..., open=True, ...)
-    # the pool starts connecting immediately.
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
+    logging.getLogger("psycopg.pool").setLevel(logging.INFO)
 
-    # in another module
-    from .db import pool
+    pool = ConnectionPool(min_size=2)
+    pool.wait()
+    logging.info("pool ready")
 
-    def my_function():
+    def square(n):
         with pool.connection() as conn:
-            conn.execute(...)
+            time.sleep(1)
+            rec = conn.execute("SELECT %s * %s", (n, n)).fetchone()
+            logging.info(f"The square of {n} is {rec[0]}.")
 
-Using this pattern, the pool will start the connection process already at
-import time. If that's too early, and you want to delay opening connections
-until the application is ready, you can specify to create a closed pool and
-call the `~ConnectionPool.open()` method (and optionally the
-`~ClonnectionPool.close()` method) at application startup/shutdown. For
-example, in FastAPI, you can use `startup/shutdown events`__::
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(square, n) for n in range(4)]
+        for future in as_completed(futures):
+            future.result()
 
-    pool = ConnectionPool(..., open=False, ...)
+might print something like:
 
-    @app.on_event("startup")
-    def open_pool():
-        pool.open()
+.. code:: text
 
-    @app.on_event("shutdown")
-    def close_pool():
-        pool.close()
+    2023-09-20 11:02:39,718 INFO psycopg.pool: waiting for pool 'pool-1' initialization
+    2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
+    2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
+    2023-09-20 11:02:39,720 INFO psycopg.pool: pool 'pool-1' is ready to use
+    2023-09-20 11:02:39,720 INFO root: pool ready
+    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+    2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
+    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+    2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
+    2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+    2023-09-20 11:02:39,722 INFO psycopg.pool: connection requested from 'pool-1'
+    2023-09-20 11:02:40,724 INFO root: The square of 0 is 0.
+    2023-09-20 11:02:40,724 INFO root: The square of 1 is 1.
+    2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
+    2023-09-20 11:02:40,725 INFO psycopg.pool: connection given by 'pool-1'
+    2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
+    2023-09-20 11:02:40,726 INFO psycopg.pool: connection given by 'pool-1'
+    2023-09-20 11:02:41,728 INFO root: The square of 3 is 9.
+    2023-09-20 11:02:41,729 INFO root: The square of 2 is 4.
+    2023-09-20 11:02:41,729 INFO psycopg.pool: returning connection to 'pool-1'
+    2023-09-20 11:02:41,730 INFO psycopg.pool: returning connection to 'pool-1'
 
-.. __: https://fastapi.tiangolo.com/advanced/events/#events-startup-shutdown
-
-.. warning::
-    The current default for the `!open` parameter is `!True`. However this
-    proved to be not the best idea and, in future releases, the default might
-    be changed to `!False`. As a consequence, if you rely on the pool to be
-    opened on creation, you should specify `!open=True` explicitly.
-
-
-.. _null-pool:
-
-Null connection pools
----------------------
-
-.. versionadded:: 3.1
-
-Sometimes you may want leave the choice of using or not using a connection
-pool as a configuration parameter of your application. For instance, you might
-want to use a pool if you are deploying a "large instance" of your application
-and can dedicate it a handful of connections; conversely you might not want to
-use it if you deploy the application in several instances, behind a load
-balancer, and/or using an external connection pool process such as PgBouncer.
-
-Switching between using or not using a pool requires some code change, because
-the `ConnectionPool` API is different from the normal `~psycopg.connect()`
-function and because the pool can perform additional connection configuration
-(in the `!configure` parameter) that, if the pool is removed, should be
-performed in some different code path of your application.
-
-The `!psycopg_pool` 3.1 package introduces the `NullConnectionPool` class.
-This class has the same interface, and largely the same behaviour, of the
-`!ConnectionPool`, but doesn't create any connection beforehand. When a
-connection is returned, unless there are other clients already waiting, it
-is closed immediately and not kept in the pool state.
-
-A null pool is not only a configuration convenience, but can also be used to
-regulate the access to the server by a client program. If `!max_size` is set to
-a value greater than 0, the pool will make sure that no more than `!max_size`
-connections are created at any given time. If more clients ask for further
-connections, they will be queued and served a connection as soon as a previous
-client has finished using it, like for the basic pool. Other mechanisms to
-throttle client requests (such as `!timeout` or `!max_waiting`) are respected
-too.
-
-.. note::
-
-    Queued clients will be handed an already established connection, as soon
-    as a previous client has finished using it (and after the pool has
-    returned it to idle state and called `!reset()` on it, if necessary).
-
-Because normally (i.e. unless queued) every client will be served a new
-connection, the time to obtain the connection is paid by the waiting client;
-background workers are not normally involved in obtaining new connections.
+Please do not rely on the messages generated to remain unchanged across
+versions: they don't constitute a stable interface.
 
 
 .. _pool-stats:
