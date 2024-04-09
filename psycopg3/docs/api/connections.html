@@ -624,9 +624,44 @@ deallocation; see <a class="reference internal" href="../advanced/prepare.html#p
 
 <p class="rubric">Methods you can use to do something cool</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Connection.cancel_safe">
+<span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.Connection.cancel_safe" title="Permalink to this definition">#</a></dt>
+<dd><p>Cancel the current operation on the connection.</p>
+<p>This is a non-blocking version of <a class="reference internal" href="#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code></a> which
+leverages a more secure and improved cancellation feature of the libpq,
+which is only available from version 17.</p>
+<p>If the underlying libpq is older than version 17, the method will fall
+back to using the same implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method shouldn’t be used as a <a class="reference external" href="https://docs.python.org/3/library/signal.html#signal.signal" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signal</span></code></a> handler.
+Please use <a class="reference internal" href="#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code></a> instead.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Connection.cancel">
 <span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Connection.cancel" title="Permalink to this definition">#</a></dt>
 <dd><p>Cancel the current operation on the connection.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code> method has a few shortcomings:</p>
+<ul class="simple">
+<li><p>it is blocking even on async connections,</p></li>
+<li><p>it <a class="reference external" href="https://www.postgresql.org/docs/devel/libpq-cancel.html#LIBPQ-CANCEL-DEPRECATED">might use an insecure connection</a> even if the original
+connection was secure.</p></li>
+</ul>
+<p>Therefore you should use the <a class="reference internal" href="#psycopg.Connection.cancel_safe" title="psycopg.Connection.cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code></a> method whenever
+possible.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unlike <a class="reference internal" href="#psycopg.Connection.cancel_safe" title="psycopg.Connection.cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code></a>, it is safe to call this method as a
+<a class="reference external" href="https://docs.python.org/3/library/signal.html#signal.signal" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signal</span></code></a> handler.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -964,6 +999,20 @@ block even if there were no error (e.g. to try a no-op process).</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncConnection.cancel_safe">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.AsyncConnection.cancel_safe" title="Permalink to this definition">#</a></dt>
+<dd><p>Cancel the current operation on the connection.</p>
+<p>This is a non-blocking version of <a class="reference internal" href="#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code></a> which
+leverages a more secure and improved cancellation feature of the libpq,
+which is only available from version 17.</p>
+<p>If the underlying libpq is older than version 17, the method will fall
+back to using the same implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.notifies">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">notifies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.AsyncGenerator" title="(in Python v3.12)"><span class="pre">AsyncGenerator</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="objects.html#psycopg.Notify" title="psycopg.Notify"><span class="pre">Notify</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.AsyncConnection.notifies" title="Permalink to this definition">#</a></dt>
 <dd><p>Yield <a class="reference internal" href="objects.html#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a> objects as soon as they are received from the database.</p>
@@ -1119,6 +1168,7 @@ notifications arrives in the same packet.</p></li>
 <li><a class="reference internal" href="#psycopg.Connection.info"><code class="docutils literal notranslate"><span class="pre">Connection.info</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Connection.prepare_threshold"><code class="docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Connection.prepared_max"><code class="docutils literal notranslate"><span class="pre">Connection.prepared_max</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Connection.cancel_safe"><code class="docutils literal notranslate"><span class="pre">Connection.cancel_safe()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Connection.cancel"><code class="docutils literal notranslate"><span class="pre">Connection.cancel()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Connection.notifies"><code class="docutils literal notranslate"><span class="pre">Connection.notifies()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Connection.add_notify_handler"><code class="docutils literal notranslate"><span class="pre">Connection.add_notify_handler()</span></code></a></li>
@@ -1149,6 +1199,7 @@ notifications arrives in the same packet.</p></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.commit"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.commit()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.rollback"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.rollback()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.transaction"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncConnection.cancel_safe"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.cancel_safe()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.notifies"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.notifies()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.set_autocommit"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_autocommit()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncConnection.set_isolation_level"><code class="docutils literal notranslate"><span class="pre">AsyncConnection.set_isolation_level()</span></code></a></li>
