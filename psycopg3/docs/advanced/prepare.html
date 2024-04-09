@@ -145,7 +145,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -242,7 +242,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -283,14 +283,30 @@ prepared statements in PostgreSQL.</p>
 <code class="sql docutils literal notranslate"><span class="pre">PREPARE</span></code> and <code class="sql docutils literal notranslate"><span class="pre">EXECUTE</span></code>, but protocol level commands such as the
 ones exposed by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQSENDPREPARE"><span class="pre">PQsendPrepare</span></a></code>, <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQSENDQUERYPREPARED"><span class="pre">PQsendQueryPrepared</span></a></code>.</p>
 </div>
+<section id="using-prepared-statements-with-pgbouncer">
+<span id="pgbouncer"></span><h2>Using prepared statements with PgBouncer<a class="headerlink" href="#using-prepared-statements-with-pgbouncer" title="Permalink to this heading">#</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Using external connection poolers, such as PgBouncer, is not compatible
-with prepared statements, because the same client connection may change
-the server session it refers to. If such middleware is used you should
-disable prepared statements, by setting the <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a>
-attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Unless a connection pooling middleware explicitly declares otherwise, they
+are not compatible with prepared statements, because the same client
+connection may change the server session it refers to. If such middleware
+is used you should disable prepared statements, by setting the
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a> attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </div>
+<p>Starting from 3.2, Psycopg supports prepared statements when using the
+<a class="reference external" href="https://www.pgbouncer.org/">PgBouncer</a> middleware, using the following caveats:</p>
+<ul class="simple">
+<li><p>PgBouncer version must be at least version <a class="reference external" href="https://www.pgbouncer.org/2024/01/pgbouncer-1-22-0">1.22</a>.</p></li>
+<li><p>PgBouncer <a class="reference external" href="https://www.pgbouncer.org/config.html#max_prepared_statements">max_prepared_statements</a> must be greater than 0.</p></li>
+<li><p>The libpq version on the client must be from PostgreSQL 17 or higher.</p></li>
+</ul>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If libpq 17 is not available on your client, but PgBouncer is 1.22 or
+higher, you can still use Psycopg <em>as long as you disable deallocation</em>.</p>
+<p>You can do so by setting <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepared_max" title="psycopg.Connection.prepared_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.prepared_max</span></code></a> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</div>
+</section>
 </section>
 
         </article>
@@ -337,8 +353,27 @@ attribute to <code class="xref py py-obj docutils literal notranslate"><span cla
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Prepared statements</a><ul>
+<li><a class="reference internal" href="#using-prepared-statements-with-pgbouncer">Using prepared statements with PgBouncer</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
