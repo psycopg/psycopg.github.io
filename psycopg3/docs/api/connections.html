@@ -632,6 +632,11 @@ leverages a more secure and improved cancellation feature of the libpq,
 which is only available from version 17.</p>
 <p>If the underlying libpq is older than version 17, the method will fall
 back to using the same implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can use the <a class="reference internal" href="objects.html#psycopg.Capabilities.has_cancel_safe" title="psycopg.Capabilities.has_cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_cancel_safe</span></code></a> capability to check
+if <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code> will not fall back on the legacy implementation.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This method shouldn’t be used as a <a class="reference external" href="https://docs.python.org/3/library/signal.html#signal.signal" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signal</span></code></a> handler.
@@ -648,7 +653,9 @@ Please use <a class="reference internal" href="#psycopg.Connection.cancel" title
 <dd><p>Cancel the current operation on the connection.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code> method has a few shortcomings:</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code> method is implemented using the <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQCANCEL"><span class="pre">PQcancel</span></a></code>
+function, which is deprecated since PostgreSQL 17, and has a few
+shortcomings:</p>
 <ul class="simple">
 <li><p>it is blocking even on async connections,</p></li>
 <li><p>it <a class="reference external" href="https://www.postgresql.org/docs/devel/libpq-cancel.html#LIBPQ-CANCEL-DEPRECATED">might use an insecure connection</a> even if the original

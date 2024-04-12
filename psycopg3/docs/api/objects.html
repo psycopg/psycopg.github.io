@@ -380,8 +380,9 @@ because it will always be an absolute path, beginning with <code class="docutils
 <dt class="sig sig-object py" id="psycopg.ConnectionInfo.hostaddr">
 <span class="sig-name descname"><span class="pre">hostaddr</span></span><a class="headerlink" href="#psycopg.ConnectionInfo.hostaddr" title="Permalink to this definition">#</a></dt>
 <dd><p>The server IP address of the connection. See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQHOSTADDR"><span class="pre">PQhostaddr()</span></a></code>.</p>
-<p>Only available if the libpq used is at least from PostgreSQL 12.
-Raise <a class="reference internal" href="errors.html#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a> otherwise.</p>
+<p>Only available if the libpq used is from PostgreSQL 12 or newer.
+Raise <a class="reference internal" href="errors.html#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a> otherwise. You can use the
+<a class="reference internal" href="#psycopg.Capabilities.has_hostaddr" title="psycopg.Capabilities.has_hostaddr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_hostaddr</span></code></a> capability to check for support.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -443,6 +444,95 @@ selected (currently <code class="docutils literal notranslate"><span class="pre"
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>The <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">PostgreSQL supported encodings</a>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="libpq-capabilities-information">
+<span id="capabilities"></span><h2>Libpq capabilities information<a class="headerlink" href="#libpq-capabilities-information" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.Capabilities">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Capabilities</span></span><a class="headerlink" href="#psycopg.Capabilities" title="Permalink to this definition">#</a></dt>
+<dd><p>An object to check if a feature is supported by the libpq available on the client.</p>
+<p>An instance of this object is normally exposed by the module as the object
+<a class="reference internal" href="module.html#psycopg.capabilities" title="psycopg.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.capabilities</span></code></a>.</p>
+<p>Every feature check is implemented by an <code class="xref py py-obj docutils literal notranslate"><span class="pre">has_SOMETHING()</span></code> method. All
+the methods return a boolean value stating if the capability is supported,
+which can be used by a program to degrade gracefully:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_pipeline</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
+        <span class="n">operations</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;slower&quot;</span><span class="p">)</span>
+    <span class="n">operations</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, and the capability is not supported, raise a
+<a class="reference internal" href="errors.html#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a> instead of returning <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, explaining why the
+feature is not supported. This allows to make a check at import time,
+crashing early and with a clear description of the problem.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">psycopg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_pipeline</span><span class="p">(</span><span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">  </span><span class="c">...</span>
+<span class="gr">psycopg.NotSupportedError</span>: <span class="n">the feature &#39;Connection.pipeline()&#39; is not available:</span>
+<span class="x">    the client libpq version (imported from system libraries) is 13.4; the</span>
+<span class="x">    feature requires libpq version 14.0 or newer</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_encrypt_password">
+<span class="sig-name descname"><span class="pre">has_encrypt_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_encrypt_password" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn.encrypt_password()</span></code> method is implemented.</p>
+<p>The feature requires libpq 10.0 and greater.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_hostaddr">
+<span class="sig-name descname"><span class="pre">has_hostaddr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_hostaddr" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the <a class="reference internal" href="#psycopg.ConnectionInfo.hostaddr" title="psycopg.ConnectionInfo.hostaddr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionInfo.hostaddr</span></code></a> attribute is implemented.</p>
+<p>The feature requires libpq 12.0 and greater.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_pipeline">
+<span class="sig-name descname"><span class="pre">has_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_pipeline" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the <a class="reference internal" href="../advanced/pipeline.html#pipeline-mode"><span class="std std-ref">pipeline mode</span></a> is supported.</p>
+<p>The feature requires libpq 14.0 and greater.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_set_trace_flags">
+<span class="sig-name descname"><span class="pre">has_set_trace_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_set_trace_flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the <a class="reference internal" href="pq.html#psycopg.pq.PGconn.set_trace_flags" title="psycopg.pq.PGconn.set_trace_flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq.PGconn.set_trace_flags()</span></code></a> method is implemented.</p>
+<p>The feature requires libpq 14.0 and greater.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_cancel_safe">
+<span class="sig-name descname"><span class="pre">has_cancel_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_cancel_safe" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the <a class="reference internal" href="connections.html#psycopg.Connection.cancel_safe" title="psycopg.Connection.cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cancel_safe()</span></code></a> method is implemented.</p>
+<p>The feature requires libpq 17.0 and greater.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code> method is implemented anyway, but it will use
+the legacy <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQCANCEL"><span class="pre">PQcancel</span></a></code> implementation.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Capabilities.has_pgbouncer_prepared">
+<span class="sig-name descname"><span class="pre">has_pgbouncer_prepared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#psycopg.Capabilities.has_pgbouncer_prepared" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if prepared statements in PgBouncer are supported.</p>
+<p>The feature requires libpq 17.0 and greater.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../advanced/prepare.html#pgbouncer"><span class="std std-ref">Using prepared statements with PgBouncer</span></a></p>
 </div>
 </dd></dl>
 
@@ -775,6 +865,18 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
 <li><a class="reference internal" href="#psycopg.ConnectionInfo.options"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.options</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.ConnectionInfo.parameter_status"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.parameter_status()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.ConnectionInfo.encoding"><code class="docutils literal notranslate"><span class="pre">ConnectionInfo.encoding</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#libpq-capabilities-information">Libpq capabilities information</a><ul>
+<li><a class="reference internal" href="#psycopg.Capabilities"><code class="docutils literal notranslate"><span class="pre">Capabilities</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_encrypt_password"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_encrypt_password()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_hostaddr"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_hostaddr()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_pipeline"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_pipeline()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_set_trace_flags"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_set_trace_flags()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_cancel_safe"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_cancel_safe()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Capabilities.has_pgbouncer_prepared"><code class="docutils literal notranslate"><span class="pre">Capabilities.has_pgbouncer_prepared()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -262,6 +262,32 @@ documentation for details.</p>
 instead.</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="psycopg.capabilities">
+<span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">capabilities</span></span><a class="headerlink" href="#psycopg.capabilities" title="Permalink to this definition">#</a></dt>
+<dd><p>An object that can be used to verify that the client library used by
+psycopg implements a certain feature. For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fail at import time if encrypted passwords is not available</span>
+<span class="kn">import</span> <span class="nn">psycopg</span>
+<span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_encrypt_password</span><span class="p">(</span><span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Verify at runtime if a feature can be used</span>
+<span class="k">if</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_hostaddr</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">hostaddr</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unknown connection hostadd&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="objects.html#psycopg.Capabilities" title="psycopg.Capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Capabilities</span></code></a></p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.2.</span></p>
+</div>
+</dd></dl>
+
 <p class="rubric">Exceptions</p>
 <p>The standard <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#exceptions">DBAPI exceptions</a> are exposed both by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module
 and by the <a class="reference internal" href="errors.html#module-psycopg.errors" title="psycopg.errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.errors</span></code></a> module. The latter also exposes more specific
@@ -359,6 +385,7 @@ PostgreSQL builtin type, useful for adaptation customisation (see
             <ul>
 <li><a class="reference internal" href="#">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> module</a><ul>
 <li><a class="reference internal" href="#psycopg.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.capabilities"><code class="docutils literal notranslate"><span class="pre">capabilities</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.adapters"><code class="docutils literal notranslate"><span class="pre">adapters</span></code></a></li>
 </ul>
 </li>
