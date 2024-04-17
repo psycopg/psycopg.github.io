@@ -625,8 +625,16 @@ deallocation; see <a class="reference internal" href="../advanced/prepare.html#p
 <p class="rubric">Methods you can use to do something cool</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Connection.cancel_safe">
-<span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.Connection.cancel_safe" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.Connection.cancel_safe" title="Permalink to this definition">#</a></dt>
 <dd><p>Cancel the current operation on the connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> – raise a <a class="reference internal" href="errors.html#psycopg.errors.CancellationTimeout" title="psycopg.errors.CancellationTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CancellationTimeout</span></code></a> if the
+cancellation request does not succeed within <code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p>
+</dd>
+</dl>
+<p>Note that a successful cancel attempt on the client is not a guarantee
+that the server will successfully manage to cancel the operation.</p>
 <p>This is a non-blocking version of <a class="reference internal" href="#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code></a> which
 leverages a more secure and improved cancellation feature of the libpq,
 which is only available from version 17.</p>
@@ -635,7 +643,13 @@ back to using the same implementation of <code class="xref py py-obj docutils li
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can use the <a class="reference internal" href="objects.html#psycopg.Capabilities.has_cancel_safe" title="psycopg.Capabilities.has_cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_cancel_safe</span></code></a> capability to check
-if <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code> will not fall back on the legacy implementation.</p>
+if <code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code> will not fall back on the legacy libpq
+functions.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code> parameter has no effect for libpq older than version
+17.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -667,7 +681,8 @@ possible.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Unlike <a class="reference internal" href="#psycopg.Connection.cancel_safe" title="psycopg.Connection.cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code></a>, it is safe to call this method as a
-<a class="reference external" href="https://docs.python.org/3/library/signal.html#signal.signal" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signal</span></code></a> handler.</p>
+<a class="reference external" href="https://docs.python.org/3/library/signal.html#signal.signal" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signal</span></code></a> handler. This is pretty much the only case in
+which you might want to use this function.</p>
 </div>
 </dd></dl>
 
@@ -1007,8 +1022,16 @@ block even if there were no error (e.g. to try a no-op process).</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncConnection.cancel_safe">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.AsyncConnection.cancel_safe" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.AsyncConnection.cancel_safe" title="Permalink to this definition">#</a></dt>
 <dd><p>Cancel the current operation on the connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> – raise a <a class="reference internal" href="errors.html#psycopg.errors.CancellationTimeout" title="psycopg.errors.CancellationTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CancellationTimeout</span></code></a> if the
+cancellation request does not succeed within <code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p>
+</dd>
+</dl>
+<p>Note that a successful cancel attempt on the client is not a guarantee
+that the server will successfully manage to cancel the operation.</p>
 <p>This is a non-blocking version of <a class="reference internal" href="#psycopg.Connection.cancel" title="psycopg.Connection.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel()</span></code></a> which
 leverages a more secure and improved cancellation feature of the libpq,
 which is only available from version 17.</p>
