@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
+    <title>Pipeline mode in Psycopg — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sponsors/">Sponsors</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h1>Pipeline mode in Psycopg</h1>
+  
+  <p class="header">
+    Posted by Denis Laxalde on 2024-05-08
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/psycopg3/"
+          >psycopg3</a>,
+      <a class="tag" href="/articles/tag/development/"
+          >development</a>
+      
+    
+  </p>
+  
+    <p><a class="reference external" href="https://www.psycopg.org/articles/2022/08/30/psycopg-31-released/">Version 3.1</a> of Psycopg added support for <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html">libpq pipeline mode</a>, bringing
+significant performance boost, especially when network latency is important.
+In this article, we’ll briefly describe how it works from users’ perspective
+and <em>under the hood</em> while also providing a few implementation details.</p>
+<!-- CUT-HERE -->
+<p>Supporting <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html">libpq pipeline mode</a> involved significant changes to the query
+processing logic in the driver. Yet, the challenge was to make it compatible
+with the “normal” query mode in order to keep the API almost unchanged and
+thus bring performance benefits to users without exposing the complexity of
+the batch query mode.</p>
+<p>For the impatient, head out to the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html">pipeline mode</a> documentation of
+Psycopg: it’s self-consistent, explains nicely the details for
+client/server communication, as well as how things work from the user’s
+perspective.</p>
+<div class="section" id="using-the-pipeline-mode-in-psycopg">
+<h2>Using the pipeline mode in Psycopg</h2>
+<p><tt class="docutils literal">Connection</tt> objects gained a <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.pipeline">pipeline()</a> method to enable the
+pipeline mode through a context manager (<a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#context-managers">&quot;with&quot; statement</a>); so
+using it is as simple as:</p>
+<pre class="code python literal-block">
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span><span class="w">
+</span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span><span class="w">
+</span>   <span class="c1"># do work</span>
+</pre>
+</div>
+<div class="section" id="what-is-the-pipeline-mode-for">
+<h2>What is the pipeline mode for?</h2>
+<p><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PIPELINE-TIPS">Postgres documentation</a> contains advices on when the pipeline mode is
+useful. One particular case is when the application is doing many write
+operations (<tt class="docutils literal">INSERT</tt>, <tt class="docutils literal">UPDATE</tt>, <tt class="docutils literal">DELETE</tt>).</p>
+<p>For instance, let’s consider the following schema:</p>
+<pre class="code sql literal-block">
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="nb">numeric</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="nb">boolean</span><span class="p">)</span>
+</pre>
+<p>and assume an application does a lot of queries like:</p>
+<pre class="code sql literal-block">
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="o">%</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="o">%</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="o">%</span><span class="n">s</span><span class="p">)</span>
+</pre>
+<p>with distinct values. Maybe the application could make use of batch inserts
+such as <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.executemany">executemany()</a>, maybe not (e.g.&nbsp;because it needs to do some other
+operations between inserts, like querying another resource): this does not
+matter much.</p>
+<p>Let’s put this together into a little <tt class="docutils literal">demo.py</tt> Python program:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span> <span class="nn">math</span><span class="w">
+</span><span class="kn">import</span> <span class="nn">sys</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="w">
+</span><span class="kn">import</span> <span class="nn">psycopg</span><span class="w">
+
+</span><span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE IF EXISTS t&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE UNLOGGED TABLE t (x numeric, d timestamp, p boolean)&quot;</span><span class="p">)</span><span class="w">
+
+</span><span class="k">def</span> <span class="nf">do_insert</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO t (x, d, p) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span><span class="w">
+</span>        <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">pipeline</span><span class="p">)</span><span class="w">
+</span>        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">prepare</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+
+</span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>    <span class="n">create_table</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span><span class="w">
+</span>    <span class="k">if</span> <span class="s2">&quot;--pipeline&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span><span class="w">
+</span>        <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span><span class="w">
+</span>            <span class="n">do_insert</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span>    <span class="k">else</span><span class="p">:</span><span class="w">
+</span>        <span class="n">do_insert</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="w">
+</span>    <span class="n">row_count</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select count(*) from t&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;→ </span><span class="si">{</span><span class="n">row_count</span><span class="si">}</span><span class="s2"> rows&quot;</span><span class="p">)</span>
+</pre>
+<p>we’ll run our script as <tt class="docutils literal">python demo.py <span class="pre">[--pipeline]</span></tt>, the
+<tt class="docutils literal"><span class="pre">--pipeline</span></tt> flag allowing to enable pipeline mode. Note that we
+passed <tt class="docutils literal">prepare=True</tt> to <tt class="docutils literal">Connection.execute()</tt>, in order to issue a
+<tt class="docutils literal">PREPARE</tt> statement as we’ll emit the same query many times.</p>
+<p>In general, each <tt class="docutils literal">INSERT</tt> query will be fast to execute server-side.
+Without the pipeline mode enabled, the client will typically issue the
+query and then wait for its result (though it is unused here): thus the
+client/server round-trip time will probably be much larger than the
+execution time (on server). With the pipeline mode, we basically save
+these round-trips most of the times.</p>
+</div>
+<div class="section" id="interlude-tracing">
+<h2>Interlude: tracing</h2>
+<p>When working on optimizing client/server communication, it’s essential
+to be able to monitor this communication at a reasonably <em>low level</em>.
+From Psycopg’s perspective, the boundary is the libpq. Fortunately, the
+library provides a tracing mechanism through the <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQTRACE">PQtrace</a> function and
+friends.</p>
+<p>The output of this function looks like (example taken from the
+<a class="reference external" href="https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/test/modules/libpq_pipeline/traces/prepared.trace;h=1a7de5c3e65e35da3f711e0eeea961cb0b77c5cd;hb=278273ccbad27a8834dfdf11895da9cd91de4114">PostgreSQL test suite</a>):</p>
+<pre class="literal-block">
+F   68  Parse    &quot;select_one&quot; &quot;SELECT $1, '42', $1::numeric, interval '1 sec'&quot; 1 NNNN
+F   16  Describe     S &quot;select_one&quot;
+F   4   Sync
+B   4   ParseComplete
+B   10  ParameterDescription     1 NNNN
+B   113 RowDescription   4 &quot;?column?&quot; NNNN 0 NNNN 4 -1 0 &quot;?column?&quot; NNNN 0 NNNN 65535 -1 0 &quot;numeric&quot; NNNN 0 NNNN 65535 -1 0 &quot;interval&quot; NNNN 0 NNNN 16 -1 0
+B   5   ReadyForQuery    I
+F   10  Query    &quot;BEGIN&quot;
+B   10  CommandComplete  &quot;BEGIN&quot;
+B   5   ReadyForQuery    T
+F   43  Query    &quot;DECLARE cursor_one CURSOR FOR SELECT 1&quot;
+B   19  CommandComplete  &quot;DECLARE CURSOR&quot;
+B   5   ReadyForQuery    T
+F   16  Describe     P &quot;cursor_one&quot;
+F   4   Sync
+B   33  RowDescription   1 &quot;?column?&quot; NNNN 0 NNNN 4 -1 0
+B   5   ReadyForQuery    T
+F   4   Terminate
+</pre>
+<p>Each row contains the “direction indicator” (<tt class="docutils literal">F</tt> for messages from
+client to server or <tt class="docutils literal">B</tt> for messages from server to client), the
+message length, the <a class="reference external" href="https://www.postgresql.org/docs/14/protocol-message-formats.html">message type</a>, and its content. This example shows
+messages from the <a class="reference external" href="https://www.postgresql.org/docs/14/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">Extended Query</a> protocol.</p>
+<p>In Psycopg, we have access to the low-level <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html#psycopg.pq.PGconn">PGconn</a> object,
+representing the libpq connection, through <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.pgconn">Connection.pgconn</a>
+attribute.</p>
+<p>Here’s how to enable tracing to <tt class="docutils literal">stderr</tt>, for our <tt class="docutils literal">demo.py</tt> program
+above:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="w">
+</span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">pq</span><span class="w">
+
+</span><span class="nd">&#64;contextmanager</span><span class="w">
+</span><span class="k">def</span> <span class="nf">trace_to_stderr</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span><span class="w">
+    </span><span class="sd">&quot;&quot;&quot;Enable tracing of the client/server communication to STDERR.&quot;&quot;&quot;</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">set_trace_flags</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">SUPPRESS_TIMESTAMPS</span> <span class="o">|</span> <span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">REGRESS_MODE</span><span class="p">)</span><span class="w">
+</span>    <span class="k">try</span><span class="p">:</span><span class="w">
+</span>        <span class="k">yield</span><span class="w">
+</span>    <span class="k">finally</span><span class="p">:</span><span class="w">
+</span>        <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">untrace</span><span class="p">()</span><span class="w">
+
+</span><span class="k">def</span> <span class="nf">do_insert</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>    <span class="c1"># ...</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">trace_to_stderr</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span><span class="w">
+</span>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span><span class="w">
+</span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">prepare</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre>
+</div>
+<div class="section" id="to-pipeline-or-not-to-pipeline">
+<h2>To pipeline or not to pipeline</h2>
+<p>If we run our demo script (without pipeline mode), we’ll typically get
+the following output:</p>
+<pre class="literal-block">
+F   69  Parse    &quot;_pg3_0&quot; &quot;INSERT INTO t (x, d, p) VALUES ($1, $2, $3)&quot; 3 NNNN NNNN NNNN
+F   4   Sync
+B   4   ParseComplete
+B   5   ReadyForQuery    I
+F   49  Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x00\x01' 8 '\x00\x02\xffffff8b\xffffff8fp~WN' 1 '\x00' 1 0
+F   6   Describe     P &quot;&quot;
+F   9   Execute  &quot;&quot; 0
+F   4   Sync
+B   4   BindComplete
+B   4   NoData
+B   15  CommandComplete  &quot;INSERT 0 1&quot;
+B   5   ReadyForQuery    I
+F   49  Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x00\x01' 8 '\x00\x02\xffffff8b\xffffff8fp~^\xffffff80' 1 '\x00' 1 0
+F   6   Describe     P &quot;&quot;
+F   9   Execute  &quot;&quot; 0
+F   4   Sync
+B   4   BindComplete
+B   4   NoData
+B   15  CommandComplete  &quot;INSERT 0 1&quot;
+B   5   ReadyForQuery    I
+[ ... and so forth ~1000 more times ... ]
+</pre>
+<p>we indeed see the client/server <em>round-trips</em> in the form of sequences
+of <tt class="docutils literal">F</tt> messages followed by sequences of <tt class="docutils literal">B</tt> messages for each
+query.</p>
+<p>The first message sequence <tt class="docutils literal">Parse</tt>+<tt class="docutils literal">ParseComplete</tt> corresponds
+to the <tt class="docutils literal">PREPARE</tt> statement. Next ones only have a
+<tt class="docutils literal">Bind</tt>/<tt class="docutils literal">Describe</tt>/<tt class="docutils literal">Execute</tt> client messages followed by server
+response.</p>
+<p>Now using the pipeline mode (run the script with <tt class="docutils literal"><span class="pre">--pipeline</span></tt>), we get
+the following trace:</p>
+<pre class="literal-block">
+F   69      Parse    &quot;_pg3_0&quot; &quot;INSERT INTO t (x, d, p) VALUES ($1, $2, $3)&quot; 3 NNNN NNNN NNNN
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x00\x00' 8 '\x00\x02\xffffff8e&lt;k\x0c\x16\xffffffe6' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x00\x01' 8 '\x00\x02\xffffff8e&lt;k\x0c\x18\xffffffcd' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x00\x02' 8 '\x00\x02\xffffff8e&lt;k\x0c\x19\xffffff8a' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+[ ... ~300 more of those ... ]
+B   4       ParseComplete
+B   4       BindComplete
+B   4       NoData
+B   15      CommandComplete  &quot;INSERT 0 1&quot;
+B   4       BindComplete
+B   4       NoData
+B   15      CommandComplete  &quot;INSERT 0 1&quot;
+B   4       BindComplete
+B   4       NoData
+B   15      CommandComplete  &quot;INSERT 0 1&quot;
+[ ... ~300 more of those ... ]
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x01&lt;' 8 '\x00\x02\xffffff8e&lt;k\x0c\xffffff96\xffffff8a' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x01=' 8 '\x00\x02\xffffff8e&lt;k\x0c\xffffff9c'' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+F   49      Bind     &quot;&quot; &quot;_pg3_0&quot; 3 1 1 1 3 2 '\x01&gt;' 8 '\x00\x02\xffffff8e&lt;k\x0c\xffffff9c\xffffff85' 1 '\x01' 1 0
+F   6       Describe         P &quot;&quot;
+F   9       Execute  &quot;&quot; 0
+[ ... ]
+</pre>
+<p>We can see that the client sends more than 900 messages before the
+server replies (with the same number of messages). Clearly, this can
+have a huge impact on performance, especially when network latency
+matters. And indeed, this runs twice faster even though the Postgres
+server is on <tt class="docutils literal">localhost</tt>!</p>
+<p>What’s actually happening is that the client sends as many queries as
+possible, until the server decides it cannot manage more (in general
+because its output buffer is full, typically here because of the large
+integers we’re inserting), at which point the server sends back the
+results of all queries; rinse and repeat. Instead of producing small and
+frequent client/server round-trips, the pipeline mode optimizes network
+communication by producing large and scarce round-trips. The “downside”
+(remember we got a 2x speed-up) is that the client program needs to
+handle more data in memory in general.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h2>How does it work?</h2>
+<p>As mentioned earlier, the entry point for the pipeline mode is the
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.pipeline">pipeline()</a> method on <tt class="docutils literal">Connection</tt> object which enters and exists
+pipeline mode. But what does this mean? Well, basically, this involves
+calling underlying <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PQENTERPIPELINEMODE">PQ{enter,exit}PipelineMode</a> functions.</p>
+<p>But this does not tell much about how things work in Psycopg.</p>
+<p>To actually understand how things work, we need to step back and read
+<a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html">libpq pipeline mode</a> documentation, in which section “Interleaving
+Result Processing and Query Dispatch” states:</p>
+<blockquote>
+The client application should generally maintain a queue of work remaining
+to be dispatched and a queue of work that has been dispatched but not yet
+had its results processed. When the socket is writable it should dispatch
+more work. When the socket is readable it should read results and process
+them, matching them up to the next entry in its corresponding results
+queue.</blockquote>
+<p>As often with PostgreSQL, everything is there although this paragraph is
+somehow enigmatic. However, it, in fact, describes the heart of the
+algorithm for the Psycopg driver (though it took us a while to grasp all
+the details implied by these few sentences…).</p>
+<div class="section" id="socket-communication">
+<h3>Socket communication</h3>
+<blockquote>
+When the socket is writable it should dispatch more work. When the
+socket is readable it should read results […].</blockquote>
+<p>In Psycopg, socket communication for exchanging libpq messages is
+implemented through <em>waiting functions</em> and <em>generators</em> that are tied
+together by the I/O layer (either blocking or async): this is explained
+in details in <a class="reference external" href="https://www.varrazzo.com/blog/2020/03/26/psycopg3-first-report/">Daniele’s blog post</a>.</p>
+<p>What’s important for the pipeline mode (mostly) is the generator part,
+as it is responsible for <em>dispatching queries to</em> or <em>reading results
+from</em> the socket. In contrast with normal query mode, where these steps
+are handled sequentially by independent logic, the pipeline mode needs
+<em>interleaving result processing and query dispatch</em>: this is implemented
+by the <a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.1/psycopg/psycopg/generators.py#L180">pipeline_communicate()</a> generator. Without going too much into
+the details, we can notice that: - the function takes a <em>queue</em> of
+“commands”, e.g. <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQSENDQUERYPARAMS">pgconn.send_query_params()</a> or similar, - it
+continuously waits for the socket to be either Read or Write ready (or
+both) (<tt class="docutils literal">ready = yield Wait.RW</tt>), - when the socket is Read-ready
+(<tt class="docutils literal">if ready &amp; Ready.R:</tt>), results are fetched (calling
+<a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQGETRESULT">pgconn.get_result()</a>), - when the socket is Write-ready
+(<tt class="docutils literal">if ready &amp; Ready.W:</tt>), commands are sent (calling <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-async.html#LIBPQ-PQFLUSH">pgconn.flush()</a>
+to flush the queue of previously sent commands, and then calling any
+pending one), - until the queue of commands gets empty.</p>
+</div>
+<div class="section" id="queueing-work-processing-results">
+<h3>Queueing work, processing results</h3>
+<p>Around the <tt class="docutils literal">pipeline_communicate()</tt> generator described above, we need
+to handle the commands queue as well as the queue of results pending
+processing. The first part, filling the commands queue, is simply
+managed by stacking commands instead of directly calling them along with
+keeping a reference of the cursor used for <tt class="docutils literal">execute()</tt>. The second
+part implies handling the output of <a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.1/psycopg/psycopg/generators.py#L180">pipeline_communicate()</a> generator
+described above, a list of <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pq.html#psycopg.pq.PGresult">PGresult</a>. Each fetched result item: - is
+possibly bound back to its respective cursor (the one where respective
+<tt class="docutils literal">execute()</tt> originates from), - might trigger an error if its status
+is non-<tt class="docutils literal">OK</tt> (e.g.&nbsp;<tt class="docutils literal">FATAL_ERROR</tt>).</p>
+<p>All this is handled in methods of the <a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.1/psycopg/psycopg/_pipeline.py#L37">BasePipeline</a> class (see methods
+prefixed with an <tt class="docutils literal">_</tt> at the end).</p>
+</div>
+</div>
+<div class="section" id="integration-with-high-level-features-transactions">
+<h2>Integration with high-level features: transactions</h2>
+<p>Beside the low-level logic described above, implementing pipeline mode
+in Psycopg implied handling some Psycopg-specific features such as:
+transactions.</p>
+<p>Transactions need special attention because of how <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PIPELINE-ERROS">error handling</a>
+works in the pipeline mode. There is a few distinct cases that need to
+be handled properly, depending on whether the pipeline uses an <em>implicit
+transaction</em> or if it contains <em>explicit transactions</em>. But the general
+rule is that when an error occurs, the pipeline gets in <em>aborted</em> state
+meaning subsequent commands are skipped and prior statements might get
+persisted or not (depending on the usage of explicit transactions or
+not).</p>
+<p>Consider the following statements, executed within a pipeline:</p>
+<pre class="code sql literal-block">
+<span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="k">transaction</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'abc'</span><span class="p">);</span><span class="w">
+</span><span class="k">COMMIT</span><span class="p">;</span><span class="w">
+</span><span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="k">transaction</span><span class="w"> </span><span class="mi">2</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">no_such_table</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'x'</span><span class="p">);</span><span class="w">
+</span><span class="k">ROLLBACK</span><span class="p">;</span><span class="w">
+</span><span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="k">transaction</span><span class="w"> </span><span class="mi">3</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'xyz'</span><span class="p">);</span><span class="w">
+</span><span class="k">COMMIT</span><span class="p">;</span><span class="w">
+
+</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w">
+</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">abc</span>
+</pre>
+<p>The <tt class="docutils literal">INSERT INTO no_such_table</tt> statement would produce an error,
+making the pipeline <strong>aborted</strong>; accordingly, the following explicit
+<tt class="docutils literal">ROLLBACK</tt> will not be executed. And the next statements (“transaction
+3”) will also be skipped.</p>
+<p>Another example:</p>
+<pre class="code sql literal-block">
+<span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="k">transaction</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'abc'</span><span class="p">);</span><span class="w">
+</span><span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="n">sub</span><span class="o">-</span><span class="k">transaction</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">no_such_table</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'x'</span><span class="p">);</span><span class="w">
+</span><span class="k">ROLLBACK</span><span class="p">;</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'xyz'</span><span class="p">);</span><span class="w">
+</span><span class="k">COMMIT</span><span class="p">;</span><span class="w">
+
+</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w">
+</span><span class="o">-&gt;</span><span class="w"> </span><span class="p">[]</span>
+</pre>
+<p>Here, still due to the same error in <tt class="docutils literal">INSERT INTO no_such_table</tt>, the
+final <tt class="docutils literal">COMMIT</tt> statement is not executed and the main (outer)
+transaction is not committed (despite the inner sub-transaction is
+explicitly rolled back).</p>
+<p>That’s typically something the user of a high level driver would not
+want.</p>
+<p>In Psycopg, transactions are managed explicitly through the
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/transactions.html#transaction-contexts">transaction()</a> context manager method on <tt class="docutils literal">Connection</tt> objects. So to
+preserve a consistent behaviour, its logic needed to be adapted for the
+pipeline mode. This got achieved by leveraging synchronization points
+through <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PIPELINESYNC">PQpipelineSync</a> and nested pipelines.</p>
+<div class="section" id="nested-pipelines">
+<h3>Nested pipelines</h3>
+<p>In the libpq, there is no such thing as a nested pipeline as the
+connection can only enter pipeline mode once. What’s referred to as a
+“nested pipeline” in Psycopg is the operation to “isolate” a sequence of
+commands in a pipeline session through synchronization points. By doing
+so, we work around the surprising behaviour described above (where a
+committed transaction got rolled back). Here’s what happens:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>  <span class="c1"># emits PQenterPipelineMode</span><span class="w">
+</span>  <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w">
+</span>  <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>  <span class="c1"># emits PQpipelineSync</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w">
+</span>  <span class="c1"># exiting the inner 'with' block emits PQpipelineSync</span><span class="w">
+</span><span class="c1"># exiting the outermost 'with' block emits PQexitPipelineMode</span>
+</pre>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PIPELINESYNC">PQpipelineSync</a> operation <em>resets</em> the pipeline state, thus
+allowing subsequent commands to be run independently of whether previous
+ones succeeded or not. (It also triggers results to be sent back from
+the server, but that’s another matter.)</p>
+</div>
+<div class="section" id="pipelined-transactions">
+<h3>Pipelined transactions</h3>
+<p>By using nested pipelines for Psycopg transactions, we typically follow
+the “logical unit of work” pattern that’s mentioned in <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html">libpq pipeline
+mode</a> documentation:</p>
+<blockquote>
+Pipelines should be scoped to logical units of work, usually (but not
+necessarily) one transaction per pipeline.</blockquote>
+<p>(Except that we’re not strictly use one pipeline per transaction, rather
+a nested one.)</p>
+<p>In practice, it means that it’s safe to use <tt class="docutils literal">with <span class="pre">transaction():</span></tt>
+block within a pipeline session as the semantics of both the transaction
+and the pipeline are preserved: the transaction either succeeds or fails
+overall, it only gets executed if previous commands in the pipeline
+session succeeded:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span><span class="w">
+</span>  <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w">
+</span>  <span class="k">try</span><span class="p">:</span><span class="w">
+</span>      <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>  <span class="c1"># implicit nested pipeline (with conn.pipeline())</span><span class="w">
+</span>          <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w">
+</span>  <span class="k">finally</span><span class="p">:</span><span class="w">
+</span>      <span class="c1"># This will be executed independently of whether the previous</span><span class="w">
+</span>      <span class="c1"># transaction succeeded or not.</span><span class="w">
+</span>      <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre>
+<p>So back to the (second) example above, if written using Psycopg:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span><span class="w">
+</span><span class="o">...</span>     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span><span class="w">
+</span><span class="o">...</span>         <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span><span class="w">
+</span><span class="o">...</span>             <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO s VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">,))</span><span class="w">
+</span><span class="o">...</span>             <span class="k">try</span><span class="p">:</span><span class="w">
+</span><span class="o">...</span>                 <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span><span class="w">
+</span><span class="o">...</span>                     <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO no_such_table VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,))</span><span class="w">
+</span><span class="o">...</span>             <span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">UndefinedTable</span><span class="p">:</span><span class="w">
+</span><span class="o">...</span>                 <span class="k">pass</span><span class="w">
+</span><span class="o">...</span>             <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO s VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;xyz&quot;</span><span class="p">,))</span><span class="w">
+</span><span class="o">...</span>     <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM s ).fetchall()</span><span class="w">
+</span><span class="p">[(</span><span class="s1">'abc'</span><span class="p">,),</span> <span class="p">(</span><span class="s1">'xyz'</span><span class="p">,)]</span>
+</pre>
+<p>we indeed get the inner transaction rolled back, and the outer one
+committed, just like without the pipeline mode.</p>
+<p>That’s an implementation detail, the user does not need to know about
+this as the overall behaviour is hopefully natural.</p>
+<hr class="docutils" />
+<p>Supporting libpq pipeline mode in Psycopg was a large milestone. It
+required months of work with a lot of thinking and testing. There is
+probably more to say about it, like how it transparently manages
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/prepare.html">automatic prepared statement</a> or how <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.executemany">executemany()</a> got optimized to
+use the pipeline mode implicitly (try adapting the demo script above to
+use it — hint: no need for the <tt class="docutils literal">with pipeline:</tt> block). And be sure to
+read the Psycopg’s <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pipeline.html">pipeline mode</a> documentation soon!</p>
+<hr class="docutils" />
+<blockquote>
+This article, originally published at <a class="reference external" href="https://blog.dalibo.com/2022/09/19/psycopg-pipeline-mode.html">Pipeline mode in Psycopg</a>, is used
+under <a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a>
+(introduction shortened).</blockquote>
+</div>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>Psycopg 3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Psycopg 2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2024/">2024</a></li>
+  <li><a href="/articles/2022/">2022</a></li>
+  <li><a href="/articles/2021/">2021</a></li>
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+      <a style="display:none" rel="me" href="https://fosstodon.org/@psycopg">Mastodon</a>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2023 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
