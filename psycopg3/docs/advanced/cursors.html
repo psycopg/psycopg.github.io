@@ -369,6 +369,19 @@ as argument.</p>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>You can also use <a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a> with autocommit mode to disable Extended
+Query Protocol and use Simple Query Protocol instead. This is useful for
+example when issuing <code class="xref py py-obj docutils literal notranslate"><span class="pre">SHOW</span> <span class="pre">STATS</span></code> to a <code class="xref py py-obj docutils literal notranslate"><span class="pre">pgbouncer</span></code> for example, since the
+<a class="reference external" href="https://www.pgbouncer.org/usage.html#admin-console">Pgbouncer Admin Console</a>
+only support Simple Query Protocol.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW STATS&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre></div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Client-side cursors don’t support <a class="reference internal" href="../basic/params.html#binary-data"><span class="std std-ref">binary parameters and return
