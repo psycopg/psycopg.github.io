@@ -369,19 +369,6 @@ as argument.</p>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can also use <a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a> with autocommit mode to disable Extended
-Query Protocol and use Simple Query Protocol instead. This is useful for
-example when issuing <code class="xref py py-obj docutils literal notranslate"><span class="pre">SHOW</span> <span class="pre">STATS</span></code> to a <code class="xref py py-obj docutils literal notranslate"><span class="pre">pgbouncer</span></code> for example, since the
-<a class="reference external" href="https://www.pgbouncer.org/usage.html#admin-console">Pgbouncer Admin Console</a>
-only support Simple Query Protocol.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
-
-<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW STATS&quot;</span><span class="p">)</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-</pre></div>
-</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Client-side cursors don’t support <a class="reference internal" href="../basic/params.html#binary-data"><span class="std std-ref">binary parameters and return
@@ -397,9 +384,39 @@ composition, to mix client- and server-side parameters binding, and allows
 to parametrize tables and fields names too, or entirely generic SQL
 snippets.</p>
 </div>
+<section id="simple-query-protocol">
+<span id="index-3"></span><span id="id4"></span><h3>Simple query protocol<a class="headerlink" href="#simple-query-protocol" title="Permalink to this heading">#</a></h3>
+<p>Using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> should ensure that psycopg will always use the
+<a class="reference external" href="https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SIMPLE-QUERY">simple query protocol</a> for querying. In most cases, the choice of the
+fronted/backend protocol used is transparent on PostgreSQL. However, in some
+case using the simple query protocol is mandatory. This is the case querying
+the <a class="reference external" href="https://www.pgbouncer.org/usage.html#admin-console">PgBouncer admin console</a> for instance, which doesn’t support the
+extended query protocol.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ADMIN_DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW STATS&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1.20: </span>While querying using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> works well with PgBouncer, the
+connection’s COMMIT and ROLLBACK commands are only ensured to be executed
+using the simple query protocol starting from Psycopg 3.1.20.</p>
+<p>In previous versions you should use an autocommit connection in order to
+query the PgBouncer admin console:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ADMIN_DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 <section id="server-side-cursors">
-<span id="index-3"></span><span id="id4"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this heading">#</a></h2>
+<span id="index-4"></span><span id="id7"></span><h2>Server-side cursors<a class="headerlink" href="#server-side-cursors" title="Permalink to this heading">#</a></h2>
 <p>PostgreSQL has its own concept of <em>cursor</em> too (sometimes also called
 <em>portal</em>). When a database cursor is created, the query is not necessarily
 completely processed: the server might be able to produce results only as they
@@ -457,7 +474,7 @@ directly call the fetch methods, skipping the <a class="reference internal" href
 </section>
 </section>
 <section id="raw-query-cursors">
-<span id="id6"></span><h2>Raw query cursors<a class="headerlink" href="#raw-query-cursors" title="Permalink to this heading">#</a></h2>
+<span id="id9"></span><h2>Raw query cursors<a class="headerlink" href="#raw-query-cursors" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.2.</span></p>
 </div>
@@ -554,7 +571,10 @@ in the form of a list or tuple. This means you cannot use named arguments
             <ul>
 <li><a class="reference internal" href="#">Cursor types</a><ul>
 <li><a class="reference internal" href="#client-side-cursors">Client-side cursors</a></li>
-<li><a class="reference internal" href="#client-side-binding-cursors">Client-side-binding cursors</a></li>
+<li><a class="reference internal" href="#client-side-binding-cursors">Client-side-binding cursors</a><ul>
+<li><a class="reference internal" href="#simple-query-protocol">Simple query protocol</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#server-side-cursors">Server-side cursors</a><ul>
 <li><a class="reference internal" href="#stealing-an-existing-cursor">“Stealing” an existing cursor</a></li>
 </ul>
