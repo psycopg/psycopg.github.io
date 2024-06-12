@@ -353,10 +353,57 @@ you only need to implement the <a class="reference internal" href="../api/abc.ht
 <span class="go">[&#39;Manual&#39;]</span>
 </pre></div>
 </div>
-<p>Note that it is possible to use a <a class="reference internal" href="../api/types.html#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a>, exposed by
-any <a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>, to obtain information on builtin types, or
-extension types if they have been registered on that context using the
-<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a> method.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can use a <a class="reference internal" href="../api/types.html#psycopg.types.TypesRegistry" title="psycopg.types.TypesRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypesRegistry</span></code></a>, exposed by
+any <a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>, to obtain information on builtin types, in
+the form of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Global types registry</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">TypeInfo</span><span class="p">:</span> <span class="n">text</span> <span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="n">array</span> <span class="n">oid</span><span class="p">:</span> <span class="mi">1009</span><span class="p">)</span><span class="o">&gt;</span>
+
+<span class="c1"># Types registry on a connection</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;integer&quot;</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">TypeInfo</span><span class="p">:</span> <span class="n">int4</span> <span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span> <span class="n">array</span> <span class="n">oid</span><span class="p">:</span> <span class="mi">1007</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The same method can be used to get information about extension types if
+they have been registered on that context using the
+<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t</span> <span class="o">:=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;hstore&quot;</span><span class="p">))</span>
+<span class="go">&lt;TypeInfo: hstore (oid: 770082, array oid: 770087)&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>  <span class="c1"># globally</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;hstore&quot;</span><span class="p">]</span>
+<span class="go">&lt;TypeInfo: hstore (oid: 770082, array oid: 770087)&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="example-converting-empty-strings-to-null">
+<span id="adapt-example-null-str"></span><h2>Example: converting empty strings to NULL<a class="headerlink" href="#example-converting-empty-strings-to-null" title="Permalink to this heading">#</a></h2>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.2: </span>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code> method can also return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, which will be stored as
+<code class="sql docutils literal notranslate"><span class="pre">NULL</span></code> in the database.</p>
+</div>
+<p>If you prefer to store missing values as <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code>, in the database, but
+your input may contain empty strings, you can subclass the stock string dumper
+to return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> upon empty or whitespace-only strings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.string</span> <span class="kn">import</span> <span class="n">StrDumper</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">NullStrDumper</span><span class="p">(</span><span class="n">StrDumper</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+<span class="gp">... </span>            <span class="k">return</span> <span class="kc">None</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_dumper</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">NullStrDumper</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;  &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">(&#39;foo&#39;, None, &#39;bar&#39;, None)</span>
+</pre></div>
+</div>
 </section>
 <section id="example-postgresql-numeric-to-python-float">
 <span id="adapt-example-float"></span><h2>Example: PostgreSQL numeric to Python float<a class="headerlink" href="#example-postgresql-numeric-to-python-float" title="Permalink to this heading">#</a></h2>
@@ -540,6 +587,7 @@ value will be returned as a string (or bytes string for binary types).</p>
             <ul>
 <li><a class="reference internal" href="#">Data adaptation configuration</a><ul>
 <li><a class="reference internal" href="#writing-a-custom-adapter-xml">Writing a custom adapter: XML</a></li>
+<li><a class="reference internal" href="#example-converting-empty-strings-to-null">Example: converting empty strings to NULL</a></li>
 <li><a class="reference internal" href="#example-postgresql-numeric-to-python-float">Example: PostgreSQL numeric to Python float</a></li>
 <li><a class="reference internal" href="#example-handling-infinity-date">Example: handling infinity date</a></li>
 <li><a class="reference internal" href="#dumpers-and-loaders-life-cycle">Dumpers and loaders life cycle</a></li>
