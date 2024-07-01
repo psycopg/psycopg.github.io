@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-19287248-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-19287248-2');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
+    <title>Psycopg 3.2 released — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sponsors/">Sponsors</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h1>Psycopg 3.2 released</h1>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2024-06-30
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="/articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>It was quite the ride! But we made it!</p>
+<p>After almost two years, 846 commits, more than 700 new tests, more than 20000
+changes in 310 files (I didn't even realise that there were 310 files in this
+project...) Psycopg 3.2 has been released!</p>
+<p>This release brings a few new feature and hopefully no meaningful non-backward
+compatible change. The whole list of changes is available <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-2">in the changelog</a>; these are
+some of the major points explained.</p>
+<!-- CUT-HERE -->
+<div class="section" id="numpy-scalars-support">
+<h2>Numpy scalars support</h2>
+<p>In many scientific applications, <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#built-in-scalar-types">Numpy scalars</a>
+are widely used, either by themselves or in conjunction with regular Python
+values. However there was no support for storing them to the database and a
+conversion to normal Python values was necessary. Starting from Psycopg 3.2
+storing Numpy scalars is automatic and the operation efficient.</p>
+<p>A natural extension would be to convert between Numpy and PostgreSQL arrays
+too. However there hasn't been much demand for the feature, therefore it's
+currently <a class="reference external" href="https://github.com/psycopg/psycopg/issues/336">on the back burner</a> but can be implemented if
+there is demand.</p>
+</div>
+<div class="section" id="postgresql-parameters">
+<h2>PostgreSQL parameters</h2>
+<p>Psycopg uses placeholders such as <tt class="docutils literal">%s</tt> and <tt class="docutils literal">%(name)s</tt> to <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/params.html">pass values to
+queries</a>. These
+formats are familiar to Python developers, but they are quite foreign in
+PostgreSQL environment, because, natively, <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-exec.html#LIBPQ-PQEXECPARAMS">PostgreSQL uses a number-based
+placeholder format</a>
+(such as <tt class="docutils literal">$1</tt>, <tt class="docutils literal">$2</tt>...) Psycopg, internally, converts the first format
+into the second.</p>
+<p>It is now possible to execute queries using the PostgreSQL format by using the
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#raw-query-cursors">raw query cursors</a>,
+which should feel more familiar to PostgreSQL developers and maybe lower the
+barrier to convert programs using large bodies of native queries to Python
+(the PostgreSQL test suite, maybe?)</p>
+<pre class="code python literal-block">
+<span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">RawCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span><span class="w">
+</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ($1 + $2) * $1&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span><span class="w">
+</span><span class="p">(</span><span class="mi">24</span><span class="p">,)</span>
+</pre>
+</div>
+<div class="section" id="scalar-row-factory">
+<h2>Scalar row factory</h2>
+<p>The example above shows a pretty common annoyance. How many times do you need
+a single value from the database and you are returned a tuple?</p>
+<p>Psycopg normally emits records as Python tuples; the behaviour can be
+customized to return named tuples, dictionaries, or entirely custom objects
+with the use of <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/rows.html">row factories</a>.</p>
+<p>In the frequent case of a query returning a single value, the new <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/rows.html#psycopg.rows.scalar_row">scalar_row</a>
+factory will return only that:</p>
+<pre class="code python literal-block">
+<span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">RawCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">row_factory</span><span class="o">=</span><span class="n">scalar_row</span><span class="p">)</span><span class="w">
+</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ($1 + $2) * $1&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span><span class="w">
+</span><span class="mi">24</span>
+</pre>
+<p>This is not a feature of <tt class="docutils literal">RawCursor</tt> only, but it's independent from the
+choice of the cursor class. We just needed to fix the example above!</p>
+</div>
+<div class="section" id="libpq-17-features">
+<h2>Libpq 17 features</h2>
+<p>In the upcoming PostgreSQL 17 release, the libpq (the PostgreSQL client
+library used internally by Psycopg) has seen an unusually intense activity,
+with the introduction of <a class="reference external" href="https://www.postgresql.org/docs/17/release-17.html#RELEASE-17-LIBPQ">several new features</a>.</p>
+<p>Our friend Denis Laxalde has been quick to build features and improvements on
+top of these new functionalities. So, when Psycopg is used with libpq 17, it
+can benefit of features such as:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.cancel_safe">asynchronous, safe cancellation</a></li>
+<li><a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.stream">chunked stream results</a></li>
+<li><a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/prepare.html#pgbouncer">better interaction with PgBouncer</a></li>
+</ul>
+<p>A new <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/objects.html#psycopg.Capabilities">capabilities object</a>
+can help to navigate the differences and to write programs either degrading
+gracefully or crashing helpfully if the libpq used doesn't offer a requested
+functionality.</p>
+</div>
+<div class="section" id="easier-interaction-with-notifications">
+<h2>Easier interaction with notifications</h2>
+<p>Psycopg 3 introduced a <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-notifications">notifications generator</a>
+to receive asynchronous notification from the database. However the generator
+turned out to be... difficult to stop! It could be stopped upon receiving a
+specific notification as a message, but, because of Python quirks, not easily
+from the rest of the program.</p>
+<pre class="code python literal-block">
+<span class="kn">import</span> <span class="nn">psycopg</span><span class="w">
+</span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN mychan&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">gen</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">()</span><span class="w">
+</span><span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">gen</span><span class="p">:</span><span class="w">
+</span>    <span class="nb">print</span><span class="p">(</span><span class="n">notify</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># ehm... please kill me!</span>
+</pre>
+<p>New <tt class="docutils literal">timeout</tt> and <tt class="docutils literal">stop_after</tt> parameters allow for better control of a
+notification listening task (often a component of larger applications) and to
+provide better ways to control its operations. Such as to kindly tell it that
+its services are not requested anymore without having to kill the whole
+program!</p>
+</div>
+<div class="section" id="less-work-for-us">
+<h2>Less work for us!</h2>
+<p>An interesting internal change has helped us to reduce the amount of code to
+write and maintain.</p>
+<p>All the Psycopg objects interacting with the network come in two flavours: one
+implementing &quot;classic&quot; blocking methods (with which concurrency in a process
+can be implemented via multi-threading) and one implementing <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-operations">asynchronous
+methods</a>
+to participate in <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">collaborative concurrency</a>.</p>
+<p>Thanks to an early design choice, all the libpq I/O interaction only happens
+via asynchronous functions and is shared by both the sync and the async
+objects; however the code implementing the outermost objects and highest level
+behaviour had to be pretty much almost duplicated, with the same features
+implemented almost identically with and without async/await keywords, bugs to
+be tested and fixed on two sides...</p>
+<p>We have therefore developed an <a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.2.0/tools/async_to_sync.py">async_to_sync conversion tool</a> to
+generate the synchronous code starting from the AST of the asynchronous
+counterpart. As a result, the 20-25% of the codebase is now automatically
+generated and doesn't require specific maintenance. The process of converting
+the sync side from hand-written to auto-generated has also highlighted subtle
+differences between async and sync behaviours, which have been addressed, and
+affects tests too.</p>
+<p>The technique could be useful for other projects maintaining both sync and
+async code, and is interesting enough to require an article of its own to
+be written...</p>
+</div>
+<div class="section" id="we-need-your-help">
+<h2>We need your help!</h2>
+<p>Psycopg, first v2, now v3, is the de-facto standard for the communication
+between Python and PostgreSQL, two major components of innumerable businesses
+and mission-critical infrastructures.</p>
+<p>Maintaining such a critical library to the highest standard of reliability,
+completeness, performance requires a lot of care and work.</p>
+<p>If you are a Python and PostgreSQL user and would like to make sure that the
+interface between the two is well maintained and continuously improved, please
+consider <a class="reference external" href="https://github.com/sponsors/dvarrazzo">sponsoring the project</a>
+and to be one of <a class="reference external" href="https://www.psycopg.org/sponsors/">our sponsors</a> 💜</p>
+<p>Thank you very much, happy hacking!</p>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>Psycopg 3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Psycopg 2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2024/">2024</a></li>
+  <li><a href="/articles/2022/">2022</a></li>
+  <li><a href="/articles/2021/">2021</a></li>
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+      <a style="display:none" rel="me" href="https://fosstodon.org/@psycopg">Mastodon</a>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright 2010—2023 by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+

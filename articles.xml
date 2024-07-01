@@ -1,5 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Articles</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/articles.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2024-05-08T00:00:00Z</updated><author><name></name></author><entry><title>Pipeline mode in Psycopg</title><link href="https://www.psycopg.org/articles/2024/05/08/psycopg3-pipeline-mode/" rel="alternate"></link><updated>2024-05-08T00:00:00Z</updated><author><name>Denis Laxalde</name></author><id>urn:uuid:cc006cca-31a0-34b1-a369-6a1f6b9d3fbd</id><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.psycopg.org/articles/2022/08/30/psycopg-31-released/"&gt;Version 3.1&lt;/a&gt; of Psycopg added support for &lt;a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html"&gt;libpq pipeline mode&lt;/a&gt;, bringing
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Articles</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/articles.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2024-06-30T00:00:00Z</updated><author><name></name></author><entry><title>Psycopg 3.2 released</title><link href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/" rel="alternate"></link><updated>2024-06-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:31cb8a57-f930-3fb0-82c6-4067eb76bd76</id><content type="html">&lt;p&gt;It was quite the ride! But we made it!&lt;/p&gt;
+&lt;p&gt;After almost two years, 846 commits, more than 700 new tests, more than 20000
+changes in 310 files (I didn't even realise that there were 310 files in this
+project...) Psycopg 3.2 has been released!&lt;/p&gt;
+&lt;p&gt;This release brings a few new feature and hopefully no meaningful non-backward
+compatible change. The whole list of changes is available &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-2"&gt;in the changelog&lt;/a&gt;; these are
+some of the major points explained.&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class="section" id="numpy-scalars-support"&gt;
+&lt;h2&gt;Numpy scalars support&lt;/h2&gt;
+&lt;p&gt;In many scientific applications, &lt;a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#built-in-scalar-types"&gt;Numpy scalars&lt;/a&gt;
+are widely used, either by themselves or in conjunction with regular Python
+values. However there was no support for storing them to the database and a
+conversion to normal Python values was necessary. Starting from Psycopg 3.2
+storing Numpy scalars is automatic and the operation efficient.&lt;/p&gt;
+&lt;p&gt;A natural extension would be to convert between Numpy and PostgreSQL arrays
+too. However there hasn't been much demand for the feature, therefore it's
+currently &lt;a class="reference external" href="https://github.com/psycopg/psycopg/issues/336"&gt;on the back burner&lt;/a&gt; but can be implemented if
+there is demand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="postgresql-parameters"&gt;
+&lt;h2&gt;PostgreSQL parameters&lt;/h2&gt;
+&lt;p&gt;Psycopg uses placeholders such as &lt;tt class="docutils literal"&gt;%s&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;%(name)s&lt;/tt&gt; to &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/params.html"&gt;pass values to
+queries&lt;/a&gt;. These
+formats are familiar to Python developers, but they are quite foreign in
+PostgreSQL environment, because, natively, &lt;a class="reference external" href="https://www.postgresql.org/docs/current/libpq-exec.html#LIBPQ-PQEXECPARAMS"&gt;PostgreSQL uses a number-based
+placeholder format&lt;/a&gt;
+(such as &lt;tt class="docutils literal"&gt;$1&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;$2&lt;/tt&gt;...) Psycopg, internally, converts the first format
+into the second.&lt;/p&gt;
+&lt;p&gt;It is now possible to execute queries using the PostgreSQL format by using the
+&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#raw-query-cursors"&gt;raw query cursors&lt;/a&gt;,
+which should feel more familiar to PostgreSQL developers and maybe lower the
+barrier to convert programs using large bodies of native queries to Python
+(the PostgreSQL test suite, maybe?)&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;psycopg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RawCursor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT ($1 + $2) * $1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;,)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="scalar-row-factory"&gt;
+&lt;h2&gt;Scalar row factory&lt;/h2&gt;
+&lt;p&gt;The example above shows a pretty common annoyance. How many times do you need
+a single value from the database and you are returned a tuple?&lt;/p&gt;
+&lt;p&gt;Psycopg normally emits records as Python tuples; the behaviour can be
+customized to return named tuples, dictionaries, or entirely custom objects
+with the use of &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/rows.html"&gt;row factories&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In the frequent case of a query returning a single value, the new &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/rows.html#psycopg.rows.scalar_row"&gt;scalar_row&lt;/a&gt;
+factory will return only that:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;psycopg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RawCursor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;row_factory&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;scalar_row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT ($1 + $2) * $1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This is not a feature of &lt;tt class="docutils literal"&gt;RawCursor&lt;/tt&gt; only, but it's independent from the
+choice of the cursor class. We just needed to fix the example above!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="libpq-17-features"&gt;
+&lt;h2&gt;Libpq 17 features&lt;/h2&gt;
+&lt;p&gt;In the upcoming PostgreSQL 17 release, the libpq (the PostgreSQL client
+library used internally by Psycopg) has seen an unusually intense activity,
+with the introduction of &lt;a class="reference external" href="https://www.postgresql.org/docs/17/release-17.html#RELEASE-17-LIBPQ"&gt;several new features&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Our friend Denis Laxalde has been quick to build features and improvements on
+top of these new functionalities. So, when Psycopg is used with libpq 17, it
+can benefit of features such as:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.cancel_safe"&gt;asynchronous, safe cancellation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.stream"&gt;chunked stream results&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/prepare.html#pgbouncer"&gt;better interaction with PgBouncer&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A new &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/objects.html#psycopg.Capabilities"&gt;capabilities object&lt;/a&gt;
+can help to navigate the differences and to write programs either degrading
+gracefully or crashing helpfully if the libpq used doesn't offer a requested
+functionality.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="easier-interaction-with-notifications"&gt;
+&lt;h2&gt;Easier interaction with notifications&lt;/h2&gt;
+&lt;p&gt;Psycopg 3 introduced a &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-notifications"&gt;notifications generator&lt;/a&gt;
+to receive asynchronous notification from the database. However the generator
+turned out to be... difficult to stop! It could be stopped upon receiving a
+specific notification as a message, but, because of Python quirks, not easily
+from the rest of the program.&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;psycopg&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;psycopg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;autocommit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;LISTEN mychan&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;gen&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;notifies&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;notify&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;gen&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;notify&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# ehm... please kill me!&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;New &lt;tt class="docutils literal"&gt;timeout&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;stop_after&lt;/tt&gt; parameters allow for better control of a
+notification listening task (often a component of larger applications) and to
+provide better ways to control its operations. Such as to kindly tell it that
+its services are not requested anymore without having to kill the whole
+program!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="less-work-for-us"&gt;
+&lt;h2&gt;Less work for us!&lt;/h2&gt;
+&lt;p&gt;An interesting internal change has helped us to reduce the amount of code to
+write and maintain.&lt;/p&gt;
+&lt;p&gt;All the Psycopg objects interacting with the network come in two flavours: one
+implementing &amp;quot;classic&amp;quot; blocking methods (with which concurrency in a process
+can be implemented via multi-threading) and one implementing &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-operations"&gt;asynchronous
+methods&lt;/a&gt;
+to participate in &lt;a class="reference external" href="https://docs.python.org/3/library/asyncio.html"&gt;collaborative concurrency&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks to an early design choice, all the libpq I/O interaction only happens
+via asynchronous functions and is shared by both the sync and the async
+objects; however the code implementing the outermost objects and highest level
+behaviour had to be pretty much almost duplicated, with the same features
+implemented almost identically with and without async/await keywords, bugs to
+be tested and fixed on two sides...&lt;/p&gt;
+&lt;p&gt;We have therefore developed an &lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.2.0/tools/async_to_sync.py"&gt;async_to_sync conversion tool&lt;/a&gt; to
+generate the synchronous code starting from the AST of the asynchronous
+counterpart. As a result, the 20-25% of the codebase is now automatically
+generated and doesn't require specific maintenance. The process of converting
+the sync side from hand-written to auto-generated has also highlighted subtle
+differences between async and sync behaviours, which have been addressed, and
+affects tests too.&lt;/p&gt;
+&lt;p&gt;The technique could be useful for other projects maintaining both sync and
+async code, and is interesting enough to require an article of its own to
+be written...&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="we-need-your-help"&gt;
+&lt;h2&gt;We need your help!&lt;/h2&gt;
+&lt;p&gt;Psycopg, first v2, now v3, is the de-facto standard for the communication
+between Python and PostgreSQL, two major components of innumerable businesses
+and mission-critical infrastructures.&lt;/p&gt;
+&lt;p&gt;Maintaining such a critical library to the highest standard of reliability,
+completeness, performance requires a lot of care and work.&lt;/p&gt;
+&lt;p&gt;If you are a Python and PostgreSQL user and would like to make sure that the
+interface between the two is well maintained and continuously improved, please
+consider &lt;a class="reference external" href="https://github.com/sponsors/dvarrazzo"&gt;sponsoring the project&lt;/a&gt;
+and to be one of &lt;a class="reference external" href="https://www.psycopg.org/sponsors/"&gt;our sponsors&lt;/a&gt; 💜&lt;/p&gt;
+&lt;p&gt;Thank you very much, happy hacking!&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Pipeline mode in Psycopg</title><link href="https://www.psycopg.org/articles/2024/05/08/psycopg3-pipeline-mode/" rel="alternate"></link><updated>2024-05-08T00:00:00Z</updated><author><name>Denis Laxalde</name></author><id>urn:uuid:cc006cca-31a0-34b1-a369-6a1f6b9d3fbd</id><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.psycopg.org/articles/2022/08/30/psycopg-31-released/"&gt;Version 3.1&lt;/a&gt; of Psycopg added support for &lt;a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html"&gt;libpq pipeline mode&lt;/a&gt;, bringing
 significant performance boost, especially when network latency is important.
 In this article, we’ll briefly describe how it works from users’ perspective
 and &lt;em&gt;under the hood&lt;/em&gt; while also providing a few implementation details.&lt;/p&gt;
@@ -2806,14 +2942,4 @@ versions (&lt;a class="reference external" href="https://psycopg.lighthouseapp.c
 &lt;li&gt;Fixed notices order (&lt;a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/9"&gt;ticket #9&lt;/a&gt;).&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</content></entry><entry><title>Psycopg at PGDay Italy 2010</title><link href="https://www.psycopg.org/articles/2010/11/12/psycopg-pgday-italy-2010/" rel="alternate"></link><updated>2010-11-12T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:07db87bd-f9fc-3840-9855-94198b55b739</id><content type="html">&lt;a class="reference external image-reference" href="https://2010.pgday.it/"&gt;
-&lt;img alt="PGDay Roma, 10 Dicembre 2010" class="inline-right" src="banner_200x60.gif" style="width: 200px; height: 60px;" /&gt;
-&lt;/a&gt;
-&lt;p&gt;Psycopg will be at PGDay Italy in Rome, on December 10th.&lt;/p&gt;
-&lt;!-- CUT-HERE --&gt;
-&lt;p&gt;Psycopg sarà a Roma per il &lt;a class="reference external" href="https://2010.pgday.it/"&gt;PGDay 2010&lt;/a&gt; con ben due interventi:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Accedere a PostgreSQL da Python: uso di base di Psycopg&lt;/strong&gt;: sarà un tutorial di base su come usare Python per accedere a PostgreSQL, presentato come una sessione interattiva e adatto ai principianti.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Uso avanzato di Psycopg per l'accesso a PostgreSQL da Python&lt;/strong&gt;: illustrerà le tecniche più avanzate messe a disposizione dalla libreria (query e notifiche asincrone, cursori lato server, data mapping tra Python e PostgreSQL) e le ultime novità introdotte nella libreria (mapping di dizionari con &lt;tt class="docutils literal"&gt;hstore&lt;/tt&gt;, two-phase commit).&lt;/p&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://2010.pgday.it/registrazione"&gt;Le iscrizioni sono aperte&lt;/a&gt;: fino al 21 novembre sarà possibile registrarsi al prezzo di 50 euro (inclusi coffee break e pranzo). La &lt;a class="reference external" href="https://2010.pgday.it/sede-del-pgday-2010"&gt;sede dell'evento&lt;/a&gt; è al &lt;a class="reference external" href="http://www.icavour.it/"&gt;Centro Congressi iCavour&lt;/a&gt;, a due passi dalla stazione Termini.&lt;/p&gt;
-&lt;p&gt;Ci vediamo a Roma, ciao!&lt;/p&gt;
 </content></entry></feed>
