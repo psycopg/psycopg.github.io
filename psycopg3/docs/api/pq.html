@@ -306,7 +306,7 @@ ImportError: couldn&#39;t import requested psycopg &#39;c&#39; implementation: N
 <p>Certain features might not be available if the libpq library used is too old.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>the <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-misc.html#LIBPQ-PQLIBVERSION"><span class="pre">PQlibVersion()</span></a></code> function</p>
+<p>the <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-misc.html#LIBPQ-PQLIBVERSION"><span class="pre">PQlibVersion()</span></a></code> function</p>
 </div>
 </dd></dl>
 
@@ -323,7 +323,7 @@ available.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="psycopg.pq.error_message">
 <span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">error_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">psycopg.pq.abc.PGconn</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">psycopg.pq.abc.PGresult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">psycopg.pq.abc.PGcancelConn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#psycopg.pq.error_message" title="Permalink to this definition">#</a></dt>
-<dd><p>Return an error message from a <a class="reference internal" href="#psycopg.pq.PGconn" title="psycopg.pq.PGconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn</span></code></a>, <a class="reference internal" href="#psycopg.pq.PGresult" title="psycopg.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGcancelConn</span></code>.</p>
+<dd><p>Return an error message from a <a class="reference internal" href="#psycopg.pq.PGconn" title="psycopg.pq.PGconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn</span></code></a>, <a class="reference internal" href="#psycopg.pq.PGresult" title="psycopg.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a>, <a class="reference internal" href="#psycopg.pq.PGcancelConn" title="psycopg.pq.PGcancelConn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGcancelConn</span></code></a>.</p>
 <p>The return value is a <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> (unlike pq data which is usually <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>):
 use the connection encoding if available, otherwise the <code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code>
 parameter as a fallback for decoding. Don’t raise exceptions on decoding
@@ -352,10 +352,17 @@ libraries such as <a class="reference external" href="https://docs.python.org/3/
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.cancel_conn">
+<span class="sig-name descname"><span class="pre">cancel_conn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.pq.PGcancelConn" title="psycopg.pq.pq_ctypes.PGcancelConn"><span class="pre">PGcancelConn</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.cancel_conn" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a connection over which a cancel request can be sent.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCELCREATE"><span class="pre">PQcancelCreate</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.get_cancel">
 <span class="sig-name descname"><span class="pre">get_cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.pq.PGcancel" title="psycopg.pq.pq_ctypes.PGcancel"><span class="pre">PGcancel</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.get_cancel" title="Permalink to this definition">#</a></dt>
 <dd><p>Create an object with the information needed to cancel a command.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQGETCANCEL"><span class="pre">PQgetCancel</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQGETCANCEL"><span class="pre">PQgetCancel</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -363,21 +370,21 @@ libraries such as <a class="reference external" href="https://docs.python.org/3/
 <span class="sig-name descname"><span class="pre">needs_password</span></span><a class="headerlink" href="#psycopg.pq.PGconn.needs_password" title="Permalink to this definition">#</a></dt>
 <dd><p>True if the connection authentication method required a password,
 but none was available.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQCONNECTIONNEEDSPASSWORD"><span class="pre">PQconnectionNeedsPassword</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-status.html#LIBPQ-PQCONNECTIONNEEDSPASSWORD"><span class="pre">PQconnectionNeedsPassword</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.used_password">
 <span class="sig-name descname"><span class="pre">used_password</span></span><a class="headerlink" href="#psycopg.pq.PGconn.used_password" title="Permalink to this definition">#</a></dt>
 <dd><p>True if the connection authentication method used a password.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQCONNECTIONUSEDPASSWORD"><span class="pre">PQconnectionUsedPassword</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-status.html#LIBPQ-PQCONNECTIONUSEDPASSWORD"><span class="pre">PQconnectionUsedPassword</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.encrypt_password">
 <span class="sig-name descname"><span class="pre">encrypt_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">passwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.encrypt_password" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the encrypted form of a PostgreSQL password.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-misc.html#LIBPQ-PQENCRYPTPASSWORDCONN"><span class="pre">PQencryptPasswordConn</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-misc.html#LIBPQ-PQENCRYPTPASSWORDCONN"><span class="pre">PQencryptPasswordConn</span></a></code> for details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">enc</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">encrypted</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">encrypt_password</span><span class="p">(</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">rolename</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">))</span>
 <span class="go">b&#39;SCRAM-SHA-256$4096:...</span>
@@ -386,10 +393,22 @@ but none was available.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGconn.change_password">
+<span class="sig-name descname"><span class="pre">change_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">passwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.change_password" title="Permalink to this definition">#</a></dt>
+<dd><p>Change a PostgreSQL password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if the command to change password failed.</p>
+</dd>
+</dl>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-misc.html#LIBPQ-PQCHANGEPASSWORD"><span class="pre">PQchangePassword</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.trace">
 <span class="sig-name descname"><span class="pre">trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.trace" title="Permalink to this definition">#</a></dt>
 <dd><p>Enable tracing of the client/server communication to a file stream.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQTRACE"><span class="pre">PQtrace</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-control.html#LIBPQ-PQTRACE"><span class="pre">PQtrace</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -401,14 +420,14 @@ but none was available.</p>
 <dd class="field-odd"><p><strong>flags</strong> – operating mode of tracing.</p>
 </dd>
 </dl>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.untrace">
 <span class="sig-name descname"><span class="pre">untrace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGconn.untrace" title="Permalink to this definition">#</a></dt>
 <dd><p>Disable tracing, previously enabled through <a class="reference internal" href="#psycopg.pq.PGconn.trace" title="psycopg.pq.PGconn.trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trace()</span></code></a>.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQUNTRACE"><span class="pre">PQuntrace</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-control.html#LIBPQ-PQUNTRACE"><span class="pre">PQuntrace</span></a></code> for details.</p>
 </dd></dl>
 
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
@@ -464,6 +483,37 @@ libraries such as <a class="reference external" href="https://docs.python.org/3/
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="psycopg.pq.PGcancelConn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">PGcancelConn</span></span><a class="headerlink" href="#psycopg.pq.PGcancelConn" title="Permalink to this definition">#</a></dt>
+<dd><p>Token to handle non-blocking cancellation requests.</p>
+<p>Created by <a class="reference internal" href="#psycopg.pq.PGconn.cancel_conn" title="psycopg.pq.PGconn.cancel_conn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn.cancel_conn()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGcancelConn.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGcancelConn.start" title="Permalink to this definition">#</a></dt>
+<dd><p>Requests that the server abandons processing of the current command
+in a non-blocking manner.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCELSTART"><span class="pre">PQcancelStart</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGcancelConn.blocking">
+<span class="sig-name descname"><span class="pre">blocking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGcancelConn.blocking" title="Permalink to this definition">#</a></dt>
+<dd><p>Requests that the server abandons processing of the current command
+in a blocking manner.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCELBLOCKING"><span class="pre">PQcancelBlocking</span></a></code> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.pq.PGcancelConn.finish">
+<span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGcancelConn.finish" title="Permalink to this definition">#</a></dt>
+<dd><p>Free the data structure created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">PQcancelCreate()</span></code>.</p>
+<p>Automatically invoked by <code class="xref py py-obj docutils literal notranslate"><span class="pre">__del__()</span></code>.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCELFINISH"><span class="pre">PQcancelFinish()</span></a></code> for details.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="psycopg.pq.PGcancel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">PGcancel</span></span><a class="headerlink" href="#psycopg.pq.PGcancel" title="Permalink to this definition">#</a></dt>
 <dd><p>Token to cancel the current operation on a connection.</p>
@@ -471,16 +521,16 @@ libraries such as <a class="reference external" href="https://docs.python.org/3/
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGcancel.free">
 <span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGcancel.free" title="Permalink to this definition">#</a></dt>
-<dd><p>Free the data structure created by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQGETCANCEL"><span class="pre">PQgetCancel()</span></a></code>.</p>
+<dd><p>Free the data structure created by <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQGETCANCEL"><span class="pre">PQgetCancel()</span></a></code>.</p>
 <p>Automatically invoked by <code class="xref py py-obj docutils literal notranslate"><span class="pre">__del__()</span></code>.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQFREECANCEL"><span class="pre">PQfreeCancel()</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQFREECANCEL"><span class="pre">PQfreeCancel()</span></a></code> for details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGcancel.cancel">
 <span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.pq.PGcancel.cancel" title="Permalink to this definition">#</a></dt>
 <dd><p>Requests that the server abandon processing of the current command.</p>
-<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-cancel.html#LIBPQ-PQCANCEL"><span class="pre">PQcancel()</span></a></code> for details.</p>
+<p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCEL"><span class="pre">PQcancel()</span></a></code> for details.</p>
 </dd></dl>
 
 </dd></dl>
@@ -498,7 +548,7 @@ during the connection phase and are considered internal.
 <a class="reference internal" href="#psycopg.pq.ConnStatus.ALLOCATED" title="psycopg.pq.ConnStatus.ALLOCATED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALLOCATED</span></code></a> is only expected to be returned by <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGcancelConn.status</span></code>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQSTATUS"><span class="pre">PQstatus()</span></a></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">PQcancelStatus()</span></code> return this value.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-status.html#LIBPQ-PQSTATUS"><span class="pre">PQstatus()</span></a></code> and <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-cancel.html#LIBPQ-PQCANCELSTATUS"><span class="pre">PQcancelStatus()</span></a></code> return this value.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.ConnStatus.OK">
@@ -524,7 +574,7 @@ during the connection phase and are considered internal.
 <p>If <code class="docutils literal notranslate"><span class="pre">READING</span></code> or <code class="docutils literal notranslate"><span class="pre">WRITING</span></code> you may select before polling again.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-connect.html#LIBPQ-PQCONNECTSTARTPARAMS"><span class="pre">PQconnectPoll</span></a></code> for a description of these states.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-connect.html#LIBPQ-PQCONNECTSTARTPARAMS"><span class="pre">PQconnectPoll</span></a></code> for a description of these states.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.PollingStatus.FAILED">
@@ -554,7 +604,7 @@ during the connection phase and are considered internal.
 <dd><p>The transaction status of a connection.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-status.html#LIBPQ-PQTRANSACTIONSTATUS"><span class="pre">PQtransactionStatus</span></a></code> for a description of these states.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-status.html#LIBPQ-PQTRANSACTIONSTATUS"><span class="pre">PQtransactionStatus</span></a></code> for a description of these states.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.TransactionStatus.IDLE">
@@ -589,7 +639,7 @@ during the connection phase and are considered internal.
 <dd><p>The status of a command.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-exec.html#LIBPQ-PQRESULTSTATUS"><span class="pre">PQresultStatus</span></a></code> for a description of these states.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-exec.html#LIBPQ-PQRESULTSTATUS"><span class="pre">PQresultStatus</span></a></code> for a description of these states.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.ExecStatus.EMPTY_QUERY">
@@ -664,7 +714,7 @@ during the connection phase and are considered internal.
 <dd><p>Pipeline mode status of the libpq connection.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-pipeline-mode.html#LIBPQ-PQPIPELINESTATUS"><span class="pre">PQpipelineStatus</span></a></code> for a description of these states.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-pipeline-mode.html#LIBPQ-PQPIPELINESTATUS"><span class="pre">PQpipelineStatus</span></a></code> for a description of these states.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.PipelineStatus.OFF">
@@ -747,7 +797,7 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-exec.html#LIBPQ-PQRESULTERRORFIELD"><span class="pre">PQresultErrorField</span></a></code> for a description of these values.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-exec.html#LIBPQ-PQRESULTERRORFIELD"><span class="pre">PQresultErrorField</span></a></code> for a description of these values.</p>
 </div>
 </dd></dl>
 
@@ -757,7 +807,7 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 <dd><p>Response from a ping attempt.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-connect.html#LIBPQ-PQPINGPARAMS"><span class="pre">PQpingParams</span></a></code> for a description of these values.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-connect.html#LIBPQ-PQPINGPARAMS"><span class="pre">PQpingParams</span></a></code> for a description of these values.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.Ping.OK">
@@ -787,7 +837,7 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 <dd><p>Enum to control tracing of the client/server communication.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/14/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for a description of these values.</p>
+<p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/17/libpq-control.html#LIBPQ-PQSETTRACEFLAGS"><span class="pre">PQsetTraceFlags</span></a></code> for a description of these values.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.Trace.SUPPRESS_TIMESTAMPS">
@@ -872,10 +922,12 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 <li><a class="reference internal" href="#objects-wrapping-libpq-structures-and-functions">Objects wrapping libpq structures and functions</a><ul>
 <li><a class="reference internal" href="#psycopg.pq.PGconn"><code class="docutils literal notranslate"><span class="pre">PGconn</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.pgconn_ptr"><code class="docutils literal notranslate"><span class="pre">PGconn.pgconn_ptr</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.pq.PGconn.cancel_conn"><code class="docutils literal notranslate"><span class="pre">PGconn.cancel_conn()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.get_cancel"><code class="docutils literal notranslate"><span class="pre">PGconn.get_cancel()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.needs_password"><code class="docutils literal notranslate"><span class="pre">PGconn.needs_password</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.used_password"><code class="docutils literal notranslate"><span class="pre">PGconn.used_password</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.encrypt_password"><code class="docutils literal notranslate"><span class="pre">PGconn.encrypt_password()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.pq.PGconn.change_password"><code class="docutils literal notranslate"><span class="pre">PGconn.change_password()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.trace"><code class="docutils literal notranslate"><span class="pre">PGconn.trace()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.set_trace_flags"><code class="docutils literal notranslate"><span class="pre">PGconn.set_trace_flags()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGconn.untrace"><code class="docutils literal notranslate"><span class="pre">PGconn.untrace()</span></code></a></li>
@@ -887,6 +939,12 @@ support automatically-chosen values: see <a class="reference internal" href="ada
 </li>
 <li><a class="reference internal" href="#psycopg.pq.Conninfo"><code class="docutils literal notranslate"><span class="pre">Conninfo</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.Escaping"><code class="docutils literal notranslate"><span class="pre">Escaping</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.pq.PGcancelConn"><code class="docutils literal notranslate"><span class="pre">PGcancelConn</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.pq.PGcancelConn.start"><code class="docutils literal notranslate"><span class="pre">PGcancelConn.start()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.pq.PGcancelConn.blocking"><code class="docutils literal notranslate"><span class="pre">PGcancelConn.blocking()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.pq.PGcancelConn.finish"><code class="docutils literal notranslate"><span class="pre">PGcancelConn.finish()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#psycopg.pq.PGcancel"><code class="docutils literal notranslate"><span class="pre">PGcancel</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.pq.PGcancel.free"><code class="docutils literal notranslate"><span class="pre">PGcancel.free()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.pq.PGcancel.cancel"><code class="docutils literal notranslate"><span class="pre">PGcancel.cancel()</span></code></a></li>
