@@ -71,18 +71,16 @@
     
       <br />
       Tagged as
-      <a class="tag" href="/"
-          >article</a>,
-      <a class="tag" href="/"
-          >internals</a>,
-      <a class="tag" href="/"
-          >hacking</a>
+      <a class="tag" href="/articles/tag/psycopg3/"
+          >psycopg3</a>,
+      <a class="tag" href="/articles/tag/development/"
+          >development</a>
       
     
   </p>
   
-    <p>Psycopg 3 exposes both a sync and an async interface. For every object used to
-perform some I/O operation, such as <tt class="docutils literal">Connection</tt>, <tt class="docutils literal">Cursor</tt>, there is an
+    <p>Psycopg 3 provide both a sync and an async Python interface. For each object used to
+perform I/O operations, such as <tt class="docutils literal">Connection</tt>, <tt class="docutils literal">Cursor</tt>, there is an
 async counterpart: <tt class="docutils literal">AsyncConnection</tt>, <tt class="docutils literal">AsyncCursor</tt>, with an intuitive
 interface: just add the right <tt class="docutils literal">async</tt> or <tt class="docutils literal">await</tt> keyword where needed:</p>
 <pre class="code python literal-block">
@@ -96,53 +94,58 @@ interface: just add the right <tt class="docutils literal">async</tt> or <tt cla
 </span><span class="n">acur</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aconn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select now()&quot;</span><span class="p">)</span><span class="w">
 </span><span class="nb">print</span><span class="p">((</span><span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
 </pre>
-<p>The decision to provide both sync and async code was <a class="reference external" href="https://www.varrazzo.com/blog/2020/03/26/psycopg3-first-report/">an early one in Psycopg
-3 development</a>, so we tried to make most of the code already sync/async
-compatible in order to keep code duplication at a minimum. This was achieved
-by making all the libpq communication async, and to write the networking code
-as generators, yielding at the moment they need to wait, isolating the
-differences in the sync/async waiting policy all in <tt class="docutils literal">wait()</tt> functions.</p>
-<p>This helped to make the async/sync differences between Python and PostgreSQL
-minimal. However, the interface between Psycopg and the Python user,  is still
-a lot to maintain, and is made of a lot of code very similar, almost
-duplicated, between the sync and async side. Apart from the obvious
-<tt class="docutils literal">async</tt>/<tt class="docutils literal">await</tt> keywords, there would be subtle implementation
-differences, for instance:</p>
+<p>The decision to provide both sync and async code <a class="reference external" href="https://www.varrazzo.com/blog/2020/03/26/psycopg3-first-report/">was made early in the
+development of Psycopg 3</a> and most of the internal code is written in a way
+to be compatible with both sync and async code, in order to keep code
+duplication to a minimum. This was achieved by making all the libpq
+communication async, and writing the network code as generators,
+<tt class="docutils literal">yield</tt>ing at the moment they need to wait, isolating the differences in
+the sync/async wait policy all in <tt class="docutils literal">wait()</tt> functions.</p>
+<p>This helped to minimise the async/sync differences in the code related to the
+communication between Python and PostgreSQL. However, the interface between
+Psycopg and the Python user is still a lot to maintain, and consists of a lot
+of code that is very similar, almost duplicated, between the sync and async
+sided. Apart from the obvious <tt class="docutils literal">async</tt>/<tt class="docutils literal">await</tt> keywords, there would be
+subtle implementation differences, for example:</p>
 <ul class="simple">
 <li>using <tt class="docutils literal">await asyncio.sleep()</tt> instead of <tt class="docutils literal">time.sleep()</tt>;</li>
 <li><tt class="docutils literal">asyncio.create_task(f(arg1, arg2))</tt> is similar to <tt class="docutils literal">thread.Thread(f,
 (arg1, <span class="pre">arg2)).start()</span></tt>;</li>
 <li><tt class="docutils literal">threading.Event</tt> has a <tt class="docutils literal">asyncio.Event</tt> counterpart whose <tt class="docutils literal">lock()</tt>
 method doesn't have a <tt class="docutils literal">timeout</tt>, parameter, so <tt class="docutils literal">event.wait(timeout=10)</tt>
-must be rewritten as <tt class="docutils literal"><span class="pre">asyncio.wait_for(event.wait(),</span> timeout=10)</tt>.</li>
+needs to be rewritten as <tt class="docutils literal"><span class="pre">asyncio.wait_for(event.wait(),</span> timeout=10)</tt>.</li>
 </ul>
-<p>Until Psycopg 3.1, the two variants of each objects were developed manually.
-Once a change was made on the sync side, it had to be ported to the async
-side, with cumbersome and noisy diffs, and subtle differences introduced every
-now and then. Even the tests were pretty much duplicated (with some sync test
-lost in the async side, or the other way round). It seemed a situation that
-could have been improved.</p>
+<p>Up to Psycopg 3.1, the two variants of each object were developed manually.
+Every time changes were made on the sync side, they had to be ported to the
+async side, with cumbersome and noisy diffs, and subtle differences being
+introduced from time to time. Even the tests were pretty much duplicated (with
+some sync tests being accidentally lost on the async side, or vice versa). It
+seemed like a situation that could have been improved.</p>
 <div class="section" id="this-is-so-boring-that">
 <h2>This is so boring that...</h2>
-<p>...a computer should do it for me instead. Looking at the code, it is obvious
-that the async side has more information than the sync counterpart (every
-method definition and call clearly indicate whether it will block or not) and
-most differences are minimal and repetitive. What we want then is <em>a script
-taking an asyncio-based source code as input and emitting equivalent sync
-code</em>. This article describes how such a script can be implemented and how it
-is used for the transformation and the maintenance of the Psycopg 3 codebase.</p>
+<p>...a computer should do it for me instead.</p>
+<p>Writing the async side starting from the sync side? Actually, the opposite. It
+is obvious that the async side has more information than the sync side (every
+method definition and call clearly indicates whether it will block or not) and
+most of the differences are minimal and repetitive. What we want then is <em>a
+script that takes asyncio-based source code as input and outputs
+equivalent sync code</em>.</p>
+<p>This article describes what we did to implement such a script and how we used
+it for the initial transformation (replacing manually written sync code with
+auto-generated code without loss of quality) and how we are currently using it
+to maintain the Psycopg 3 codebase.</p>
 </div>
 <div class="section" id="abstract-syntax-tree">
 <h2>Abstract Syntax Tree</h2>
 <p>You would be tempted to write a bunch of regular expressions to just scrub
 away every <tt class="docutils literal">async</tt> and <tt class="docutils literal">await</tt> keyword found, but the source code is
-likely the wrong level to attack the problem: Python knows well how to parse
-Python and can allow us to reason at a higher level.</p>
+probably the wrong level to attack the problem: Python knows how to parse
+Python itself well and can allow us to reason at a higher level.</p>
 <p>A better tool to work with is the <a class="reference external" href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> (AST): an in-memory
-representation of the code obtained after it has been parsed. At this level we
-manipulate objects representing &quot;the for loop&quot;, or &quot;the function call&quot;, and we
-will not be fooled by unexpected spacing, extra brackets, comments, literal
-strings, and other traps.</p>
+representation of the code obtained after parsing. At this level we manipulate
+objects that represent &quot;the for loop&quot;, or &quot;the function call&quot;, and we are not
+fooled by unexpected spaces, extra brackets, comments, literal strings, and
+other traps.</p>
 <p>The <a class="reference external" href="https://docs.python.org/3/library/ast.html">Python 'ast' module</a> is the obvious starting point: if you have a bit
 of source code such as:</p>
 <pre class="code python literal-block">
@@ -154,7 +157,7 @@ of source code such as:</p>
 
 </span>    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span>
 </pre>
-<p>you can pass it to the module to see the AST tree representing it:</p>
+<p>you can pass it to the module to see the AST tree that represents it:</p>
 <pre class="literal-block">
 $ python -m ast ast1.py
 <strong>Module</strong>(
@@ -187,9 +190,9 @@ $ python -m ast ast1.py
 </pre>
 <p>You can see, highlighted, the nodes in the tree representing the main
 statements in the code: the tree represents a <em>module</em>, whose body contains two
-<em>statements</em> - an <tt class="docutils literal">import</tt> and an <tt class="docutils literal">async def</tt> - with the function's body
+<em>statements</em> - an <tt class="docutils literal">import</tt> and an <tt class="docutils literal">async def</tt> - with the function body
 defining an <tt class="docutils literal">await</tt> call and a <tt class="docutils literal">return</tt> statement.</p>
-<p>The same <tt class="docutils literal">ast</tt> module can perform the opposite transformation and convert an
+<p>The same <tt class="docutils literal">ast</tt> module can perform the reverse transformation, converting an
 AST tree back to source:</p>
 <pre class="literal-block">
 $ python -c &quot;import ast; print(ast.unparse(ast.parse(open('ast1.py').read())))&quot;
@@ -199,26 +202,26 @@ async def square(n: float) -&gt; float:
     await asyncio.sleep(1)
     return n * n
 </pre>
-<p>As you can see, unfortunately, the transformation back to code is not a
-perfect reconstruction of the original code, it is only <em>equivalent</em>, with
-missing comments and different spacing. That's because the syntax tree is
-<em>abstract</em> and whitespaces or comments don't affect it. If you wanted to keep
-these details into account you would need a <em>concrete</em> syntax tree (there is
-<a class="reference external" href="https://pypi.org/project/libcst/">something available</a> but I haven't played with it).</p>
-<p>Whitespaces changing is not a problem, but losing comments may be, especially
-when they are used to drive linters (such as Flake8's <tt class="docutils literal">noqa</tt> or Mypy's
-<tt class="docutils literal">type: ignore</tt>), or simply if you happen to be a human being and want to
-read the source code. Thankfully there is a simple wrapper module,
+<p>As you can see, the transformation back to code is unfortunately not a perfect
+reconstruction of the original code, it is only <em>equivalent</em>, with missing
+comments and different spacing. This is because the syntax tree is <em>abstract</em>
+and whitespaces and comments don't affect it. If you wanted to take those
+details into account you would need a <em>concrete</em> syntax tree (<a class="reference external" href="https://pypi.org/project/libcst/">something like
+that exists</a>, but I haven't played with it).</p>
+<p>Changing whitespaces is not a problem, but losing comments can be, especially
+when they are used to control linters (such as Flake8's <tt class="docutils literal">noqa</tt> or Mypy's
+<tt class="docutils literal">type: ignore</tt>), or simply when you happen to be a human being and want to
+read the source code. Fortunately there is a simple wrapper module,
 <a class="reference external" href="https://pypi.org/project/ast-comments/">ast-comments</a>, which does exactly what it says on the tin: it introduces
-Comment nodes as part of an AST. Playing with it, it turned out to be a good
-compromise between an abstract and a concrete syntax tree, after taming the
-comments placement a bit.</p>
+<tt class="docutils literal">Comment</tt> nodes as part of an AST. Playing around with it, it turned out to
+be a good compromise between an abstract and a concrete syntax tree, after
+some taming of the comments placement.</p>
 </div>
 <div class="section" id="du-ast-mich">
 <h2>Du AST Mich</h2>
-<p>In order to perform the code transformation, we will walk over the abstract
+<p>To perform the code transformation, we will walk over the abstract
 syntax tree and we will perform some operation to generate a different tree of
-our liking. Usually, this type of operation is performed with an
+our liking. Typically, this type of operation is performed using an
 implementation of the <a class="reference external" href="https://en.wikipedia.org/wiki/Visitor_pattern">visitor pattern</a>.</p>
 <p>This pattern can be incredibly useful whenever you need to perform operations
 on data structures composed of heterogeneous nodes (I've seen it in
@@ -226,33 +229,33 @@ applications ranging from converting UML representations to code, converting
 markup language to HTML, converting Kubernetes manifests to Helm charts,
 converting annotated lyrics files to Ukulele tab sheets...); unfortunately
 many of the descriptions of the pattern you can find online fail to make its
-brilliance immediate (the Wikipedia page is pretty bad at it) and,
-historically, have focused on solving the <em>double-dispatch</em> problem in static
-languages such as C++ or Java (which in a dynamic language such as Python is
-trivial) instead of focusing on the <strong>awesome</strong> things you can do with it.</p>
-<p>In a nutshell, you will have an object walking over an input data structure,
+brilliance immediately apparent (the Wikipedia page is pretty bad at it)
+because they have historically focused on solving the <em>double-dispatch</em>
+problem in static languages like as C++ or Java (which is trivial in a dynamic
+language like Python) rather than focusing on the <strong>awesome</strong> things you
+can do with it.</p>
+<p>In a nutshell, you will have an object that traverses an input data structure,
 element by element, and building an output structure in the process, allowing
-to run different code and to perform different manipulations according to the
-type of element traversed.</p>
+you to run different code and to perform different manipulations depending on
+the type of element being traversed.</p>
 <p>In our case, both the input and the output are AST trees, which will happen to
-be very similar to each other (as we are just trying to convert some subtle
-differences from one Python module to another): for many nodes, the visitor
-will just emit a copy of it (for instance the <tt class="docutils literal">return</tt> statement in the
-example is unchanged). But, when we recognise a certain pattern, we can
-instruct our visitor to produce a somewhat different node.</p>
-<p>The <tt class="docutils literal">ast</tt> module offers a base <a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.NodeTransformer">ast.NodeTransformer</a> class, which
-implements the node traversal and tree production parts. On its own, it
-doesn't perform any operation on the nodes, so, if you use the object as it
-is, it will just produce a copy of the input tree. However, by subclassing the
-class and adding visit methods, you can implement node-specific
-transformations.</p>
-<p>With the AST node transformer, the method to call is based on the name of the
-node visited; for instance, if you add a method called <tt class="docutils literal">visit_Import</tt> to
-your subclass, the visitor will call it whenever it traverses an <tt class="docutils literal">Import</tt>
-node, giving you a chance to manipulate an <tt class="docutils literal">import</tt> statement. You can then
-decide if you want to change some of the node detail (drop some import, change
-some name), or replace the node with something entirely different (such as an
-async function definition into a sync one).</p>
+be very similar to each other (since we are just trying to translate some
+subtle differences from one Python module to another): for many nodes, the
+visitor will just output a copy of it (for example, the <tt class="docutils literal">return</tt> statement
+in the above example is unchanged). But, if we see a pattern of interest, we
+can tell our visitor to produce a different node.</p>
+<p>The <tt class="docutils literal">ast</tt> module provides a base class <a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.NodeTransformer">ast.NodeTransformer</a> which
+implements the node traversal and tree production parts. By itself it
+doesn't perform any operations on the nodes, so it just produces a copy of the
+input tree. However, by subclassing the class and adding visit methods, you
+can implement node-specific transformations.</p>
+<p>With the AST node transformer, the method called is based on the name of the
+node being visited; for example, if you add a method called <tt class="docutils literal">visit_Import</tt>
+to your subclass, the visitor will call it whenever it traverses an <tt class="docutils literal">Import</tt>
+node, giving you the chance to manipulate an <tt class="docutils literal">import</tt> statement. You can
+then decide whether you want to change some of the details of the node (drop
+some imports, change some names), or replace the node with something completely
+different (such as replacing an async function definition with a sync one).</p>
 <p>Let's say that we want to produce a sync version of the above script: the
 differences should be the following:</p>
 <pre class="code diff literal-block">
@@ -268,7 +271,7 @@ differences should be the following:</p>
 
  </span>    return n * n
 </pre>
-<p>In our toy example, we want to convert the <tt class="docutils literal">asyncio</tt> module in the <tt class="docutils literal">time</tt>
+<p>In our toy example, we want to convert the <tt class="docutils literal">asyncio</tt> module into the <tt class="docutils literal">time</tt>
 module (which is obviously not the right thing to do in the general case, but
 let's keep the example simple). The following script implements the
 transformation and prints the converted module:</p>
@@ -291,7 +294,7 @@ transformation and prints the converted module:</p>
 <p>The script will print the new source, with an <tt class="docutils literal">import time</tt> replacing the
 original <tt class="docutils literal">import asyncio</tt>.</p>
 <p>Changing the <tt class="docutils literal">async</tt> call is a bit trickier: we want to change the
-highlighted parts from the original tree:</p>
+highlighted parts of the original tree:</p>
 <pre class="literal-block">
 <strong>value=Await</strong>(    # this node must be dropped, replaced by its <tt class="docutils literal">value</tt>
    value=Call(
@@ -302,10 +305,10 @@ highlighted parts from the original tree:</p>
          Constant(value=1)],
       keywords=[]))),
 </pre>
-<p>Adding the following two methods to the above class will implement what
-described. To make sense of them, and to implement your own transformations,
-you can always look at the output of <tt class="docutils literal">python <span class="pre">-m</span> ast</tt> in order to figure out
-the attributes on each node and the way they are nested.</p>
+<p>Adding the following two methods to the above class will implement what has
+been described. To make sense of them, and to implement your own
+transformations, you can always look at the output of <tt class="docutils literal">python <span class="pre">-m</span> ast</tt> in
+order to see the attributes on each node and how they are nested.</p>
 <pre class="code python literal-block">
 <span class="k">def</span> <span class="nf">visit_Await</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
 </span>    <span class="n">new_node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>  <span class="c1"># drop the node, continue to operate on the value</span><span class="w">
@@ -318,33 +321,31 @@ the attributes on each node and the way they are nested.</p>
 </span>            <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">node</span>
 </pre>
-<p>The latter method shows how, for this operation, the <a class="reference external" href="https://peps.python.org/pep-0636/">structural pattern
-matching</a> introduced in Python 3.10 comes extremely handy. The
-<tt class="docutils literal">visit_Call</tt> method will be invoked for every function call found in the
-input code; checking if the one just received requires some manipulation would
-have involved a cascade of ifs (the value is a <tt class="docutils literal">Name</tt>, its id is
-<tt class="docutils literal">asyncio</tt>, the attr is <tt class="docutils literal">sleep</tt>...) which becomes pretty ugly pretty
-quickly, whereas instead a <tt class="docutils literal">match</tt> statement can describe a complex nested
-test very succinctly.</p>
+<p>The latter method shows how the <a class="reference external" href="https://peps.python.org/pep-0636/">structural pattern matching</a> introduced in
+Python 3.10 comes in handy for this operation. The <tt class="docutils literal">visit_Call</tt> method is
+called for each function call found in the input code; checking whether the
+one just received requires any manipulation would have involved a cascade of
+ifs (the value is a <tt class="docutils literal">Name</tt>, its id is <tt class="docutils literal">asyncio</tt>, the attr is <tt class="docutils literal">sleep</tt>...)
+which becomes pretty ugly pretty quickly, whereas instead a <tt class="docutils literal">match</tt>
+statement can describe a complex nested test very succinctly.</p>
 </div>
 <div class="section" id="problems-with-sleep">
 <h2>Problems with <tt class="docutils literal">sleep()</tt></h2>
 <p>Performing the transformation from <tt class="docutils literal">asyncio.sleep</tt> to <tt class="docutils literal">time.sleep</tt> for
-real is much more complex than this. What if our source includes <tt class="docutils literal">from
-asycio import sleep, Event</tt>? We would need to split the import into
-different parts:</p>
+real is much more complex than this. What if our source includes <tt class="docutils literal">from asycio
+import sleep, Event</tt>? We would have to split the import into several parts:</p>
 <pre class="code python literal-block">
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="w">
 </span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span>
 </pre>
 <p>and the latter should be treated differently later because the two <tt class="docutils literal">Event</tt>
-objects have a different <tt class="docutils literal">wait()</tt> signature.</p>
-<p>In order to help ourselves with this operation, in Psycopg 3 we introduced <a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg/psycopg/_acompat.py">an
-internal '_acompat' module</a> (<a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg_pool/psycopg_pool/_acompat.py">two</a>, actually, because the pool is released
-separately and uses different functions; <a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tests/acompat.py">three</a> actually, because the tests
-have its own too...) to expose pairs of functions or objects that should be
+objects have a different <tt class="docutils literal">wait()</tt> signatures.</p>
+<p>To help with this operation, in Psycopg 3 we introduced <a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg/psycopg/_acompat.py">an internal
+'_acompat' module</a> (actually <a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg_pool/psycopg_pool/_acompat.py">two</a>, because the pool is released
+separately and uses different functions; actually <a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tests/acompat.py">three</a>, because the tests
+also have their own...) to expose pairs of functions or objects that should be
 used alternatively in sync or in async mode.</p>
-<p>For instance we can solve the <tt class="docutils literal">sleep()</tt> problem with:</p>
+<p>For example we can solve the <tt class="docutils literal">sleep()</tt> problem with:</p>
 <pre class="code python literal-block">
 <span class="c1"># module _acompat.py</span><span class="w">
 
@@ -359,22 +360,22 @@ used alternatively in sync or in async mode.</p>
     &quot;&quot;&quot;</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
 </pre>
-<p>Now it's easy to use <tt class="docutils literal">from ._acompat import asleep; await asleep(1)</tt> and to
-make simple names substitutions in the AST: the resulting statement
-<tt class="docutils literal">from ._acompat import sleep, sleep(1)</tt> will work as expected.</p>
-<p>Other goodies we have implemented to help uniforming async and sync code are
-<tt class="docutils literal">spawn</tt>/<tt class="docutils literal">aspawn</tt> and <tt class="docutils literal">agather</tt>/<tt class="docutils literal">gather</tt> to uniform threads and
+<p>Now it's easy to use <tt class="docutils literal">from ._acompat import asleep; await asleep(1)</tt> and do
+come simple name substitutions in the AST: the resulting statement <tt class="docutils literal">from
+._acompat import sleep, sleep(1)</tt> will work as expected.</p>
+<p>Other goodies we have implemented to help unify async and sync code are
+<tt class="docutils literal">spawn</tt>/<tt class="docutils literal">aspawn</tt> and <tt class="docutils literal">agather</tt>/<tt class="docutils literal">gather</tt> to unify threads and
 asyncio tasks creation, <tt class="docutils literal">alist()</tt> to encapsulate <tt class="docutils literal">[x for x in await
 iterable]</tt> in a way that can be easily converted to <tt class="docutils literal">list(iterable)</tt> and
-many other helpers to smoothen the transition.</p>
+many other helpers to smooth the transition.</p>
 </div>
 <div class="section" id="when-everything-else-fail">
 <h2>When everything else fail</h2>
-<p>There might be parts of the codebase where the difference between sync and
-async versions is too difficult to deal in a practical way, and is not worth
-to put together a complex matching for a complex, one-off case. What we would
-like to have is a simple &quot;if async, do this, else do that&quot;.</p>
-<p>We have solved this problem by using a pattern such as:</p>
+<p>There may be parts of the codebase where the difference between sync and async
+versions is too difficult to handle in a practical way, and is not worth to
+put together a complex matching for a complex, one-off case. What we want is a
+simple &quot;if async, do this, else do that&quot;.</p>
+<p>We have solved this problem by using a pattern like:</p>
 <pre class="code python literal-block">
 <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># ASYNC</span><span class="w">
 </span>    <span class="n">foo</span><span class="p">()</span><span class="w">
@@ -402,10 +403,11 @@ Module(
                   keywords=[]))])],
    type_ignores=[])
 </pre>
-<p><a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tools/async_to_sync.py#L253-L262">Our transformation</a> will find the <tt class="docutils literal">ASYNC</tt> comment: in that case it will
-just discard the if-side of the condition, as well as the <tt class="docutils literal">if</tt> itself, and
-will leave only the <tt class="docutils literal">else</tt> branch in the sync code, allowing to discard
-unneeded imports or other code that would be just invalid in the sync context.</p>
+<p><a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tools/async_to_sync.py#L253-L262">Our transformation</a> will find the <tt class="docutils literal">ASYNC</tt> comment: in this case it will
+simply discard the if side of the condition, as well as the <tt class="docutils literal">if</tt> itself, and
+will leave only the <tt class="docutils literal">else</tt> branch in the sync code, allowing you to discard
+unneeded imports or other code that would simply be invalid in the sync
+context.</p>
 <p>This pattern is also efficient, because the Python compiler is able to
 recognise that <tt class="docutils literal">if True</tt> will always take the first branch, so it will
 discard the test and the code in the <tt class="docutils literal">else</tt> branch. The <a class="reference external" href="https://docs.python.org/3/library/dis.html">dis</a>(assembler)
@@ -423,18 +425,18 @@ $ python -m dis ast3.py
 </div>
 <div class="section" id="conversion-methodology">
 <h2>Conversion methodology</h2>
-<p>If we have our conversion script, how can we use it to actually convert the
-codebase? The progress, for us, has been iterative: progressing
-module-by-module and adding features to the script until completing all the
-&quot;duplicated&quot; modules.</p>
-<p>For every module to convert, the procedure has been, roughly:</p>
-<p>First step: refactoring to change no behaviour but to make the async code as
-close as possible to the sync one. This would have meant some code
-reorganization, some variables, some function definitions swapping, some
-rediscovery of forgotten skeletons and a chance to give them the proper
-burial.</p>
-<p>Often we would have some non-I/O-related helper functionality implemented in
-the sync side and imported in the async side:</p>
+<p>Once we have our conversion script, how do we use it to actually convert the
+code base, making sure to not break it? The process, for us, was
+iterative: going module by module and adding features to the script until
+all the &quot;duplicated&quot; modules were complete.</p>
+<p>For each module to be converted, the procedure was roughly as follows.</p>
+<p>First step: refactoring the code with the intention of not changing any
+behaviour, but of making the async module as similar as possible to the sync
+module. This might have meant some code reorganisation, the renaming of some
+variables, the swapping of some function definitions, the rediscovery of some
+forgotten skeletons and a chance of giving them a proper burial.</p>
+<p>Often we would have implemented some non-I/O related helper function on the
+sync side and imported it on the async side:</p>
 <pre class="code python literal-block">
 <span class="c1"># connection.py</span><span class="w">
 
@@ -456,7 +458,7 @@ the sync side and imported in the async side:</p>
 </span>    <span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">aconn</span>
 </pre>
-<p>In this case we would have moved the common functionality into a separate
+<p>In this case we would have put the shared functionality in a separate
 module and imported the function on both the sides:</p>
 <pre class="code python literal-block">
 <span class="c1"># _connection.py</span><span class="w">
@@ -484,15 +486,14 @@ module and imported the function on both the sides:</p>
 </span>    <span class="k">return</span> <span class="n">aconn</span>
 </pre>
 <p>Now that the two modules are more similar we can run the test suite to verify
-that the library is still working and can commit the current state in
-git.</p>
-<p>Second step: running a conversion async -&gt; sync with the current version of
+that the library still works and can commit the current state to git.</p>
+<p>Second step: run an async -&gt; sync conversion with the current version of
 the script. Even running a no-op script is useful: it produces changes that
 can be easily seen with <tt class="docutils literal">git diff</tt>, suggesting which feature is missing, or
-what further cleanup we can do to the code to make the sync and async flavours
+what further cleanup we can do in the code to make the sync and async flavours
 more similar.</p>
-<p>For instance, a no-op script which would just copy the async side on the sync
-side, would be seen in <tt class="docutils literal">git diff</tt> as:</p>
+<p>For example, a no-op script that just copies the async side to the sync
+side, would show up in <tt class="docutils literal">git diff</tt> as:</p>
 <pre class="code diff literal-block">
 <span class="gu">&#64;&#64; -1,6 +1,6 &#64;&#64;</span><span class="w">
  </span>from ._connection import clean_up_conninfo<span class="w">
@@ -505,9 +506,8 @@ side, would be seen in <tt class="docutils literal">git diff</tt> as:</p>
 </span><span class="gi">+    aconn = await async_wait(connection_gen(bettern_conninfo))</span><span class="w">
 </span><span class="gi">+    return aconn</span>
 </pre>
-<p>The first feature to add to the conversion script is the removal of the
-<tt class="docutils literal">async</tt> and <tt class="docutils literal">await</tt> keywords. Running conversion and diff again you would
-see:</p>
+<p>The first feature to add to the conversion script is to remove the <tt class="docutils literal">async</tt>
+and <tt class="docutils literal">await</tt> keywords. Run the conversion and diff again and you will see:</p>
 <pre class="code diff literal-block">
 <span class="gu">&#64;&#64; -1,6 +1,6 &#64;&#64;</span><span class="w">
  </span>from ._connection import clean_up_conninfo<span class="w">
@@ -520,14 +520,14 @@ see:</p>
 </span><span class="gi">+    aconn = async_wait(connection_gen(bettern_conninfo))</span><span class="w">
 </span><span class="gi">+    return aconn</span>
 </pre>
-<p>A following step is some renaming. If <tt class="docutils literal">connect()</tt> and <tt class="docutils literal">connect_async()</tt>
-are public functions we don't want to change their name. The script should
-have a names mapping function, suggesting to convert:</p>
+<p>The next step is some renaming. If <tt class="docutils literal">connect()</tt> and <tt class="docutils literal">connect_async()</tt>
+are public functions we don't want to change their names. The script should
+have a name mapping function suggesting to convert:</p>
 <ul class="simple">
 <li><tt class="docutils literal">connect_async</tt> -&gt; <tt class="docutils literal">connect</tt></li>
 <li><tt class="docutils literal">wait_async</tt> -&gt; <tt class="docutils literal">wait</tt></li>
 </ul>
-<p>Implementing these renaming in the AST we would get to the diff:</p>
+<p>Implementing this renaming in the AST we would bring us to the diff:</p>
 <pre class="code diff literal-block">
 <span class="gu">&#64;&#64; -2,5 +2,5 &#64;&#64;</span><span class="w">
 
@@ -542,43 +542,43 @@ have a names mapping function, suggesting to convert:</p>
 gratuitous difference: we can change the async side and call the local
 variable <tt class="docutils literal">conn</tt> without losing readability and obviously without changing
 any behaviour.</p>
-<p>Committing the async-side change and running the conversion again would show
-no more difference on the sync side. At this point we can commit the entire
-project (any leftover but acceptable change on the sync side, the new features
-added to the conversion script, new entries in the renaming mapping...), run
-the tests to verify that no regression was introduced, and move on to the next
-module.</p>
+<p>Committing the change on the async side and re-running the conversion would
+show no more difference on the sync side. At this point we can commit the
+whole project (any remaining but acceptable change on the sync side, the new
+features added to the conversion script, new entries in the renaming
+mapping...), run the tests to verify that no regression has been introduced,
+and move on to the next module.</p>
 <p>This operation, in Psycopg 3, started at commit <a class="reference external" href="https://github.com/psycopg/psycopg/commit/765f663f171bf5d5e4862d5c4a5d572b7e3227d8">765f663f</a> and can be seen in
 the git history as a parallel branch that was eventually merged in <a class="reference external" href="https://github.com/psycopg/psycopg/commit/8bb0f9bfef945861e8f671fba9073b3fae45c67f">8bb0f9bf</a>.
 The <tt class="docutils literal">diff <span class="pre">--stat</span></tt> shows a whopping:</p>
 <pre class="literal-block">
 99 files changed, 9697 insertions(+), 8486 deletions(-)
 </pre>
-<p>which is a monster changeset of course, but mostly consisting of step-by-step
-refactoring, conversions, finding new ways to minimize differences. It might
-make for an interesting ride if you have a project where you need to introduce
+<p>which is obviously a monster changeset, but mostly consists of incremental
+refactorings, conversions, finding new ways to minimise differences. It could
+be an interesting ride if you have a project where you need to introduce
 a similar automatic conversion.</p>
 </div>
 <div class="section" id="the-final-result">
 <h2>The final result</h2>
 <p>Here is the <a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.2.0/tools/async_to_sync.py">Psycopg 3 async to sync conversion script</a> (as of the Psycopg
-3.2 release). It operates on 27 of files, auto-generating about the 25% of the
-codebase. Some of the features it boasts:</p>
+3.2 release). It currently works on 27 files and automatically generates about
+the 25% of the codebase. Some of the features it boasts:</p>
 <ul>
-<li><p class="first">the AST transformations described, including trickeries such as recursing
-down strings containing code to convert, such as Mypy annotations expressed
-as strings, tailoring the output and the comments to make the resulting
-unparsed code almost as good as the hand-written side;</p>
+<li><p class="first">the AST transformations described above, including tricks like recursion
+into strings containing code to be transformed, such as Mypy annotations
+expressed as strings, adjusting the output and the comments to make the
+resulting unparsed code almost as good as the handwritten side;</p>
 </li>
 <li><p class="first">it inserts non-essential whitespace, and runs <a class="reference external" href="https://black.readthedocs.io/">black</a> on the output, in
 order to make the resulting code as uniform as possible to the original and
 as good to work with (to read, debug, diff, etc);</p>
 </li>
-<li><p class="first">because different Python versions may generate different AST and different
+<li><p class="first">since different Python versions may generate different ASTs and different
 output code, it can run in a Docker container, whose image is created on the
 fly using as base the Python image of the reference version;</p>
 </li>
-<li><p class="first">it adds an useful disclaimer on top of the file:</p>
+<li><p class="first">it adds a useful disclaimer to the top of the file:</p>
 <pre class="code python literal-block">
 <span class="c1"># WARNING: this file is auto-generated by 'async_to_sync.py'</span><span class="w">
 </span><span class="c1"># from the original file 'connection_async.py'</span><span class="w">
@@ -586,29 +586,29 @@ fly using as base the Python image of the reference version;</p>
 </pre>
 </li>
 <li><p class="first">it has a &quot;check&quot; mode that runs in Github Action upon every commit, as part
-of the lint step, and fails if it finds any file needing conversion that
-haven't been committed;</p>
+of the lint step, and will fail if it finds any files to convert that haven't
+been committed;</p>
 </li>
-<li><p class="first">the check mode has its own check: if any script that includes the disclaimer
-above is not included in the list of files to convert, it will throw an
+<li><p class="first">the check mode has its own check: if any script containing the above disclaimer
+is not included in the list of files to be converted, it will throw an
 error (because a converted file has not been added to the automatic
 conversion list);</p>
 </li>
-<li><p class="first">the check of the check has its own check too! If no file is found with the
-disclaimer then it means that something is broken... Maybe the disclaimer was
-reworded and, as a consequence, the check doesn't work anymore.</p>
+<li><p class="first">the check of the check also has its own check! If no file with the
+disclaimer is found then it means that something is wrong... Maybe the
+disclaimer has been rewritten and the check doesn't work anymore.</p>
 </li>
-<li><p class="first">it can run in parallel and only on the files changed. Almost as good as
-<tt class="docutils literal">make</tt> (for some reason that at the moment I don't remember we preferred
-to write a script converting all the files instead of a recursive makefile
-converting only one module).</p>
+<li><p class="first">it can run in parallel and only on the files that have changed. Almost as
+good as <tt class="docutils literal">make</tt> (for some reason I can't remember at the moment we
+preferred to write a script that converts all the files instead of a
+recursive makefile that converts only one module).</p>
 </li>
 </ul>
 <p>The code is specific to the Psycopg 3 codebase and formatting style, so it's
-probably not ready to be used as it is in other project. But it is probably a
-great starting point to perform your own conversion: change the list of files
-to process, the names mapping, and you should be good to start.</p>
-<p>We hope this helps. Happy hacking!</p>
+probably not ready to be used as it is in other projects. But it is probably a
+good starting point to to your own conversion: change the list of files to
+process, the name mapping, and you should be good to start.</p>
+<p>Hope this helps. Happy hacking!</p>
 </div>
 
   
