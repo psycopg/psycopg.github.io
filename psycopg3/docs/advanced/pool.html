@@ -387,16 +387,16 @@ import time. If that’s too early, and you want to delay opening connections
 until the application is ready, you can specify to create a closed pool and
 call the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.open" title="psycopg_pool.ConnectionPool.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code></a> method (and optionally the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method) at application startup/shutdown. For
-example, in FastAPI, you can use <a class="reference external" href="https://fastapi.tiangolo.com/advanced/events/#events-startup-shutdown">startup/shutdown events</a>:</p>
+example, in FastAPI, you can use a <a class="reference external" href="https://fastapi.tiangolo.com/advanced/events/#lifespan">Lifespan</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">AsyncConnectionPool</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 
-<span class="nd">@app</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">&quot;startup&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">open_pool</span><span class="p">():</span>
+<span class="nd">@asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">lifespan</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">):</span>
     <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
-
-<span class="nd">@app</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">&quot;shutdown&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">close_pool</span><span class="p">():</span>
+    <span class="k">yield</span>
     <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">lifespan</span><span class="o">=</span><span class="n">lifespan</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition warning">
