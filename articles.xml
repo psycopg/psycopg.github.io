@@ -1,5 +1,539 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Articles</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/articles.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2024-06-30T00:00:00Z</updated><author><name></name></author><entry><title>Psycopg 3.2 released</title><link href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/" rel="alternate"></link><updated>2024-06-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:31cb8a57-f930-3fb0-82c6-4067eb76bd76</id><content type="html">&lt;p&gt;It was quite the ride! But we made it!&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Articles</title><link href="https://www.psycopg.org/articles/" rel="alternate"></link><link href="https://www.psycopg.org/articles.xml" rel="self"></link><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2024-09-23T00:00:00Z</updated><author><name></name></author><entry><title>Automatic async to sync code conversion</title><link href="https://www.psycopg.org/articles/2024/09/23/async-to-sync/" rel="alternate"></link><updated>2024-09-23T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:765ce6dc-afc5-34ff-bf78-d5f78cc8aed5</id><content type="html">&lt;p&gt;Psycopg 3 provides both a sync and an async Python interface: for each object
+used to perform I/O operations, such as &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection"&gt;Connection&lt;/a&gt;, &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor"&gt;Cursor&lt;/a&gt;, there is an
+async counterpart: &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.AsyncConnection"&gt;AsyncConnection&lt;/a&gt;, &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.AsyncCursor"&gt;AsyncCursor&lt;/a&gt;, with an intuitive
+interface: just add the right &lt;tt class="docutils literal"&gt;async&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;await&lt;/tt&gt; keyword where needed:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="c1"&gt;# Familiar sync code&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;psycopg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Connection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;select now()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="c1"&gt;# Similar async code&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;aconn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;psycopg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AsyncConnection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;acur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;aconn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;select now()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;acur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;())[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The decision to provide both sync and async code &lt;a class="reference external" href="https://www.varrazzo.com/blog/2020/03/26/psycopg3-first-report/"&gt;was made early in the
+development of Psycopg 3&lt;/a&gt; and most of the internal code is written in a way
+to be compatible with both sync and async code, in order to keep code
+duplication to a minimum. This was achieved by making all the libpq
+communication async, and writing the network code as generators,
+&lt;tt class="docutils literal"&gt;yield&lt;/tt&gt;ing at the moment they need to wait, isolating the differences in
+the sync/async wait policy all in &lt;tt class="docutils literal"&gt;wait()&lt;/tt&gt; functions.&lt;/p&gt;
+&lt;p&gt;This helped to minimise the async/sync differences in the code related to the
+communication between PostgreSQL and Psycopg. However, the interface between
+Psycopg and the Python user is still a lot to maintain, and consists of a lot
+of code that is very similar, almost duplicated, between the sync and async
+sided. Apart from the obvious &lt;tt class="docutils literal"&gt;async&lt;/tt&gt;/&lt;tt class="docutils literal"&gt;await&lt;/tt&gt; keywords, there would be
+subtle implementation differences, for example:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;using &lt;tt class="docutils literal"&gt;asyncio&lt;/tt&gt; functions instead of blocking counterparts, for instance
+&lt;tt class="docutils literal"&gt;await asyncio.sleep()&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;time.sleep()&lt;/tt&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;asyncio.create_task(f(arg1, arg2))&lt;/tt&gt; is similar to &lt;tt class="docutils literal"&gt;thread.Thread(f,
+(arg1, &lt;span class="pre"&gt;arg2)).start()&lt;/span&gt;&lt;/tt&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;threading.Event&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;asyncio.Event&lt;/tt&gt; counterpart whose &lt;tt class="docutils literal"&gt;lock()&lt;/tt&gt;
+method doesn't have a &lt;tt class="docutils literal"&gt;timeout&lt;/tt&gt;, parameter, so &lt;tt class="docutils literal"&gt;event.wait(timeout=10)&lt;/tt&gt;
+needs to be rewritten as &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;asyncio.wait_for(event.wait(),&lt;/span&gt; timeout=10)&lt;/tt&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Up until Psycopg 3.1, the two variants of each object were kept in sync
+manually. Every time changes were made on the sync side, they had to be ported
+to the async side, with cumbersome and noisy diffs, with subtle differences
+being introduced from time to time. Even the tests were pretty much duplicated
+(with some sync tests being accidentally lost on the async side, or vice
+versa). It seemed like a situation that could have been improved.&lt;/p&gt;
+&lt;div class="section" id="this-is-so-boring-that"&gt;
+&lt;h2&gt;This is so boring that...&lt;/h2&gt;
+&lt;p&gt;...a computer should do it for me instead.&lt;/p&gt;
+&lt;p&gt;Writing the async side starting from the sync side? Actually, the opposite. It
+is obvious that the async side has more information than the sync side (every
+method definition and call clearly indicates whether it will block or not) and
+most of the differences are minimal and repetitive. What we want then is &lt;em&gt;a
+script that takes asyncio-based source code as input and outputs
+equivalent sync code&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;This article describes what we did to implement such a script and how we used
+it for the initial transformation (replacing manually written sync code with
+auto-generated code without loss of quality) and how we are currently using it
+to maintain the Psycopg 3 codebase.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="abstract-syntax-tree"&gt;
+&lt;h2&gt;Abstract Syntax Tree&lt;/h2&gt;
+&lt;p&gt;You would be tempted to write a bunch of regular expressions to just scrub
+away every &lt;tt class="docutils literal"&gt;async&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;await&lt;/tt&gt; keyword found, but the source code is
+probably the wrong level to attack the problem: Python knows how to parse
+Python itself well and can allow us to reason at a higher level.&lt;/p&gt;
+&lt;p&gt;A better tool to work with is the &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Abstract_syntax_tree"&gt;Abstract Syntax Tree&lt;/a&gt; (AST): an in-memory
+representation of the code obtained after parsing. At this level we manipulate
+objects that represent &amp;quot;the for loop&amp;quot;, or &amp;quot;the function call&amp;quot;, and we are not
+fooled by unexpected spaces, extra brackets, comments, literal strings, and
+other traps.&lt;/p&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://docs.python.org/3/library/ast.html"&gt;Python 'ast' module&lt;/a&gt; is the obvious starting point: if you have a bit
+of source code such as:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;asyncio&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;async&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;async_square&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# Squares are slow&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;asyncio&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;you can pass it to the module to see the AST tree that represents it:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ python -m ast ast1.py
+&lt;strong&gt;Module&lt;/strong&gt;(
+   body=[
+      &lt;strong&gt;Import&lt;/strong&gt;(
+         names=[
+            alias(name='asyncio')]),
+      &lt;strong&gt;AsyncFunctionDef&lt;/strong&gt;(
+         name='async_square',
+         args=arguments(
+            args=[
+               arg(arg='n')],
+            defaults=[]),
+         body=[
+            Expr(
+               value=&lt;strong&gt;Await&lt;/strong&gt;(
+                  value=&lt;strong&gt;Call&lt;/strong&gt;(
+                     func=Attribute(
+                        value=Name(id='asyncio'),
+                        attr='sleep'),
+                     args=[
+                        Constant(value=1)]))),
+            &lt;strong&gt;Return&lt;/strong&gt;(
+               value=BinOp(
+                  left=Name(id='n'),
+                  op=Mult(),
+                  right=Name(id='n')))],
+         decorator_list=[],
+         returns=Name(id='float'))])
+&lt;/pre&gt;
+&lt;p&gt;You can see, highlighted, the nodes in the tree representing the main
+statements in the code: the tree represents a &lt;em&gt;module&lt;/em&gt;, whose body contains two
+&lt;em&gt;statements&lt;/em&gt; - an &lt;tt class="docutils literal"&gt;import&lt;/tt&gt; and an &lt;tt class="docutils literal"&gt;async def&lt;/tt&gt; - with the function body
+defining an &lt;tt class="docutils literal"&gt;await&lt;/tt&gt; call and a &lt;tt class="docutils literal"&gt;return&lt;/tt&gt; statement.&lt;/p&gt;
+&lt;p&gt;The same &lt;tt class="docutils literal"&gt;ast&lt;/tt&gt; module can perform the reverse transformation, converting an
+AST tree back to source:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ python -c &amp;quot;import ast; print(ast.unparse(ast.parse(open('ast1.py').read())))&amp;quot;
+import asyncio
+
+async def square(n: float) -&amp;gt; float:
+    await asyncio.sleep(1)
+    return n * n
+&lt;/pre&gt;
+&lt;p&gt;As you can see, the transformation back to code is unfortunately not a perfect
+reconstruction of the original code, it is only &lt;em&gt;equivalent&lt;/em&gt;, with missing
+comments and different spacing. This is because the syntax tree is &lt;em&gt;abstract&lt;/em&gt;
+and whitespaces and comments don't affect it. If you wanted to take those
+details into account you would need a &lt;em&gt;concrete&lt;/em&gt; syntax tree (&lt;a class="reference external" href="https://pypi.org/project/libcst/"&gt;something like
+that exists&lt;/a&gt;, but I haven't played with it).&lt;/p&gt;
+&lt;p&gt;Changing whitespaces is not a problem, but losing comments can be, especially
+when they are used to control linters (such as Flake8's &lt;tt class="docutils literal"&gt;noqa&lt;/tt&gt; or Mypy's
+&lt;tt class="docutils literal"&gt;type: ignore&lt;/tt&gt;), or simply when you happen to be a human being and want to
+read the source code. Fortunately there is a simple wrapper module,
+&lt;a class="reference external" href="https://pypi.org/project/ast-comments/"&gt;ast-comments&lt;/a&gt;, which does exactly what it says on the tin: it introduces
+&lt;tt class="docutils literal"&gt;Comment&lt;/tt&gt; nodes as part of an AST. Playing around with it, it turned out to
+be a good compromise between an abstract and a concrete syntax tree, after
+some taming of the comments placement.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="du-ast-mich"&gt;
+&lt;h2&gt;Du AST Mich&lt;/h2&gt;
+&lt;p&gt;To perform the code transformation, we will walk over the abstract
+syntax tree and we will perform some operation to generate a different tree of
+our liking. Typically, this type of operation is performed using an
+implementation of the &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Visitor_pattern"&gt;visitor pattern&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This pattern can be incredibly useful whenever you need to perform operations
+on data structures composed of heterogeneous nodes (I've seen it in
+applications ranging from converting UML representations to code, converting
+markup language to HTML, converting Kubernetes manifests to Helm charts,
+converting annotated lyrics files to Ukulele tab sheets...); unfortunately
+many of the descriptions of the pattern you can find online fail to make its
+brilliance immediately apparent (the Wikipedia page is pretty bad at it)
+because they have historically focused on solving the &lt;em&gt;double-dispatch&lt;/em&gt;
+problem in static languages like as C++ or Java (which is trivial in a dynamic
+language like Python) rather than focusing on the &lt;strong&gt;awesome&lt;/strong&gt; things you
+can do with it.&lt;/p&gt;
+&lt;p&gt;In a nutshell, you will have an object that traverses an input data structure,
+element by element, building an output structure in the process, allowing you
+to run different code and to perform different manipulations depending on the
+type of element being traversed.&lt;/p&gt;
+&lt;p&gt;In our case, both the input and the output are AST trees, which will happen to
+be very similar to each other (since we are just trying to translate some
+subtle differences from one Python module to another): for many nodes, the
+visitor will just output a copy of it (for example, the &lt;tt class="docutils literal"&gt;return&lt;/tt&gt; statement
+in the above example is unchanged). But, if we see a pattern of interest, we
+can tell our visitor to produce a different node.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;ast&lt;/tt&gt; module provides a base class &lt;a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.NodeTransformer"&gt;ast.NodeTransformer&lt;/a&gt; which
+implements the node traversal and tree production parts. By itself it
+doesn't perform any operations on the nodes, so it just produces a copy of the
+input tree. However, by subclassing the class and adding visit methods, you
+can implement node-specific transformations.&lt;/p&gt;
+&lt;p&gt;With the AST node transformer, the method called is based on the name of the
+node being visited; for example, if you add a method called &lt;tt class="docutils literal"&gt;visit_Import&lt;/tt&gt;
+to your subclass, the visitor will call it whenever it traverses an &lt;tt class="docutils literal"&gt;Import&lt;/tt&gt;
+node, giving you the chance to manipulate an &lt;tt class="docutils literal"&gt;import&lt;/tt&gt; statement. You can
+then decide whether you want to change some of the details of the node (drop
+some imports, change some names), or replace the node with something completely
+different (such as replacing an async function definition with a sync one).&lt;/p&gt;
+&lt;p&gt;Let's say that we want to produce a sync version of the above script: the
+differences should be the following:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -1,7 +1,7 &amp;#64;&amp;#64;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-import asyncio&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+import time&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="gd"&gt;-async def async_square(n: float) -&amp;gt; float:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+def square(n: float) -&amp;gt; float:&lt;/span&gt;&lt;span class="w"&gt;
+ &lt;/span&gt;    # Squares are slow&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    await asyncio.sleep(1)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    time.sleep(1)&lt;/span&gt;&lt;span class="w"&gt;
+
+ &lt;/span&gt;    return n * n
+&lt;/pre&gt;
+&lt;p&gt;In our toy example, we want to convert the &lt;tt class="docutils literal"&gt;asyncio&lt;/tt&gt; module into the &lt;tt class="docutils literal"&gt;time&lt;/tt&gt;
+module (which is obviously not the right thing to do in the general case, but
+let's keep the example simple). The following script implements the
+transformation and prints the converted module:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;ast&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyTransformer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;NodeTransformer&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;visit_Import&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;alias&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;alias&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;asyncio&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;                &lt;span class="n"&gt;alias&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ast1.py&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;tree&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;tree&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyTransformer&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;visit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;unparse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The script will print the new source, with an &lt;tt class="docutils literal"&gt;import time&lt;/tt&gt; replacing the
+original &lt;tt class="docutils literal"&gt;import asyncio&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Changing the &lt;tt class="docutils literal"&gt;async&lt;/tt&gt; call is a bit trickier: we want to change the
+highlighted parts of the original tree:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&lt;strong&gt;value=Await&lt;/strong&gt;(   &amp;lt;&amp;lt; this node must be dropped, replaced by its &lt;strong&gt;value&lt;/strong&gt;
+   value=Call(
+      func=Attribute(
+         value=Name(id='&lt;strong&gt;asyncio&lt;/strong&gt;'),  &amp;lt;&amp;lt; we want &lt;strong&gt;time&lt;/strong&gt; here
+         attr='sleep'),
+      args=[
+         Constant(value=1)],
+      keywords=[]))),
+&lt;/pre&gt;
+&lt;p&gt;Adding the following two methods to the above class will implement what has
+been described.&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;visit_Await&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;new_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;  &lt;span class="c1"&gt;# drop the node, continue to operate on the value&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;visit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;visit_Call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;asyncio&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;attr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sleep&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;To make sense of how these methods operate on their input nodes, and then to
+implement your own transformations, you can always look at the output of
+&lt;tt class="docutils literal"&gt;python &lt;span class="pre"&gt;-m&lt;/span&gt; ast&lt;/tt&gt; in order to see the attributes on each node and how they are
+nested.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;visit_Call&lt;/tt&gt; method shows how the &lt;a class="reference external" href="https://peps.python.org/pep-0636/"&gt;structural pattern matching&lt;/a&gt;
+introduced in Python 3.10 comes in handy for this operation. The method is
+called for each function call found in the input code; checking whether the
+one just received requires any manipulation would have involved a cascade of
+ifs (the value is a &lt;tt class="docutils literal"&gt;Name&lt;/tt&gt;, its id is &lt;tt class="docutils literal"&gt;asyncio&lt;/tt&gt;, the attr is &lt;tt class="docutils literal"&gt;sleep&lt;/tt&gt;...)
+which becomes pretty ugly pretty quickly, whereas instead a &lt;tt class="docutils literal"&gt;match&lt;/tt&gt;
+statement can describe a complex nested test very succinctly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="problems-with-sleep"&gt;
+&lt;h2&gt;Problems with &lt;tt class="docutils literal"&gt;sleep()&lt;/tt&gt;&lt;/h2&gt;
+&lt;p&gt;Performing the transformation from &lt;tt class="docutils literal"&gt;asyncio.sleep&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;time.sleep&lt;/tt&gt; for
+real is much more complex than this. What if our source includes &lt;tt class="docutils literal"&gt;from asycio
+import sleep, Event&lt;/tt&gt;? We would have to split the import into several parts:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;threading&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Event&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;and the latter should be treated differently later because the two &lt;tt class="docutils literal"&gt;Event&lt;/tt&gt;
+objects have a different &lt;tt class="docutils literal"&gt;wait()&lt;/tt&gt; signatures.&lt;/p&gt;
+&lt;p&gt;To help with this operation, in Psycopg 3 we introduced &lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg/psycopg/_acompat.py"&gt;an internal
+'_acompat' module&lt;/a&gt; (actually &lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/psycopg_pool/psycopg_pool/_acompat.py"&gt;two&lt;/a&gt;, because the pool is released
+separately and uses different functions; actually &lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tests/acompat.py"&gt;three&lt;/a&gt;, because the tests
+also have their own...) to expose pairs of functions or objects that should be
+used alternatively in sync or in async mode.&lt;/p&gt;
+&lt;p&gt;For example we can solve the &lt;tt class="docutils literal"&gt;sleep()&lt;/tt&gt; problem with:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="c1"&gt;# module _acompat.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;asyncio&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;asleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;seconds&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Coroutine&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Any&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Any&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;
+    Equivalent to asyncio.sleep(), converted to time.sleep() by async_to_sync.
+    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;asyncio&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;seconds&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Now it's easy to use &lt;tt class="docutils literal"&gt;from ._acompat import asleep; await asleep(1)&lt;/tt&gt; and do
+some simple name substitutions in the AST: the resulting statement &lt;tt class="docutils literal"&gt;from
+._acompat import sleep; sleep(1)&lt;/tt&gt; will work as expected.&lt;/p&gt;
+&lt;p&gt;Other goodies we have implemented to help unify async and sync code are
+&lt;tt class="docutils literal"&gt;aspawn&lt;/tt&gt;/&lt;tt class="docutils literal"&gt;spawn&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;agather&lt;/tt&gt;/&lt;tt class="docutils literal"&gt;gather&lt;/tt&gt; to unify threads and
+asyncio tasks creation, &lt;tt class="docutils literal"&gt;alist()&lt;/tt&gt; to encapsulate &lt;tt class="docutils literal"&gt;[x for x in await
+iterable]&lt;/tt&gt; in a way that can be easily converted to &lt;tt class="docutils literal"&gt;list(iterable)&lt;/tt&gt; and
+many other helpers to smooth the transition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="when-everything-else-fail"&gt;
+&lt;h2&gt;When everything else fail&lt;/h2&gt;
+&lt;p&gt;There may be parts of the codebase where the difference between sync and async
+versions is too difficult to handle in a practical way, and is not worth to
+put together a complex matching for a complex, one-off case. What we want is a
+simple &amp;quot;if async, do this, else do that&amp;quot;.&lt;/p&gt;
+&lt;p&gt;We have solved this problem by using a pattern like:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;  &lt;span class="c1"&gt;# ASYNC&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;bar&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The AST with this code, including the comments, looks like:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+Module(
+   body=[
+      &lt;strong&gt;If(&lt;/strong&gt;
+         &lt;strong&gt;test=Constant(value=True),&lt;/strong&gt;
+         body=[
+            &lt;strong&gt;Comment(value='# ASYNC', inline=True),&lt;/strong&gt;
+            Expr(
+               value=Call(
+                  func=Name(id='foo'),
+                  args=[],
+                  keywords=[]))],
+         orelse=[
+            Expr(
+               value=Call(
+                  func=Name(id='bar'),
+                  args=[],
+                  keywords=[]))])],
+   type_ignores=[])
+&lt;/pre&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/d13137aacb82fed79459a9dd487846a2ec972571/tools/async_to_sync.py#L253-L262"&gt;Our transformation&lt;/a&gt; will find the &lt;tt class="docutils literal"&gt;ASYNC&lt;/tt&gt; comment: in this case it will
+simply discard the if side of the condition, as well as the &lt;tt class="docutils literal"&gt;if&lt;/tt&gt; itself, and
+will leave only the &lt;tt class="docutils literal"&gt;else&lt;/tt&gt; branch in the sync code, allowing you to discard
+unneeded imports or other code that would simply be invalid in the sync
+context.&lt;/p&gt;
+&lt;p&gt;This pattern is also efficient, because the Python compiler is able to
+recognise that &lt;tt class="docutils literal"&gt;if True&lt;/tt&gt; will always take the first branch, so it will
+discard the test and the code in the &lt;tt class="docutils literal"&gt;else&lt;/tt&gt; branch. The &lt;a class="reference external" href="https://docs.python.org/3/library/dis.html"&gt;dis&lt;/a&gt;(assembler)
+module shows no jump and that no reference to the &lt;tt class="docutils literal"&gt;bar()&lt;/tt&gt; function call:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ python -m dis ast3.py
+  1           0 NOP
+
+  2           2 LOAD_NAME                0 (foo)
+              4 CALL_FUNCTION            0
+              6 POP_TOP
+              8 LOAD_CONST               1 (None)
+             10 RETURN_VALUE
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conversion-methodology"&gt;
+&lt;h2&gt;Conversion methodology&lt;/h2&gt;
+&lt;p&gt;Once we have our conversion script, how do we use it to actually convert the
+code base, making sure to not break it? The process, for us, was
+iterative: going module by module and adding features to the script until
+all the &amp;quot;duplicated&amp;quot; modules were complete.&lt;/p&gt;
+&lt;p&gt;For each module to be converted, the procedure was roughly as follows.&lt;/p&gt;
+&lt;p&gt;First step: refactoring the code with the intention of not changing any
+behaviour, but of making the async module as similar as possible to the sync
+module. This might have meant some code reorganisation, the renaming of some
+variables, the swapping of some function definitions, the rediscovery of some
+forgotten skeletons and a chance of giving them a proper burial.&lt;/p&gt;
+&lt;p&gt;Often we would have implemented some non-I/O related helper function on the
+sync side and imported it on the async side:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="c1"&gt;# connection.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="o"&gt;...&lt;/span&gt;  &lt;span class="c1"&gt;# hack hack&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;better_conninfo&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;better_conninfo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wait&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;connection_gen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bettern_conninfo&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="c1"&gt;# connection_async.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;.connection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;async&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;connect_async&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;better_conninfo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;aconn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;async_wait&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;connection_gen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bettern_conninfo&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;aconn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;In this case we would have moved the shared functionality in a separate
+internal module and imported the function on both the sides:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="c1"&gt;# _connection.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="o"&gt;...&lt;/span&gt;  &lt;span class="c1"&gt;# hack hack&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;better_conninfo&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="c1"&gt;# connection.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;._connection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;better_conninfo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wait&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;connection_gen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bettern_conninfo&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="c1"&gt;# connection_async.py&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;._connection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="k"&gt;async&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;connect_async&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;better_conninfo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clean_up_conninfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conninfo&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;aconn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;await&lt;/span&gt; &lt;span class="n"&gt;async_wait&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;connection_gen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bettern_conninfo&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;aconn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Now that the two modules are more similar we can run the test suite to verify
+that the library still works and can commit the current state to git.&lt;/p&gt;
+&lt;p&gt;Second step: run an async -&amp;gt; sync conversion with the current version of the
+script. Even running a no-op script is useful: it produces changes that can be
+easily seen with &lt;tt class="docutils literal"&gt;git diff&lt;/tt&gt;, suggesting which conversion feature is missing,
+or what further cleanup we could have done in the code to make the sync and
+async flavours more similar.&lt;/p&gt;
+&lt;p&gt;For example, a no-op script that just copies the async side to the sync
+side, would show up in &lt;tt class="docutils literal"&gt;git diff&lt;/tt&gt; as:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -1,6 +1,6 &amp;#64;&amp;#64;&lt;/span&gt;&lt;span class="w"&gt;
+ &lt;/span&gt;from ._connection import clean_up_conninfo&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="gd"&gt;-def connect(conninfo):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+async def connect_async(conninfo):&lt;/span&gt;&lt;span class="w"&gt;
+ &lt;/span&gt;    better_conninfo = clean_up_conninfo(conninfo)&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    conn = wait(connection_gen(bettern_conninfo))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    return conn&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    aconn = await async_wait(connection_gen(bettern_conninfo))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    return aconn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The first feature to add to the conversion script is to remove the &lt;tt class="docutils literal"&gt;async&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;await&lt;/tt&gt; keywords. Run the conversion and diff again and you will see:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -1,6 +1,6 &amp;#64;&amp;#64;&lt;/span&gt;&lt;span class="w"&gt;
+ &lt;/span&gt;from ._connection import clean_up_conninfo&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="gd"&gt;-def connect(conninfo):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+def connect_async(conninfo):&lt;/span&gt;&lt;span class="w"&gt;
+ &lt;/span&gt;    better_conninfo = clean_up_conninfo(conninfo)&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    conn = wait(connection_gen(bettern_conninfo))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    return conn&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    aconn = async_wait(connection_gen(bettern_conninfo))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    return aconn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The next step is some renaming. If &lt;tt class="docutils literal"&gt;connect()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;connect_async()&lt;/tt&gt;
+are public functions we don't want to change their names. The script should
+have a name mapping function suggesting to convert:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;connect_async&lt;/tt&gt; -&amp;gt; &lt;tt class="docutils literal"&gt;connect&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;wait_async&lt;/tt&gt; -&amp;gt; &lt;tt class="docutils literal"&gt;wait&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Implementing this renaming in the AST we would bring us to the diff:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -2,5 +2,5 &amp;#64;&amp;#64;&lt;/span&gt;&lt;span class="w"&gt;
+
+ &lt;/span&gt;def connect(conninfo):&lt;span class="w"&gt;
+ &lt;/span&gt;    better_conninfo = clean_up_conninfo(conninfo)&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    conn = wait(libpq.connect_async())&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-    return conn&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    aconn = async(libpq.connect_async())&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+    return aconn&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;We are getting there. This remaining &lt;tt class="docutils literal"&gt;aconnn&lt;/tt&gt;/&lt;tt class="docutils literal"&gt;conn&lt;/tt&gt; is actually a
+gratuitous difference: we can change the async side and call the local
+variable &lt;tt class="docutils literal"&gt;conn&lt;/tt&gt; without losing readability and obviously without changing
+any behaviour.&lt;/p&gt;
+&lt;p&gt;Committing the change on the async side and re-running the conversion would
+show no more difference on the sync side. At this point we can commit the
+whole project (any remaining but acceptable change on the sync side, the new
+features added to the conversion script, new entries in the renaming
+mapping...), run the tests to verify that no regression has been introduced,
+and move on to the next module.&lt;/p&gt;
+&lt;p&gt;This operation, in Psycopg 3, started at commit &lt;a class="reference external" href="https://github.com/psycopg/psycopg/commit/765f663f171bf5d5e4862d5c4a5d572b7e3227d8"&gt;765f663f&lt;/a&gt; and can be seen in
+the git history as a parallel branch that was eventually merged in &lt;a class="reference external" href="https://github.com/psycopg/psycopg/commit/8bb0f9bfef945861e8f671fba9073b3fae45c67f"&gt;8bb0f9bf&lt;/a&gt;.
+The &lt;tt class="docutils literal"&gt;diff &lt;span class="pre"&gt;--stat&lt;/span&gt;&lt;/tt&gt; shows a whopping:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+99 files changed, 9697 insertions(+), 8486 deletions(-)
+&lt;/pre&gt;
+&lt;p&gt;which is obviously a monster changeset, but mostly consists of incremental
+refactorings, conversions, finding new ways to minimise differences. It could
+be an interesting ride if you have a project where you need to introduce
+a similar automatic conversion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-final-result"&gt;
+&lt;h2&gt;The final result&lt;/h2&gt;
+&lt;p&gt;Here is the &lt;a class="reference external" href="https://github.com/psycopg/psycopg/blob/3.2.0/tools/async_to_sync.py"&gt;Psycopg 3 async to sync conversion script&lt;/a&gt; (as of the &lt;a class="reference external" href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/"&gt;Psycopg
+3.2 release&lt;/a&gt;). At the time of writing, It processes 27 files and
+automatically generates about the 25% of the codebase. Some of the features it
+boasts:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class="first"&gt;the AST transformations described above, including tricks like recursion
+into strings containing code to be transformed, such as Mypy annotations
+expressed as strings, adjusting the output and the comments to make the
+resulting unparsed code almost as good as the handwritten side;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;it inserts non-essential whitespace, and runs &lt;a class="reference external" href="https://black.readthedocs.io/"&gt;black&lt;/a&gt; on the output, in
+order to make the resulting code as uniform as possible to the original and
+as good for humans to work with (to read, debug, diff, etc);&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;since different Python versions may generate different ASTs and different
+output code, it can run in a Docker container, whose image is created on the
+fly using as base the Python image of the reference version;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;it adds a useful disclaimer to the top of the file:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="c1"&gt;# WARNING: this file is auto-generated by 'async_to_sync.py'&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="c1"&gt;# from the original file 'connection_async.py'&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="c1"&gt;# DO NOT CHANGE! Change the original file instead.&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;it has a &amp;quot;check&amp;quot; mode that runs in Github Action upon every commit, as part
+of the lint step, and will fail if it finds any files to convert that haven't
+been committed;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;the check mode has its own check: if any script containing the above disclaimer
+is not included in the list of files to be converted, it will throw an
+error (because a converted file has not been added to the automatic
+conversion list);&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;the check of the check also has its own check! If no file with the
+disclaimer is found then it means that something is wrong... Maybe the
+disclaimer has been rewritten and the check doesn't work anymore;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;it can run in parallel and only on the files that have changed. Almost as
+good as &lt;tt class="docutils literal"&gt;make&lt;/tt&gt; (but for certain tasks it is useful to have all the input
+files at once, therefore, &amp;quot;better than &lt;tt class="docutils literal"&gt;make&lt;/tt&gt;&amp;quot;).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The code is specific to the Psycopg 3 codebase and formatting style, so it's
+probably not ready to be used as it is in other projects. But it is probably a
+good starting point to to your own conversion: change the list of files to
+process, the name mapping, and you should be good to start.&lt;/p&gt;
+&lt;p&gt;Hope this helps. Happy hacking!&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Psycopg 3.2 released</title><link href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/" rel="alternate"></link><updated>2024-06-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:31cb8a57-f930-3fb0-82c6-4067eb76bd76</id><content type="html">&lt;p&gt;It was quite the ride! But we made it!&lt;/p&gt;
 &lt;p&gt;After almost two years, 846 commits, more than 700 new tests, more than 20000
 changes in 310 files (I didn't even realise that there were 310 files in this
 project...) Psycopg 3.2 has been released!&lt;/p&gt;
@@ -2883,63 +3417,5 @@ but if there is anything to point out I'd be happy to know. Best option would be
 &lt;p&gt;The rest of the example is not shown here: it only consists in a static page and the web server setup. You can &lt;a class="reference external" href="pushdemo.py"&gt;download the complete example&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Running the program and opening the page &lt;a class="reference external" href="http://localhost:7000/"&gt;http://localhost:7000/&lt;/a&gt; in a WebSocket-enabled browser you will see a page with three coloured bars: using a command such as &lt;tt class="docutils literal"&gt;NOTIFY data, 'green'&lt;/tt&gt; in a psql shell, one of the bars in the page will be updated accordingly. Here is a screenshot:&lt;/p&gt;
 &lt;img alt="psycopg eventlet push demo" class="align-center" src="pushdemo.png" style="width: 477px; height: 327px;" /&gt;
-&lt;/div&gt;
-</content></entry><entry><title>Psycopg 2.3.0 released</title><link href="https://www.psycopg.org/articles/2010/12/01/psycopg-230-released/" rel="alternate"></link><updated>2010-12-01T00:00:00Z</updated><author><name>Federico Di Gregorio</name></author><id>urn:uuid:12f1b527-a80a-34f4-9c06-c281d38f0559</id><content type="html">&lt;p&gt;Hi *,&lt;/p&gt;
-&lt;p&gt;lately my involvement on psycopg has been quite small (work and other
-projects are taking their toll) but thanks to Daniele (with some help
-from Jan) here is a new psycopg2 release. The number of changes is big
-(an excerpt from the NEWS file is at the end, as always) so we decided
-to bump up the version to 2.3.0 and to test, and test... and test. We
-tested this new release on Linux and Windows, with Python 2.4, 2.5, 2.6,
-2.7 and on PostgreSQL from 7.4 to 9.0.&lt;/p&gt;
-&lt;!-- CUT-HERE --&gt;
-&lt;p&gt;As always, signed download from:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference external" href="https://pypi.org/packages/source/p/psycopg2/psycopg2-2.3.0.tar.gz"&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.3.0.tar.gz&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference external" href="https://pypi.org/packages/source/p/psycopg2/psycopg2-2.3.0.tar.gz.asc"&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.3.0.tar.gz.asc&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Have fun,
-federico&lt;/p&gt;
-&lt;p&gt;And here are the NEWS:&lt;/p&gt;
-&lt;p&gt;psycopg 2.3 aims to expose some new features introduced in PostgreSQL 9.0.&lt;/p&gt;
-&lt;div class="section" id="main-new-features"&gt;
-&lt;h2&gt;Main new features&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;dict&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;hstore&lt;/tt&gt; adapter and &lt;tt class="docutils literal"&gt;hstore&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;dict&lt;/tt&gt; typecaster, using
-both 9.0 and pre-9.0 syntax.&lt;/li&gt;
-&lt;li&gt;Two-phase commit protocol support as per DBAPI specification.&lt;/li&gt;
-&lt;li&gt;Support for payload in notifications received from the backed.&lt;/li&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;namedtuple&lt;/tt&gt;-returning cursor.&lt;/li&gt;
-&lt;li&gt;Query execution cancel.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class="section" id="other-features-and-changes"&gt;
-&lt;h2&gt;Other features and changes&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;Dropped support for protocol 2: Psycopg 2.3 can only connect to
-PostgreSQL servers with version at least 7.4.&lt;/li&gt;
-&lt;li&gt;Don't issue a query at every connection to detect the client
-encoding and to set the datestyle to ISO if it is already
-compatible with what expected.&lt;/li&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;mogrify()&lt;/tt&gt; now supports unicode queries.&lt;/li&gt;
-&lt;li&gt;Subclasses of a type that can be adapted are adapted as the
-superclass.&lt;/li&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;errorcodes&lt;/tt&gt; knows a couple of new codes introduced in PostgreSQL
-9.0.&lt;/li&gt;
-&lt;li&gt;Dropped deprecated Psycopg &amp;quot;own quoting&amp;quot;.&lt;/li&gt;
-&lt;li&gt;Never issue a ROLLBACK on close/GC. This behaviour was introduced
-as a bug in release 2.2, but trying to send a command while being
-destroyed has been considered not safe.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class="section" id="bug-fixes"&gt;
-&lt;h2&gt;Bug fixes&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;Fixed use of &lt;tt class="docutils literal"&gt;PQfreemem&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;free&lt;/tt&gt; in binary typecaster.&lt;/li&gt;
-&lt;li&gt;Fixed access to freed memory in &lt;tt class="docutils literal"&gt;conn_get_isolation_level()&lt;/tt&gt;.&lt;/li&gt;
-&lt;li&gt;Fixed crash during Decimal adaptation with a few 2.5.x Python
-versions (&lt;a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/7"&gt;ticket #7&lt;/a&gt;).&lt;/li&gt;
-&lt;li&gt;Fixed notices order (&lt;a class="reference external" href="https://psycopg.lighthouseapp.com/projects/62710/tickets/9"&gt;ticket #9&lt;/a&gt;).&lt;/li&gt;
-&lt;/ul&gt;
 &lt;/div&gt;
 </content></entry></feed>

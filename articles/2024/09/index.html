@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
     <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
-    <title>Automatic async to sync code conversion — Psycopg</title>
+    <title>September 2024 Articles — Psycopg</title>
   </head>
   <body>
     <header>
@@ -59,15 +59,21 @@
 
     <div id="site" class="container" style="margin-top:30px">
       <div class="row">
-        <div id="content" class="col-sm-8 sidebar">
+        <div id="content" class="offset-sm-1 col-sm-10">
         
+  <h1>Articles from September 2024</h1>
+  <p>
+    <a href="/articles/2024/">&laquo; Back to 2024</a>
+  </p>
+
   
+    
   <div class="article">
   
-    <h1>Automatic async to sync code conversion</h1>
+    <h2><a href="/articles/2024/09/23/async-to-sync/">Automatic async to sync code conversion</a></h2>
   
   <p class="header">
-    Posted by Daniele Varrazzo on 2024-09-13
+    Posted by Daniele Varrazzo on 2024-09-23
     
       <br />
       Tagged as
@@ -367,7 +373,7 @@ used alternatively in sync or in async mode.</p>
 some simple name substitutions in the AST: the resulting statement <tt class="docutils literal">from
 ._acompat import sleep; sleep(1)</tt> will work as expected.</p>
 <p>Other goodies we have implemented to help unify async and sync code are
-<tt class="docutils literal">spawn</tt>/<tt class="docutils literal">aspawn</tt> and <tt class="docutils literal">agather</tt>/<tt class="docutils literal">gather</tt> to unify threads and
+<tt class="docutils literal">aspawn</tt>/<tt class="docutils literal">spawn</tt> and <tt class="docutils literal">agather</tt>/<tt class="docutils literal">gather</tt> to unify threads and
 asyncio tasks creation, <tt class="docutils literal">alist()</tt> to encapsulate <tt class="docutils literal">[x for x in await
 iterable]</tt> in a way that can be easily converted to <tt class="docutils literal">list(iterable)</tt> and
 many other helpers to smooth the transition.</p>
@@ -444,7 +450,7 @@ sync side and imported it on the async side:</p>
 <span class="c1"># connection.py</span><span class="w">
 
 </span><span class="k">def</span> <span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
-</span>    <span class="c1"># hack hack</span><span class="w">
+</span>    <span class="o">...</span>  <span class="c1"># hack hack</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">better_conninfo</span><span class="w">
 
 </span><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
@@ -461,13 +467,13 @@ sync side and imported it on the async side:</p>
 </span>    <span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">aconn</span>
 </pre>
-<p>In this case we would have put the shared functionality in a separate
-module and imported the function on both the sides:</p>
+<p>In this case we would have moved the shared functionality in a separate
+internal module and imported the function on both the sides:</p>
 <pre class="code python literal-block">
 <span class="c1"># _connection.py</span><span class="w">
 
 </span><span class="k">def</span> <span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
-</span>    <span class="c1"># hack hack</span><span class="w">
+</span>    <span class="o">...</span>  <span class="c1"># hack hack</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">better_conninfo</span><span class="w">
 
 </span><span class="c1"># connection.py</span><span class="w">
@@ -600,12 +606,11 @@ conversion list);</p>
 </li>
 <li><p class="first">the check of the check also has its own check! If no file with the
 disclaimer is found then it means that something is wrong... Maybe the
-disclaimer has been rewritten and the check doesn't work anymore.</p>
+disclaimer has been rewritten and the check doesn't work anymore;</p>
 </li>
 <li><p class="first">it can run in parallel and only on the files that have changed. Almost as
-good as <tt class="docutils literal">make</tt> (for some reason I can't remember at the moment we
-preferred to write a script that converts all the files instead of a
-recursive makefile that converts only one module).</p>
+good as <tt class="docutils literal">make</tt> (but for certain tasks it is useful to have all the input
+files at once, therefore, &quot;better than <tt class="docutils literal">make</tt>&quot;).</p>
 </li>
 </ul>
 <p>The code is specific to the Psycopg 3 codebase and formatting style, so it's
@@ -615,123 +620,14 @@ process, the name mapping, and you should be good to start.</p>
 <p>Hope this helps. Happy hacking!</p>
 </div>
 
+    
   
   </div>
 
-  <script src="https://utteranc.es/client.js"
-    repo="psycopg/psycopg-website"
-    issue-term="pathname"
-    label="comments"
-    theme="github-light"
-    crossorigin="anonymous"
-    async>
-  </script>
+  
+
 
         </div>
-        <div id="sidebar" class="col-sm-4">
-
-
-<div>
-  <iframe src="https://github.com/sponsors/dvarrazzo/button"
-          title="Sponsor the project" style="border: 0"
-          width="116" height="35">
-  </iframe>
-</div>
-
-
-
-<div class="dashed-top">
-
-  <h3>Psycopg 3</h3>
-
-  <ul class="fa-ul links">
-    <li>
-      <a href="/psycopg3/">
-        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
-        The Project</a>
-    </li>
-    <li>
-      <a href="/psycopg3/docs/">
-        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
-        Documentation</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg3/">
-        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
-        Source code</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg3/issues">
-        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
-        Bug tracker</a>
-    </li>
-  </ul>
-</div>
-
-<div class="dashed-top">
-  <h3>Psycopg 2</h3>
-
-  <ul class="fa-ul links">
-    <li>
-      <a href="/docs/">
-        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
-        Documentation</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg2/">
-        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
-        Source code</a>
-    </li>
-    <li>
-      <a href="https://github.com/psycopg/psycopg2/issues">
-        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
-        Bug tracker</a>
-    </li>
-  </ul>
-</div>
-
-<div class="dashed-top">
-  <h3>Mailing List</h3>
-
-  <ul class="fa-ul links">
-    <li>
-      <a href="https://lists.postgresql.org/">
-        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
-        Subscribe</a>
-    </li>
-    <li>
-      <a href="https://www.postgresql.org/list/psycopg/">
-        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
-        Archives</a>
-    </li>
-  </ul>
-</div>
-
-<div class="dashed-top">
-
-<h3>Articles archive</h3>
-<ul class="links">
-  <li><a href="/articles/2024/">2024</a></li>
-  <li><a href="/articles/2022/">2022</a></li>
-  <li><a href="/articles/2021/">2021</a></li>
-  <li><a href="/articles/2020/">2020</a></li>
-  <li><a href="/articles/2019/">2019</a></li>
-  <li><a href="/articles/2018/">2018</a></li>
-  <li><a href="/articles/2017/">2017</a></li>
-  <li><a href="/articles/2016/">2016</a></li>
-  <li><a href="/articles/2015/">2015</a></li>
-  <li><a href="/articles/2014/">2014</a></li>
-  <li><a href="/articles/2013/">2013</a></li>
-  <li><a href="/articles/2012/">2012</a></li>
-  <li><a href="/articles/2011/">2011</a></li>
-  <li><a href="/articles/2010/">2010</a></li>
-</ul>
-
-
-</div>
-
-        </div>
-        
       </div>
       <a style="display:none" rel="me" href="https://fosstodon.org/@psycopg">Mastodon</a>
     </div>
