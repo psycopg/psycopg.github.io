@@ -466,18 +466,19 @@ the <code class="sql docutils literal notranslate"><span class="pre">IN</span></
 <span class="x">                                     ^</span>
 </pre></div>
 </div>
-<p>This is probably caused by the fact that <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> is not a binary operator in
-PostgreSQL; rather, <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NULL</span></code> and <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></code> are unary operators
+<p>This is probably caused by the fact that <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> is not a binary predicate in
+PostgreSQL; rather, <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NULL</span></code> and <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></code> are unary predicates
 and you cannot use <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> with anything else on the right hand side.
 Testing in psql:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=# SELECT 10 IS 10;
 ERROR:  syntax error at or near &quot;10&quot;
-LINE 1: select 10 is 10;
+LINE 1: SELECT 10 IS 10;
                      ^
 </pre></div>
 </div>
-<p>What you can do instead is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparison.html">IS DISTINCT FROM operator</a>, which
-will gladly accept a placeholder:</p>
+<p>What you can do is to use <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparison.html">IS [NOT] DISTINCT FROM</a> predicate instead:
+<code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">%s</span></code> can be used in place of <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code> (please
+pay attention to the awkwardly reversed <code class="sql docutils literal notranslate"><span class="pre">NOT</span></code>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE field IS NOT DISTINCT FROM </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
 </pre></div>
 </div>
