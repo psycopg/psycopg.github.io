@@ -385,9 +385,16 @@ global object and use it from the rest of your code:</p>
 <p>Using this pattern, the pool will start the connection process already at
 import time. If that’s too early, and you want to delay opening connections
 until the application is ready, you can specify to create a closed pool and
-call the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.open" title="psycopg_pool.ConnectionPool.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code></a> method (and optionally the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method) at application startup/shutdown. For
-example, in FastAPI, you can use a <a class="reference external" href="https://fastapi.tiangolo.com/advanced/events/#lifespan">Lifespan</a>:</p>
+call the <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.open" title="psycopg_pool.ConnectionPool.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open()</span></code></a> method.</p>
+<p>If you are not using the pool as context manager, you are advised to call the
+<a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.close" title="psycopg_pool.ConnectionPool.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> method on program exit: on some Python versions this
+might cause a program exit delay. How to ensure it depends on the way you are
+writing your program. One simple method is to use the <a class="reference external" href="https://docs.python.org/3/library/atexit.html#module-atexit" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atexit</span></code></a> module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Other frameworks might provide suitable hooks. For example, in FastAPI, you
+can use a <a class="reference external" href="https://fastapi.tiangolo.com/advanced/events/#lifespan">lifespan</a> function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pool</span> <span class="o">=</span> <span class="n">AsyncConnectionPool</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 
 <span class="nd">@asynccontextmanager</span>
