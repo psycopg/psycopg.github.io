@@ -270,7 +270,7 @@ update <code class="docutils literal notranslate"><span class="pre">LIBPQ_VERSIO
 <li><p><a class="reference external" href="https://github.com/psycopg/psycopg/actions/workflows/packages-pool.yml">Pool packages</a></p></li>
 </ul>
 </li>
-<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">wheelhouse</span></code> directory there is one.</p></li>
+<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">wheelhouse</span></code> directory if there is one.</p></li>
 <li><p>Build m1 packages by running <code class="docutils literal notranslate"><span class="pre">./tools/build/run_build_macos_arm64.sh</span> <span class="pre">BRANCH</span></code>.
 On successful completion it will save built packages in <code class="docutils literal notranslate"><span class="pre">wheelhouse</span></code></p></li>
 <li><p>If all packages were built ok, push the new tag created by <code class="docutils literal notranslate"><span class="pre">bump_version.py</span></code>:</p>
@@ -345,6 +345,27 @@ the new version. Look for both the <code class="docutils literal notranslate"><s
 <code class="docutils literal notranslate"><span class="pre">CIBW_BUILD</span></code> environment variable.</p></li>
 </ul>
 </section>
+<section id="when-dropping-end-of-life-python-versions">
+<h2>When dropping end-of-life Python versions<a class="headerlink" href="#when-dropping-end-of-life-python-versions" title="Permalink to this heading">#</a></h2>
+<ul>
+<li><p>Update project metadata, <code class="docutils literal notranslate"><span class="pre">requires-python</span></code> and (maybe) package dependencies
+in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> files of the corresponding <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> directories.</p></li>
+<li><p>Update GitHub Actions workflow files in the <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code> directory,
+e.g., <code class="docutils literal notranslate"><span class="pre">tests.yml</span></code>, <code class="docutils literal notranslate"><span class="pre">.3rd-party-tests.yml</span></code>, <code class="docutils literal notranslate"><span class="pre">packages-bin.yml</span></code>.</p></li>
+<li><p>Bump versions in the <code class="docutils literal notranslate"><span class="pre">tests/constraints.txt</span></code> file if it is necessary.</p></li>
+<li><p>You may grep throughout the project for occurrences of a version to be dropped.
+However, favouring smaller pull requests is convenient and easy to review.
+An example for grepping <code class="xref py py-obj docutils literal notranslate"><span class="pre">end-of-life</span></code> Python 3.8:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">grep</span> <span class="o">-</span><span class="n">E</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;</span><span class="se">\b</span><span class="s1">3\.8</span><span class="se">\b</span><span class="s1">&#39;</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;</span><span class="se">\b</span><span class="s1">(cp)?38</span><span class="se">\b</span><span class="s1">&#39;</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;</span><span class="se">\b</span><span class="s1">3, 8</span><span class="se">\b</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Examples:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/psycopg/psycopg/pull/977">PR #977</a></p></li>
+</ul>
+</section>
 </section>
 
         </article>
@@ -388,6 +409,7 @@ the new version. Look for both the <code class="docutils literal notranslate"><s
 <li><a class="reference internal" href="#">How to make a psycopg release</a><ul>
 <li><a class="reference internal" href="#when-a-new-postgresql-major-version-is-released">When a new PostgreSQL major version is released</a></li>
 <li><a class="reference internal" href="#when-a-new-python-major-version-is-released">When a new Python major version is released</a></li>
+<li><a class="reference internal" href="#when-dropping-end-of-life-python-versions">When dropping end-of-life Python versions</a></li>
 </ul>
 </li>
 </ul>
