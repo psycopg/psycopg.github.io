@@ -300,7 +300,7 @@ function can be used instead of <code class="sql docutils literal notranslate"><
 </div>
 <p>If this is not possible, you must merge the query and the parameter on the
 client side. You can do so using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE foo (id int DEFAULT </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
 </pre></div>
@@ -318,7 +318,7 @@ will behave largely the same way of Psycopg 2.</p>
 as parameters (i.e. <em>the strings that go in single quotes</em>). If you need to
 parametrize different parts of a statement (such as a table name), you must
 use the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 
 <span class="go"># This will quote the user and the password using the right quotes</span>
 <span class="go"># e.g.: ALTER USER &quot;foo&quot; SET PASSWORD &#39;bar&#39;</span>
@@ -355,7 +355,7 @@ calls.</p>
 <p><strong>There is no such limitation if no parameters are used</strong>. As a consequence, you
 can compose a multiple query on the client side and run them all in the same
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call, using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">sql</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">{}</span><span class="s2">); INSERT INTO foo values (</span><span class="si">{}</span><span class="s2">)&quot;</span>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
@@ -499,7 +499,7 @@ factory</span></a>:</p>
 <p>Other row factories are available in the <a class="reference internal" href="../api/rows.html#module-psycopg.rows" title="psycopg.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code></a> module. There isn’t an
 object behaving like <a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.DictCursor" title="(in Psycopg v2.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DictCursor</span></code></a> (whose results are
 indexable both by column position and by column name).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">dict_row</span><span class="p">,</span> <span class="n">namedtuple_row</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_row</span><span class="p">,</span> <span class="n">namedtuple_row</span>
 
 <span class="c1"># By default, every cursor will return dicts.</span>
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>

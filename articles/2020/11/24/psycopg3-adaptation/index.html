@@ -216,8 +216,8 @@ Python cannot. If we wanted to store Python's <tt class="docutils literal">date.
 infinity, we could create a subclass for the dumper and register it in the
 scope we want to use it, globally or just on a connection or cursor:</p>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span><span class="w">
+<span class="k">class</span><span class="w"> </span><span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span><span class="w">
 </span>        <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">:</span><span class="w">
 </span>            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span><span class="w">
 </span>        <span class="k">else</span><span class="p">:</span><span class="w">
@@ -237,8 +237,8 @@ reverse the above customisation and map PostgreSQL infinity date to
 <tt class="docutils literal">date.max</tt> (instead of raising an exception), it could be done using a
 subclass of the builtin loader (or using an entirely new object if required):</p>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span><span class="w">
+<span class="k">class</span><span class="w"> </span><span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span><span class="w">
 </span>        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span><span class="p">:</span><span class="w">
 </span>            <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="w">
 </span>        <span class="k">else</span><span class="p">:</span><span class="w">
@@ -247,7 +247,7 @@ subclass of the builtin loader (or using an entirely new object if required):</p
 </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '2020-12-31'::date, 'infinity'::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span><span class="w">
 </span><span class="c1"># Raises DataError: Python date doesn't support years after 9999: got infinity</span><span class="w">
 
-</span><span class="kn">from</span> <span class="nn">psycopg3.oids</span> <span class="kn">import</span> <span class="n">builtins</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg3.oids</span><span class="w"> </span><span class="kn">import</span> <span class="n">builtins</span><span class="w">
 </span><span class="n">InfDateLoader</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">builtins</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span><span class="w">
 
 </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select '2020-12-31'::date, 'infinity'::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span><span class="w">

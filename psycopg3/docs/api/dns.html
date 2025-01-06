@@ -298,11 +298,11 @@ insensitive).</p>
 <p>One possible way to use this function automatically is to subclass
 <a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a>, extending the
 <a class="reference internal" href="#psycopg.Connection._get_connection_params" title="psycopg.Connection._get_connection_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_connection_params()</span></code></a> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg._dns</span>  <span class="c1"># not imported automatically</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg._dns</span>  <span class="c1"># not imported automatically</span>
 
-<span class="k">class</span> <span class="nc">SrvCognizantConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SrvCognizantConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_connection_params</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">_dns</span><span class="o">.</span><span class="n">resolve_srv</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">params</span>
@@ -332,7 +332,7 @@ insensitive).</p>
 parameters before performing the connection. Make sure to call the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">super()</span></code> implementation before further manipulation of the arguments:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_connection_params</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="c1"># do something with the params</span>
     <span class="k">return</span> <span class="n">params</span>
@@ -386,11 +386,11 @@ function is unneeded.</p>
 <p>In psycopg 3.0, one possible way to use this function automatically is
 to subclass <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a>, extending the
 <a class="reference internal" href="#psycopg.AsyncConnection._get_connection_params" title="psycopg.AsyncConnection._get_connection_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_connection_params()</span></code></a> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg._dns</span>  <span class="c1"># not imported automatically</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg._dns</span>  <span class="c1"># not imported automatically</span>
 
-<span class="k">class</span> <span class="nc">AsyncDnsConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncDnsConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_connection_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_connection_params</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">_dns</span><span class="o">.</span><span class="n">resolve_hostaddr_async</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">params</span>

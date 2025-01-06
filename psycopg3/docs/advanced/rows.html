@@ -256,7 +256,7 @@ programmer by using custom <em>row factories</em>.</p>
 <p>The module <a class="reference internal" href="../api/rows.html#module-psycopg.rows" title="psycopg.rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.rows</span></code></a> exposes several row factories ready to be used. For
 instance, if you want to return your records as dictionaries, you can use
 <a class="reference internal" href="../api/rows.html#psycopg.rows.dict_row" title="psycopg.rows.dict_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_row</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">dict_row</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_row</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">row_factory</span><span class="o">=</span><span class="n">dict_row</span><span class="p">)</span>
 
@@ -273,7 +273,7 @@ they return:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;John Doe&#39; as name, 33 as age&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">{&#39;name&#39;: &#39;John Doe&#39;, &#39;age&#39;: 33}</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">namedtuple_row</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple_row</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">namedtuple_row</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;John Doe&#39; as name, 33 as age&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">Row(name=&#39;John Doe&#39;, age=33)</span>
@@ -282,15 +282,15 @@ they return:</p>
 <p>If you want to return objects of your choice you can use a row factory
 <em>generator</em>, for instance <a class="reference internal" href="../api/rows.html#psycopg.rows.class_row" title="psycopg.rows.class_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_row</span></code></a> or
 <a class="reference internal" href="../api/rows.html#psycopg.rows.args_row" title="psycopg.rows.args_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args_row</span></code></a>, or you can <a class="reference internal" href="#row-factory-create"><span class="std std-ref">write your own row factory</span></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="gp">... </span>    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
 <span class="gp">... </span>    <span class="n">weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">class_row</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_row</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;John Doe&#39; as name, 33 as age&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">Person(name=&#39;John Doe&#39;, age=33, weight=None)</span>
@@ -318,22 +318,22 @@ columns are extracted, sanitised, and stored in local variables).</p>
 <p>Formally, these objects are represented by the <a class="reference internal" href="../api/rows.html#psycopg.rows.RowFactory" title="psycopg.rows.RowFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code></a> and
 <a class="reference internal" href="../api/rows.html#psycopg.rows.RowMaker" title="psycopg.rows.RowMaker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowMaker</span></code></a> protocols.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RowFactory</span></code> objects can be implemented as a class, for instance:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Cursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cursor</span>
 
-<span class="k">class</span> <span class="nc">DictRowFactory</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">:</span> <span class="n">Cursor</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DictRowFactory</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">:</span> <span class="n">Cursor</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or as nested functions:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dict_row_factory</span><span class="p">(</span><span class="n">cursor</span><span class="p">:</span> <span class="n">Cursor</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RowMaker</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">dict_row_factory</span><span class="p">(</span><span class="n">cursor</span><span class="p">:</span> <span class="n">Cursor</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RowMaker</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">make_row</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_row</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">make_row</span>

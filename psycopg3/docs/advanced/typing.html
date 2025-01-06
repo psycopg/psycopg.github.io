@@ -309,8 +309,8 @@ returned will follow the rule as in <a class="reference internal" href="#row-fac
 <p>Note that, at the moment, if you use a generic class as <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code>,
 you will need to specify a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> consistently in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>,
 otherwise the typing system and the runtime will not agree.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">Connection</span>
-<span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">DictRow</span><span class="p">,</span> <span class="n">dict_row</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictRow</span><span class="p">,</span> <span class="n">dict_row</span>
 
 <span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span>
     <span class="n">connection_class</span><span class="o">=</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">],</span>   <span class="c1"># provides type hinting</span>
@@ -329,8 +329,8 @@ otherwise the typing system and the runtime will not agree.</p>
 </div>
 <p>If a non-generic <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> subclass is used (one whose returned row
 type is not parametric) then it’s not necessary to specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;row_factory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_row</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -356,20 +356,20 @@ compatible with the model.</p>
 <p>The following example can be checked with <code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span></code> without reporting
 any issue. Pydantic will also raise a runtime error in case the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code> is used with a query that returns incompatible data.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">psycopg</span>
-<span class="kn">from</span> <span class="nn">psycopg.rows</span> <span class="kn">import</span> <span class="n">class_row</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_row</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
-<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">first_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">last_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">dob</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
             <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
@@ -411,13 +411,13 @@ come from a literal string in your code, not from an arbitrary string
 expression.</p>
 <p>For instance, passing an argument to the query should be done via the second
 argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>, not by string composition:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>  <span class="c1"># BAD!</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
 <span class="c1"># the function should be implemented as:</span>
 
-<span class="k">def</span> <span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">id</span><span class="p">,))</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 </pre></div>
@@ -425,13 +425,13 @@ argument to <code class="xref py py-obj docutils literal notranslate"><span clas
 <p>If you are composing a query dynamically you should use the <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a> object
 and similar to escape safely table and field names. The parameter of the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL()</span></code> object should be a literal string:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*) FROM </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">table</span>  <span class="c1"># BAD!</span>
     <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># the function should be implemented as:</span>
 
-<span class="k">def</span> <span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>

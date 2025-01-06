@@ -124,7 +124,7 @@ connection is available or until a timeout expires, and only then throw an
 exception, so that in the face of a spike there is a buffer before requests
 start to get killed. I would expect no crash here:</p>
 <pre class="code python literal-block">
-<span class="k">async</span> <span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">work_for_sec</span><span class="p">):</span><span class="w">
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">worker</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">work_for_sec</span><span class="p">):</span><span class="w">
 </span>    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select pg_sleep(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">work_for_sec</span><span class="p">,))</span><span class="w">
 
 </span><span class="n">pool</span> <span class="o">=</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">AsyncPool</span><span class="p">(</span><span class="n">maxconn</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">connection_timeout_sec</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span><span class="w">
@@ -145,8 +145,8 @@ what configuration to use.</p>
 <pre class="code python literal-block">
 <span class="c1"># Subclassing:</span><span class="w">
 
-</span><span class="k">class</span> <span class="nc">MyPool</span><span class="p">(</span><span class="n">psycopg3</span><span class="o">.</span><span class="n">pool</span><span class="p">):</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">MyPool</span><span class="p">(</span><span class="n">psycopg3</span><span class="o">.</span><span class="n">pool</span><span class="p">):</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span><span class="w">
 </span>        <span class="n">MyAdapter</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span><span class="w">
 </span>        <span class="k">return</span> <span class="n">conn</span><span class="w">
 
@@ -154,7 +154,7 @@ what configuration to use.</p>
 
 </span><span class="c1"># Configuring:</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">my_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">my_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span><span class="w">
 </span>    <span class="n">MyAdapter</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">conn</span><span class="w">
 
@@ -166,7 +166,7 @@ what configuration to use.</p>
 <p>Should there be a way to create an exclusive connection? Sometimes I need
 one, in an otherwise pooled application, e.g. to receive notifications:</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">listen_notifications</span><span class="p">():</span><span class="w">
+<span class="k">def</span><span class="w"> </span><span class="nf">listen_notifications</span><span class="p">():</span><span class="w">
 </span>    <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">exclusive</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
 </span>        <span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span><span class="w">
 </span>        <span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">notifies</span><span class="p">():</span><span class="w">
@@ -177,7 +177,7 @@ available on the pool:</p>
 <pre class="code python literal-block">
 <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">maxconn</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">pool_maxconn</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">db_dsn</span><span class="p">,))</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">listen_notifications</span><span class="p">():</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">listen_notifications</span><span class="p">():</span><span class="w">
 </span>    <span class="k">with</span> <span class="n">psycopg3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">*</span><span class="n">pool</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">pool</span><span class="o">.</span><span class="n">kwargs</span><span class="p">):</span><span class="w">
 </span>        <span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span><span class="w">
 </span>        <span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">notifies</span><span class="p">():</span><span class="w">
@@ -201,8 +201,8 @@ the application operations, certain things should happen behind the scene:</p>
 <p>A trivial behaviour would be something like &quot;if there are no connections
 available create a new one&quot;:</p>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">Pool</span><span class="p">:</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">getconn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+<span class="k">class</span><span class="w"> </span><span class="nc">Pool</span><span class="p">:</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">getconn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
 </span>        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_a_connection_from_the_pool</span><span class="p">()</span><span class="w">
 </span>        <span class="k">if</span> <span class="n">conn</span><span class="p">:</span><span class="w">
 </span>            <span class="k">return</span> <span class="n">conn</span><span class="w">
@@ -216,8 +216,8 @@ it, especially if the connection time is particularly long compared to the
 processing time. Growing the pool could be demanded to a background worker,
 following a strategy like:</p>
 <pre class="code python literal-block">
-<span class="k">class</span> <span class="nc">Pool</span><span class="p">:</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">getconn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+<span class="k">class</span><span class="w"> </span><span class="nc">Pool</span><span class="p">:</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">getconn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
 </span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pool</span><span class="p">():</span><span class="w">
 </span>            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">create_a_new_connection_and_put_it_in_the_pool</span><span class="p">()</span><span class="w">
 </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_a_connection_from_the_pool</span><span class="p">()</span>

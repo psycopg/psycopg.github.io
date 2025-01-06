@@ -150,9 +150,9 @@ other traps.</p>
 <p>The <a class="reference external" href="https://docs.python.org/3/library/ast.html">Python 'ast' module</a> is the obvious starting point: if you have a bit
 of source code such as:</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">asyncio</span><span class="w">
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span><span class="w">
 
-</span><span class="k">async</span> <span class="k">def</span> <span class="nf">async_square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span><span class="w">
+</span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span><span class="w">
 </span>    <span class="c1"># Squares are slow</span><span class="w">
 </span>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">
 
@@ -277,10 +277,10 @@ module (which is obviously not the right thing to do in the general case, but
 let's keep the example simple). The following script implements the
 transformation and prints the converted module:</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">ast</span><span class="w">
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span><span class="w">
 
-</span><span class="k">class</span> <span class="nc">MyTransformer</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NodeTransformer</span><span class="p">):</span><span class="w">
-</span>    <span class="k">def</span> <span class="nf">visit_Import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NodeTransformer</span><span class="p">):</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">visit_Import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
 </span>        <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">names</span><span class="p">:</span><span class="w">
 </span>            <span class="k">if</span> <span class="n">alias</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;asyncio&quot;</span><span class="p">:</span><span class="w">
 </span>                <span class="n">alias</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span><span class="w">
@@ -309,12 +309,12 @@ highlighted parts of the original tree:</p>
 <p>Adding the following two methods to the above class will implement what has
 been described.</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">visit_Await</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
+<span class="k">def</span><span class="w"> </span><span class="nf">visit_Await</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
 </span>    <span class="n">new_node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>  <span class="c1"># drop the node, continue to operate on the value</span><span class="w">
 </span>    <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">new_node</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">visit_Call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">visit_Call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span><span class="w">
 </span>    <span class="k">match</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="p">:</span><span class="w">
 </span>        <span class="k">case</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;asyncio&quot;</span><span class="p">),</span> <span class="n">attr</span><span class="o">=</span><span class="s2">&quot;sleep&quot;</span><span class="p">):</span><span class="w">
 </span>            <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span><span class="w">
@@ -338,8 +338,8 @@ statement can describe a complex nested test very succinctly.</p>
 real is much more complex than this. What if our source includes <tt class="docutils literal">from asycio
 import sleep, Event</tt>? We would have to split the import into several parts:</p>
 <pre class="code python literal-block">
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
 </pre>
 <p>and the latter should be treated differently later because the two <tt class="docutils literal">Event</tt>
 objects have a different <tt class="docutils literal">wait()</tt> signatures.</p>
@@ -352,12 +352,12 @@ used alternatively in sync or in async mode.</p>
 <pre class="code python literal-block">
 <span class="c1"># module _acompat.py</span><span class="w">
 
-</span><span class="kn">import</span> <span class="nn">time</span><span class="w">
-</span><span class="kn">import</span> <span class="nn">asyncio</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span><span class="w">
 
 </span><span class="n">sleep</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">asleep</span><span class="p">(</span><span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">asleep</span><span class="p">(</span><span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span><span class="w">
     </span><span class="sd">&quot;&quot;&quot;
     Equivalent to asyncio.sleep(), converted to time.sleep() by async_to_sync.
     &quot;&quot;&quot;</span><span class="w">
@@ -443,20 +443,20 @@ sync side and imported it on the async side:</p>
 <pre class="code python literal-block">
 <span class="c1"># connection.py</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="o">...</span>  <span class="c1"># hack hack</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">better_conninfo</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="n">better_conninfo</span> <span class="o">=</span> <span class="n">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">)</span><span class="w">
 </span>    <span class="n">conn</span> <span class="o">=</span> <span class="n">wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">conn</span><span class="w">
 
 </span><span class="c1"># connection_async.py</span><span class="w">
 
-</span><span class="kn">from</span> <span class="nn">.connection</span> <span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">.connection</span><span class="w"> </span><span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
 
-</span><span class="k">async</span> <span class="k">def</span> <span class="nf">connect_async</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect_async</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="n">better_conninfo</span> <span class="o">=</span> <span class="n">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">)</span><span class="w">
 </span>    <span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">aconn</span>
@@ -466,24 +466,24 @@ internal module and imported the function on both the sides:</p>
 <pre class="code python literal-block">
 <span class="c1"># _connection.py</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="o">...</span>  <span class="c1"># hack hack</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">better_conninfo</span><span class="w">
 
 </span><span class="c1"># connection.py</span><span class="w">
 
-</span><span class="kn">from</span> <span class="nn">._connection</span> <span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">._connection</span><span class="w"> </span><span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="n">better_conninfo</span> <span class="o">=</span> <span class="n">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">)</span><span class="w">
 </span>    <span class="n">conn</span> <span class="o">=</span> <span class="n">wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">conn</span><span class="w">
 
 </span><span class="c1"># connection_async.py</span><span class="w">
 
-</span><span class="kn">from</span> <span class="nn">._connection</span> <span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">._connection</span><span class="w"> </span><span class="kn">import</span> <span class="n">clean_up_conninfo</span><span class="w">
 
-</span><span class="k">async</span> <span class="k">def</span> <span class="nf">connect_async</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
+</span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect_async</span><span class="p">(</span><span class="n">conninfo</span><span class="p">):</span><span class="w">
 </span>    <span class="n">better_conninfo</span> <span class="o">=</span> <span class="n">clean_up_conninfo</span><span class="p">(</span><span class="n">conninfo</span><span class="p">)</span><span class="w">
 </span>    <span class="n">aconn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_wait</span><span class="p">(</span><span class="n">connection_gen</span><span class="p">(</span><span class="n">bettern_conninfo</span><span class="p">))</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">aconn</span>

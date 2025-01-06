@@ -311,12 +311,12 @@ too many ways of handling XML in Python. Creating a loader to parse the
 <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-xml.html">PostgreSQL xml type</a> to <a class="reference external" href="https://docs.python.org/3/library/xml.etree.elementtree.html#module-xml.etree.ElementTree" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElementTree</span></code></a> is very simple, using the
 <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Loader</span></code></a> base class and implementing the
 <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.adapt</span> <span class="kn">import</span> <span class="n">Loader</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.adapt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Loader</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a class implementing the `load()` method.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">XmlLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">XmlLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Register the loader on the adapters of a context.</span>
@@ -336,13 +336,13 @@ too many ways of handling XML in Python. Creating a loader to parse the
 <p>The opposite operation, converting Python objects to PostgreSQL, is performed
 by dumpers. The <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Dumper</span></code></a> base class makes it easy to implement one:
 you only need to implement the <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.adapt</span> <span class="kn">import</span> <span class="n">Dumper</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.adapt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dumper</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">XmlDumper</span><span class="p">(</span><span class="n">Dumper</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">XmlDumper</span><span class="p">(</span><span class="n">Dumper</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="c1"># Setting an OID is not necessary but can be helpful</span>
 <span class="gp">... </span>    <span class="n">oid</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;xml&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Register the dumper on the adapters of a context</span>
@@ -390,10 +390,10 @@ they have been registered on that context using the
 <p>If you prefer to store missing values as <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code>, in the database, but
 your input may contain empty strings, you can subclass the stock string dumper
 to return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> upon empty or whitespace-only strings:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.string</span> <span class="kn">import</span> <span class="n">StrDumper</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.string</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrDumper</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">NullStrDumper</span><span class="p">(</span><span class="n">StrDumper</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">NullStrDumper</span><span class="p">(</span><span class="n">StrDumper</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
 <span class="gp">... </span>            <span class="k">return</span> <span class="kc">None</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
@@ -448,13 +448,13 @@ PostgreSQL but not handled by Python:</p>
 infinity. For this, let’s create a subclass for the dumper and the loader and
 register them in the working scope (globally or just on a connection or
 cursor):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
 
 <span class="c1"># Subclass existing adapters so that the base case is handled normally.</span>
-<span class="kn">from</span> <span class="nn">psycopg.types.datetime</span> <span class="kn">import</span> <span class="n">DateLoader</span><span class="p">,</span> <span class="n">DateDumper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">DateLoader</span><span class="p">,</span> <span class="n">DateDumper</span>
 
-<span class="k">class</span> <span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span>
         <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">min</span><span class="p">:</span>
@@ -462,8 +462,8 @@ cursor):</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span>
         <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;-infinity&quot;</span><span class="p">:</span>

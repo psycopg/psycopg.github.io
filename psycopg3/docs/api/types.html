@@ -280,8 +280,8 @@ as a subtype.</p>
 <p><a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a> describes how to convert from Python objects to
 PostgreSQL types and back.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.adapt</span> <span class="kn">import</span> <span class="n">Loader</span>
-<span class="kn">from</span> <span class="nn">psycopg.types</span> <span class="kn">import</span> <span class="n">TypeInfo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.adapt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Loader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeInfo</span>
 
 <span class="n">t</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;mytype&quot;</span><span class="p">)</span>
 <span class="n">t</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
@@ -289,8 +289,8 @@ PostgreSQL types and back.</p>
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT mytypearray FROM mytable&quot;</span><span class="p">):</span>
     <span class="c1"># records will return lists of &quot;mytype&quot; as string</span>
 
-<span class="k">class</span> <span class="nc">MyTypeLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTypeLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="c1"># parse the data and return a MyType instance</span>
 
 <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">&quot;mytype&quot;</span><span class="p">,</span> <span class="n">MyTypeLoader</span><span class="p">)</span>
@@ -380,7 +380,7 @@ its <a class="reference internal" href="adapt.html#psycopg.adapt.AdaptersMap.typ
 </dd>
 </dl>
 <p>Raise KeyError if not found.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">psycopg</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
 <span class="go">&lt;TypeInfo: text (oid: 25, array oid: 1009)&gt;</span>

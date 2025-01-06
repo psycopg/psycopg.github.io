@@ -92,12 +92,12 @@
 <p>This example shows how hook the notifications system into Eventlet: using it with a <a class="reference external" href="https://en.wikipedia.org/wiki/WebSockets">WebSocket</a> it is possible to send an event from the database to the application and up to a web browser, all in push mode! The example requires PostgreSQL 9.0 and Psycopg 2.3 as it uses notification payloads.</p>
 <p>This function handles a WebSocket connection in a green thread: it creates a <tt class="docutils literal">Queue</tt> and opens a database connection (calling the <tt class="docutils literal">dblisten()</tt> function), then blocks on the queue waiting to receive notifications: as soon as any is received, its payload is forwarded to the browser. This is obviously just an example: a database connection for every browser wouldn't scale very much...</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">eventlet</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">wsgi</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">eventlet</span> <span class="kn">import</span> <span class="n">websocket</span><span class="w">
+<span class="kn">import</span><span class="w"> </span><span class="nn">eventlet</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">eventlet</span><span class="w"> </span><span class="kn">import</span> <span class="n">wsgi</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">eventlet</span><span class="w"> </span><span class="kn">import</span> <span class="n">websocket</span><span class="w">
 
 </span><span class="nd">&#64;websocket</span><span class="o">.</span><span class="n">WebSocketWSGI</span><span class="w">
-</span><span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span><span class="w">
     </span><span class="sd">&quot;&quot;&quot;
     Receive a connection and send it database notifications.
     &quot;&quot;&quot;</span><span class="w">
@@ -111,11 +111,11 @@
 <p>When <tt class="docutils literal">handle()</tt> blocks on the queue the control of the program switches to a different green thread, allowing the rest of the program to keep on running even if single-threaded.</p>
 <p>The <tt class="docutils literal">dblisten</tt> function sets up the listening database connection:</p>
 <pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">psycopg2</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">eventlet.hubs</span> <span class="kn">import</span> <span class="n">trampoline</span><span class="w">
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg2.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">eventlet.hubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">trampoline</span><span class="w">
 
-</span><span class="k">def</span> <span class="nf">dblisten</span><span class="p">(</span><span class="n">q</span><span class="p">):</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">dblisten</span><span class="p">(</span><span class="n">q</span><span class="p">):</span><span class="w">
     </span><span class="sd">&quot;&quot;&quot;
     Open a db connection and add notifications to *q*.
     &quot;&quot;&quot;</span><span class="w">

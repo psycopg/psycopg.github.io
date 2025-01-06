@@ -442,9 +442,9 @@ message is passed to the callback as a <a class="reference internal" href="../ap
 containing all the information passed by the server, such as the message text
 and the severity. The object is the same found on the <a class="reference internal" href="../api/errors.html#psycopg.Error.diag" title="psycopg.Error.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diag</span></code></a>
 attribute of the errors raised by the server:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">psycopg</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">log_notice</span><span class="p">(</span><span class="n">diag</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">log_notice</span><span class="p">(</span><span class="n">diag</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The server says: </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">message_primary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -486,7 +486,7 @@ blocking <a class="reference internal" href="../api/connections.html#psycopg.Con
 </div>
 <p>The following example will print notifications and stop when one containing
 the <code class="docutils literal notranslate"><span class="pre">&quot;stop&quot;</span></code> message is received.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN mychan&quot;</span><span class="p">)</span>
 <span class="n">gen</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">()</span>
@@ -548,7 +548,7 @@ the <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 register it as a file-like object. You can run such code in a dedicated thread
 (and using a dedicated connection) if the rest of the program happens to have
 something else to do too.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">selectors</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">selectors</span>
 
 <span class="n">sel</span> <span class="o">=</span> <span class="n">selectors</span><span class="o">.</span><span class="n">DefaultSelector</span><span class="p">()</span>
 <span class="n">sel</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">selectors</span><span class="o">.</span><span class="n">EVENT_READ</span><span class="p">)</span>
@@ -567,7 +567,7 @@ something else to do too.</p>
 </div>
 <p>In an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> program you can dedicate a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code></a> instead and do
 something similar using <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_reader" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_reader</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="n">ev</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
 <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>

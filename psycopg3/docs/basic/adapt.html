@@ -478,7 +478,7 @@ types</a>, allowing to customise the load and dump function used.</p>
 scalars, even date/time if using a dumps function customised to use them),
 Psycopg requires you to wrap the object to dump as JSON into a wrapper:
 either <a class="reference internal" href="../api/types.html#psycopg.types.json.Json" title="psycopg.types.json.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.json.Json</span></code></a> or <a class="reference internal" href="../api/types.html#psycopg.types.json.Jsonb" title="psycopg.types.json.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jsonb</span>
 
 <span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
@@ -491,9 +491,9 @@ parameters or using a different JSON library, you can specify your own
 functions using the <a class="reference internal" href="../api/types.html#psycopg.types.json.set_json_dumps" title="psycopg.types.json.set_json_dumps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.json.set_json_dumps()</span></code></a> and
 <a class="reference internal" href="../api/types.html#psycopg.types.json.set_json_loads" title="psycopg.types.json.set_json_loads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_loads()</span></code></a> functions, to apply either globally or
 to a specific context (connection or cursor).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">psycopg.types.json</span> <span class="kn">import</span> <span class="n">Jsonb</span><span class="p">,</span> <span class="n">set_json_dumps</span><span class="p">,</span> <span class="n">set_json_loads</span>
-<span class="kn">import</span> <span class="nn">ujson</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jsonb</span><span class="p">,</span> <span class="n">set_json_dumps</span><span class="p">,</span> <span class="n">set_json_loads</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ujson</span>
 
 <span class="c1"># Use a faster dump function</span>
 <span class="n">set_json_dumps</span><span class="p">(</span><span class="n">ujson</span><span class="o">.</span><span class="n">dumps</span><span class="p">)</span>
@@ -510,11 +510,11 @@ to a specific context (connection or cursor).</p>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">dumps</span></code> parameter in the
 <a class="reference internal" href="../api/types.html#psycopg.types.json.Json" title="psycopg.types.json.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Json</span></code></a>/<a class="reference internal" href="../api/types.html#psycopg.types.json.Jsonb" title="psycopg.types.json.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a> wrapper, which will
 take precedence over what is specified by <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_json_dumps()</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
 
-<span class="k">class</span> <span class="nc">UUIDEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UUIDEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A JSON encoder which can dump UUID.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">UUID</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
@@ -558,7 +558,7 @@ the values as a list (not a tuple).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select gen_random_uuid()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">UUID(&#39;97f0dd62-3bd2-459e-89b8-a5e36ea3c16c&#39;)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select gen_random_uuid() = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">uuid4</span><span class="p">()])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">False  # long shot</span>
 </pre></div>
@@ -673,10 +673,10 @@ PostgreSQL enum labels.</p>
 </dd></dl>
 
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg.types.enum</span> <span class="kn">import</span> <span class="n">EnumInfo</span><span class="p">,</span> <span class="n">register_enum</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnumInfo</span><span class="p">,</span> <span class="n">register_enum</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">UserRole</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">UserRole</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
@@ -735,7 +735,7 @@ pair in the sequence will take precedence:</p>
 <p>A particularly useful case is when the PostgreSQL labels match the <em>values</em> of
 a <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>-based Enum. In this case it is possible to use something like <code class="docutils literal notranslate"><span class="pre">{m:</span>
 <span class="pre">m.value</span> <span class="pre">for</span> <span class="pre">m</span> <span class="pre">in</span> <span class="pre">enum}</span></code> as mapping:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">LowercaseRole</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">LowercaseRole</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
 <span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="s2">&quot;editor&quot;</span>
 <span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="s2">&quot;guest&quot;</span>

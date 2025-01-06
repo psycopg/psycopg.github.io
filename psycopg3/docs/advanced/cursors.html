@@ -361,7 +361,7 @@ right object.</p>
 <p>In order to obtain <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> from a connection, you can set its
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor_factory</span></code></a> (at init time or changing its attribute
 afterwards):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
@@ -398,7 +398,7 @@ fronted/backend protocol used is transparent on PostgreSQL. However, in some
 case using the simple query protocol is mandatory. This is the case querying
 the <a class="reference external" href="https://www.pgbouncer.org/usage.html#admin-console">PgBouncer admin console</a> for instance, which doesn’t support the
 extended query protocol.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ADMIN_DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
@@ -412,7 +412,7 @@ connection’s COMMIT and ROLLBACK commands are only ensured to be executed
 using the simple query protocol starting from Psycopg 3.1.20.</p>
 <p>In previous versions you should use an autocommit connection in order to
 query the PgBouncer admin console:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">ClientCursor</span>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ADMIN_DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="o">...</span>
@@ -500,7 +500,7 @@ implement <a class="reference internal" href="#server-side-cursors"><span class=
 <ol class="arabic simple">
 <li><p>Using the cursor factory:</p></li>
 </ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
 
 <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">RawCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
@@ -511,7 +511,7 @@ implement <a class="reference internal" href="#server-side-cursors"><span class=
 <ol class="arabic simple" start="2">
 <li><p>Instantiating a cursor:</p></li>
 </ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">psycopg</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">RawCursor</span>
 
 <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">RawCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
