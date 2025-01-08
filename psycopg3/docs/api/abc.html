@@ -252,10 +252,18 @@
 <h1><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc</span></code> – Psycopg abstract classes<a class="headerlink" href="#abc-psycopg-abstract-classes" title="Permalink to this heading">#</a></h1>
 <p>The module exposes Psycopg definitions which can be used for static type
 checking.</p>
-<span class="target" id="module-psycopg.abc"></span><dl class="py class">
+<span class="target" id="module-psycopg.abc"></span><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../advanced/adapt.html#adapt-life-cycle"><span class="std std-ref">Dumpers and loaders life cycle</span></a> for more information about how these objects
+are used by Psycopg,</p>
+</div>
+<dl class="py class">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">Dumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.abc.Dumper" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert Python objects of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">cls</span></code> to PostgreSQL representation.</p>
+<p>This class is a formal <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Protocol</span></code></a>. A partial implementation of
+this protocol (implementing everything except the <a class="reference internal" href="#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> metood) is
+available as <a class="reference internal" href="adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Dumper</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -266,8 +274,6 @@ be possible to know the connection encoding or the server date format.</p></li>
 </ul>
 </dd>
 </dl>
-<p>A partial implementation of this protocol (implementing everything except
-<a class="reference internal" href="#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a>) is available as <a class="reference internal" href="adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Dumper</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.format">
 <span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">Format</span></a></em><a class="headerlink" href="#psycopg.abc.Dumper.format" title="Permalink to this definition">#</a></dt>
@@ -385,6 +391,9 @@ result.</p>
 <dt class="sig sig-object py" id="psycopg.abc.Loader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">Loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.abc.Loader" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert PostgreSQL values with type OID <code class="xref py py-obj docutils literal notranslate"><span class="pre">oid</span></code> to Python objects.</p>
+<p>This class is a formal <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Protocol</span></code></a>. A partial implementation of this
+protocol (implementing everything except the <a class="reference internal" href="#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method) is available
+as <a class="reference internal" href="adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Loader</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -395,8 +404,6 @@ be possible to know the connection encoding or the server date format.</p></li>
 </ul>
 </dd>
 </dl>
-<p>A partial implementation of this protocol (implementing everything except
-<a class="reference internal" href="#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a>) is available as <a class="reference internal" href="adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Loader</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.abc.Loader.format">
 <span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">Format</span></a></em><a class="headerlink" href="#psycopg.abc.Loader.format" title="Permalink to this definition">#</a></dt>
