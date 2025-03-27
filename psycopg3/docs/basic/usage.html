@@ -281,11 +281,17 @@ the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249
 
         <span class="c1"># Query the database and obtain data as Python objects.</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="c1"># will return (1, 100, &quot;abc&#39;def&quot;)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
+        <span class="c1"># will print (1, 100, &quot;abc&#39;def&quot;)</span>
+
+        <span class="c1"># You can use `cur.executemany()` to perform an operation in batch</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO test (num) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">[(</span><span class="mi">33</span><span class="p">,),</span> <span class="p">(</span><span class="mi">66</span><span class="p">,),</span> <span class="p">(</span><span class="mi">99</span><span class="p">,)])</span>
 
         <span class="c1"># You can use `cur.fetchmany()`, `cur.fetchall()` to return a list</span>
         <span class="c1"># of several records, or even iterate on the cursor</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, num FROM test order by num&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 
