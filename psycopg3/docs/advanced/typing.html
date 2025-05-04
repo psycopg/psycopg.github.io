@@ -273,6 +273,8 @@ annotations such as <code class="xref py py-obj docutils literal notranslate"><s
 
 <span class="n">rec</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>     <span class="c1"># type is tuple[Any, ...] | None</span>
 
+<span class="n">rec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>          <span class="c1"># type is tuple[Any, ...]</span>
+
 <span class="n">recs</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>    <span class="c1"># type is List[tuple[Any, ...]]</span>
 </pre></div>
 </div>
@@ -296,6 +298,45 @@ cursors and annotate the returned objects accordingly. See
 <span class="c1"># drec type is dict[str, Any] | None</span>
 </pre></div>
 </div>
+</section>
+<section id="the-fetchone-frustration">
+<span id="typing-fetchone"></span><h2>The <code class="docutils literal notranslate"><span class="pre">fetchone()</span></code> frustration<a class="headerlink" href="#the-fetchone-frustration" title="Permalink to this heading">#</a></h2>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.3.</span></p>
+</div>
+<p>If you use a static type checker and you are 100% sure that the cursor will
+exactly one record, it is frustrating to be told that the returned row might
+be <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">scalar_row</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">scalar_row</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM mytable&quot;</span><span class="p">)</span>
+    <span class="n">rv</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>  <span class="c1"># mypy error here</span>
+    <span class="k">return</span> <span class="n">rv</span>
+</pre></div>
+</div>
+<p>The <code class="sql docutils literal notranslate"><span class="pre">count(*)</span></code> will always return a record with a number, even if the
+table is empty (it will just report 0). However, Mypy will report an error
+such as <em>incompatible types in assignment (expression has type “Any | None”,
+variable has type “int”)</em>. In order to work around the error you will need
+to use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">if</span></code>, an <code class="xref py py-obj docutils literal notranslate"><span class="pre">assert</span></code> or some other workaround (like <code class="docutils literal notranslate"><span class="pre">(rv,)</span> <span class="pre">=</span>
+<span class="pre">cur.fetchall()</span></code> or some other horrible trick).</p>
+<p>Since Psycopg 3.3, cursors are <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable">iterables</a>, therefore they support the
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#next" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next</span></code></a> function. A <code class="xref py py-obj docutils literal notranslate"><span class="pre">next(cur)</span></code> will behave like <code class="xref py py-obj docutils literal notranslate"><span class="pre">cur.fetchone()</span></code>, but it
+is guaranteed to return a row (in case there are no rows in the result set it
+will not return anything but will raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">StopIteration</span></code>). Therefore the
+function above can terminate with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="o">...</span>
+    <span class="n">rv</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rv</span>
+</pre></div>
+</div>
+<p>and your static checker will be happy.</p>
+<p>Similarly, in async code, you can use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> <a class="reference external" href="https://docs.python.org/3/library/functions.html#anext" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anext</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">(cur)</span></code> expression.</p>
 </section>
 <section id="generic-pool-types">
 <span id="pool-generic"></span><h2>Generic pool types<a class="headerlink" href="#generic-pool-types" title="Permalink to this heading">#</a></h2>
@@ -502,6 +543,7 @@ should be reported as errors.</p>
 <li><a class="reference internal" href="#">Static Typing</a><ul>
 <li><a class="reference internal" href="#generic-types">Generic types</a></li>
 <li><a class="reference internal" href="#type-of-rows-returned">Type of rows returned</a></li>
+<li><a class="reference internal" href="#the-fetchone-frustration">The <code class="docutils literal notranslate"><span class="pre">fetchone()</span></code> frustration</a></li>
 <li><a class="reference internal" href="#generic-pool-types">Generic pool types</a></li>
 <li><a class="reference internal" href="#example-returning-records-as-pydantic-models">Example: returning records as Pydantic models</a></li>
 <li><a class="reference internal" href="#checking-literal-strings-in-queries">Checking literal strings in queries</a></li>
