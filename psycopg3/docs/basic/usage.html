@@ -450,6 +450,47 @@ into each other, beside the <a class="reference internal" href="adapt.html#types
 you can <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">configure your types</span></a>.</p></li>
 </ul>
 </section>
+<section id="connection-logging">
+<span id="logging"></span><h2>Connection logging<a class="headerlink" href="#connection-logging" title="Permalink to this heading">#</a></h2>
+<p>Psycopg uses the <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging</span></code></a> module to report the operations happening at
+connection time. If you experience slowness or random failures on connection
+you can set the <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> logger at <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> level to read the operations
+performed.</p>
+<p>A very simple example of logging configuration may be the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;psycopg&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;host=192.0.2.1,localhost connect_timeout=10&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example Psycopg will first try to connect to a non responsive server,
+only stopping after hitting the timeout, and will move on to a working server.
+The resulting log might look like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2045-05-10 11:45:54,364 DEBUG connection attempt: host: &#39;192.0.2.1&#39;, port: None, hostaddr: &#39;192.0.2.1&#39;
+2045-05-10 11:45:54,365 DEBUG connection started: &lt;psycopg_c.pq.PGconn [STARTED] at 0x79dff6d26160&gt;
+2045-05-10 11:45:54,365 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,392 DEBUG connection failed: host: &#39;192.0.2.1&#39;, port: None, hostaddr: &#39;192.0.2.1&#39;: connection timeout expired
+2045-05-10 11:46:04,392 DEBUG connection attempt: host: &#39;localhost&#39;, port: None, hostaddr: &#39;127.0.0.1&#39;
+2045-05-10 11:46:04,393 DEBUG connection started: &lt;psycopg_c.pq.PGconn [STARTED] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,394 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,394 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [SSL_STARTUP] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,411 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [SSL_STARTUP] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,413 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [SSL_STARTUP] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,423 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,424 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [AWAITING_RESPONSE] at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,426 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [IDLE] (host=localhost database=piro) at 0x79dff6d26160&gt;
+2045-05-10 11:46:04,426 DEBUG connection succeeded: host: &#39;localhost&#39;, port: None, hostaddr: &#39;127.0.0.1&#39;
+</pre></div>
+</div>
+<p>Please note that a connection attempt might try to reach different servers:
+either explicitly because the connection string specifies <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-MULTIPLE-HOSTS">multiple hosts</a>,
+or implicitly, because the DNS resolves an host name to multiple IPs.</p>
+</section>
 </section>
 
         </article>
@@ -513,6 +554,7 @@ you can <a class="reference internal" href="../advanced/adapt.html#adaptation"><
 <li><a class="reference internal" href="#shortcuts">Shortcuts</a></li>
 <li><a class="reference internal" href="#connection-context">Connection context</a></li>
 <li><a class="reference internal" href="#adapting-psycopg-to-your-program">Adapting psycopg to your program</a></li>
+<li><a class="reference internal" href="#connection-logging">Connection logging</a></li>
 </ul>
 </li>
 </ul>
