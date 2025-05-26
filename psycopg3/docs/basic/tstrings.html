@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Basic module usage" href="usage.html" /><link rel="prev" title="Getting started with Psycopg 3" href="index.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Adapting basic Python types" href="adapt.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.06.21"/>
-        <title>Installation - psycopg 3.3.0.dev1 documentation</title>
+        <title>Template string queries - psycopg 3.3.0.dev1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -171,10 +171,10 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Getting started with Psycopg 3</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html">Basic module usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="params.html">Passing parameters to SQL queries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tstrings.html">Template string queries</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Template string queries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="adapt.html">Adapting basic Python types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pgtypes.html">Adapting other PostgreSQL types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions management</a></li>
@@ -249,185 +249,130 @@
           </label>
         </div>
         <article role="main">
-          <section id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
-<p>In short, if you use a <a class="reference internal" href="#supported-systems"><span class="std std-ref">supported system</span></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span>           <span class="c1"># upgrade pip to at least 20.3</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[binary]&quot;</span>       <span class="c1"># remove [binary] for PyPy</span>
-</pre></div>
-</div>
-<p>and you should be <a class="reference internal" href="usage.html#module-usage"><span class="std std-ref">ready to start</span></a>. Read further for
-alternative ways to install.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Fun fact: there is no <code class="docutils literal notranslate"><span class="pre">psycopg3</span></code> package, only <code class="docutils literal notranslate"><span class="pre">psycopg</span></code>!</p>
-</div>
-<section id="supported-systems">
-<span id="id2"></span><h2>Supported systems<a class="headerlink" href="#supported-systems" title="Permalink to this heading">#</a></h2>
-<p>The Psycopg version documented here has <em>official and tested</em> support for:</p>
-<ul class="simple">
-<li><p>Python: from version 3.10 to 3.13</p>
-<ul>
-<li><p>Python 3.8 and 3.9 supported before Psycopg 3.3</p></li>
-<li><p>Python 3.7 supported before Psycopg 3.2</p></li>
-<li><p>Python 3.6 supported before Psycopg 3.1</p></li>
-</ul>
-</li>
-<li><p>PyPy: from version 3.10 to 3.11</p>
-<ul>
-<li><p>PyPy 3.9 supported before Psycopg 3.3</p></li>
-<li><p><strong>Note:</strong> Only the pure Python version is supported.</p></li>
-</ul>
-</li>
-<li><p>PostgreSQL: from version 10 to 17</p>
-<ul>
-<li><p><strong>Note:</strong> PostgreSQL <a class="reference external" href="https://www.postgresql.org/support/versioning/">currently supported release</a> are actively tested
-in the CI. Out-of-support releases are supported on a best-effort basis.</p></li>
-</ul>
-</li>
-<li><p>OS: Linux, macOS, Windows</p></li>
-</ul>
-<p>The tests to verify the supported systems run in <a class="reference external" href="https://github.com/psycopg/psycopg/actions">Github workflows</a>:
-anything that is not tested there is not officially supported. This includes:</p>
-<ul class="simple">
-<li><p>Unofficial Python distributions such as Conda;</p></li>
-<li><p>Alternative PostgreSQL implementation;</p></li>
-<li><p>Other platforms such as BSD or Solaris.</p></li>
-</ul>
-<p>If you use an unsupported system, things might work (because, for instance, the
-database may use the same wire protocol as PostgreSQL) but we cannot guarantee
-the correct working or a smooth ride.</p>
-</section>
-<section id="binary-installation">
-<span id="binary-install"></span><h2>Binary installation<a class="headerlink" href="#binary-installation" title="Permalink to this heading">#</a></h2>
-<p>The quickest way to start developing with Psycopg 3 is to install the binary
-packages by running:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[binary]&quot;</span>
-</pre></div>
-</div>
-<p>This will install a self-contained package with all the libraries needed.
-<strong>You will need pip 20.3 at least</strong>: please run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">pip</span></code>
-to update it beforehand.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>Did Psycopg 3 install ok? Great! You can now move on to the <a class="reference internal" href="usage.html#module-usage"><span class="std std-ref">basic
-module usage</span></a> to learn how it works.</p>
-<p>Keep on reading if the above method didn’t work and you need a different
-way to install Psycopg 3.</p>
-<p>For further information about the differences between the packages see
-<a class="reference internal" href="../api/pq.html#pq-impl"><span class="std std-ref">pq module implementations</span></a>.</p>
-</div>
-<p>If your platform is not supported, or if the libpq packaged is not suitable,
-you should proceed to a <a class="reference internal" href="#local-installation"><span class="std std-ref">local installation</span></a> or a
-<a class="reference internal" href="#pure-python-installation"><span class="std std-ref">pure Python installation</span></a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Binary packages are produced on a best-effort basis; the supported
-platforms depend on the CI runners available to build the
-packages. This means that:</p>
-<ul class="simple">
-<li><p>binary packages for a new version of Python are made available once
-the runners used for the build support it. You can check the
-<a class="reference external" href="https://pypi.org/project/psycopg-binary/#files">psycopg-binary PyPI files</a> to verify whether your platform is
-supported;</p></li>
-<li><p>the libpq version included in the binary packages depends on the version
-available on the runners. You can use the <a class="reference internal" href="../api/pq.html#psycopg.pq.version" title="psycopg.pq.version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.pq.version()</span></code></a>
-function and <a class="reference internal" href="../api/pq.html#psycopg.pq.__build_version__" title="psycopg.pq.__build_version__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__build_version__</span></code></a> constant to infer the
-features available.</p></li>
-</ul>
+          <section id="template-string-queries">
+<span id="template-strings"></span><span id="index-0"></span><h1>Template string queries<a class="headerlink" href="#template-string-queries" title="Permalink to this heading">#</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.3.</span></p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<ul class="simple">
-<li><p>Starting from Psycopg 3.1.20, ARM64 macOS binary packages (i.e. for
-Apple M1 machines) are no more available for macOS versions before 14.0.
-Please upgrade your OS to at least 14.0 or use a <a class="reference internal" href="#local-installation"><span class="std std-ref">local</span></a> or a <a class="reference internal" href="#pure-python-installation"><span class="std std-ref">Python</span></a>
-installation.</p></li>
-<li><p>The binary installation is not supported by PyPy.</p></li>
-</ul>
+<p>This is an experimental feature, still <a class="reference external" href="https://github.com/psycopg/psycopg/pull/1054">under active development</a> and
+only documented here for preview. Details may change before Psycopg 3.3
+release.</p>
+<p>Template strings are a Python language feature under active development
+too, planned for release in Python 3.14. Template string queries are
+currently tested in Python 3.14 beta 1.</p>
 </div>
-</section>
-<section id="local-installation">
-<span id="id6"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this heading">#</a></h2>
-<p>A “Local installation” results in a performing and maintainable library. The
-library will include the speed-up C module and will be linked to the system
-libraries (<code class="docutils literal notranslate"><span class="pre">libpq</span></code>, <code class="docutils literal notranslate"><span class="pre">libssl</span></code>…) so that system upgrade of libraries will
-upgrade the libraries used by Psycopg 3 too. This is the preferred way to
-install Psycopg for a production site.</p>
-<p>In order to perform a local installation you need some prerequisites:</p>
-<ul class="simple">
-<li><p>a C compiler,</p></li>
-<li><p>Python development headers (e.g. the <code class="docutils literal notranslate"><span class="pre">python3-dev</span></code> package).</p></li>
-<li><p>PostgreSQL client development headers (e.g. the <code class="docutils literal notranslate"><span class="pre">libpq-dev</span></code> package).</p></li>
-<li><p>The <strong class="program">pg_config</strong> program available in the <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>.</p></li>
-</ul>
-<p>You <strong>must be able</strong> to troubleshoot an extension build, for instance you must
-be able to read your compiler’s error message. If you are not, please don’t
-try this and follow the <a class="reference internal" href="#binary-installation">binary installation</a> instead.</p>
-<p>If your build prerequisites are in place you can run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[c]&quot;</span>
+<p>Psycopg can process queries expressed as <a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-strings">template strings</a> defined in
+<span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0750/"><strong>PEP 750</strong></a> and implemented for the first time in Python 3.14.</p>
+<p>Template strings are similar to <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#tut-f-strings">f-strings</a>: they are string literals
+interspersed with variables or expressions marked by <code class="docutils literal notranslate"><span class="pre">{}</span></code>. They use a <code class="docutils literal notranslate"><span class="pre">t</span></code>
+prefix instead of <code class="docutils literal notranslate"><span class="pre">f</span></code>, and can be used to express queries:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM mytable WHERE id = </span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The local installation is not supported by PyPy.</p>
-</div>
-</section>
-<section id="pure-python-installation">
-<span id="id7"></span><h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this heading">#</a></h2>
-<p>If you simply install:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg</span>
+<p>The difference between the two is that f-strings are immediately evaluated by
+Python and passed to the rest of the program as an already formatted regular
+string; t-strings, instead, are evaluated by Psycopg, which has a chance to
+process query parameters in a safe way.</p>
+<p>For example you can pass to a query some strings parameters, which may contain
+unsafe characters such as <code class="docutils literal notranslate"><span class="pre">'</span></code>, or come from untrusted sources such as web
+form, and leave Psycopg to perform the right processing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="n">t</span><span class="s2">&quot;INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">{first_name}</span><span class="s2">, </span><span class="si">{last_name}</span><span class="s2">)&quot;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>without <code class="docutils literal notranslate"><span class="pre">[c]</span></code> or <code class="docutils literal notranslate"><span class="pre">[binary]</span></code> extras you will obtain a pure Python
-implementation. This is particularly handy to debug and hack, but it still
-requires the system libpq to operate (which will be imported dynamically via
-<a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>).</p>
-<p>In order to use the pure Python installation you will need the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>
-installed in the system: for instance on Debian system you will probably
-need:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">libpq5</span>
+<p>This statement has the same effect as a classic:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="s2">&quot;INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">libpq</span></code> is the client library used by <strong class="program">psql</strong>, the
-PostgreSQL command line client, to connect to the database.  On most
-systems, installing <strong class="program">psql</strong> will install the <code class="docutils literal notranslate"><span class="pre">libpq</span></code> too as a
-dependency.</p>
-</div>
-<p>If you are not able to fulfill this requirement please follow the <a class="reference internal" href="#binary-installation">binary
-installation</a>.</p>
-</section>
-<section id="installing-the-connection-pool">
-<span id="pool-installation"></span><h2>Installing the connection pool<a class="headerlink" href="#installing-the-connection-pool" title="Permalink to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../advanced/pool.html#connection-pools"><span class="std std-ref">Psycopg connection pools</span></a> are distributed in a
-separate package from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg</span></code> package itself, in order to allow a
-different release cycle.</p>
-<p>In order to use the pool you must install the <code class="docutils literal notranslate"><span class="pre">pool</span></code> extra, using <code class="docutils literal notranslate"><span class="pre">pip</span>
-<span class="pre">install</span> <span class="pre">&quot;psycopg[pool]&quot;</span></code>, or install the <a class="reference internal" href="../api/pool.html#module-psycopg_pool" title="psycopg_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code></a> package separately,
-which would allow to specify the release to install more precisely.</p>
-</section>
-<section id="handling-dependencies">
-<h2>Handling dependencies<a class="headerlink" href="#handling-dependencies" title="Permalink to this heading">#</a></h2>
-<p>If you need to specify your project dependencies (for instance in a
-<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file, <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> dependencies…)
-you should probably specify one of the following:</p>
+<p>as Psycopg will be able to send parameters separately from the query, or to
+compose the query on the client side using safe escaping rules, according to
+the <a class="reference internal" href="../advanced/cursors.html#cursor-types"><span class="std std-ref">type of cursor</span></a> used, but it is has the same
+readability of f-strings.</p>
+<section id="format-specifiers">
+<h2>Format specifiers<a class="headerlink" href="#format-specifiers" title="Permalink to this heading">#</a></h2>
+<p>Format specifiers can be associated to template strings interpolation using a
+<code class="docutils literal notranslate"><span class="pre">:</span></code> in the placeholder, for example in <code class="docutils literal notranslate"><span class="pre">{id:b}</span></code>. Psycopg supports a few
+format specifiers specifying <a class="reference external" href="http://localhost:8000/basic/params.html#binary-parameters-and-results">how to pass a parameter to the server</a> and a few
+format specifiers specifying how to compose query parts on the client, in a
+way similar to what can be obtained using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects.</p>
+<p>The supported specifiers for parameter formats are:</p>
 <ul class="simple">
-<li><p>If your project is a library, add a dependency on <code class="docutils literal notranslate"><span class="pre">psycopg</span></code>. This will
-make sure that your library will have the <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> package with the right
-interface and leaves the possibility of choosing a specific implementation
-to the end user of your library.</p></li>
-<li><p>If your project is a final application (e.g. a service running on a server)
-you can require a specific implementation, for instance <code class="docutils literal notranslate"><span class="pre">psycopg[c]</span></code>,
-after you have made sure that the prerequisites are met (e.g. the depending
-libraries and tools are installed in the host machine).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: automatic parameter format, similar to using <code class="docutils literal notranslate"><span class="pre">%s</span></code> in a classic
+query. This is the same effect of using no format specifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span></code>: use the binary format to pass the parameter, similar to using <code class="docutils literal notranslate"><span class="pre">%b</span></code>
+in a classic query.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: use the text format to pass the parameter, similar to using <code class="docutils literal notranslate"><span class="pre">%t</span></code>
+in a classic query.</p></li>
 </ul>
-<p>In both cases you can specify which version of Psycopg to use using
-<a class="reference external" href="https://pip.pypa.io/en/stable/reference/requirement-specifiers/">requirement specifiers</a>.</p>
-<p>If you want to make sure that a specific implementation is used you can
-specify the <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_IMPL</span></code> environment variable: importing the library
-will fail if the implementation specified is not available. See <a class="reference internal" href="../api/pq.html#pq-impl"><span class="std std-ref">pq module implementations</span></a>.</p>
+<p>The supported specifiers for query composition are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">i</span></code>: the parameter is an <a class="reference external" href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS">identifier</a>, for example a table or column name.
+The parameter must be a string or a <a class="reference internal" href="../api/sql.html#psycopg.sql.Identifier" title="psycopg.sql.Identifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Identifier</span></code></a> instance.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">l</span></code>: the parameter is a literal value, which will be composed to the
+query on the client. This allows to parametrize statements that <a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">don’t
+support parametrization in PostgreSQL</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the parameter is a snippet of statement to be included verbatim in
+the query. The parameter must be another template string or a <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>
+instance.</p></li>
+</ul>
+<section id="example-notify">
+<span id="tstring-template-notify"></span><h3>Example: NOTIFY<a class="headerlink" href="#example-notify" title="Permalink to this heading">#</a></h3>
+<p>The <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html">NOTIFY</a> command takes a <em>channel</em> parameter (an identifier, so it must be
+quoted with double quotes if it contains any non-alphanumeric character), and
+a <em>payload</em> parameter as a string (which must be escaped with string syntax,
+hence with single quotes).</p>
+<p>The <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code> command cannot be parametrized by PostgreSQL, so it must be
+composed entirely on the server side. Using template strings this could be as
+simple as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">send_notify</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {channel:i}, {payload:l}&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Calling the function with channel <code class="docutils literal notranslate"><span class="pre">foo.bar</span></code> and payload <code class="docutils literal notranslate"><span class="pre">O'Reilly</span></code> will
+result in executing the statement <code class="docutils literal notranslate"><span class="pre">NOTIFY</span> <span class="pre">&quot;foo.bar&quot;,</span> <span class="pre">'O''Reilly'</span></code>.</p>
+</section>
+<section id="example-nested-templates">
+<span id="tstring-template-nested"></span><h3>Example: nested templates<a class="headerlink" href="#example-nested-templates" title="Permalink to this heading">#</a></h3>
+<p>A string template merges literal parts of the query with parameter. It is also
+possible to pass templates to templates in order to compose more and more
+complex and dynamic SQL statements.</p>
+<p>For example let’s say we have an <code class="xref py py-obj docutils literal notranslate"><span class="pre">User</span></code> Python object mapping to an <code class="docutils literal notranslate"><span class="pre">users</span></code>
+database table. We might want to implement a <code class="xref py py-obj docutils literal notranslate"><span class="pre">search()</span></code> function to return
+users by a list of ids, by names pattern, by group. This function might
+be written as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">search_users</span><span class="p">(</span>
+    <span class="n">conn</span><span class="p">:</span> <span class="n">Connection</span><span class="p">,</span>
+    <span class="n">ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.id = any({list(ids)})&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">name_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.name ~* </span><span class="si">{name_pattern}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.group_id = </span><span class="si">{group_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;please specify at least one search parameter&quot;</span><span class="p">)</span>
+    <span class="n">joined</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot; AND &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">User</span><span class="p">))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM users AS u WHERE {joined:q}&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this example we have used the <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL.join" title="psycopg.sql.SQL.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL.join()</span></code></a> method overload that takes a
+list of templates and returns a joined template in order to create an AND-ed
+sequence of conditions.</p>
+</section>
 </section>
 </section>
 
@@ -436,23 +381,23 @@ will fail if the implementation specified is not available. See <a class="refere
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="usage.html">
+          <a class="next-page" href="adapt.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Basic module usage</div>
+                <div class="title">Adapting basic Python types</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="params.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Getting started with Psycopg 3</div>
+                <div class="title">Passing parameters to SQL queries</div>
                 
               </div>
             </a>
@@ -487,13 +432,12 @@ will fail if the implementation specified is not available. See <a class="refere
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#supported-systems">Supported systems</a></li>
-<li><a class="reference internal" href="#binary-installation">Binary installation</a></li>
-<li><a class="reference internal" href="#local-installation">Local installation</a></li>
-<li><a class="reference internal" href="#pure-python-installation">Pure Python installation</a></li>
-<li><a class="reference internal" href="#installing-the-connection-pool">Installing the connection pool</a></li>
-<li><a class="reference internal" href="#handling-dependencies">Handling dependencies</a></li>
+<li><a class="reference internal" href="#">Template string queries</a><ul>
+<li><a class="reference internal" href="#format-specifiers">Format specifiers</a><ul>
+<li><a class="reference internal" href="#example-notify">Example: NOTIFY</a></li>
+<li><a class="reference internal" href="#example-nested-templates">Example: nested templates</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
