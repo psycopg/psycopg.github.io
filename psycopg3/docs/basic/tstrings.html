@@ -298,9 +298,9 @@ readability of f-strings.</p>
 <h2>Format specifiers<a class="headerlink" href="#format-specifiers" title="Permalink to this heading">#</a></h2>
 <p>Format specifiers can be associated to template strings interpolation using a
 <code class="docutils literal notranslate"><span class="pre">:</span></code> in the placeholder, for example in <code class="docutils literal notranslate"><span class="pre">{id:b}</span></code>. Psycopg supports a few
-format specifiers specifying <a class="reference external" href="http://localhost:8000/basic/params.html#binary-parameters-and-results">how to pass a parameter to the server</a> and a few
-format specifiers specifying how to compose query parts on the client, in a
-way similar to what can be obtained using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects.</p>
+format specifiers specifying <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">how to pass a parameter to the server</span></a> and a few format specifiers specifying how to compose query
+parts on the client, in a way similar to what can be obtained using the
+<a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects.</p>
 <p>The supported specifiers for parameter formats are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: automatic parameter format, similar to using <code class="docutils literal notranslate"><span class="pre">%s</span></code> in a classic
@@ -328,7 +328,7 @@ quoted with double quotes if it contains any non-alphanumeric character), and
 a <em>payload</em> parameter as a string (which must be escaped with string syntax,
 hence with single quotes).</p>
 <p>The <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code> command cannot be parametrized by PostgreSQL, so it must be
-composed entirely on the server side. Using template strings this could be as
+composed entirely on the client side. Using template strings this could be as
 simple as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">send_notify</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {channel:i}, {payload:l}&quot;</span><span class="p">)</span>
