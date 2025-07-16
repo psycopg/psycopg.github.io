@@ -410,18 +410,13 @@ result of the last statement is returned:</p>
 <p>In Psycopg 3 instead, all the results are available. After running the query,
 the first result will be readily available in the cursor and can be consumed
 using the usual <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> methods. In order to access the following
-results, you can use the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.nextset()</span></code></a> method:</p>
+results, you can use the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.results" title="psycopg.Cursor.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.results()</span></code></a> method (or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>
+before Psycopg 3.3):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1; SELECT 2&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cur_pg3</span><span class="o">.</span><span class="n">results</span><span class="p">():</span>
+<span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
 <span class="go">(1,)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">nextset</span><span class="p">()</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">(2,)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">nextset</span><span class="p">()</span>
-<span class="go">None  # no more results</span>
 </pre></div>
 </div>
 <p>Remember though that you cannot use server-side bindings to <a class="reference internal" href="#multi-statements"><span class="std std-ref">execute more

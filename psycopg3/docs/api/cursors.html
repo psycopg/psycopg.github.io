@@ -360,7 +360,7 @@ you can specify <code class="xref py py-obj docutils literal notranslate"><span 
 <p>Using the usual <a class="reference internal" href="#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchone()</span></code></a>, <a class="reference internal" href="#psycopg.Cursor.fetchall" title="psycopg.Cursor.fetchall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code></a>, you
 will be able to read the records returned <em>by the first query
 executed only</em>. In order to read the results of the following
-queries you can call <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> to move to the following
+queries you can call <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> or <a class="reference internal" href="#psycopg.Cursor.results" title="psycopg.Cursor.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results()</span></code></a> to move across the
 result set.</p>
 <p>A typical use case for <code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany(returning=True)</span></code> might be to
 insert a bunch of records and to retrieve the primary keys
@@ -370,11 +370,7 @@ may execute a query such as <code class="sql docutils literal notranslate"><span
 exactly a single record, you can obtain the list of the new ids
 using a pattern such as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">records</span><span class="p">)</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">cur</span><span class="o">.</span><span class="n">nextset</span><span class="p">():</span>
-        <span class="k">break</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">results</span><span class="p">()]</span>
 </pre></div>
 </div>
 </div>
@@ -382,7 +378,7 @@ using a pattern such as:</p>
 <p class="admonition-title">Warning</p>
 <p>More explicitly, <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchall()</span></code> alone will not return all the
 values returned! You must iterate on the results using
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code>.</p>
+<a class="reference internal" href="#psycopg.Cursor.results" title="psycopg.Cursor.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results()</span></code></a>.</p>
 </div>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=False</span></code>, the value of <a class="reference internal" href="#psycopg.Cursor.rowcount" title="psycopg.Cursor.rowcount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rowcount</span></code></a> is set to the cumulated
 number of rows affected by queries. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=True</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">rowcount</span></code>
@@ -567,6 +563,35 @@ an exception if used with operations that don’t return result, such as an
 or to the next result set if <a class="reference internal" href="#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> returned more than one.</p>
 <p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> if a new result is available, which will be the one
 methods <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> will operate on.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psycopg.Cursor.results">
+<span class="sig-name descname"><span class="pre">results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" title="(in Python v3.13)"><span class="pre">Iterator</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.Cursor.results" title="Permalink to this definition">#</a></dt>
+<dd><p>Iterate across multiple record sets received by the cursor.</p>
+<p>Multiple record sets are received after using <a class="reference internal" href="#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=True</span></code> or using <a class="reference internal" href="#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> with more than one query in the
+command.</p>
+<p>The iterator yields the cursor itself upon iteration, but the cursor
+state changes, in a way equivalent to calling <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> in a loop.
+Therefore you can ignore the result of the iteration if you are consuming
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">results()</span></code> in a loop:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">results</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>or make use of it for example using <code class="xref py py-obj docutils literal notranslate"><span class="pre">map()</span></code> to consume the iterator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cursor_consumer</span><span class="p">(</span><span class="n">cur</span><span class="p">:</span> <span class="n">Cursor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="o">...</span>
+
+<span class="nb">map</span><span class="p">(</span><span class="n">cursor_consumer</span><span class="p">,</span> <span class="n">cursor</span><span class="o">.</span><span class="n">results</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.3: </span>In previous version you may call <a class="reference internal" href="#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a> in a loop until it
+returns a false value.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1013,6 +1038,15 @@ available from version 17 of the libpq.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psycopg.AsyncCursor.results">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" title="(in Python v3.13)"><span class="pre">AsyncIterator</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.AsyncCursor.results" title="Permalink to this definition">#</a></dt>
+<dd><p>Iterate across multiple record sets received by the cursor.</p>
+<p>Multiple record sets are received after using <a class="reference internal" href="#psycopg.AsyncCursor.executemany" title="psycopg.AsyncCursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">returning=True</span></code> or using <a class="reference internal" href="#psycopg.AsyncCursor.execute" title="psycopg.AsyncCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> with more than one query in the
+command.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncCursor.scroll">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scroll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'relative'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.AsyncCursor.scroll" title="Permalink to this definition">#</a></dt>
 <dd><p>Move the cursor in the result set to a new position according to mode.</p>
@@ -1229,6 +1263,7 @@ w.r.t. the sync counterpart are the same described in <a class="reference intern
 <li><a class="reference internal" href="#psycopg.Cursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">Cursor.fetchmany()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Cursor.fetchall"><code class="docutils literal notranslate"><span class="pre">Cursor.fetchall()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Cursor.nextset"><code class="docutils literal notranslate"><span class="pre">Cursor.nextset()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Cursor.results"><code class="docutils literal notranslate"><span class="pre">Cursor.results()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Cursor.scroll"><code class="docutils literal notranslate"><span class="pre">Cursor.scroll()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Cursor.pgresult"><code class="docutils literal notranslate"><span class="pre">Cursor.pgresult</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Cursor.description"><code class="docutils literal notranslate"><span class="pre">Cursor.description</span></code></a></li>
@@ -1280,6 +1315,7 @@ w.r.t. the sync counterpart are the same described in <a class="reference intern
 <li><a class="reference internal" href="#psycopg.AsyncCursor.fetchone"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchone()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncCursor.fetchmany"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchmany()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncCursor.fetchall"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.fetchall()</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncCursor.results"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.results()</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.AsyncCursor.scroll"><code class="docutils literal notranslate"><span class="pre">AsyncCursor.scroll()</span></code></a></li>
 </ul>
 </li>
