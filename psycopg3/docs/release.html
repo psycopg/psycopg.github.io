@@ -327,6 +327,27 @@ an example docker command line to run a server locally.</p></li>
 </ul>
 </li>
 </ul>
+<section id="adding-new-libpq-wrapper-methods">
+<h3>Adding new libpq wrapper methods<a class="headerlink" href="#adding-new-libpq-wrapper-methods" title="Permalink to this heading">#</a></h3>
+<p>The <a href="#id6"><span class="problematic" id="id7">``</span></a><a class="reference internal" href="api/pq.html#module-psycopg.pq" title="psycopg.pq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.pq</span></code></a> module is a thin wrapper around the libpq, only doing the
+minimal work to make the library somewhat Pythonic (e.g. converting types and
+raising exceptions instead of returning error values).</p>
+<p>When new functionalities are added to the libpq we often want to expose them
+to Python (either to allow Python users to use them directly or to build new
+features on top of them). The procedure touches several files, in order to
+add function wrappers to both the Python and the C implementation of the
+libpq, to the objects interfaces and every object implementing them, and
+eventually to bubble up to some Python object.</p>
+<p>It is polite to add new top-level objects interfaces (such as
+<code class="docutils literal notranslate"><span class="pre">connection.info</span></code> or <code class="docutils literal notranslate"><span class="pre">Capabilities</span></code> only on minor releases (3.x), but if
+we need to add a libpq function wrapper to solve an issue we can do it in a
+bugfix release, without documenting it (e.g. <code class="docutils literal notranslate"><span class="pre">PQconnectionUsedGSSAPI</span></code> was
+added in 3.2.10 but only advertised in 3.3).</p>
+<p>You can use <a class="reference external" href="https://github.com/psycopg/psycopg/pull/1140/">PR 1140</a> as a reference for the work to do (code, tests,
+documentation). In this MR, the changes in the first commit are suitable to
+introduce a new function in a bugfix release, the second commit changes make
+the new functionality public.</p>
+</section>
 </section>
 <section id="when-a-new-python-major-version-is-released">
 <h2>When a new Python major version is released<a class="headerlink" href="#when-a-new-python-major-version-is-released" title="Permalink to this heading">#</a></h2>
@@ -407,7 +428,10 @@ to Python 3.NN (the new minimum supported version).</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How to make a psycopg release</a><ul>
-<li><a class="reference internal" href="#when-a-new-postgresql-major-version-is-released">When a new PostgreSQL major version is released</a></li>
+<li><a class="reference internal" href="#when-a-new-postgresql-major-version-is-released">When a new PostgreSQL major version is released</a><ul>
+<li><a class="reference internal" href="#adding-new-libpq-wrapper-methods">Adding new libpq wrapper methods</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#when-a-new-python-major-version-is-released">When a new Python major version is released</a></li>
 <li><a class="reference internal" href="#when-dropping-end-of-life-python-versions">When dropping end-of-life Python versions</a></li>
 </ul>
