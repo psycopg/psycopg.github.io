@@ -471,16 +471,26 @@ of communication.</p>
 <p>Because of the way transactions interact with notifications (see <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>
 documentation), you should keep the connection in <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>
 mode if you wish to receive or send notifications in a timely manner.</p>
-<p>Notifications are received as instances of <a class="reference internal" href="../api/objects.html#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a>. If you are reserving a
-connection only to receive notifications, the simplest way is to consume the
-<a class="reference internal" href="../api/connections.html#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies</span></code></a> generator. The generator can be stopped using
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code>. Starting from Psycopg 3.2, the method supports options to receive
-notifications only for a certain time or up to a certain number.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You don’t need an <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> to handle notifications: a normal
 blocking <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> is perfectly valid.</p>
 </div>
+<p>Notifications are received as instances of the <a class="reference internal" href="../api/objects.html#psycopg.Notify" title="psycopg.Notify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Notify</span></code></a> object. You can
+receive notifications using either the <a class="reference internal" href="#notifies-generator"><span class="std std-ref">notifies generator</span></a> or a <a class="reference internal" href="#notifies-handlers"><span class="std std-ref">notifies handler</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You should use only one of the two methods to receive notifications.</p>
+<p>Since Psycopg 3.2.10 using the generator and handlers at the same time
+raises a runtime warning.</p>
+</div>
+<section id="notifies-generator">
+<span id="id10"></span><h3>Notifies generator<a class="headerlink" href="#notifies-generator" title="Permalink to this heading">#</a></h3>
+<p>If you are reserving a connection only to receive notifications, the simplest
+way to receive them is to consume the <a class="reference internal" href="../api/connections.html#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.notifies()</span></code></a> generator. The
+generator can be stopped using its <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method, or using the parameters
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">stop_after</span></code> to receive notifications only for a certain time
+or up to a certain number.</p>
 <p>The following example will print notifications and stop when one containing
 the <code class="docutils literal notranslate"><span class="pre">&quot;stop&quot;</span></code> message is received.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
@@ -510,6 +520,27 @@ the <code class="docutils literal notranslate"><span class="pre">&quot;stop&quot
 <span class="n">there</span><span class="p">,</span> <span class="n">I</span> <span class="n">stopped</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The behaviour of the notifies generator has changed slightly as problems
+were found:</p>
+<ul class="simple">
+<li><p>Before Psycopg 3.2.4, notification received between calling
+<code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code> and starting the generator were lost.</p></li>
+<li><p>Since <a class="reference internal" href="../news.html#psycopg-3-2-4"><span class="std std-ref">Psycopg 3.2.4</span></a> such notifications are captured and yielded
+by the generator once it is started. However this introduced a leak
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1091">#1091</a>) and, if the generator is not regularly used, some
+memory is allocated indefinitely.</p></li>
+<li><p>Since <a class="reference internal" href="../news.html#psycopg-3-2-10"><span class="std std-ref">Psycopg 3.2.10 (unreleased)</span></a> if a handler is registered then
+notifications are not captured when the generator is not running. So the
+behaviour is similar to pre-3.2.4 but <em>only if a handler is registered
+too</em>. Therefore, using handlers and generators together starts seeming a
+bad idea, hence it is since deprecated.</p></li>
+</ul>
+</div>
+</section>
+<section id="notifies-handlers">
+<span id="id11"></span><h3>Notifies handlers<a class="headerlink" href="#notifies-handlers" title="Permalink to this heading">#</a></h3>
 <p>Alternatively, you can use <a class="reference internal" href="../api/connections.html#psycopg.Connection.add_notify_handler" title="psycopg.Connection.add_notify_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notify_handler()</span></code></a> to register a
 callback function, which will be invoked whenever a notification is received,
 during the normal query processing; you will be then able to use the
@@ -526,6 +557,7 @@ received immediately, but only during a connection operation, such as a query.</
 <span class="c1"># (1,)</span>
 </pre></div>
 </div>
+</section>
 </section>
 <section id="detecting-disconnections">
 <span id="disconnections"></span><span id="index-7"></span><h2>Detecting disconnections<a class="headerlink" href="#detecting-disconnections" title="Permalink to this heading">#</a></h2>
@@ -649,7 +681,11 @@ something similar using <a class="reference external" href="https://docs.python.
 <li><a class="reference internal" href="#interrupting-async-operations">Interrupting async operations</a></li>
 <li><a class="reference internal" href="#gevent-support">Gevent support</a></li>
 <li><a class="reference internal" href="#server-messages">Server messages</a></li>
-<li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a></li>
+<li><a class="reference internal" href="#asynchronous-notifications">Asynchronous notifications</a><ul>
+<li><a class="reference internal" href="#notifies-generator">Notifies generator</a></li>
+<li><a class="reference internal" href="#notifies-handlers">Notifies handlers</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#detecting-disconnections">Detecting disconnections</a></li>
 </ul>
 </li>
