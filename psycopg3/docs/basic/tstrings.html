@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Adapting basic Python types" href="adapt.html" /><link rel="prev" title="Passing parameters to SQL queries" href="params.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.06.21"/>
-        <title>Template string queries - psycopg 3.3.0.dev1 documentation</title>
+        <title>Template string queries - psycopg 3.3.0.dev2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -134,7 +134,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">psycopg 3.3.0.dev1 documentation</div></a>
+      <a href="../index.html"><div class="brand">psycopg 3.3.0.dev2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -161,7 +161,7 @@
     <img class="sidebar-logo only-dark" src="../_static/psycopg.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">psycopg 3.3.0.dev1 documentation</span>
+  <span class="sidebar-brand-text">psycopg 3.3.0.dev2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -254,6 +254,20 @@
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.3.</span></p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is an experimental feature, still under active development,
+documented here for preview. Details may change before the final Psycopg
+3.3 release.</p>
+<p>Template strings are a Python language feature under development too,
+planned for release in Python 3.14. Template string queries are currently
+tested in Python 3.14 rc 2.</p>
+<p>If you want to test the feature you can install a <a class="reference external" href="https://test.pypi.org/project/psycopg/3.3.0.dev1/">test version of Pyscopg
+from test pypi</a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s2">&quot;psycopg[binary]==3.3.0.dev1&quot;</span>
+</pre></div>
+</div>
+</div>
 <p>Psycopg can process queries expressed as <a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-strings">template strings</a> defined in
 <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0750/"><strong>PEP 750</strong></a> and implemented for the first time in Python 3.14.</p>
 <p>Template strings are similar to <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#tut-f-strings">f-strings</a>: they are string literals
@@ -281,10 +295,13 @@ form, and leave Psycopg to perform the right processing:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>as Psycopg will be able to send parameters separately from the query, or to
-compose the query on the client side using safe escaping rules, according to
-the <a class="reference internal" href="../advanced/cursors.html#cursor-types"><span class="std std-ref">type of cursor</span></a> used, but it is has the same
-readability of f-strings.</p>
+<p>but has a clear readability advantage because the Python variable names or
+expressions appear directly in the place where they will be used in the query
+(no more forgetting to add a placeholder when adding a field in an INSERT…).</p>
+<p>Like in normal queries, according to the <a class="reference internal" href="../advanced/cursors.html#cursor-types"><span class="std std-ref">type of cursor</span></a>
+used, Psycopg will either send parameters separately from the query, or will
+compose the query on the client side using safe escaping rules, guaranteeing
+protection from SQL injections.</p>
 <section id="format-specifiers">
 <h2>Format specifiers<a class="headerlink" href="#format-specifiers" title="Permalink to this heading">#</a></h2>
 <p>Format specifiers can be associated to template strings interpolation using a
@@ -312,8 +329,9 @@ support parametrization in PostgreSQL</span></a>.</p></li>
 the query. The parameter must be another template string or a
 <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>/<a class="reference internal" href="../api/sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code></a> instance.</p></li>
 </ul>
+</section>
 <section id="example-notify">
-<span id="tstring-template-notify"></span><h3>Example: NOTIFY<a class="headerlink" href="#example-notify" title="Permalink to this heading">#</a></h3>
+<span id="tstring-template-notify"></span><h2>Example: NOTIFY<a class="headerlink" href="#example-notify" title="Permalink to this heading">#</a></h2>
 <p>The <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html">NOTIFY</a> command takes a <em>channel</em> parameter (an identifier, so it must be
 quoted with double quotes if it contains any non-alphanumeric character), and
 a <em>payload</em> parameter as a string (which must be escaped with string syntax,
@@ -329,7 +347,7 @@ simple as:</p>
 result in executing the statement <code class="docutils literal notranslate"><span class="pre">NOTIFY</span> <span class="pre">&quot;foo.bar&quot;,</span> <span class="pre">'O''Reilly'</span></code>.</p>
 </section>
 <section id="example-nested-templates">
-<span id="tstring-template-nested"></span><h3>Example: nested templates<a class="headerlink" href="#example-nested-templates" title="Permalink to this heading">#</a></h3>
+<span id="tstring-template-nested"></span><h2>Example: nested templates<a class="headerlink" href="#example-nested-templates" title="Permalink to this heading">#</a></h2>
 <p>A string template merges literal parts of the query with parameter. It is also
 possible to pass templates to templates in order to compose more and more
 complex and dynamic SQL statements.</p>
@@ -351,11 +369,10 @@ be written as:</p>
         <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.name ~* </span><span class="si">{name_pattern}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.group_id = </span><span class="si">{group_id}</span><span class="s2">&quot;</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;please specify at least one search parameter&quot;</span><span class="p">)</span>
-    <span class="n">joined</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot; AND &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
 
+    <span class="n">joined</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot; AND &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">User</span><span class="p">))</span>
     <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM users AS u WHERE {joined:q}&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
@@ -364,7 +381,6 @@ be written as:</p>
 <p>In this example we have used the <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL.join" title="psycopg.sql.SQL.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL.join()</span></code></a> method overload that takes a
 list of templates and returns a joined template in order to create an AND-ed
 sequence of conditions.</p>
-</section>
 </section>
 </section>
 
@@ -425,11 +441,9 @@ sequence of conditions.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Template string queries</a><ul>
-<li><a class="reference internal" href="#format-specifiers">Format specifiers</a><ul>
+<li><a class="reference internal" href="#format-specifiers">Format specifiers</a></li>
 <li><a class="reference internal" href="#example-notify">Example: NOTIFY</a></li>
 <li><a class="reference internal" href="#example-nested-templates">Example: nested templates</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
