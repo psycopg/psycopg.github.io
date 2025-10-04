@@ -260,6 +260,28 @@ differences to be aware of.</p>
 Psycopg 2 and 3, which could be useful if you are porting a program or
 writing a program that should work with both Psycopg 2 and 3.</p>
 </div>
+<section id="which-package-to-install">
+<span id="install-difference"></span><h2>Which package to install?<a class="headerlink" href="#which-package-to-install" title="Permalink to this heading">#</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>If you were installing <code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> you should now install
+<code class="docutils literal notranslate"><span class="pre">psycopg[binary]</span></code> instead.</p></li>
+<li><p>If you were installing <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code>, therefore your client has the
+prerequisites to build the C extension yourself, you can install
+<code class="docutils literal notranslate"><span class="pre">psycopg[c]</span></code> instead.</p></li>
+</ul>
+</div>
+<p>Please see the <a class="reference internal" href="install.html#installation"><span class="std std-ref">installation</span></a> section for all the details.</p>
+<p>Rationale: both the <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> and the <code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> distribution
+packages install the <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> Python package. This scenario is not well
+covered by Python packaging metadata, resulting in complex dependencies
+management and problems if both the packages are installed.</p>
+<p>In Psycopg 3 there is a clear “interface” package, <code class="docutils literal notranslate"><span class="pre">psycopg</span></code>, and optional
+speed-up extensions that can be included in the dependencies of a service (but
+don’t need to – and shouldn’t be – included in the dependencies of a
+library). See <a class="reference internal" href="install.html#install-dependencies"><span class="std std-ref">Handling dependencies</span></a> for more details.</p>
+</section>
 <section id="server-side-binding">
 <span id="id1"></span><h2>Server-side binding<a class="headerlink" href="#server-side-binding" title="Permalink to this heading">#</a></h2>
 <p>Psycopg 3 sends the query and the parameters to the server separately, instead
@@ -679,6 +701,7 @@ appropriate loaders: take a look at <a class="reference internal" href="../advan
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Differences from <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code></a><ul>
+<li><a class="reference internal" href="#which-package-to-install">Which package to install?</a></li>
 <li><a class="reference internal" href="#server-side-binding">Server-side binding</a></li>
 <li><a class="reference internal" href="#extended-query-protocol">Extended query Protocol</a></li>
 <li><a class="reference internal" href="#multiple-statements-in-the-same-query">Multiple statements in the same query</a></li>
