@@ -251,9 +251,10 @@
         <article role="main">
           <section id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
-<p>In short, if you use a <a class="reference internal" href="#supported-systems"><span class="std std-ref">supported system</span></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span>           <span class="c1"># upgrade pip to at least 20.3</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[binary]&quot;</span>       <span class="c1"># remove [binary] for PyPy</span>
+<p>In short, if you use one of the <a class="reference internal" href="#supported-systems"><span class="std std-ref">supported systems</span></a>,
+run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[binary]&quot;</span>
 </pre></div>
 </div>
 <p>and you should be <a class="reference internal" href="usage.html#module-usage"><span class="std std-ref">ready to start</span></a>. Read further for
@@ -268,15 +269,15 @@ alternative ways to install.</p>
 <ul class="simple">
 <li><p>Python: from version 3.10 to 3.14</p>
 <ul>
-<li><p>Python 3.8 and 3.9 supported before Psycopg 3.3</p></li>
-<li><p>Python 3.7 supported before Psycopg 3.2</p></li>
-<li><p>Python 3.6 supported before Psycopg 3.1</p></li>
+<li><p>Python 3.8 and 3.9 are supported before Psycopg 3.3</p></li>
+<li><p>Python 3.7 is supported before Psycopg 3.2</p></li>
+<li><p>Python 3.6 is supported before Psycopg 3.1</p></li>
 </ul>
 </li>
 <li><p>PyPy: from version 3.10 to 3.11</p>
 <ul>
-<li><p>PyPy 3.9 supported before Psycopg 3.3</p></li>
-<li><p><strong>Note:</strong> Only the pure Python version is supported.</p></li>
+<li><p>PyPy 3.9 is supported before Psycopg 3.3</p></li>
+<li><p><strong>Note:</strong> Only the pure Python installation is currently supported.</p></li>
 </ul>
 </li>
 <li><p>PostgreSQL: from version 10 to 18</p>
@@ -286,6 +287,7 @@ in the CI. Out-of-support releases are supported on a best-effort basis.</p></li
 </ul>
 </li>
 <li><p>OS: Linux, macOS, Windows</p></li>
+<li><p>Pip: 20.3 or newer</p></li>
 </ul>
 <p>The tests to verify the supported systems run in <a class="reference external" href="https://github.com/psycopg/psycopg/actions">Github workflows</a>:
 anything that is not tested there is not officially supported. This includes:</p>
@@ -299,7 +301,7 @@ database may use the same wire protocol as PostgreSQL) but we cannot guarantee
 the correct working or a smooth ride.</p>
 </section>
 <section id="binary-installation">
-<span id="binary-install"></span><h2>Binary installation<a class="headerlink" href="#binary-installation" title="Permalink to this heading">#</a></h2>
+<span id="id5"></span><h2>Binary installation<a class="headerlink" href="#binary-installation" title="Permalink to this heading">#</a></h2>
 <p>The quickest way to start developing with Psycopg 3 is to install the binary
 packages by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[binary]&quot;</span>
@@ -308,8 +310,6 @@ packages by running:</p>
 <p>This will install a self-contained package with all the libraries needed.
 If you are coming from Psycopg 2, this is the equivalent of installing
 the <code class="docutils literal notranslate"><span class="pre">psycopg2-binary</span></code> package.</p>
-<p><strong>You will need pip 20.3 at least</strong>: please run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">pip</span></code>
-to update it beforehand.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>Did Psycopg 3 install ok? Great! You can now move on to the <a class="reference internal" href="usage.html#module-usage"><span class="std std-ref">basic
@@ -350,7 +350,7 @@ installation.</p></li>
 </div>
 </section>
 <section id="local-installation">
-<span id="id6"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this heading">#</a></h2>
+<span id="id7"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this heading">#</a></h2>
 <p>A “Local installation” results in a performing and maintainable library. The
 library will include the speed-up C module and will be linked to the system
 libraries (<code class="docutils literal notranslate"><span class="pre">libpq</span></code>, <code class="docutils literal notranslate"><span class="pre">libssl</span></code>…) so that system upgrade of libraries will
@@ -365,7 +365,7 @@ install Psycopg for a production site.</p>
 </ul>
 <p>You <strong>must be able</strong> to troubleshoot an extension build, for instance you must
 be able to read your compiler’s error message. If you are not, please don’t
-try this and follow the <a class="reference internal" href="#binary-installation">binary installation</a> instead.</p>
+try this and use the <a class="reference internal" href="#binary-installation"><span class="std std-ref">Binary installation</span></a> instead.</p>
 <p>If your build prerequisites are in place you can run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;psycopg[c]&quot;</span>
 </pre></div>
@@ -380,30 +380,36 @@ dependencies at runtime.</p>
 </div>
 </section>
 <section id="pure-python-installation">
-<span id="id7"></span><h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this heading">#</a></h2>
+<span id="id8"></span><h2>Pure Python installation<a class="headerlink" href="#pure-python-installation" title="Permalink to this heading">#</a></h2>
 <p>If you simply install:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">psycopg</span>
 </pre></div>
 </div>
 <p>without <code class="docutils literal notranslate"><span class="pre">[c]</span></code> or <code class="docutils literal notranslate"><span class="pre">[binary]</span></code> extras you will obtain a pure Python
-implementation. This is particularly handy to debug and hack, but it still
-requires the system libpq to operate (which will be imported dynamically via
-<a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>).</p>
+implementation. This is particularly handy for debugging and hacking.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The pure Python installation is much slower than the
+<a class="reference internal" href="#binary-installation"><span class="std std-ref">Binary installation</span></a> or <a class="reference internal" href="#local-installation"><span class="std std-ref">Local installation</span></a>. It is likely
+sufficient for local developments or small tasks but, for production loads,
+you might want to install one of the speed-up extensions too.</p>
+</div>
 <p>In order to use the pure Python installation you will need the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>
-installed in the system: for instance on Debian system you will probably
+PostgreSQL client library installed on your client (which will be imported
+dynamically via <a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>); for example on Debian systems you will probably
 need:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">libpq5</span>
 </pre></div>
 </div>
+<p>If you are not able to fulfill this requirement please use a
+<a class="reference internal" href="#binary-installation"><span class="std std-ref">Binary installation</span></a>, which packages its own copy of the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">libpq</span></code> is the client library used by <strong class="program">psql</strong>, the
+<p>The <code class="docutils literal notranslate"><span class="pre">libpq</span></code> is the client library also used by <strong class="program">psql</strong>, the
 PostgreSQL command line client, to connect to the database.  On most
 systems, installing <strong class="program">psql</strong> will install the <code class="docutils literal notranslate"><span class="pre">libpq</span></code> too as a
 dependency.</p>
 </div>
-<p>If you are not able to fulfill this requirement please follow the <a class="reference internal" href="#binary-installation">binary
-installation</a>.</p>
 </section>
 <section id="installing-the-connection-pool">
 <span id="pool-installation"></span><h2>Installing the connection pool<a class="headerlink" href="#installing-the-connection-pool" title="Permalink to this heading">#</a></h2>
