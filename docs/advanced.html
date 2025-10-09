@@ -1,14 +1,13 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>More advanced topics &#8212; Psycopg 2.9.11.dev1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/better.css" />
+    <title>More advanced topics &#8212; Psycopg 2.9.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/better.css?v=58ad701a" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=null"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -16,9 +15,9 @@
       gtag('js', new Date());
       gtag('config', 'null');
     </script>
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/documentation_options.js?v=6d47958c"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="psycopg2.extensions – Extensions to the DB API" href="extensions.html" />
@@ -27,7 +26,7 @@
       <link rel="stylesheet" href="_static/psycopg.css" type="text/css" />
   </head><body>
     <header id="pageheader"><h1><a href="index.html ">
-        Psycopg 2.9.11.dev1 documentation
+        Psycopg 2.9.11 documentation
     </a></h1></header>
   <div class="related top">
   <nav id="rellinks">
@@ -55,9 +54,9 @@
           <div class="body" role="main">
             
   <section id="more-advanced-topics">
-<h1>More advanced topics<a class="headerlink" href="#more-advanced-topics" title="Permalink to this heading">¶</a></h1>
+<h1>More advanced topics<a class="headerlink" href="#more-advanced-topics" title="Link to this heading">¶</a></h1>
 <section id="connection-and-cursor-factories">
-<span id="subclassing-cursor"></span><span id="subclassing-connection"></span><span id="index-0"></span><h2>Connection and cursor factories<a class="headerlink" href="#connection-and-cursor-factories" title="Permalink to this heading">¶</a></h2>
+<span id="subclassing-cursor"></span><span id="subclassing-connection"></span><span id="index-0"></span><h2>Connection and cursor factories<a class="headerlink" href="#connection-and-cursor-factories" title="Link to this heading">¶</a></h2>
 <p>Psycopg exposes two new-style classes that can be sub-classed and expanded to
 adapt them to the needs of the programmer: <a class="reference internal" href="extensions.html#psycopg2.extensions.cursor" title="psycopg2.extensions.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.cursor</span></code></a>
 and <a class="reference internal" href="extensions.html#psycopg2.extensions.connection" title="psycopg2.extensions.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.connection</span></code></a>.  The <a class="reference internal" href="connection.html#connection" title="connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code></a> class is
@@ -74,12 +73,12 @@ the <a class="reference internal" href="connection.html#connection.cursor_factor
 of creating a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection</span></code> subclass.</p>
 </div>
 <p id="index-1">An example of cursor subclass performing logging is:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">import</span> <span class="nn">psycopg2.extensions</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2.extensions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="k">class</span> <span class="nc">LoggingCursor</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">cursor</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingCursor</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">cursor</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;sql_debug&#39;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mogrify</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
 
@@ -97,7 +96,7 @@ of creating a new <code class="xref py py-obj docutils literal notranslate"><spa
 </div>
 </section>
 <section id="adapting-new-python-types-to-sql-syntax">
-<span id="adapting-new-types"></span><span id="index-2"></span><h2>Adapting new Python types to SQL syntax<a class="headerlink" href="#adapting-new-python-types-to-sql-syntax" title="Permalink to this heading">¶</a></h2>
+<span id="adapting-new-types"></span><span id="index-2"></span><h2>Adapting new Python types to SQL syntax<a class="headerlink" href="#adapting-new-python-types-to-sql-syntax" title="Link to this heading">¶</a></h2>
 <p>Any Python class or type can be adapted to an SQL string.  Adaptation mechanism
 is similar to the Object Adaptation proposed in the <span class="target" id="index-3"></span><a class="pep reference external" href="https://peps.python.org/pep-0246/"><strong>PEP 246</strong></a> and is exposed
 by the <a class="reference internal" href="extensions.html#psycopg2.extensions.adapt" title="psycopg2.extensions.adapt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extensions.adapt()</span></code></a> function.</p>
@@ -132,14 +131,14 @@ wrapper, whose <code class="xref py py-obj docutils literal notranslate"><span c
 the wrapped object.</p>
 <p id="index-4">Example: mapping of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Point</span></code> class into the <a class="reference external" href="https://www.postgresql.org/docs/current/static/datatype-geometric.html#DATATYPE-GEOMETRIC"><code class="sql docutils literal notranslate"><span class="pre">point</span></code></a> PostgreSQL
 geometric type:</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">adapt</span><span class="p">,</span> <span class="n">register_adapter</span><span class="p">,</span> <span class="n">AsIs</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg2.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">adapt</span><span class="p">,</span> <span class="n">register_adapter</span><span class="p">,</span> <span class="n">AsIs</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="gp">... </span>   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="gp">... </span>       <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
 <span class="gp">... </span>       <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">adapt_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">adapt_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="n">adapt</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">getquoted</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">y</span> <span class="o">=</span> <span class="n">adapt</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">getquoted</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">AsIs</span><span class="p">(</span><span class="s2">&quot;&#39;(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
@@ -156,14 +155,14 @@ geometric type:</p>
 </div>
 </section>
 <section id="type-casting-of-sql-types-into-python-objects">
-<span id="type-casting-from-sql-to-python"></span><span id="index-5"></span><h2>Type casting of SQL types into Python objects<a class="headerlink" href="#type-casting-of-sql-types-into-python-objects" title="Permalink to this heading">¶</a></h2>
+<span id="type-casting-from-sql-to-python"></span><span id="index-5"></span><h2>Type casting of SQL types into Python objects<a class="headerlink" href="#type-casting-of-sql-types-into-python-objects" title="Link to this heading">¶</a></h2>
 <p>PostgreSQL objects read from the database can be adapted to Python objects
 through an user-defined adapting function.  An adapter function takes two
 arguments: the object string representation as returned by PostgreSQL and the
 cursor currently being read, and should return a new Python object.  For
 example, the following function parses the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">point</span></code>
 representation into the previously defined <code class="xref py py-obj docutils literal notranslate"><span class="pre">Point</span></code> class:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">cast_point</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cur</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">cast_point</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cur</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <span class="gp">... </span>       <span class="k">return</span> <span class="kc">None</span>
 <span class="gp">...</span>
@@ -219,7 +218,7 @@ read:</p>
 PostgreSQL array into a Python list.</p>
 </section>
 <section id="asynchronous-notifications">
-<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Permalink to this heading">¶</a></h2>
+<span id="async-notify"></span><span id="index-6"></span><h2>Asynchronous notifications<a class="headerlink" href="#asynchronous-notifications" title="Link to this heading">¶</a></h2>
 <p>Psycopg allows asynchronous interaction with other database sessions using the
 facilities offered by PostgreSQL commands <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-listen.html"><code class="sql docutils literal notranslate"><span class="pre">LISTEN</span></code></a> and <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-notify.html"><code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code></a>. Please
 refer to the PostgreSQL documentation for examples about how to use this form of
@@ -240,9 +239,9 @@ something new has arrived. A better strategy is to use some I/O completion
 function such as <a class="reference external" href="https://docs.python.org/3/library/select.html#select.select" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> to sleep until awakened by the kernel when there is
 some data to read on the connection, thereby using no CPU unless there is
 something to read:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">select</span>
-<span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">import</span> <span class="nn">psycopg2.extensions</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">select</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2.extensions</span>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">ISOLATION_LEVEL_AUTOCOMMIT</span><span class="p">)</span>
@@ -285,9 +284,9 @@ example would be to use a <a class="reference external" href="https://docs.pytho
 </div>
 </section>
 <section id="asynchronous-support">
-<span id="async-support"></span><span id="index-7"></span><h2>Asynchronous support<a class="headerlink" href="#asynchronous-support" title="Permalink to this heading">¶</a></h2>
+<span id="async-support"></span><span id="index-7"></span><h2>Asynchronous support<a class="headerlink" href="#asynchronous-support" title="Link to this heading">¶</a></h2>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.2.</span></p>
+<p><span class="versionmodified added">Added in version 2.2.</span></p>
 </div>
 <p>Psycopg can issue asynchronous queries to a PostgreSQL database. An asynchronous
 communication style is established passing the parameter <em>async</em>=1 to the
@@ -302,7 +301,7 @@ the current connection state.</p>
 <p>The following is an example loop using methods <code class="xref py py-obj docutils literal notranslate"><span class="pre">fileno()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">poll()</span></code>
 together with the Python <a class="reference external" href="https://docs.python.org/3/library/select.html#select.select" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> function in order to carry on
 asynchronous operations with Psycopg:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">wait</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">POLL_OK</span><span class="p">:</span>
@@ -361,9 +360,9 @@ objects</span></a>, <a class="reference internal" href="usage.html#server-side-c
 this will be probably implemented in a future release.</p>
 </section>
 <section id="support-for-coroutine-libraries">
-<span id="green-support"></span><span id="index-8"></span><h2>Support for coroutine libraries<a class="headerlink" href="#support-for-coroutine-libraries" title="Permalink to this heading">¶</a></h2>
+<span id="green-support"></span><span id="index-8"></span><h2>Support for coroutine libraries<a class="headerlink" href="#support-for-coroutine-libraries" title="Link to this heading">¶</a></h2>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.2.</span></p>
+<p><span class="versionmodified added">Added in version 2.2.</span></p>
 </div>
 <p>Psycopg can be used together with <a class="reference external" href="https://en.wikipedia.org/wiki/Coroutine">coroutine</a>-based libraries and participate
 in cooperative multithreading.</p>
@@ -399,7 +398,7 @@ connections, e.g. for pooling.</p>
 possibly a method to register it) to make Psycopg as green as they want. An
 example callback (using <code class="xref py py-obj docutils literal notranslate"><span class="pre">select()</span></code> to block) is provided as
 <a class="reference internal" href="extras.html#psycopg2.extras.wait_select" title="psycopg2.extras.wait_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2.extras.wait_select()</span></code></a>: it boils down to something similar to:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">wait_select</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">wait_select</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">extensions</span><span class="o">.</span><span class="n">POLL_OK</span><span class="p">:</span>
@@ -425,9 +424,9 @@ not compatible with asynchronous connections.</p>
 </div>
 </section>
 <section id="replication-protocol-support">
-<span id="replication-support"></span><span id="index-9"></span><h2>Replication protocol support<a class="headerlink" href="#replication-protocol-support" title="Permalink to this heading">¶</a></h2>
+<span id="replication-support"></span><span id="index-9"></span><h2>Replication protocol support<a class="headerlink" href="#replication-protocol-support" title="Link to this heading">¶</a></h2>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.7.</span></p>
+<p><span class="versionmodified added">Added in version 2.7.</span></p>
 </div>
 <p>Modern PostgreSQL servers (version 9.0 and above) support replication.  The
 replication protocol is built on top of the client-server protocol and can be
@@ -442,7 +441,7 @@ The replication protocol can be operated on both synchronous and
 </ul>
 </div>
 <section id="logical-replication-quick-start">
-<h3>Logical replication Quick-Start<a class="headerlink" href="#logical-replication-quick-start" title="Permalink to this heading">¶</a></h3>
+<h3>Logical replication Quick-Start<a class="headerlink" href="#logical-replication-quick-start" title="Link to this heading">¶</a></h3>
 <p>You must be using PostgreSQL server version 9.4 or above to run this quick
 start.</p>
 <p>Make sure that replication connections are permitted for user <code class="docutils literal notranslate"><span class="pre">postgres</span></code> in
@@ -453,10 +452,10 @@ restart).  Create a database <code class="docutils literal notranslate"><span cl
 <p>Then run the following code to quickly try the replication support out.  This
 is not production code – it’s only intended as a simple demo of logical
 replication:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">import</span> <span class="nn">psycopg2.extras</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2.extras</span>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;dbname=psycopg2_test user=postgres&#39;</span><span class="p">,</span>
    <span class="n">connection_factory</span><span class="o">=</span><span class="n">psycopg2</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">LogicalReplicationConnection</span><span class="p">)</span>
@@ -468,8 +467,8 @@ replication:</p>
     <span class="n">cur</span><span class="o">.</span><span class="n">create_replication_slot</span><span class="p">(</span><span class="s1">&#39;pytest&#39;</span><span class="p">,</span> <span class="n">output_plugin</span><span class="o">=</span><span class="s1">&#39;test_decoding&#39;</span><span class="p">)</span>
     <span class="n">cur</span><span class="o">.</span><span class="n">start_replication</span><span class="p">(</span><span class="n">slot_name</span><span class="o">=</span><span class="s1">&#39;pytest&#39;</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">DemoConsumer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DemoConsumer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">send_feedback</span><span class="p">(</span><span class="n">flush_lsn</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">data_start</span><span class="p">)</span>
 
@@ -502,7 +501,7 @@ by this demo client.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
