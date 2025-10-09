@@ -258,7 +258,7 @@ types to validate the correct use of Psycopg objects and of the data returned
 by the database.</p>
 <section id="generic-types">
 <h2>Generic types<a class="headerlink" href="#generic-types" title="Permalink to this heading">#</a></h2>
-<p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects are <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> objects and
+<p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> objects are <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> objects and
 support a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Row</span></code> parameter which is the type of the records returned. The
 parameter can be configured by passing a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> parameter to the
 constructor or to the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method.</p>
@@ -326,7 +326,7 @@ variable has type “int”)</em>. In order to work around the error you will ne
 to use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">if</span></code>, an <code class="xref py py-obj docutils literal notranslate"><span class="pre">assert</span></code> or some other workaround (like <code class="docutils literal notranslate"><span class="pre">(rv,)</span> <span class="pre">=</span>
 <span class="pre">cur.fetchall()</span></code> or some other horrible trick).</p>
 <p>Since Psycopg 3.3, cursors are <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable">iterables</a>, therefore they support the
-<a class="reference external" href="https://docs.python.org/3/library/functions.html#next" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next</span></code></a> function. A <code class="xref py py-obj docutils literal notranslate"><span class="pre">next(cur)</span></code> will behave like <code class="xref py py-obj docutils literal notranslate"><span class="pre">cur.fetchone()</span></code>, but it
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#next" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next</span></code></a> function. A <code class="xref py py-obj docutils literal notranslate"><span class="pre">next(cur)</span></code> will behave like <code class="xref py py-obj docutils literal notranslate"><span class="pre">cur.fetchone()</span></code>, but it
 is guaranteed to return a row (in case there are no rows in the result set it
 will not return anything but will raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">StopIteration</span></code>). Therefore the
 function above can terminate with:</p>
@@ -337,7 +337,7 @@ function above can terminate with:</p>
 </pre></div>
 </div>
 <p>and your static checker will be happy.</p>
-<p>Similarly, in async code, you can use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> <a class="reference external" href="https://docs.python.org/3/library/functions.html#anext" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anext</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">(cur)</span></code> expression.</p>
+<p>Similarly, in async code, you can use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> <a class="reference external" href="https://docs.python.org/3/library/functions.html#anext" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anext</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">(cur)</span></code> expression.</p>
 </section>
 <section id="generic-pool-types">
 <span id="pool-generic"></span><h2>Generic pool types<a class="headerlink" href="#generic-pool-types" title="Permalink to this heading">#</a></h2>

@@ -362,7 +362,7 @@ value will be returned as a string (or bytes string for binary types).</p>
 <span id="adapt-example-xml"></span><h2>Writing a custom adapter: XML<a class="headerlink" href="#writing-a-custom-adapter-xml" title="Permalink to this heading">#</a></h2>
 <p>Psycopg doesn’t provide adapters for the XML data type, because there are just
 too many ways of handling XML in Python. Creating a loader to parse the
-<a class="reference external" href="https://www.postgresql.org/docs/current/datatype-xml.html">PostgreSQL xml type</a> to <a class="reference external" href="https://docs.python.org/3/library/xml.etree.elementtree.html#module-xml.etree.ElementTree" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElementTree</span></code></a> is very simple, using the
+<a class="reference external" href="https://www.postgresql.org/docs/current/datatype-xml.html">PostgreSQL xml type</a> to <a class="reference external" href="https://docs.python.org/3/library/xml.etree.elementtree.html#module-xml.etree.ElementTree" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElementTree</span></code></a> is very simple, using the
 <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapt.Loader</span></code></a> base class and implementing the
 <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
@@ -462,7 +462,7 @@ to return <code class="xref py py-obj docutils literal notranslate"><span class=
 <section id="example-postgresql-numeric-to-python-float">
 <span id="adapt-example-float"></span><h2>Example: PostgreSQL numeric to Python float<a class="headerlink" href="#example-postgresql-numeric-to-python-float" title="Permalink to this heading">#</a></h2>
 <p>Normally PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> values are converted to Python
-<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> instances, because both the types allow fixed-precision
+<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> instances, because both the types allow fixed-precision
 arithmetic and are not subject to rounding.</p>
 <p>Sometimes, however, you may want to perform floating-point math on
 <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> values, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code> may get in the way (maybe because it is
@@ -498,7 +498,7 @@ PostgreSQL but not handled by Python:</p>
 <span class="gr">DataError</span>: <span class="n">date too large (after year 10K): &#39;infinity&#39;</span>
 </pre></div>
 </div>
-<p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> as PostgreSQL
+<p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> as PostgreSQL
 infinity. For this, let’s create a subclass for the dumper and the loader and
 register them in the working scope (globally or just on a connection or
 cursor):</p>

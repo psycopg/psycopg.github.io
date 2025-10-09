@@ -296,7 +296,7 @@ create too many connections and starve the server, you might want to use a
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><em>Connections are not process-safe</em> and cannot be shared across processes,
-for instance using the facilities of the <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
+for instance using the facilities of the <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
 <p>If you are using Psycopg in a forking framework (for instance in a web
 server that implements concurrency using multiprocessing), you should make
 sure that the database connections are created after the worker process is
@@ -306,7 +306,7 @@ state.</p>
 <section id="asynchronous-operations">
 <span id="async"></span><span id="index-1"></span><h2>Asynchronous operations<a class="headerlink" href="#asynchronous-operations" title="Permalink to this heading">#</a></h2>
 <p>Psycopg <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> and <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> have counterparts <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> and
-<a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
+<a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> supporting an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> interface.</p>
 <p>The design of the asynchronous objects is pretty much the same of the sync
 ones: in order to use them you will only have to scatter the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword
 here and there.</p>
@@ -323,7 +323,7 @@ here and there.</p>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>An <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> can be used by several <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.Task</span></code></a> at the same time.
+<p>An <code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code> can be used by several <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio.Task</span></code></a> at the same time.
 However, as with threads, all the <a class="reference internal" href="../api/cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor</span></code></a> on the same connection will
 share the same session and will have their access to the connection
 serialized.</p>
@@ -341,8 +341,8 @@ do it automatically.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>On Windows, Psycopg is not compatible with the default
-<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProactorEventLoop</span></code></a>. Please use a different loop, for instance
-the <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorEventLoop</span></code></a>. See <a class="reference external" href="https://docs.python.org/3.14/library/asyncio-eventloop.html#asyncio.SelectorEventLoop">asyncio documentation</a> for details.</p>
+<a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProactorEventLoop</span></code></a>. Please use a different loop, for instance
+the <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorEventLoop</span></code></a>. See <a class="reference external" href="https://docs.python.org/3.14/library/asyncio-eventloop.html#asyncio.SelectorEventLoop">asyncio documentation</a> for details.</p>
 </div>
 </section>
 <section id="with-async-connections">
@@ -404,7 +404,7 @@ manually cancel connections.  This should no longer be necessary.</p>
 <section id="gevent-support">
 <span id="gevent"></span><span id="index-4"></span><h2>Gevent support<a class="headerlink" href="#gevent-support" title="Permalink to this heading">#</a></h2>
 <p>Psycopg 3 supports <a class="reference external" href="https://www.gevent.org/">gevent</a> out of the box. If the
-<a class="reference external" href="https://docs.python.org/3/library/select.html#module-select" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select</span></code></a> module is found patched by functions such as
+<a class="reference external" href="https://docs.python.org/3/library/select.html#module-select" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select</span></code></a> module is found patched by functions such as
 <a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_select">gevent.monkey.patch_select()</a> or <a class="reference external" href="http://www.gevent.org/api/gevent.monkey.html#gevent.monkey.patch_all">patch_all()</a>, psycopg will behave in a
 collaborative way.</p>
 <p>Unlike with <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code>, using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycogreen</span></code> module is not required.</p>
@@ -572,7 +572,7 @@ an additional connection and wait for a notification from the OS that this
 connection has something to say: only then you can run some checks. You
 can dedicate a thread (or an asyncio task) to wait on this connection: such
 thread will perform no activity until awaken by the OS.</p>
-<p>In a normal (non asyncio) program you can use the <a class="reference external" href="https://docs.python.org/3/library/selectors.html#module-selectors" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selectors</span></code></a> module. Because
+<p>In a normal (non asyncio) program you can use the <a class="reference external" href="https://docs.python.org/3/library/selectors.html#module-selectors" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selectors</span></code></a> module. Because
 the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> implements a <a class="reference internal" href="../api/connections.html#psycopg.Connection.fileno" title="psycopg.Connection.fileno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fileno()</span></code></a> method you can just
 register it as a file-like object. You can run such code in a dedicated thread
 (and using a dedicated connection) if the rest of the program happens to have
@@ -594,8 +594,8 @@ something else to do too.</p>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> program you can dedicate a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code></a> instead and do
-something similar using <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_reader" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_reader</span></code></a>:</p>
+<p>In an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> program you can dedicate a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code></a> instead and do
+something similar using <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.add_reader" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_reader</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="n">ev</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
