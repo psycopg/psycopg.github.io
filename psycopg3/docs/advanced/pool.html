@@ -652,6 +652,74 @@ server</p></td>
 </table>
 </div>
 </section>
+<section id="integration-with-sqlalchemy">
+<span id="pool-sqlalchemy"></span><h2>Integration with SQLAlchemy<a class="headerlink" href="#integration-with-sqlalchemy" title="Permalink to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.3.</span></p>
+</div>
+<p>If you want to use <a class="reference external" href="https://sqlalchemy.org">SQLAlchemy</a> with psycopg’s connection pool you can use the
+SQLAlchemy’s <a class="reference external" href="https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.NullPool">NullPool</a> feature, using the pool’s <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.getconn" title="psycopg_pool.ConnectionPool.getconn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getconn</span></code></a>
+as <code class="xref py py-obj docutils literal notranslate"><span class="pre">creator</span></code> function. However, SQLAlchemy expects that calling
+<a class="reference internal" href="../api/connections.html#psycopg.Connection.close" title="psycopg.Connection.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code></a> on the connection will return the connection to
+the pool, which is not Psycopg’s default behaviour.</p>
+<p>Since <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code> version 3.3, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">close_returns</span></code> parameter of the pool
+allows to change this behaviour, telling its connections to return to the
+pool, instead of closing, when <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> is called.</p>
+<p>For example, the initialization in an async application may look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg_pool</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy.pool</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy.ext.asyncio</span>
+
+<span class="n">db_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://postgres:postgres@hostname:port/database&quot;</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Create and open a Psycopg pool</span>
+    <span class="n">pgpool</span> <span class="o">=</span> <span class="n">psycopg_pool</span><span class="o">.</span><span class="n">AsyncConnectionPool</span><span class="p">(</span>
+        <span class="n">conninfo</span><span class="o">=</span><span class="n">db_url</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">close_returns</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">await</span> <span class="n">mypool</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+    <span class="c1"># Create a SQLAlchemy engine using the pool just created</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">ext</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">create_async_engine</span><span class="p">(</span>
+        <span class="n">url</span><span class="o">=</span><span class="s2">&quot;postgresql+psycopg://&quot;</span><span class="p">,</span>
+        <span class="n">poolclass</span><span class="o">=</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">NullPool</span><span class="p">,</span>
+        <span class="n">async_creator</span><span class="o">=</span><span class="n">pgpool</span><span class="o">.</span><span class="n">getconn</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Use the `engine` in the rest of your application.</span>
+    <span class="k">await</span> <span class="n">run_my_app</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>If you want to integrate the Psycopg pool with SQLAlchemy using a <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code>
+version older than 3.3, you will need to create a subclass of the
+<a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> class, overriding the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method, with an implementation similar to the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyAsyncConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="p">):</span>
+    <span class="c1"># If you need to subclass a sync connection, just drop the</span>
+    <span class="c1"># &#39;async&#39; and &#39;await&#39; keywords from this example.</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pool</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_pool&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># Connection currently checked out from the pool.</span>
+            <span class="c1"># Instead of closing it, return it to the pool.</span>
+            <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">putconn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Connection not part of any pool, or currently into the pool.</span>
+            <span class="c1"># Close the connection for real.</span>
+            <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Using a connection implementing this method you will not need to specify
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">close_returns</span></code> in the pool constructor, but just <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code>; the
+example above would be modified as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pgpool</span> <span class="o">=</span> <span class="n">psycopg_pool</span><span class="o">.</span><span class="n">AsyncConnectionPool</span><span class="p">(</span>
+    <span class="n">conninfo</span><span class="o">=</span><span class="n">db_url</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">connection_class</span><span class="o">=</span><span class="n">MyAsyncConnection</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -723,6 +791,7 @@ server</p></td>
 <li><a class="reference internal" href="#connection-quality">Connection quality</a></li>
 <li><a class="reference internal" href="#pool-operations-logging">Pool operations logging</a></li>
 <li><a class="reference internal" href="#pool-stats">Pool stats</a></li>
+<li><a class="reference internal" href="#integration-with-sqlalchemy">Integration with SQLAlchemy</a></li>
 </ul>
 </li>
 </ul>
