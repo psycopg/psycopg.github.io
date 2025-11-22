@@ -249,8 +249,8 @@
           </label>
         </div>
         <article role="main">
-          <span class="target" id="index-0"></span><span class="target" id="index-1"></span><section id="transactions-management">
-<span id="transactions"></span><span id="index-2"></span><h1>Transactions management<a class="headerlink" href="#transactions-management" title="Permalink to this heading">#</a></h1>
+          <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><section id="transactions-management">
+<span id="transactions"></span><span id="index-3"></span><h1>Transactions management<a class="headerlink" href="#transactions-management" title="Permalink to this heading">#</a></h1>
 <p>Psycopg has a behaviour that may seem surprising compared to
 <strong class="program">psql</strong>: by default, any database operation will start a new
 transaction. As a consequence, changes made by any cursor of the connection
@@ -495,9 +495,54 @@ but not entirely committed yet.</p>
 </pre></div>
 </div>
 </section>
+<section id="transaction-status">
+<span id="id4"></span><h3>Transaction status<a class="headerlink" href="#transaction-status" title="Permalink to this heading">#</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.3.</span></p>
+</div>
+<p>Each <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code> object exposes a <a class="reference internal" href="../api/objects.html#psycopg.Transaction.status" title="psycopg.Transaction.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a> property allowing
+to inspect the current state of the transaction. This can be useful for
+debugging, logging, or implementing custom transaction management logic.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code> property is a <a class="reference internal" href="../api/objects.html#psycopg.psycopg.Transaction.Status" title="psycopg.psycopg.Transaction.Status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Status</span></code></a> enum value:
+please check the enum documentation for the possible values.</p>
+<p>Here are a few examples of how to use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code> property:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rollback</span>
+
+<span class="c1"># Successful transaction</span>
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+<span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">COMMITTED</span>
+
+<span class="c1"># Transaction rolled back with an error</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;World&quot;</span><span class="p">,))</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="mi">0</span>  <span class="c1"># Causes an exception</span>
+<span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ROLLED_BACK_WITH_ERROR</span>
+
+<span class="c1"># Explicit rollback</span>
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Test&quot;</span><span class="p">,))</span>
+    <span class="k">raise</span> <span class="n">Rollback</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ROLLED_BACK_EXPLICITLY</span>
+
+<span class="c1"># Force rollback</span>
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="n">force_rollback</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Temp&quot;</span><span class="p">,))</span>
+<span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ROLLED_BACK_EXPLICITLY</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code> property remains accessible after the transaction context has
+exited, allowing you to check the final outcome of the transaction even after
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block completes. This is particularly useful when you need to log
+transaction outcomes or implement retry logic based on the transaction status.</p>
+</section>
 </section>
 <section id="transaction-characteristics">
-<span id="id4"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this heading">#</a></h2>
+<span id="id5"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Permalink to this heading">#</a></h2>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
 transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
@@ -535,7 +580,7 @@ caused the exception.</p>
 </div>
 </section>
 <section id="two-phase-commit-protocol-support">
-<span id="two-phase-commit"></span><span id="index-3"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this heading">#</a></h2>
+<span id="two-phase-commit"></span><span id="index-4"></span><h2>Two-Phase Commit protocol support<a class="headerlink" href="#two-phase-commit-protocol-support" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.1.</span></p>
 </div>
@@ -632,6 +677,7 @@ transactions produced by a Java program.</p>
 <li><a class="reference internal" href="#autocommit-transactions">Autocommit transactions</a></li>
 <li><a class="reference internal" href="#transaction-contexts">Transaction contexts</a><ul>
 <li><a class="reference internal" href="#nested-transactions">Nested transactions</a></li>
+<li><a class="reference internal" href="#transaction-status">Transaction status</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#transaction-characteristics">Transaction characteristics</a></li>

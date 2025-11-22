@@ -715,7 +715,7 @@ all available results.</p>
 <p>See <a class="reference internal" href="../basic/transactions.html#transactions"><span class="std std-ref">Transactions management</span></a> for details about these objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.IsolationLevel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">IsolationLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.IsolationLevel" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">IsolationLevel</span></span><a class="headerlink" href="#psycopg.IsolationLevel" title="Permalink to this definition">#</a></dt>
 <dd><p>Enum representing the isolation level for a transaction.</p>
 <p>The value is usually used with the <a class="reference internal" href="connections.html#psycopg.Connection.isolation_level" title="psycopg.Connection.isolation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.isolation_level</span></code></a> property.</p>
 <p>Check the PostgreSQL documentation for a description of the effects of the
@@ -756,6 +756,23 @@ different <a class="reference external" href="https://www.postgresql.org/docs/cu
 <dt class="sig sig-object py" id="psycopg.Transaction.connection">
 <span class="sig-name descname"><span class="pre">connection</span></span><a class="headerlink" href="#psycopg.Transaction.connection" title="Permalink to this definition">#</a></dt>
 <dd><p>The connection the object is managing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.Transaction.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#psycopg.Transaction.status" title="Permalink to this definition">#</a></dt>
+<dd><p>The current status of the transaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#psycopg.psycopg.Transaction.Status" title="psycopg.psycopg.Transaction.Status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Status</span></code></a></p>
+</dd>
+</dl>
+<p>See <a class="reference internal" href="../basic/transactions.html#transaction-status"><span class="std std-ref">Transaction status</span></a> for more details and examples.</p>
 </dd></dl>
 
 </dd></dl>
@@ -764,10 +781,69 @@ different <a class="reference external" href="https://www.postgresql.org/docs/cu
 <dt class="sig sig-object py" id="psycopg.AsyncTransaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncTransaction</span></span><a class="headerlink" href="#psycopg.AsyncTransaction" title="Permalink to this definition">#</a></dt>
 <dd><p>Returned by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.transaction" title="psycopg.AsyncConnection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a> to handle a transaction block.</p>
+<p>The class differs from <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> for the following details:</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.AsyncTransaction.connection">
 <span class="sig-name descname"><span class="pre">connection</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.connection" title="Permalink to this definition">#</a></dt>
+<dd><p>The connection the object is managing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.psycopg.Transaction.Status">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.Transaction.</span></span><span class="sig-name descname"><span class="pre">Status</span></span><a class="headerlink" href="#psycopg.psycopg.Transaction.Status" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psycopg.AsyncTransaction.</span></span><span class="sig-name descname"><span class="pre">Status</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status" title="Permalink to this definition">#</a></dt>
+<dd><p>The current status of a transaction.</p>
+<p>Exposed as the <a class="reference internal" href="#psycopg.Transaction.status" title="psycopg.Transaction.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a> attribute of
+<a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> and <a class="reference internal" href="#psycopg.AsyncTransaction" title="psycopg.AsyncTransaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncTransaction</span></code></a> objects.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.NON_STARTED">
+<span class="sig-name descname"><span class="pre">NON_STARTED</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.NON_STARTED" title="Permalink to this definition">#</a></dt>
+<dd><p>Transaction created but not yet entered.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.ACTIVE">
+<span class="sig-name descname"><span class="pre">ACTIVE</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.ACTIVE" title="Permalink to this definition">#</a></dt>
+<dd><p>Transaction currently active (inside the <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.COMMITTED">
+<span class="sig-name descname"><span class="pre">COMMITTED</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.COMMITTED" title="Permalink to this definition">#</a></dt>
+<dd><p>Transaction successfully committed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.ROLLED_BACK_EXPLICITLY">
+<span class="sig-name descname"><span class="pre">ROLLED_BACK_EXPLICITLY</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.ROLLED_BACK_EXPLICITLY" title="Permalink to this definition">#</a></dt>
+<dd><p>The transaction was explicitly rolled back (by raising
+<a class="reference internal" href="#psycopg.Rollback" title="psycopg.Rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rollback</span></code></a> or calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction(force_rollback=True)</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.ROLLED_BACK_WITH_ERROR">
+<span class="sig-name descname"><span class="pre">ROLLED_BACK_WITH_ERROR</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.ROLLED_BACK_WITH_ERROR" title="Permalink to this definition">#</a></dt>
+<dd><p>The transaction was rolled back due to an exception raised within the
+transaction block.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psycopg.AsyncTransaction.Status.FAILED">
+<span class="sig-name descname"><span class="pre">FAILED</span></span><a class="headerlink" href="#psycopg.AsyncTransaction.Status.FAILED" title="Permalink to this definition">#</a></dt>
+<dd><p>The transaction failed due to a connection failure (e.g., the
+connection was closed or became unavailable during the transaction).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -990,10 +1066,21 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
 <li><a class="reference internal" href="#psycopg.Transaction"><code class="docutils literal notranslate"><span class="pre">Transaction</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.Transaction.savepoint_name"><code class="docutils literal notranslate"><span class="pre">Transaction.savepoint_name</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.Transaction.connection"><code class="docutils literal notranslate"><span class="pre">Transaction.connection</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.Transaction.status"><code class="docutils literal notranslate"><span class="pre">Transaction.status</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psycopg.AsyncTransaction"><code class="docutils literal notranslate"><span class="pre">AsyncTransaction</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.AsyncTransaction.connection"><code class="docutils literal notranslate"><span class="pre">AsyncTransaction.connection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psycopg.psycopg.Transaction.Status"><code class="docutils literal notranslate"><span class="pre">psycopg.Transaction.Status</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status"><code class="docutils literal notranslate"><span class="pre">Status</span></code></a><ul>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.NON_STARTED"><code class="docutils literal notranslate"><span class="pre">Status.NON_STARTED</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.ACTIVE"><code class="docutils literal notranslate"><span class="pre">Status.ACTIVE</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.COMMITTED"><code class="docutils literal notranslate"><span class="pre">Status.COMMITTED</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.ROLLED_BACK_EXPLICITLY"><code class="docutils literal notranslate"><span class="pre">Status.ROLLED_BACK_EXPLICITLY</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.ROLLED_BACK_WITH_ERROR"><code class="docutils literal notranslate"><span class="pre">Status.ROLLED_BACK_WITH_ERROR</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.AsyncTransaction.Status.FAILED"><code class="docutils literal notranslate"><span class="pre">Status.FAILED</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psycopg.Rollback"><code class="docutils literal notranslate"><span class="pre">Rollback</span></code></a></li>
