@@ -284,6 +284,15 @@ form, and leave Psycopg to perform the right processing:</p>
 <p>but has a clear readability advantage because the Python variable names or
 expressions appear directly in the place where they will be used in the query
 (no more forgetting to add a placeholder when adding a field in an INSERT…).</p>
+<p>If you want to convert the template string to a regular string, instead of
+executing it directly, you can use the <a class="reference internal" href="../api/sql.html#psycopg.sql.as_string" title="psycopg.sql.as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.as_string()</span></code></a> or <a class="reference internal" href="../api/sql.html#psycopg.sql.as_bytes" title="psycopg.sql.as_bytes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_bytes()</span></code></a>
+functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;O&#39;Reilly&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dob</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">as_string</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;INSERT INTO tbl VALUES (</span><span class="si">{name}</span><span class="s2">, </span><span class="si">{dob}</span><span class="s2">)&quot;</span><span class="p">))</span>
+<span class="go">INSERT INTO tbl VALUES (&#39;O&#39;&#39;Reilly&#39;, &#39;1970-01-01&#39;::date)</span>
+</pre></div>
+</div>
 <p>With template strings it is also easy to parametrize parts of the query other
 than parameter values, for example tables or fields names:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
