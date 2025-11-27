@@ -254,21 +254,7 @@
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.3.</span></p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This is an experimental feature, still under active development,
-documented here for preview. Details may change before the final Psycopg
-3.3 release.</p>
-<p>Template strings are a Python language feature under development too,
-planned for release in Python 3.14. Template string queries are currently
-tested in Python 3.14 rc 2.</p>
-<p>If you want to test the feature you can install a <a class="reference external" href="https://test.pypi.org/project/psycopg/3.3.0.dev1/">test version of Pyscopg
-from test pypi</a>:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s2">&quot;psycopg[binary]==3.3.0.dev1&quot;</span>
-</pre></div>
-</div>
-</div>
-<p>Psycopg can process queries expressed as <a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-strings">template strings</a> defined in
+<p>Psycopg can process queries expressed as <a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-string-literals">template strings</a> defined in
 <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0750/"><strong>PEP 750</strong></a> and implemented for the first time in Python 3.14.</p>
 <p>Template strings are similar to <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#tut-f-strings">f-strings</a>: they are string literals
 interspersed with variables or expressions marked by <code class="docutils literal notranslate"><span class="pre">{}</span></code>. They use a <code class="docutils literal notranslate"><span class="pre">t</span></code>
@@ -281,7 +267,7 @@ Python and passed to the rest of the program as an already formatted regular
 string; t-strings, instead, are evaluated by Psycopg, which has a chance to
 process query parameters in a safe way.</p>
 <p>For example you can pass to a query some strings parameters, which may contain
-unsafe characters such as <code class="docutils literal notranslate"><span class="pre">'</span></code>, or come from untrusted sources such as web
+unsafe characters such as <code class="docutils literal notranslate"><span class="pre">'</span></code>, or come from untrusted sources such as a web
 form, and leave Psycopg to perform the right processing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">t</span><span class="s2">&quot;INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">{first_name}</span><span class="s2">, </span><span class="si">{last_name}</span><span class="s2">)&quot;</span>
