@@ -9,6 +9,7 @@ Python 3.14: the &lt;a class="reference external" href="https://docs.python.org/
 &lt;p&gt;How does it look? Something like:&lt;/p&gt;
 &lt;pre class="code python literal-block"&gt;
 &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;fetch_person&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+
 &lt;/span&gt;    &lt;span class="c1"&gt;# 'name' will be handled safely: as a server-side parameter or&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;    &lt;span class="c1"&gt;# correctly quoted and escaped if client-side binding is required&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;    &lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT * FROM people WHERE name = &lt;/span&gt;&lt;span class="si"&gt;{name}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
@@ -21,8 +22,10 @@ Template strings also help you generate dynamic SQL statements much more
 succinctly than with the &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html"&gt;psycopg.sql&lt;/a&gt; module:&lt;/p&gt;
 &lt;pre class="code python literal-block"&gt;
 &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;delete_something&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+
 &lt;/span&gt;    &lt;span class="c1"&gt;# Mixing client-side query composition with server-side parameters binding&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DELETE FROM {table_name:i} WHERE name = &lt;/span&gt;&lt;span class="si"&gt;{name}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
 &lt;/span&gt;    &lt;span class="c1"&gt;# Composing non-parametric statements entirely client-side&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;NOTIFY {table_name + '.deleted':i}, {name:l}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;
@@ -64,7 +67,7 @@ objects... Dataclasses anyone?&lt;/p&gt;
 &lt;/span&gt;&lt;span class="c1"&gt;# MiniPerson(age=33, name='John', height=None)&lt;/span&gt;&lt;span class="w"&gt;
 
 &lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;    &lt;span class="s2"&gt;&amp;quot;SELECT (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).name || ' next year will be ' ||  (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).age + 1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="s2"&gt;&amp;quot;SELECT (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).name || ' next year will be ' || (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).age + 1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;person&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;MiniPerson&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;John&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;33&lt;/span&gt;&lt;span class="p"&gt;)},&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;span class="c1"&gt;# 'John next year will be 34'&lt;/span&gt;

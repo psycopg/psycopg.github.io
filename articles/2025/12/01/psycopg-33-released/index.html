@@ -82,6 +82,7 @@ Python 3.14: the <a class="reference external" href="https://docs.python.org/3.1
 <p>How does it look? Something like:</p>
 <pre class="code python literal-block">
 <span class="k">def</span><span class="w"> </span><span class="nf">fetch_person</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="w">
+
 </span>    <span class="c1"># 'name' will be handled safely: as a server-side parameter or</span><span class="w">
 </span>    <span class="c1"># correctly quoted and escaped if client-side binding is required</span><span class="w">
 </span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM people WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
@@ -94,8 +95,10 @@ Template strings also help you generate dynamic SQL statements much more
 succinctly than with the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html">psycopg.sql</a> module:</p>
 <pre class="code python literal-block">
 <span class="k">def</span><span class="w"> </span><span class="nf">delete_something</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="w">
+
 </span>    <span class="c1"># Mixing client-side query composition with server-side parameters binding</span><span class="w">
 </span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;DELETE FROM {table_name:i} WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+
 </span>    <span class="c1"># Composing non-parametric statements entirely client-side</span><span class="w">
 </span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {table_name + '.deleted':i}, {name:l}&quot;</span><span class="p">)</span>
 </pre>
@@ -137,7 +140,7 @@ objects... Dataclasses anyone?</p>
 </span><span class="c1"># MiniPerson(age=33, name='John', height=None)</span><span class="w">
 
 </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="w">
-</span>    <span class="s2">&quot;SELECT (</span><span class="si">%(person)s</span><span class="s2">).name || ' next year will be ' ||  (</span><span class="si">%(person)s</span><span class="s2">).age + 1&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;SELECT (</span><span class="si">%(person)s</span><span class="s2">).name || ' next year will be ' || (</span><span class="si">%(person)s</span><span class="s2">).age + 1&quot;</span><span class="p">,</span><span class="w">
 </span>    <span class="p">{</span><span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="n">MiniPerson</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)},</span><span class="w">
 </span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
 </span><span class="c1"># 'John next year will be 34'</span>
