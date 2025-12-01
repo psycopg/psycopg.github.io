@@ -1,5 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>News</title><link href="https://www.psycopg.org/articles/" rel="alternate"/><link href="https://www.psycopg.org/news.xml" rel="self"/><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2024-06-30T00:00:00Z</updated><author><name/></author><entry><title>Psycopg 3.2 released</title><link href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/" rel="alternate"/><updated>2024-06-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:31cb8a57-f930-3fb0-82c6-4067eb76bd76</id><content type="html">&lt;p&gt;It was quite the ride! But we made it!&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>News</title><link href="https://www.psycopg.org/articles/" rel="alternate"/><link href="https://www.psycopg.org/news.xml" rel="self"/><id>urn:uuid:1f583092-c4bb-3a77-9f6f-c8ac41335aab</id><updated>2025-12-01T00:00:00Z</updated><author><name/></author><entry><title>Psycopg 3.3 released</title><link href="https://www.psycopg.org/articles/2025/12/01/psycopg-33-released/" rel="alternate"/><updated>2025-12-01T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:2593b72d-e32e-37db-9fa0-57834bcf9188</id><content type="html">&lt;p&gt;We have released Psycopg 3.3 — and you should be excited about it!&lt;/p&gt;
+&lt;!-- CUT-HERE --&gt;
+&lt;div class="section" id="template-string-queries"&gt;
+&lt;h2&gt;Template string queries&lt;/h2&gt;
+&lt;p&gt;This version lets you take advantage of one of the biggest innovation in
+Python 3.14: the &lt;a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-string-literals"&gt;template strings&lt;/a&gt;, which allow you to write
+&lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html"&gt;expressive and safe queries&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;How does it look? Something like:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;fetch_person&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# 'name' will be handled safely: as a server-side parameter or&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# correctly quoted and escaped if client-side binding is required&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;cur&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT * FROM people WHERE name = &lt;/span&gt;&lt;span class="si"&gt;{name}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The syntax is the same as that of &lt;a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals"&gt;f-strings&lt;/a&gt;, introduced back in the
+venerable Python 3.6 (perhaps the feature that finally ended Python 2?),
+but now paired with the safety and adaptation flexibility of Psycopg 3.
+Template strings also help you generate dynamic SQL statements much more
+succinctly than with the &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html"&gt;psycopg.sql&lt;/a&gt; module:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;delete_something&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# Mixing client-side query composition with server-side parameters binding&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DELETE FROM {table_name:i} WHERE name = &lt;/span&gt;&lt;span class="si"&gt;{name}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="c1"&gt;# Composing non-parametric statements entirely client-side&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;NOTIFY {table_name + '.deleted':i}, {name:l}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Check out the complete &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html"&gt;t-string support documentation&lt;/a&gt; for inspiration!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="more-flexible-composite-adaptation"&gt;
+&lt;h2&gt;More flexible composite adaptation&lt;/h2&gt;
+&lt;p&gt;Previously, it was only possible to &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/pgtypes.html#adapt-composite"&gt;adapt PostgreSQL composites&lt;/a&gt; to Python
+sequence types with a strict 1:1 mapping to the fields of the database type.&lt;/p&gt;
+&lt;p&gt;We have now gained extra flexibility: we can customize both how to create
+generic Python objects, for example ones only taking keyword arguments, and
+how to extract a sequence of fields from the attributes of non-sequence
+objects... Dataclasses anyone?&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;dataclasses&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;dataclass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;psycopg.types.composite&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;CompositeInfo&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;register_composite&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="nd"&gt;&amp;#64;dataclass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;MiniPerson&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="nd"&gt;&amp;#64;classmethod&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;from_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;to_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;CREATE TYPE mini_person AS (name text, age int)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;CompositeInfo&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;mini_person&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="n"&gt;register_composite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;MiniPerson&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="n"&gt;make_object&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;MiniPerson&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;from_db&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;make_sequence&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;MiniPerson&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_db&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT ('John', 33)::mini_person&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="c1"&gt;# MiniPerson(age=33, name='John', height=None)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;&lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="s2"&gt;&amp;quot;SELECT (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).name || ' next year will be ' ||  (&lt;/span&gt;&lt;span class="si"&gt;%(person)s&lt;/span&gt;&lt;span class="s2"&gt;).age + 1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;person&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;MiniPerson&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;John&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;33&lt;/span&gt;&lt;span class="p"&gt;)},&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="c1"&gt;# 'John next year will be 34'&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="solving-the-fetchone-annoyance-with-type-checkers"&gt;
+&lt;h2&gt;Solving the &lt;tt class="docutils literal"&gt;fetchone()&lt;/tt&gt; annoyance with type checkers&lt;/h2&gt;
+&lt;p&gt;If you use Mypy or other type checkers with Psycopg, you've probably seen
+false positives when calling &lt;tt class="docutils literal"&gt;fetchone()&lt;/tt&gt;. Even if you are 100% certain
+your query will return a row, &lt;tt class="docutils literal"&gt;fetchone()&lt;/tt&gt; is annotated as possibly
+returning &lt;tt class="docutils literal"&gt;None&lt;/tt&gt; — so type checkers complain about patterns like:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT count(*) FROM my_table&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# Always returns exactly one value&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchone&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="c1"&gt;# Error: value of type &amp;quot;tuple | None&amp;quot; is not indexable&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;In Psycopg 3.3, the cursor has become an &lt;a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator"&gt;iterator&lt;/a&gt;, whereas it was
+previously only an &lt;a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable"&gt;iterable&lt;/a&gt;. The distinction is subtle but meaningful: an
+iterator holds its own iteration state and does not need to create a new
+object for each pass.&lt;/p&gt;
+&lt;p&gt;More importantly, this change means you can use &lt;a class="reference external" href="https://docs.python.org/3/library/functions.html#next"&gt;next()&lt;/a&gt; or &lt;a class="reference external" href="https://docs.python.org/3/library/functions.html#anext"&gt;anext()&lt;/a&gt; to retrieve
+a record — and these functions never return &lt;tt class="docutils literal"&gt;None&lt;/tt&gt;. This makes Mypy happy,
+and probably you too:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SELECT count(*) FROM my_table&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="improvements-to-the-connection-pools"&gt;
+&lt;h2&gt;Improvements to the connection pools&lt;/h2&gt;
+&lt;p&gt;A connection pool’s parameters can now be changed dynamically — useful for
+example to support short-lived secret tokens as passwords, as requested
+by some cloud database providers.&lt;/p&gt;
+&lt;p&gt;A useful &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool.drain"&gt;drain()&lt;/a&gt; method is now available to re-create all connections in
+a pool. This is helpful, for instance, when the database needs to be
+introspected to find the OIDs of extension types to register: without draining
+the pool the connections already in the pool would remain stale after the
+adapters have been configured.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="and-more"&gt;
+&lt;h2&gt;...And more!&lt;/h2&gt;
+&lt;p&gt;Other improvements include greater flexibility when navigating results after
+a &lt;tt class="docutils literal"&gt;fetchmany()&lt;/tt&gt; call or after statements returning multiple result sets,
+the ability to reconfigure loaders after a query has run, and many other
+assorted enhancements. You can find the full list in the &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-3-0"&gt;psycopg release
+notes&lt;/a&gt; and the &lt;a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news_pool.html#psycopg-pool-3-3-0"&gt;pool release notes&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="your-help-is-welcome"&gt;
+&lt;h2&gt;Your help is welcome&lt;/h2&gt;
+&lt;p&gt;Psycopg is the de-facto standard for communication between Python and
+PostgreSQL — two major components powering countless businesses and
+mission-critical infrastructure. Maintaining such an important library to the
+highest standards of reliability, performance and security requires a lot of
+care and ongoing work.&lt;/p&gt;
+&lt;p&gt;If you use Python and PostgreSQL and want to help ensure that the interface
+between them remains robust and continues to improve, supporting new language
+and database features, please consider &lt;a class="reference external" href="https://github.com/sponsors/dvarrazzo"&gt;supporting the project&lt;/a&gt; 💜&lt;/p&gt;
+&lt;p&gt;Thank you very much, and happy hacking!&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Psycopg 3.2 released</title><link href="https://www.psycopg.org/articles/2024/06/30/psycopg-32-released/" rel="alternate"/><updated>2024-06-30T00:00:00Z</updated><author><name>Daniele Varrazzo</name></author><id>urn:uuid:31cb8a57-f930-3fb0-82c6-4067eb76bd76</id><content type="html">&lt;p&gt;It was quite the ride! But we made it!&lt;/p&gt;
 &lt;p&gt;After almost two years, 846 commits, more than 700 new tests, more than 20000
 changes in 310 files (I didn't even realise that there were 310 files in this
 project...) Psycopg 3.2 has been released!&lt;/p&gt;
@@ -1911,53 +2035,5 @@ No excerpt this time, it's a single liner, but here are the URLs:&lt;/p&gt;
 &lt;div class="line-block"&gt;
 &lt;div class="line"&gt;Have fun,&lt;/div&gt;
 &lt;div class="line"&gt;federico&lt;/div&gt;
-&lt;/div&gt;
-</content></entry><entry><title>Psycopg 2.2.0 released</title><link href="https://www.psycopg.org/articles/2010/05/16/psycopg-220-released/" rel="alternate"/><updated>2010-05-16T00:00:00Z</updated><author><name>Federico Di Gregorio</name></author><id>urn:uuid:3d1aa61b-b8dd-3307-89b7-558c94253db7</id><content type="html">&lt;p&gt;With many thanks to all the contributors here it is, psycopg 2.2.0:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference external" href="https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.0.tar.gz"&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.0.tar.gz&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference external" href="https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.0.tar.gz.asc"&gt;https://pypi.org/packages/source/p/psycopg2/psycopg2-2.2.0.tar.gz.asc&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;As always, an excerpt from the NEWS file follows.&lt;/p&gt;
-&lt;div class="line-block"&gt;
-&lt;div class="line"&gt;Have fun,&lt;/div&gt;
-&lt;div class="line"&gt;federico&lt;/div&gt;
-&lt;/div&gt;
-&lt;!-- CUT-HERE --&gt;
-&lt;div class="section" id="what-s-new-in-psycopg-2-2-0"&gt;
-&lt;h2&gt;What's new in psycopg 2.2.0&lt;/h2&gt;
-&lt;p&gt;This is the first release of the new 2.2 series, supporting not just
-one but two different ways of executing asynchronous queries, thanks to
-Jan and Daniele (with a little help from me and others, but they did
-99% of the work so they deserve their names here in the news.)&lt;/p&gt;
-&lt;p&gt;psycopg now supports both classic &lt;tt class="docutils literal"&gt;select()&lt;/tt&gt; loops and &amp;quot;green&amp;quot; coroutine
-libraries. It is all in the documentation, so just point your browser to
-&lt;a class="reference external" href="/psycopg/docs/advanced.html#asynchronous-support"&gt;doc/html/advanced.html&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="section" id="other-new-features"&gt;
-&lt;h3&gt;Other new features&lt;/h3&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;truncate()&lt;/tt&gt; method for lobjects.&lt;/li&gt;
-&lt;li&gt;&lt;tt class="docutils literal"&gt;COPY&lt;/tt&gt; functions are now a little bit faster.&lt;/li&gt;
-&lt;li&gt;All builtin PostgreSQL to Python typecasters are now available from
-the &lt;tt class="docutils literal"&gt;psycopg2.extensions&lt;/tt&gt; module.&lt;/li&gt;
-&lt;li&gt;Notifications from the backend are now available right after the
-&lt;tt class="docutils literal"&gt;execute()&lt;/tt&gt; call (before client code needed to call &lt;tt class="docutils literal"&gt;isbusy()&lt;/tt&gt; to
-ensure &lt;tt class="docutils literal"&gt;NOTIFY&lt;/tt&gt; reception.)&lt;/li&gt;
-&lt;li&gt;Better timezone support.&lt;/li&gt;
-&lt;li&gt;Lots of documentation updates.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class="section" id="bug-fixes"&gt;
-&lt;h3&gt;Bug fixes&lt;/h3&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;Fixed some gc/refcounting problems.&lt;/li&gt;
-&lt;li&gt;Fixed reference leak in &lt;tt class="docutils literal"&gt;NOTIFY&lt;/tt&gt; reception.&lt;/li&gt;
-&lt;li&gt;Fixed problem with PostgreSQL not casting string literals to the
-correct types in some situations: psycopg now add an explicit cast
-to dates, times and bytea representations.&lt;/li&gt;
-&lt;li&gt;Fixed &lt;tt class="docutils literal"&gt;TimestampFromTicks()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;TimeFromTicks()&lt;/tt&gt; for seconds &amp;gt;= 59.5.&lt;/li&gt;
-&lt;li&gt;Fixed spurious exception raised when calling C typecasters from
-Python ones.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
 &lt;/div&gt;
 </content></entry></feed>

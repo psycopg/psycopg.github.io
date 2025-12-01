@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Python adapter for PostgreSQL" />
+    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
+    <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
+    <title>Psycopg 3.3 released — Psycopg</title>
+  </head>
+  <body>
+    <header>
+      <div id="logoContainer" class="container">
+        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
+        <div style="clear: left"></div>
+      </div>
+  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/features/">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/install/">Install</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/articles/tag/news/">News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/psycopg3/">psycopg3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sponsors/">Sponsors</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+    </header>
+
+    <div id="site" class="container" style="margin-top:30px">
+      <div class="row">
+        <div id="content" class="col-sm-8 sidebar">
+        
+  
+  <div class="article">
+  
+    <h1>Psycopg 3.3 released</h1>
+  
+  <p class="header">
+    Posted by Daniele Varrazzo on 2025-12-01
+    
+      <br />
+      Tagged as
+      <a class="tag" href="/articles/tag/news/"
+          >news</a>,
+      <a class="tag" href="/articles/tag/release/"
+          >release</a>
+      
+    
+  </p>
+  
+    <p>We have released Psycopg 3.3 — and you should be excited about it!</p>
+<!-- CUT-HERE -->
+<div class="section" id="template-string-queries">
+<h2>Template string queries</h2>
+<p>This version lets you take advantage of one of the biggest innovation in
+Python 3.14: the <a class="reference external" href="https://docs.python.org/3.14/whatsnew/3.14.html#pep-750-template-string-literals">template strings</a>, which allow you to write
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html">expressive and safe queries</a>.</p>
+<p>How does it look? Something like:</p>
+<pre class="code python literal-block">
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_person</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="w">
+</span>    <span class="c1"># 'name' will be handled safely: as a server-side parameter or</span><span class="w">
+</span>    <span class="c1"># correctly quoted and escaped if client-side binding is required</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM people WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+</pre>
+<p>The syntax is the same as that of <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals">f-strings</a>, introduced back in the
+venerable Python 3.6 (perhaps the feature that finally ended Python 2?),
+but now paired with the safety and adaptation flexibility of Psycopg 3.
+Template strings also help you generate dynamic SQL statements much more
+succinctly than with the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/sql.html">psycopg.sql</a> module:</p>
+<pre class="code python literal-block">
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_something</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="w">
+</span>    <span class="c1"># Mixing client-side query composition with server-side parameters binding</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;DELETE FROM {table_name:i} WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># Composing non-parametric statements entirely client-side</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {table_name + '.deleted':i}, {name:l}&quot;</span><span class="p">)</span>
+</pre>
+<p>Check out the complete <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html">t-string support documentation</a> for inspiration!</p>
+</div>
+<div class="section" id="more-flexible-composite-adaptation">
+<h2>More flexible composite adaptation</h2>
+<p>Previously, it was only possible to <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/pgtypes.html#adapt-composite">adapt PostgreSQL composites</a> to Python
+sequence types with a strict 1:1 mapping to the fields of the database type.</p>
+<p>We have now gained extra flexibility: we can customize both how to create
+generic Python objects, for example ones only taking keyword arguments, and
+how to extract a sequence of fields from the attributes of non-sequence
+objects... Dataclasses anyone?</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.composite</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompositeInfo</span><span class="p">,</span> <span class="n">register_composite</span><span class="w">
+
+</span><span class="nd">&#64;dataclass</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">MiniPerson</span><span class="p">:</span><span class="w">
+</span>    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span><span class="w">
+</span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="w">
+</span>    <span class="n">height</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="w">
+
+</span>    <span class="nd">&#64;classmethod</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">from_db</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span><span class="w">
+</span>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">age</span><span class="o">=</span><span class="n">seq</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w">
+
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">to_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span><span class="w">
+</span>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">]</span><span class="w">
+
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE mini_person AS (name text, age int)&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">info</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;mini_person&quot;</span><span class="p">)</span><span class="w">
+
+</span><span class="n">register_composite</span><span class="p">(</span><span class="w">
+</span>    <span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="n">MiniPerson</span><span class="p">,</span><span class="w">
+</span>    <span class="n">make_object</span><span class="o">=</span><span class="n">MiniPerson</span><span class="o">.</span><span class="n">from_db</span><span class="p">,</span> <span class="n">make_sequence</span><span class="o">=</span><span class="n">MiniPerson</span><span class="o">.</span><span class="n">to_db</span><span class="p">)</span><span class="w">
+
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ('John', 33)::mini_person&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="c1"># MiniPerson(age=33, name='John', height=None)</span><span class="w">
+
+</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;SELECT (</span><span class="si">%(person)s</span><span class="s2">).name || ' next year will be ' ||  (</span><span class="si">%(person)s</span><span class="s2">).age + 1&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="p">{</span><span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="n">MiniPerson</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)},</span><span class="w">
+</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="c1"># 'John next year will be 34'</span>
+</pre>
+</div>
+<div class="section" id="solving-the-fetchone-annoyance-with-type-checkers">
+<h2>Solving the <tt class="docutils literal">fetchone()</tt> annoyance with type checkers</h2>
+<p>If you use Mypy or other type checkers with Psycopg, you've probably seen
+false positives when calling <tt class="docutils literal">fetchone()</tt>. Even if you are 100% certain
+your query will return a row, <tt class="docutils literal">fetchone()</tt> is annotated as possibly
+returning <tt class="docutils literal">None</tt> — so type checkers complain about patterns like:</p>
+<pre class="code python literal-block">
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>  <span class="c1"># Always returns exactly one value</span><span class="w">
+</span><span class="n">count</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># Error: value of type &quot;tuple | None&quot; is not indexable</span>
+</pre>
+<p>In Psycopg 3.3, the cursor has become an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator">iterator</a>, whereas it was
+previously only an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable">iterable</a>. The distinction is subtle but meaningful: an
+iterator holds its own iteration state and does not need to create a new
+object for each pass.</p>
+<p>More importantly, this change means you can use <a class="reference external" href="https://docs.python.org/3/library/functions.html#next">next()</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#anext">anext()</a> to retrieve
+a record — and these functions never return <tt class="docutils literal">None</tt>. This makes Mypy happy,
+and probably you too:</p>
+<pre class="code python literal-block">
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">cur</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre>
+</div>
+<div class="section" id="improvements-to-the-connection-pools">
+<h2>Improvements to the connection pools</h2>
+<p>A connection pool’s parameters can now be changed dynamically — useful for
+example to support short-lived secret tokens as passwords, as requested
+by some cloud database providers.</p>
+<p>A useful <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool.drain">drain()</a> method is now available to re-create all connections in
+a pool. This is helpful, for instance, when the database needs to be
+introspected to find the OIDs of extension types to register: without draining
+the pool the connections already in the pool would remain stale after the
+adapters have been configured.</p>
+</div>
+<div class="section" id="and-more">
+<h2>...And more!</h2>
+<p>Other improvements include greater flexibility when navigating results after
+a <tt class="docutils literal">fetchmany()</tt> call or after statements returning multiple result sets,
+the ability to reconfigure loaders after a query has run, and many other
+assorted enhancements. You can find the full list in the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news.html#psycopg-3-3-0">psycopg release
+notes</a> and the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/news_pool.html#psycopg-pool-3-3-0">pool release notes</a>!</p>
+</div>
+<div class="section" id="your-help-is-welcome">
+<h2>Your help is welcome</h2>
+<p>Psycopg is the de-facto standard for communication between Python and
+PostgreSQL — two major components powering countless businesses and
+mission-critical infrastructure. Maintaining such an important library to the
+highest standards of reliability, performance and security requires a lot of
+care and ongoing work.</p>
+<p>If you use Python and PostgreSQL and want to help ensure that the interface
+between them remains robust and continues to improve, supporting new language
+and database features, please consider <a class="reference external" href="https://github.com/sponsors/dvarrazzo">supporting the project</a> 💜</p>
+<p>Thank you very much, and happy hacking!</p>
+</div>
+
+  
+  </div>
+
+  <script src="https://utteranc.es/client.js"
+    repo="psycopg/psycopg-website"
+    issue-term="pathname"
+    label="comments"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+        </div>
+        <div id="sidebar" class="col-sm-4">
+
+
+<div>
+  <iframe src="https://github.com/sponsors/dvarrazzo/button"
+          title="Sponsor the project" style="border: 0"
+          width="116" height="35">
+  </iframe>
+</div>
+
+
+
+<div class="dashed-top">
+
+  <h3>Psycopg 3</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/psycopg3/">
+        <i class="fa-li fa-lg fa fa-cogs" aria-hidden="true"></i>
+        The Project</a>
+    </li>
+    <li>
+      <a href="/psycopg3/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg3/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Psycopg 2</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="/docs/">
+        <i class="fa-li fa-lg fa fa-book" aria-hidden="true"></i>
+        Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/">
+        <i class="fa-li fa-lg fa fa-github" aria-hidden="true"></i>
+        Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/psycopg/psycopg2/issues">
+        <i class="fa-li fa-lg fa fa-bug" aria-hidden="true"></i>
+        Bug tracker</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+  <h3>Mailing List</h3>
+
+  <ul class="fa-ul links">
+    <li>
+      <a href="https://lists.postgresql.org/">
+        <i class="fa-li fa-lg fa fa-pencil" aria-hidden="true"></i>
+        Subscribe</a>
+    </li>
+    <li>
+      <a href="https://www.postgresql.org/list/psycopg/">
+        <i class="fa-li fa-lg fa fa-envelope-o" aria-hidden="true"></i>
+        Archives</a>
+    </li>
+  </ul>
+</div>
+
+<div class="dashed-top">
+
+<h3>Articles archive</h3>
+<ul class="links">
+  <li><a href="/articles/2025/">2025</a></li>
+  <li><a href="/articles/2024/">2024</a></li>
+  <li><a href="/articles/2022/">2022</a></li>
+  <li><a href="/articles/2021/">2021</a></li>
+  <li><a href="/articles/2020/">2020</a></li>
+  <li><a href="/articles/2019/">2019</a></li>
+  <li><a href="/articles/2018/">2018</a></li>
+  <li><a href="/articles/2017/">2017</a></li>
+  <li><a href="/articles/2016/">2016</a></li>
+  <li><a href="/articles/2015/">2015</a></li>
+  <li><a href="/articles/2014/">2014</a></li>
+  <li><a href="/articles/2013/">2013</a></li>
+  <li><a href="/articles/2012/">2012</a></li>
+  <li><a href="/articles/2011/">2011</a></li>
+  <li><a href="/articles/2010/">2010</a></li>
+</ul>
+
+
+</div>
+
+        </div>
+        
+      </div>
+      <a style="display:none" rel="me" href="https://fosstodon.org/@psycopg">Mastodon</a>
+    </div>
+
+    <footer>
+      <div style="margin-bottom:0">
+        <p>© Copyright by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
