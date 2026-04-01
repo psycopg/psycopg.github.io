@@ -85,7 +85,7 @@ Python 3.14: the <a class="reference external" href="https://docs.python.org/3.1
 
 </span>    <span class="c1"># 'name' will be handled safely: as a server-side parameter or</span><span class="w">
 </span>    <span class="c1"># correctly quoted and escaped if client-side binding is required</span><span class="w">
-</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM people WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;SELECT * FROM people WHERE name = </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span>    <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 </pre>
 <p>The syntax is the same as that of <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals">f-strings</a>, introduced back in the
@@ -97,10 +97,10 @@ succinctly than with the <a class="reference external" href="https://www.psycopg
 <span class="k">def</span><span class="w"> </span><span class="nf">delete_something</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="w">
 
 </span>    <span class="c1"># Mixing client-side query composition with server-side parameters binding</span><span class="w">
-</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;DELETE FROM {table_name:i} WHERE name = </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;DELETE FROM </span><span class="si">{</span><span class="n">table_name</span><span class="si">:</span><span class="s2">i</span><span class="si">}</span><span class="s2"> WHERE name = </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 
 </span>    <span class="c1"># Composing non-parametric statements entirely client-side</span><span class="w">
-</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {table_name + '.deleted':i}, {name:l}&quot;</span><span class="p">)</span>
+</span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;NOTIFY </span><span class="si">{</span><span class="n">table_name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'.deleted'</span><span class="si">:</span><span class="s2">i</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">l</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre>
 <p>Check out the complete <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html">t-string support documentation</a> for inspiration!</p>
 </div>

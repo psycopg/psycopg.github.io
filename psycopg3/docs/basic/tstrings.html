@@ -259,7 +259,7 @@
 <p>Template strings are similar to <a class="reference external" href="https://docs.python.org/3/tutorial/inputoutput.html#tut-f-strings">f-strings</a>: they are string literals
 interspersed with variables or expressions marked by <code class="docutils literal notranslate"><span class="pre">{}</span></code>. They use a <code class="docutils literal notranslate"><span class="pre">t</span></code>
 prefix instead of <code class="docutils literal notranslate"><span class="pre">f</span></code>, and can be used to express queries:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM mytable WHERE id = </span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;SELECT * FROM mytable WHERE id = </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The difference between the two is that f-strings are immediately evaluated by
@@ -270,7 +270,7 @@ process query parameters in a safe way.</p>
 unsafe characters such as <code class="docutils literal notranslate"><span class="pre">'</span></code>, or come from untrusted sources such as a web
 form, and leave Psycopg to perform the right processing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">t</span><span class="s2">&quot;INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">{first_name}</span><span class="s2">, </span><span class="si">{last_name}</span><span class="s2">)&quot;</span>
+    <span class="sa">t</span><span class="s2">&quot;INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">{</span><span class="n">first_name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">)&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -289,14 +289,14 @@ executing it directly, you can use the <a class="reference internal" href="../ap
 functions:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;O&#39;Reilly&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dob</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">as_string</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;INSERT INTO tbl VALUES (</span><span class="si">{name}</span><span class="s2">, </span><span class="si">{dob}</span><span class="s2">)&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">as_string</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;INSERT INTO tbl VALUES (</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">dob</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">))</span>
 <span class="go">INSERT INTO tbl VALUES (&#39;O&#39;&#39;Reilly&#39;, &#39;1970-01-01&#39;::date)</span>
 </pre></div>
 </div>
 <p>With template strings it is also easy to parametrize parts of the query other
 than parameter values, for example tables or fields names:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">t</span><span class="s2">&quot;INSERT INTO {table_name:i} (first_name, last_name) VALUES (</span><span class="si">{first_name}</span><span class="s2">, </span><span class="si">{last_name}</span><span class="s2">)&quot;</span>
+    <span class="sa">t</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">:</span><span class="s2">i</span><span class="si">}</span><span class="s2"> (first_name, last_name) VALUES (</span><span class="si">{</span><span class="n">first_name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">)&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -341,7 +341,7 @@ hence with single quotes).</p>
 composed entirely on the client side. Using template strings this could be as
 simple as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">send_notify</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;NOTIFY {channel:i}, {payload:l}&quot;</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;NOTIFY </span><span class="si">{</span><span class="n">channel</span><span class="si">:</span><span class="s2">i</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">payload</span><span class="si">:</span><span class="s2">l</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Calling the function with channel <code class="docutils literal notranslate"><span class="pre">foo.bar</span></code> and payload <code class="docutils literal notranslate"><span class="pre">O'Reilly</span></code> will
@@ -365,17 +365,17 @@ be written as:</p>
     <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.id = ANY(</span><span class="si">{ids}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;u.id = ANY(</span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">name_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.name ~* </span><span class="si">{name_pattern}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;u.name ~* </span><span class="si">{</span><span class="n">name_pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;u.group_id = </span><span class="si">{group_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;u.group_id = </span><span class="si">{</span><span class="n">group_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;please specify at least one search parameter&quot;</span><span class="p">)</span>
 
     <span class="n">joined</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot; AND &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">User</span><span class="p">))</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">t</span><span class="s2">&quot;SELECT * FROM users AS u WHERE {joined:q}&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">t</span><span class="s2">&quot;SELECT * FROM users AS u WHERE </span><span class="si">{</span><span class="n">joined</span><span class="si">:</span><span class="s2">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 </pre></div>
 </div>
