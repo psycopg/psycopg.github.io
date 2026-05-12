@@ -1,290 +1,197 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Python adapter for PostgreSQL" />
-    <meta name="keywords" content="python, postgresql, adapter, driver, psycopg, psycopg2, database" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/syntax.css?h=8242465b">
-    <link rel="stylesheet" href="/css/psycopg.css?h=a6123e9d">
-    <title>Articles tagged recipe — Psycopg</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Psycopg — PostgreSQL adapter for Python</title>
+    <meta
+      name="description"
+      content="Psycopg is the most popular PostgreSQL adapter for the Python programming language."
+    />
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/syntax.css?h=3b162580">
   </head>
   <body>
-    <header>
-      <div id="logoContainer" class="container">
-        <div id="logo"><h1><a href="/">psycopg</a></h1></div>
-        <div style="clear: left"></div>
-      </div>
-  <nav id="menu" class="navbar navbar-expand-sm navbar-dark">
-    <button class="navbar-toggler" type="button" data-toggle="collapse"
-        data-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/features/">Features</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/install/">Install</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/articles/tag/news/">News</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="/articles/tag/recipe/">Recipes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/psycopg3/">psycopg3</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/sponsors/">Sponsors</a>
-          </li>
-      </ul>
-    </div>
-  </nav>
+    <!-- ── Navigation ─────────────────────────────────────────────── -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" class="nav__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="48" height="48" />
+          <span>psycopg</span>
+        </a>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav__links" role="list">
+          <li><a href="/">home</a></li>
+          <li><a href="/#sponsors">sponsors</a></li>
+          <li><a href="/#features">features</a></li>
+          <li><a href="/#development">development</a></li>
+          <li><a href="/articles">articles</a></li>
+          <li><a href="/#maintainers">maintainers</a></li>
+          <li><a href="/#contact">contact</a></li>
+        </ul>
+      </nav>
     </header>
 
-    <div id="site" class="container" style="margin-top:30px">
-      <div class="row">
-        <div id="content" class="offset-sm-1 col-sm-10">
-        
-  <h1>Articles tagged <em>recipe</em></h1>
-  
+    <div class="">
+      <main class="page">
+<div class="articles-page">
+  <h1 class="articles-page__heading">
+    articles tagged
+    <span class="articles-page__tag">recipe</span>
+  </h1>
+  <div class="articles-page__list" id="tag-articles">
     
-  <div class="article">
-  
-    <h2><a href="/articles/2021/08/02/psycopg3-django-driver/">Building a Django driver for Psycopg 3</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2021-08-02
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/psycopg3/"
-          >psycopg3</a>,
-      <a class="tag" href="/articles/tag/development/"
-          >development</a>,
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
-      
-    
-  </p>
-  
-    <p>One of the goals of the <a class="reference external" href="https://www.psycopg.org/psycopg3/">Psycopg 3 project</a> is to make easy to port code
-developed from Psycopg 2. For this reason the creation of a Django backend
-(the module you specify in the settings as your <a class="reference external" href="https://docs.djangoproject.com/en/3.2/ref/settings/#databases">database ENGINE</a>) was
-a project with a double goal:</p>
-<ul class="simple">
-<li>A Django driver is a way to make Psycopg 3 useful from the start, with the
-possibility of dropping it in a project transparently and have available,
-when needed the new features offered (for instance the superior <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/copy.html">COPY
-support</a>).</li>
-<li>The difficulty of introducing Psycopg 3 in the Django codebase and the type
-of changes required are indicative of the type of problems that could be
-found porting other projects.</li>
-</ul>
-<p>...and it's done! A few days ago, the new <a class="reference external" href="https://github.com/dvarrazzo/django-psycopg3-backend">Psycopg 3 Django backend</a> could
-pass the entire Django test suite!</p>
-
-    
-    <p class="read-more"><a href="/articles/2021/08/02/psycopg3-django-driver/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2014/07/20/cancelling-postgresql-statements-python/">Cancelling PostgreSQL statements from Python</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2014-07-20
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
-      
-    
-  </p>
-  
-    <p>Cancelling a long running query from Python is not something that happens automatically: the libpq doesn't react to Python signals so the only way to stop a query is to run a <tt class="docutils literal">pg_cancel_backend</tt> from another process. Killing the Python process won't cancel the query: it will run until completion and then rolled back. This makes working with long-running query from the Python interpreter somewhat frustrating.</p>
-
-    
-    <p class="read-more"><a href="/articles/2014/07/20/cancelling-postgresql-statements-python/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2012/10/01/prepared-statements-psycopg/">Prepared statements in Psycopg</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2012-10-01
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
-      
-    
-  </p>
-  
-    <p>Although the libpq library supports <a class="reference external" href="https://www.postgresql.org/docs/current/static/libpq-exec.html#LIBPQ-PQPREPARE">prepared statements</a>, psycopg2 doesn't offer yet a direct way to access the relevant functions. This will probably change in the future, but in the meantime it is possible to use prepared statements in PostgreSQL using the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-prepare.html">PREPARE</a> SQL command.</p>
-
-    
-    <p class="read-more"><a href="/articles/2012/10/01/prepared-statements-psycopg/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2011/06/05/psycopg-windows-mingw/">Building Psycopg on Windows using MinGW</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2011-06-05
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/windows/"
-          >windows</a>,
-      <a class="tag" href="/articles/tag/build/"
-          >build</a>,
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
-      
-    
-  </p>
-  
-    <p>My goal was to install Psycopg on Windows using MinGW and the PostgreSQL binary package.</p>
-<p>I have used the <a class="reference external" href="http://www.develer.com/oss/GccWinBinaries">MinGW GCC binaries</a> packaged by Giovanni Bajo. The package takes care of a lot of details, for instance registering MinGW as default compiler for Python, plus some magic I don't even want to know, and makes the entire process simple enough.</p>
-
-    
-    <p class="read-more"><a href="/articles/2011/06/05/psycopg-windows-mingw/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">PostgreSQL notifications with Psycopg2 and Eventlet</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2010-12-01
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>,
-      <a class="tag" href="/articles/tag/async/"
-          >async</a>,
-      <a class="tag" href="/articles/tag/eventlet/"
-          >eventlet</a>,
-      <a class="tag" href="/articles/tag/notify/"
-          >notify</a>
-      
-    
-  </p>
-  
-    <p>PostgreSQL supports <a class="reference external" href="https://www.postgresql.org/docs/9.0/interactive/sql-notify.html">asynchronous notifications</a>, a simple messaging system allowing clients to be notified about events occurred in the database. Notifications can be sent by any session using a &quot;<tt class="docutils literal">NOTIFY</tt> <em>channel</em>&quot; command and will be received by any session which has subscribed with a <tt class="docutils literal">LISTEN</tt> <em>channel</em> to receive updates. The system has been greatly improved in PostgreSQL 9.0 with the addition of a <em>message payload</em>, making the feature even more useful. Previously a typical use case would have been to notify interested sessions that a certain table was updated: now it is possible to signal for instance <em>which record</em> was changed. You can put the <tt class="docutils literal">NOTIFY</tt> command in a database trigger for automatic notifications on insert or update... the possibilities are actually quite interesting.</p>
-
-    
-    <p class="read-more"><a href="/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2010/11/11/links-about-building-psycopg-mac-os-x/">Links about building Psycopg on Mac OS X</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2010-11-11
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>,
-      <a class="tag" href="/articles/tag/os-x/"
-          >os-x</a>
-      
-    
-  </p>
-  
-    <p>Looks like building Psycopg on OS X is tricky: the code needs no tweak, but linking against the right library seems problematic.</p>
-
-    
-    <p class="read-more"><a href="/articles/2010/11/11/links-about-building-psycopg-mac-os-x/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-    
-  <div class="article">
-  
-    <h2><a href="/articles/2010/10/22/passing-connections-functions-using-decorator/">Passing connections to functions using a decorator</a></h2>
-  
-  <p class="header">
-    Posted by Daniele Varrazzo on 2010-10-22
-    
-      <br />
-      Tagged as
-      <a class="tag" href="/articles/tag/recipe/"
-          >recipe</a>
-      
-    
-  </p>
-  
-    <p>In many script I write, there are functions requiring database operations. Every time I need them, I try to write such code in functions like:</p>
-<pre class="code python literal-block">
-<span class="nd">&#64;with_connection</span><span class="w">
-</span><span class="k">def</span><span class="w"> </span><span class="nf">do_some_job</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span><span class="w">
-</span>    <span class="n">cur</span> <span class="o">=</span> <span class="n">cnn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="w">
-</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">))</span> <span class="c1"># or something else</span><span class="w">
-
-</span><span class="n">do_some_job</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">'hi'</span><span class="p">)</span>
-</pre>
-
-    
-    <p class="read-more"><a href="/articles/2010/10/22/passing-connections-functions-using-decorator/">Read more...</a></p>
-    
-  
-  </div>
-
-  
-
-        </div>
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/psycopg3/">psycopg3</a><a class="post-tag" href="/articles/tag/development/">development</a><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2021/08/02/psycopg3-django-driver/">Building a Django driver for Psycopg 3</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2021-08-02">02 Aug 2021</time>
       </div>
-      <a style="display:none" rel="me" href="https://fosstodon.org/@psycopg">Mastodon</a>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2014/07/20/cancelling-postgresql-statements-python/">Cancelling PostgreSQL statements from Python</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2014-07-20">20 Jul 2014</time>
+      </div>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2012/10/01/prepared-statements-psycopg/">Prepared statements in Psycopg</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2012-10-01">01 Oct 2012</time>
+      </div>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/windows/">windows</a><a class="post-tag" href="/articles/tag/build/">build</a><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2011/06/05/psycopg-windows-mingw/">Building Psycopg on Windows using MinGW</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2011-06-05">05 Jun 2011</time>
+      </div>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/recipe/">recipe</a><a class="post-tag" href="/articles/tag/async/">async</a><a class="post-tag" href="/articles/tag/eventlet/">eventlet</a><a class="post-tag" href="/articles/tag/notify/">notify</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2010/12/01/postgresql-notifications-psycopg2-eventlet/">PostgreSQL notifications with Psycopg2 and Eventlet</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2010-12-01">01 Dec 2010</time>
+      </div>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/recipe/">recipe</a><a class="post-tag" href="/articles/tag/os-x/">os-x</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2010/11/11/links-about-building-psycopg-mac-os-x/">Links about building Psycopg on Mac OS X</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2010-11-11">11 Nov 2010</time>
+      </div>
+    </article>
+    
+    <article class="post-row">
+      <div class="post-row__tags"><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+      <h2 class="post-row__title">
+        <a href="/articles/2010/10/22/passing-connections-functions-using-decorator/">Passing connections to functions using a decorator</a>
+      </h2>
+      <div class="post-row__byline">
+        <span class="post-row__author">Daniele Varrazzo</span>
+        <time class="post-row__date" datetime="2010-10-22">22 Oct 2010</time>
+      </div>
+    </article>
+    
+  </div>
+  <div class="articles-pagination" id="tag-pagination"></div>
+</div>
+<script>
+(function () {
+  var PER_PAGE = 10;
+  var rows = document.querySelectorAll('#tag-articles .post-row');
+  var total = rows.length;
+  var pages = Math.ceil(total / PER_PAGE);
+  if (pages <= 1) return;
+
+  var current = 1;
+
+  function show(page) {
+    current = page;
+    var start = (page - 1) * PER_PAGE;
+    rows.forEach(function (row, i) {
+      var visible = i >= start && i < start + PER_PAGE;
+      row.style.display = visible ? '' : 'none';
+      row.style.borderTop = (visible && i === start) ? 'none' : '';
+    });
+    render();
+  }
+
+  function render() {
+    var el = document.getElementById('tag-pagination');
+    var prev = current > 1
+      ? '<a href="#" data-page="' + (current - 1) + '" class="pagination__prev"><span class="pag-arrow">&#8592;</span> prev</a>'
+      : '<span class="pagination__prev disabled"><span class="pag-arrow">&#8592;</span> prev</span>';
+    var next = current < pages
+      ? '<a href="#" data-page="' + (current + 1) + '" class="pagination__next">next <span class="pag-arrow">&#8594;</span></a>'
+      : '<span class="pagination__next disabled">next <span class="pag-arrow">&#8594;</span></span>';
+    el.innerHTML = '<div class="pagination">' + prev
+      + '<span class="pagination__info">page ' + current + ' of ' + pages + '</span>'
+      + next + '</div>';
+
+    el.querySelectorAll('[data-page]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        show(parseInt(this.dataset.page));
+        document.querySelector('.articles-page').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+
+  show(1);
+}());
+</script>
+
+      </main>
     </div>
 
-    <footer>
-      <div style="margin-bottom:0">
-        <p>© Copyright by Daniele Varrazzo (at gmail), The Psycopg Team.</p>
+    <!-- ── Footer ─────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__copy">
+          &copy; The Psycopg Team<br/>
+          Psycopg is free software released under the
+          <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank" rel="noopener">GNU LGPL license</a>.
+        </p>
+        <a href="/" class="site-footer__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="40" height="40" />
+          <span>psycopg</span>
+        </a>
       </div>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/js/main.js" type="module"></script>
   </body>
 </html>
 
