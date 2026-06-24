@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Psycopg - PostgreSQL adapter for Python</title>
+    <meta
+      name="description"
+      content="Psycopg is the most popular PostgreSQL adapter for the Python programming language."
+    />
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/syntax.css?h=3b162580">
+  </head>
+  <body>
+    <!-- ── Navigation ─────────────────────────────────────────────── -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" class="nav__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="48" height="48" />
+          <span>psycopg</span>
+        </a>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav__links" role="list">
+          <li><a href="/">home</a></li>
+          <li><a href="/#sponsors">sponsors</a></li>
+          <li><a href="/#features">features</a></li>
+          <li><a href="/#development">development</a></li>
+          <li><a href="/articles">articles</a></li>
+          <li><a href="/#maintainers">maintainers</a></li>
+          <li><a href="/#contact">contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="with_sidebar">
+      <main class="page">
+<article class="post-article">
+  <a href="/articles/" class="post-back">
+    <span class="pag-arrow">&#8592;</span>
+    <span class="post-back__label">articles</span>
+  </a>
+
+  <header class="post-article__header">
+    
+    <div class="post-article__tags"><a class="post-tag" href="/articles/tag/psycopg3/">psycopg3</a><a class="post-tag" href="/articles/tag/development/">development</a><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+    
+    <h1 class="post-article__title">Integrating Psycopg with FastAPI and Pydantic</h1>
+    <div class="post-article__byline">
+      <span class="post-article__author">Daniele Varrazzo</span>
+      <time class="post-article__date" datetime="2026-06-24">24 Jun 2026</time>
+    </div>
+  </header>
+
+  <div class="post-article__body">
+    <p><a class="reference external" href="https://fastapi.tiangolo.com/">FastAPI</a> is currently the established
+framework to write a REST API in Python. Its clever use of dependency
+injections and static typing makes developing web services a breeze, using a
+minimal amount of code and a clean and consistent architecture.</p>
+<!-- CUT-HERE -->
+<p>It's not difficult to see why. A minimal working server, serving a list and
+the details of a set of people, is the following:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="w">
+
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;My People&quot;</span><span class="p">)</span><span class="w">
+
+</span><span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">list_people</span><span class="p">():</span><span class="w">
+</span>    <span class="k">return</span> <span class="p">[]</span><span class="w">
+
+</span><span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_person</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span><span class="w">
+</span>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">}</span>
+</pre>
+<p>Just <tt class="docutils literal">pip install 'fastapi[standard]'</tt>, save the above script in a
+<tt class="docutils literal">server.py</tt> file, and run it with <tt class="docutils literal">fastapi dev server.py</tt>: this will bring
+up a development server serving your API on port 8000:</p>
+<pre class="code sh literal-block">
+$<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8000/person<span class="w">
+</span><span class="o">[]</span><span class="w">
+
+</span>$<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8000/person/123<span class="w">
+</span><span class="o">{</span><span class="s2">&quot;id&quot;</span>:<span class="s2">&quot;123&quot;</span><span class="o">}</span>
+</pre>
+<p>Furthermore you can point your browser to <a class="reference external" href="http://localhost:8000/docs">http://localhost:8000/docs</a> and
+you will be served a <a class="reference external" href="https://swagger.io/">Swagger</a> web interface allowing
+you to interact with the API:</p>
+<div class="figure">
+<img alt="swagger-1.png" src="swagger-1.png" />
+</div>
+<p>That's already quite some infrastructure in place! However it doesn't specify
+anything about our model. What does a <em>Person</em> look like? This is where
+Pydantic comes into play.</p>
+<div class="section" id="enter-pydantic">
+<h2>Enter Pydantic</h2>
+<p><a class="reference external" href="https://pydantic.dev/docs/validation/latest/get-started/">Pydantic</a> lets you
+define an object's attributes, validate them, and describe them, just using
+<a class="reference external" href="https://typing.python.org/en/latest/spec/annotations.html">Python type annotations</a>.</p>
+<p>Let's say that our person will have a name (mandatory) and a date of birth
+(which we allow to be nullable because we might not know it). We will also
+want an id on the record - let's say it will be a UUID. This definition can
+be represented with:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="w">
+
+</span><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span><span class="w">
+</span>    <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">uuid4</span><span class="p">)</span><span class="w">
+</span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="w">
+</span>    <span class="n">date_of_birth</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</pre>
+<p>This representation is enough to create an object with advanced validation,
+arguments conversion and output. In a Python shell we can play with it:</p>
+<pre class="code python-console literal-block">
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;John Doe&quot;</span><span class="p">,</span> <span class="n">date_of_birth</span><span class="o">=</span><span class="s2">&quot;1970-01-01&quot;</span><span class="p">)</span><span class="w">
+</span><span class="go">
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>  <span class="c1"># object with attributes converted to the right types</span><span class="w">
+</span><span class="go">Person(id=UUID('94d69603-c3f7-4dd4-9d64-eb1a24fc6fed'), name='John Doe', date_of_birth=datetime.date(1970, 1, 1))
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>  <span class="c1"># convert the object to a Python dictionary</span><span class="w">
+</span><span class="go">{'id': UUID('94d69603-c3f7-4dd4-9d64-eb1a24fc6fed'),
+ 'name': 'John Doe',
+ 'date_of_birth': datetime.date(1970, 1, 1)}
+
+</span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">()</span>  <span class="c1"># convert the object to a JSON string</span><span class="w">
+</span><span class="go">'{&quot;id&quot;:&quot;94d69603-c3f7-4dd4-9d64-eb1a24fc6fed&quot;,&quot;name&quot;:&quot;John Doe&quot;,&quot;date_of_birth&quot;:&quot;1970-01-01&quot;}'</span>
+</pre>
+<p>Now that we have this model we can annotate the views to signify that they
+will return a <tt class="docutils literal">Person</tt> object and a list of such objects:</p>
+<pre class="code python literal-block">
+<span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">list_people</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="k">return</span> <span class="p">[]</span><span class="w">
+
+</span><span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">Person</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;John Doe&quot;</span><span class="p">)</span>
+</pre>
+<p>This is enough to give a pretty representation, from formal definition to
+result samples, in the Swagger interface:</p>
+<div class="figure">
+<img alt="swagger-2.png" src="swagger-2.png" />
+</div>
+<p>Of course the objects that we are returning are fake and incomplete. The
+database knows the truth and it won't come as a surprise that we will want to
+use <a class="reference external" href="https://www.psycopg.org/">Psycopg</a> to retrieve it...</p>
+</div>
+<div class="section" id="connecting-views-and-the-database">
+<h2>Connecting views and the database</h2>
+<p>Let's create a table for this example and seed it with a couple of test
+records:</p>
+<pre class="code sql literal-block">
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="p">(</span><span class="w">
+    </span><span class="n">id</span><span class="w"> </span><span class="n">uuid</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span><span class="w">
+    </span><span class="n">name</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+    </span><span class="n">date_of_birth</span><span class="w"> </span><span class="nb">date</span><span class="p">);</span><span class="w">
+
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">date_of_birth</span><span class="p">)</span><span class="w">
+   </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'Alice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'1970-01-01'</span><span class="p">);</span><span class="w">
+</span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">date_of_birth</span><span class="p">)</span><span class="w">
+   </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'Bob'</span><span class="p">,</span><span class="w"> </span><span class="k">NULL</span><span class="p">);</span>
+</pre>
+<p>I'll assume that the table is created in the &quot;default database&quot;, the one you
+connect to by typing <tt class="docutils literal">psql</tt> with no other argument. If you need to use a
+different database you can specify <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-envars.html"><tt class="docutils literal">PG*</tt> env vars</a> to select a different database to
+connect to, or hardcode a connection string in the following
+examples. Configuring FastAPI is outside the scope of this article (but psst...
+check <a class="reference external" href="https://pydantic.dev/docs/validation/latest/concepts/pydantic_settings/">Pydantic Settings</a>).</p>
+<p>Creating a working database connection, configuring it correctly, managing its
+life cycle, are matters separate from the code of the view functions, which
+just require a database connection. FastAPI offers an elegant method to
+separate these two independent concerns: the <a class="reference external" href="https://fastapi.tiangolo.com/tutorial/dependencies/">dependency injection</a>.</p>
+<p>The first part is creating a <em>dependency</em>: this is simply a function that
+creates, and optionally disposes of, an object. The one managing our
+connection could be simply:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span><span class="w">
+
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">():</span><span class="w">
+</span>    <span class="c1"># Use the PG* env vars to configure the database connection</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>        <span class="k">yield</span> <span class="n">conn</span>
+</pre>
+<p>Using <tt class="docutils literal">yield</tt> in the context manager will make sure that the connection is
+correctly closed when the view function terminates.</p>
+<p>Once we have this normal Python function we can define a <em>type alias</em> to
+enrich a type (the Psycopg connection) with the metadata defining how to
+obtain one (there are other ways, but defining an alias minimises
+repetitions):</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="w">
+
+</span><span class="n">Conn</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_connection</span><span class="p">)]</span>
+</pre>
+<p>This completes the creation of the dependency. In order to use it, i.e. to
+define that the <tt class="docutils literal">get_person()</tt> function requires a database connection to
+work, it is sufficient to add an argument of type <tt class="docutils literal">Conn</tt> to the function
+definition. In order to reuse code between the two views, we can write a
+helper function, <tt class="docutils literal">fetch_people()</tt>, taking an optional <tt class="docutils literal">id</tt> argument
+if we want only one, which would run the proper query:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="w">
+
+</span><span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">list_people</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">Conn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span><span class="w">
+
+</span><span class="nd">&#64;app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/person/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_person</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Conn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span><span class="w">
+</span>    <span class="k">if</span> <span class="n">people</span> <span class="o">:=</span> <span class="n">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">):</span><span class="w">
+</span>        <span class="k">return</span> <span class="n">people</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span>    <span class="k">else</span><span class="p">:</span><span class="w">
+</span>        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span><span class="w">
+
+</span><span class="k">def</span><span class="w"> </span><span class="nf">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="c1"># We will implement this later</span><span class="w">
+</span>    <span class="o">...</span>
+</pre>
+<p>The views are pretty much just acting as a bridge between the environment (the
+FastAPI runtime and how it's configured) and the &quot;business logic&quot; (our
+database queries in this case, but there could be much more there). Note that
+the views use the <tt class="docutils literal">Conn</tt> alias, so that FastAPI will inject the connection,
+whereas <tt class="docutils literal">fetch_people()</tt> just asks for a plain <tt class="docutils literal">psycopg.Connection</tt>: it
+doesn't know or care where the connection comes from. This separation also
+makes the code testable: you could write unit tests
+exercising <tt class="docutils literal">fetch_people()</tt> in isolation from FastAPI, for example using
+<a class="reference external" href="https://docs.pytest.org/en/stable/explanation/fixtures.html">PyTest fixtures</a> to create a database connection (your test database is
+likely reached differently from a running server's) and test your business
+code independently from whether it is used in FastAPI or in a different
+environment.</p>
+<p>Let's get down to the proper database querying: the way such code might have
+been written in <tt class="docutils literal">psycopg2</tt> could be something like:</p>
+<pre class="code python literal-block">
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT id, name, date_of_birth FROM person&quot;</span><span class="w">
+</span>    <span class="k">if</span> <span class="nb">id</span><span class="p">:</span><span class="w">
+</span>        <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; WHERE id = </span><span class="si">%(id)s</span><span class="s2">&quot;</span><span class="w">
+
+</span>    <span class="n">people</span> <span class="o">=</span> <span class="p">[]</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">})</span><span class="w">
+</span>        <span class="k">for</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date_of_birth</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>            <span class="n">people</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">rec_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">date_of_birth</span><span class="o">=</span><span class="n">date_of_birth</span><span class="p">))</span><span class="w">
+
+</span>    <span class="k">return</span> <span class="n">people</span>
+</pre>
+<p>This is a pretty verbose way to transform database records to instances of the
+<tt class="docutils literal">Person</tt> class and classes like <tt class="docutils literal">DictCursor</tt> and similar only help
+marginally. Psycopg 3 improved records conversion with the introduction of the
+<a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/rows.html">row factories</a>,
+which allow creating a direct bridge from the query result to the final
+objects.</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_row</span><span class="w">
+
+</span><span class="k">def</span><span class="w"> </span><span class="nf">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT id, name, date_of_birth FROM person&quot;</span><span class="w">
+</span>    <span class="k">if</span> <span class="nb">id</span><span class="p">:</span><span class="w">
+</span>        <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; WHERE id = </span><span class="si">%(id)s</span><span class="s2">&quot;</span><span class="w">
+
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">})</span><span class="w">
+</span>        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre>
+<p>Note that Psycopg 3 makes ample use of type annotations and <a class="reference external" href="https://typing.python.org/en/latest/reference/generics.html">generic types</a>:
+if you use a static checker such as <a class="reference external" href="https://mypy-lang.org/">Mypy</a>, it will be able to infer that
+<tt class="docutils literal">cur.fetchall()</tt> returns a list of <tt class="docutils literal">Person</tt> and not a list of tuples,
+allowing you to detect a whole class of errors before even running a test.</p>
+<p>If you are using Python 3.14, the use of <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/basic/tstrings.html">template strings</a> makes writing
+dynamic queries even simpler:</p>
+<pre class="code python literal-block">
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_people</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span><span class="w">
+</span>    <span class="n">query</span> <span class="o">=</span> <span class="sa">t</span><span class="s2">&quot;SELECT id, name, date_of_birth FROM person&quot;</span><span class="w">
+</span>    <span class="k">if</span> <span class="nb">id</span><span class="p">:</span><span class="w">
+</span>        <span class="n">query</span> <span class="o">+=</span> <span class="sa">t</span><span class="s2">&quot; WHERE id = </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="w">
+
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="w">
+</span>        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre>
+<p>Either implementation completes the code: the API can be tested using the
+Swagger interface or <tt class="docutils literal">curl</tt> on the command line:</p>
+<pre class="code sh literal-block">
+$<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8000/person<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w">
+</span><span class="o">[</span><span class="w">
+  </span><span class="o">{</span><span class="w">
+    </span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="s2">&quot;a0aaa2d4-9fa4-4baf-83ed-a3fe35f051d3&quot;</span>,<span class="w">
+    </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;Alice&quot;</span>,<span class="w">
+    </span><span class="s2">&quot;date_of_birth&quot;</span>:<span class="w"> </span><span class="s2">&quot;1970-01-01&quot;</span><span class="w">
+  </span><span class="o">}</span>,<span class="w">
+  </span><span class="o">{</span><span class="w">
+    </span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="s2">&quot;706c17ea-2214-4482-810f-e6ed1cfab694&quot;</span>,<span class="w">
+    </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;Bob&quot;</span>,<span class="w">
+    </span><span class="s2">&quot;date_of_birth&quot;</span>:<span class="w"> </span>null<span class="w">
+  </span><span class="o">}</span><span class="w">
+</span><span class="o">]</span><span class="w">
+
+</span>$<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8000/person/a0aaa2d4-9fa4-4baf-83ed-a3fe35f051d3<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w">
+</span><span class="o">{</span><span class="w">
+  </span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="s2">&quot;a0aaa2d4-9fa4-4baf-83ed-a3fe35f051d3&quot;</span>,<span class="w">
+  </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;Alice&quot;</span>,<span class="w">
+  </span><span class="s2">&quot;date_of_birth&quot;</span>:<span class="w"> </span><span class="s2">&quot;1970-01-01&quot;</span><span class="w">
+</span><span class="o">}</span><span class="w">
+
+</span><span class="c1"># The status code here is 404, not 200
+</span>$<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8000/person/00000000-0000-0000-0000-000000000000<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w">
+</span><span class="o">{</span><span class="w">
+  </span><span class="s2">&quot;detail&quot;</span>:<span class="w"> </span><span class="s2">&quot;Not Found&quot;</span><span class="w">
+</span><span class="o">}</span>
+</pre>
+</div>
+<div class="section" id="pools-and-applications">
+<h2>Pools and applications</h2>
+<p>Creating a new connection at every request is a big performance hit:
+connection creation is a relatively slow operation. For this reason Psycopg
+makes a <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/pool.html#connection-pools">connection pool</a> available, with a set of connections ready to be
+used. Remember that the Psycopg pool is distributed as a separate package,
+therefore you might want to have something like
+<tt class="docutils literal">psycopg[binary,pool]</tt> in your dependencies.</p>
+<p>In your program you will want to create a single instance of the pool and have
+the views using it. Creating a pool as a global variable works, but a much
+more refined way to manage the lifetime of the pool is to tie it to the life
+cycle of the application: FastAPI will create the pool at application start
+and dispose of it cleanly on program exit. This avoids problems such as
+partially initialized code or side effects at import time.</p>
+<p>What happens at startup and shutdown is controlled by a <tt class="docutils literal">lifespan</tt> function
+passed as argument to the <tt class="docutils literal">FastAPI</tt> object. This too uses the single
+<tt class="docutils literal">yield</tt> trick to allow suspending the execution and restoring it (to run the
+cleanup part) when the end of the application lifetime is reached. We make use
+of this function to create a pool adequately configured:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg_pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectionPool</span><span class="w">
+
+</span><span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">):</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span><span class="w">
+</span>        <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span><span class="w">
+</span>        <span class="k">yield</span><span class="w">
+
+</span><span class="c1"># Add the 'lifespan' argument to the existing app</span><span class="w">
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;My People&quot;</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="n">lifespan</span><span class="p">)</span>
+</pre>
+<p>The pool creates and maintains a configured number of connections and makes
+them available to the application code as soon as one is requested. We only
+need to change the body of the dependency injection to obtain a connection
+from the pool instead of creating a new one, no change to the views. The
+FastAPI <tt class="docutils literal">Request</tt> object (which in turn is another dependency injection)
+lets us get the object representing the running application so that we can
+obtain the pool instance from it:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="w">
+
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>        <span class="k">yield</span> <span class="n">conn</span>
+</pre>
+</div>
+<div class="section" id="conclusions">
+<h2>Conclusions</h2>
+<p>We have taken a quick look at some FastAPI features (views and models
+definition, dependency injections, application lifetime), some Psycopg
+features (<tt class="docutils literal">PG*</tt> env vars, row factories, connection pool), and how they can
+interact together, with the help of Pydantic as an expressive objects model.</p>
+<p>The complete and runnable code of the example can be downloaded <a class="reference external" href="./server.py">here</a>.</p>
+<p>Happy hacking!</p>
+</div>
+
+  </div>
+
+  <div class="post-article__comments">
+    <script src="https://utteranc.es/client.js"
+      repo="psycopg/psycopg-website"
+      issue-term="pathname"
+      label="comments"
+      theme="github-dark"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</article>
+
+      </main>
+      <div id="sidebar">
+      </div>
+      
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__copy">
+          &copy; The Psycopg Team<br/>
+          Psycopg is free software released under the
+          <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" rel="noopener">GNU LGPL license</a>.
+        </p>
+        <a href="/" class="site-footer__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="40" height="40" />
+          <span>psycopg</span>
+        </a>
+      </div>
+    </footer>
+
+    <script src="/js/main.js" type="module"></script>
+  </body>
+</html>
+
