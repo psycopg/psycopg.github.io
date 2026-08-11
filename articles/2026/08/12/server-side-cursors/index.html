@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Psycopg - PostgreSQL adapter for Python</title>
+    <meta
+      name="description"
+      content="Psycopg is the most popular PostgreSQL adapter for the Python programming language."
+    />
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/syntax.css?h=3b162580">
+  </head>
+  <body>
+    <!-- ── Navigation ─────────────────────────────────────────────── -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" class="nav__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="48" height="48" />
+          <span>psycopg</span>
+        </a>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav__links" role="list">
+          <li><a href="/">home</a></li>
+          <li><a href="/#sponsors">sponsors</a></li>
+          <li><a href="/#features">features</a></li>
+          <li><a href="/#development">development</a></li>
+          <li><a href="/#articles">articles</a></li>
+          <li><a href="/#maintainers">maintainers</a></li>
+          <li><a href="/#contact">contact</a></li>
+        </ul>
+        <div class="nav__mirror" aria-hidden="true">
+          <span class="nav__logo">
+            <img src="/img/logo.png" alt="" width="48" height="48" />
+            <span>psycopg</span>
+          </span>
+        </div>
+      </nav>
+    </header>
+
+    <div class="with_sidebar">
+      <main class="page">
+<article class="post-article">
+  <a href="/articles/" class="post-back">
+    <span class="pag-arrow">&#8592;</span>
+    <span class="post-back__label">articles</span>
+  </a>
+
+  <header class="post-article__header">
+    
+    <div class="post-article__tags"><a class="post-tag" href="/articles/tag/psycopg3/">psycopg3</a><a class="post-tag" href="/articles/tag/development/">development</a><a class="post-tag" href="/articles/tag/recipe/">recipe</a></div>
+    
+    <h1 class="post-article__title">Row-by-row streaming with server-side cursors</h1>
+    <div class="post-article__byline">
+      <span class="post-article__author">Daniele Varrazzo</span>
+      <time class="post-article__date" datetime="2026-08-12">12 Aug 2026</time>
+    </div>
+  </header>
+
+  <div class="post-article__body">
+    <p>One of the most common mistakes when working with large datasets in PostgreSQL
+is fetching everything into memory at once. It is the path of least
+resistance: you write your query, call <tt class="docutils literal">fetchall()</tt>, and iterate over the
+results. For small datasets this is fine. For large ones, you will quickly
+find your application consuming far more memory than it needs to.</p>
+<!-- CUT-HERE -->
+<p>Even after closing the cursor, Python’s memory allocator might hold on the
+memory used longer than expected; a long-running service might end up with a
+large memory footprint in a server. So this is usually a condition you will
+want to avoid.</p>
+<p>Psycopg offers a cleaner solution: <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html#server-side-cursors">server-side cursors</a>, which allow you to
+stream results from the database row by row, keeping your memory footprint
+small and predictable regardless of how large the result set is. Server-side
+cursors are available in both Psycopg 2 and Psycopg 3.</p>
+<div class="section" id="how-it-works">
+<h2>How it works</h2>
+<p>When you execute a query normally, PostgreSQL runs it, assembles the full
+result set, and sends it to the client. With a <a class="reference external" href="https://www.postgresql.org/docs/current/sql-declare.html">server-side cursor</a>,
+PostgreSQL instead keeps the result set on the server and sends rows to the
+client in batches as they are requested. This means your Python process only
+ever holds a small number of rows in memory at any one time. Giving the cursor
+a name is what tells Psycopg to use a server-side cursor rather than a
+client-side one.</p>
+<pre class="code python literal-block">
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span><span class="w">
+
+</span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=mydb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_cursor&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM very_large_table&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>            <span class="n">process</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre>
+<p>Everything else looks identical to a normal cursor: you can iterate over it,
+call <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.fetchone">fetchone()</a>, or call <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.Cursor.fetchmany">fetchmany(n)</a> to retrieve a specific number of
+rows at a time.</p>
+<p>In Psycopg 3, server-side cursors are exposed through the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.ServerCursor">ServerCursor
+class</a>, which may also be instantiated directly. In Psycopg 2 only the name
+parameter can be used.</p>
+</div>
+<div class="section" id="controlling-batch-size">
+<h2>Controlling batch size</h2>
+<p>By default, Psycopg 3 fetches rows in batches of 100 when iterating over a
+server-side cursor. You can control this with the <a class="reference external" href="https://www.psycopg.org/psycopg3/docs/api/cursors.html#psycopg.ServerCursor.itersize">itersize attribute</a>:</p>
+<pre class="code python literal-block">
+<span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_cursor&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">itersize</span> <span class="o">=</span> <span class="mi">2000</span><span class="w">
+</span>    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM very_large_table&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">process</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre>
+<p>Larger batch sizes reduce the number of round-trips to the database but
+increase memory usage per batch. The right value depends on the size of your
+rows and your application's memory constraints. For most use cases the default
+of 100 is a reasonable starting point.</p>
+<p><tt class="docutils literal">itersize</tt> only affects the iteration on the cursor using for. Other methods
+such as <tt class="docutils literal">fetchone()</tt>, and <tt class="docutils literal">fetchmany(n)</tt> will fetch exactly the number of
+rows requested.</p>
+</div>
+<div class="section" id="using-server-side-cursors-with-async">
+<h2>Using server-side cursors with async</h2>
+<p>Psycopg 3's async support extends naturally to server-side cursors, making it
+straightforward to stream large result sets in an async context without
+blocking:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span><span class="w">
+
+</span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=mydb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>    <span class="k">async</span> <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_cursor&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM very_large_table&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="k">async</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>            <span class="k">await</span> <span class="n">process</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre>
+<p>The API is deliberately symmetric with the synchronous version. Just add the
+await keyword where needed.</p>
+</div>
+<div class="section" id="a-practical-example-exporting-large-datasets">
+<h2>A practical example: exporting large datasets</h2>
+<p>A common real-world use case is exporting data to a file. Without server-side
+cursors, exporting a table with millions of rows means loading all of them
+into memory before you can write a single line. With streaming, you can write
+rows to disk as they arrive:</p>
+<pre class="code python literal-block">
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span><span class="w">
+
+</span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=mydb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;export_cursor&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, name, email FROM users ORDER BY id&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;users.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w">
+</span>            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">])</span><span class="w">
+</span>            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span><span class="w">
+</span>                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre>
+<p>This will happily export a table of any size while using only a few kilobytes
+of memory for the current batch of rows.</p>
+</div>
+<div class="section" id="things-to-be-aware-of">
+<h2>Things to be aware of</h2>
+<p>Server-side cursors require an open transaction for their lifetime. Psycopg 3
+handles this automatically, but it is worth knowing that this transaction
+exists and must be kept open on the server as long as the cursor is used. For
+long-running exports or processing jobs this is usually fine, but be mindful
+of holding transactions open unnecessarily in high-concurrency environments.</p>
+</div>
+<div class="section" id="summary">
+<h2>Summary</h2>
+<p>Server-side cursors are one of those features that you may not need every day,
+but when you do need them: processing exports, running aggregations over large
+tables, streaming data to downstream systems, they make a significant
+difference. The API is clean, the behaviour is predictable, and the memory
+savings for large datasets are substantial.</p>
+<p>If you find Psycopg useful in your work, please consider <a class="reference external" href="https://github.com/sponsors/psycopg/">sponsoring the
+project</a> to help ensure its continued
+development.</p>
+</div>
+
+  </div>
+
+  <div class="post-article__comments">
+    <script src="https://utteranc.es/client.js"
+      repo="psycopg/psycopg-website"
+      issue-term="pathname"
+      label="comments"
+      theme="github-dark"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</article>
+
+      </main>
+      <div id="sidebar">
+      </div>
+      
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__copy">
+          &copy; The Psycopg Team<br/>
+          Psycopg is free software released under the
+          <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" rel="noopener">GNU LGPL license</a>.
+        </p>
+        <a href="/" class="site-footer__logo" aria-label="psycopg home">
+          <img src="/img/logo.png" alt="" width="40" height="40" />
+          <span>psycopg</span>
+        </a>
+      </div>
+    </footer>
+
+    <script src="/js/main.js" type="module"></script>
+  </body>
+</html>
+
