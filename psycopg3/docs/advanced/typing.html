@@ -353,7 +353,7 @@ be <code class="xref py py-obj docutils literal notranslate"><span class="pre">N
 <span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">scalar_row</span><span class="p">)</span>
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM mytable&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM mytable"</span><span class="p">)</span>
     <span class="n">rv</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>  <span class="c1"># mypy error here</span>
     <span class="k">return</span> <span class="n">rv</span>
 </pre></div>
@@ -395,24 +395,24 @@ otherwise the typing system and the runtime will not agree.</p>
 
 <span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span>
     <span class="n">connection_class</span><span class="o">=</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">],</span>   <span class="c1"># provides type hinting</span>
-    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;row_factory&quot;</span><span class="p">:</span> <span class="n">dict_row</span><span class="p">},</span>       <span class="c1"># works at runtime</span>
+    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"row_factory"</span><span class="p">:</span> <span class="n">dict_row</span><span class="p">},</span>       <span class="c1"># works at runtime</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
     <span class="c1"># reveal_type(pool): ConnectionPool[Connection[dict[str, Any]]]</span>
 
     <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="c1"># reveal_type(conn): Connection[dict[str, Any]]</span>
 
-        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT now()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT now()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
         <span class="c1"># reveal_type(row): dict[str, Any] | None</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {&quot;now&quot;: datetime.datetime(...)}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {"now": datetime.datetime(...)}</span>
 </pre></div>
 </div>
 <p>If a non-generic <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code> subclass is used (one whose returned row
 type is not parametric) then it’s not necessary to specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">[</span><span class="n">DictRow</span><span class="p">]):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;row_factory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_row</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"row_factory"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_row</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">connection_class</span><span class="o">=</span><span class="n">MyConnection</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
@@ -421,10 +421,10 @@ type is not parametric) then it’s not necessary to specify <code class="xref p
     <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="c1"># reveal_type(conn): MyConnection</span>
 
-        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT now()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT now()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
         <span class="c1"># reveal_type(row): dict[str, Any] | None</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {&quot;now&quot;: datetime.datetime(...)}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>  <span class="c1"># {"now": datetime.datetime(...)}</span>
 </pre></div>
 </div>
 </section>
@@ -454,33 +454,33 @@ any issue. Pydantic will also raise a runtime error in case the
     <span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">row_factory</span><span class="o">=</span><span class="n">class_row</span><span class="p">(</span><span class="n">Person</span><span class="p">))</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
             <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">"""</span>
 <span class="sd">                SELECT id, first_name, last_name, dob</span>
 <span class="sd">                FROM (VALUES</span>
-<span class="sd">                    (1, &#39;John&#39;, &#39;Doe&#39;, &#39;2000-01-01&#39;::date),</span>
-<span class="sd">                    (2, &#39;Jane&#39;, &#39;White&#39;, NULL)</span>
+<span class="sd">                    (1, 'John', 'Doe', '2000-01-01'::date),</span>
+<span class="sd">                    (2, 'Jane', 'White', NULL)</span>
 <span class="sd">                ) AS data (id, first_name, last_name, dob)</span>
 <span class="sd">                WHERE id = %(id)s;</span>
-<span class="sd">                &quot;&quot;&quot;</span><span class="p">,</span>
-                <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
+<span class="sd">                """</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
             <span class="p">)</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
-            <span class="c1"># reveal_type(obj) would return &#39;Optional[Person]&#39; here</span>
+            <span class="c1"># reveal_type(obj) would return 'Optional[Person]' here</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;person </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"person </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
 
-            <span class="c1"># reveal_type(obj) would return &#39;Person&#39; here</span>
+            <span class="c1"># reveal_type(obj) would return 'Person' here</span>
 
             <span class="k">return</span> <span class="n">obj</span>
 
 <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">fetch_person</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born in </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born in </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Who knows when </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> was born"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -493,13 +493,13 @@ expression.</p>
 <p>For instance, passing an argument to the query should be done via the second
 argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code>, not by string composition:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>  <span class="c1"># BAD!</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>  <span class="c1"># BAD!</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
 <span class="c1"># the function should be implemented as:</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_record</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">id</span><span class="p">,))</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * FROM my_table WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="nb">id</span><span class="p">,))</span>
     <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -507,13 +507,13 @@ argument to <code class="xref py py-obj docutils literal notranslate"><span clas
 and similar to escape safely table and field names. The parameter of the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL()</span></code> object should be a literal string:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*) FROM </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">table</span>  <span class="c1"># BAD!</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">"SELECT count(*) FROM </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">table</span>  <span class="c1"># BAD!</span>
     <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># the function should be implemented as:</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM </span><span class="si">{}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>

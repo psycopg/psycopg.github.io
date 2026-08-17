@@ -442,7 +442,7 @@ extended query protocol.</p>
 
 <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ADMIN_DSN</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">ClientCursor</span><span class="p">)</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW STATS&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SHOW STATS"</span><span class="p">)</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -506,12 +506,12 @@ runs behind the scene.</p>
 </div>
 <p>you can run a one-off command in the same connection to call it (e.g. using
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>) in order to create the cursor on the server:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT reffunc(&#39;curname&#39;)&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT reffunc('curname')"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>after which you can create a server-side cursor declared by the same name, and
 directly call the fetch methods, skipping the <a class="reference internal" href="../api/cursors.html#psycopg.ServerCursor.execute" title="psycopg.ServerCursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> call:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="s1">&#39;curname&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="s1">'curname'</span><span class="p">)</span>
 <span class="c1"># no cur.execute()</span>
 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>  <span class="c1"># or cur.fetchone(), cur.fetchmany()...</span>
     <span class="c1"># do something with record</span>
@@ -544,8 +544,8 @@ implement <a class="reference internal" href="#server-side-cursors"><span class=
 
 <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">,</span> <span class="n">cursor_factory</span><span class="o">=</span><span class="n">RawCursor</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT $1, $2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">])</span>
-        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT $1, $2"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">)</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
@@ -555,8 +555,8 @@ implement <a class="reference internal" href="#server-side-cursors"><span class=
 
 <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">RawCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT $1, $2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">])</span>
-        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT $1, $2"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

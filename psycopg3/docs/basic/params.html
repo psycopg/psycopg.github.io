@@ -309,16 +309,16 @@ for.</p>
 <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> by using <code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholders in the SQL statement, and
 passing a sequence of values as the second argument of the function. For
 example the Python function call:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">    INSERT INTO some_table (id, created_at, last_name)</span>
 <span class="s2">    VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">);</span>
-<span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="s2">&quot;O&#39;Reilly&quot;</span><span class="p">))</span>
+<span class="s2">    """</span><span class="p">,</span>
+    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="s2">"O'Reilly"</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>is <em>roughly</em> equivalent to the SQL command:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">some_table</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">last_name</span><span class="p">)</span>
-<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;2020-11-18&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;O&#39;&#39;Reilly&#39;</span><span class="p">);</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-11-18'</span><span class="p">,</span><span class="w"> </span><span class="s1">'O''Reilly'</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Note that the parameters will not be really merged to the query: query and the
@@ -328,18 +328,18 @@ for details.</p>
 query and specifying the values into a mapping.  Using named arguments allows
 to specify the values in any order and to repeat the same value in several
 places in the query:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">    INSERT INTO some_table (id, created_at, updated_at, last_name)</span>
 <span class="s2">    VALUES (</span><span class="si">%(id)s</span><span class="s2">, </span><span class="si">%(created)s</span><span class="s2">, </span><span class="si">%(created)s</span><span class="s2">, </span><span class="si">%(name)s</span><span class="s2">);</span>
-<span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;O&#39;Reilly&quot;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)})</span>
+<span class="s2">    """</span><span class="p">,</span>
+    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="s1">'created'</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)})</span>
 </pre></div>
 </div>
 <p>Using characters <code class="docutils literal notranslate"><span class="pre">%</span></code>, <code class="docutils literal notranslate"><span class="pre">(</span></code>, <code class="docutils literal notranslate"><span class="pre">)</span></code> in the argument names is not supported.</p>
 <p>When parameters are used, in order to include a literal <code class="docutils literal notranslate"><span class="pre">%</span></code> in the query you
 can use the <code class="docutils literal notranslate"><span class="pre">%%</span></code> string:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT (</span><span class="si">%s</span><span class="s2"> % 2) = 0 AS even&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>       <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT (</span><span class="si">%s</span><span class="s2"> </span><span class="si">%%</span><span class="s2"> 2) = 0 AS even&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>      <span class="c1"># correct</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT (</span><span class="si">%s</span><span class="s2"> % 2) = 0 AS even"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>       <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT (</span><span class="si">%s</span><span class="s2"> </span><span class="si">%%</span><span class="s2"> 2) = 0 AS even"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>      <span class="c1"># correct</span>
 </pre></div>
 </div>
 <p>While the mechanism resembles regular Python strings manipulation, there are a
@@ -350,24 +350,24 @@ query.</p>
 method accepts a tuple or dictionary of values as second parameter.
 <a class="reference internal" href="#sql-injection"><strong>Never</strong> use <code class="docutils literal notranslate"><span class="pre">%</span></code> or <code class="docutils literal notranslate"><span class="pre">+</span></code> to merge values
 into queries</a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>  <span class="c1"># correct</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span> <span class="o">%</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>  <span class="c1"># correct</span>
 </pre></div>
 </div>
 </li>
 <li><p>For positional variables binding, <em>the second argument must always be a
 sequence</em>, even if it contains a single variable (remember that Python
 requires a comma to create a single element tuple):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">)</span>    <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">))</span>  <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,))</span> <span class="c1"># correct</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">])</span>  <span class="c1"># correct</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">)</span>    <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"bar"</span><span class="p">))</span>  <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"bar"</span><span class="p">,))</span> <span class="c1"># correct</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"bar"</span><span class="p">])</span>  <span class="c1"># correct</span>
 </pre></div>
 </div>
 </li>
 <li><p>The placeholder <em>must not be quoted</em>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (&#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span> <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>   <span class="c1"># correct</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES ('</span><span class="si">%s</span><span class="s2">')"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span> <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>   <span class="c1"># correct</span>
 </pre></div>
 </div>
 </li>
@@ -376,8 +376,8 @@ placeholder (such as a <code class="docutils literal notranslate"><span class="p
 more appropriate for the type. You may find other placeholders used in
 Psycopg queries (<code class="docutils literal notranslate"><span class="pre">%b</span></code> and <code class="docutils literal notranslate"><span class="pre">%t</span></code>) but they are not related to the
 type of the argument: see <a class="reference internal" href="#binary-data"><span class="std std-ref">Binary parameters and results</span></a> if you want to read more:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># WRONG</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># correct</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%d</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># WRONG</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>   <span class="c1"># correct</span>
 </pre></div>
 </div>
 </li>
@@ -385,9 +385,9 @@ type of the argument: see <a class="reference internal" href="#binary-data"><spa
 merge table or field names to the query. If you need to generate SQL queries
 dynamically (for instance choosing a table name at runtime) you can use the
 functionalities provided in the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO </span><span class="si">%s</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;numbers&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># WRONG</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO </span><span class="si">%s</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s1">'numbers'</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># WRONG</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>                                                <span class="c1"># correct</span>
-    <span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO </span><span class="si">{}</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">&#39;numbers&#39;</span><span class="p">)),</span>
+    <span class="n">SQL</span><span class="p">(</span><span class="s2">"INSERT INTO </span><span class="si">{}</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">'numbers'</span><span class="p">)),</span>
     <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
 </pre></div>
 </div>
@@ -404,10 +404,10 @@ quotes can be left unescaped if the string is delimited by double quotes.</p>
 <p>Because of the difference, sometimes subtle, between the data types
 representations, a naïve approach to query strings composition, such as using
 Python strings concatenation, is a recipe for <em>terrible</em> problems:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQL</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO authors (name) VALUES (&#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span> <span class="c1"># NEVER DO THIS</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;O&#39;Reilly&quot;</span><span class="p">,</span> <span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQL</span> <span class="o">=</span> <span class="s2">"INSERT INTO authors (name) VALUES ('</span><span class="si">%s</span><span class="s2">')"</span> <span class="c1"># NEVER DO THIS</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="p">)</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span> <span class="c1"># THIS WILL FAIL MISERABLY</span>
-<span class="c1"># SyntaxError: syntax error at or near &quot;Reilly&quot;</span>
+<span class="c1"># SyntaxError: syntax error at or near "Reilly"</span>
 </pre></div>
 </div>
 <p>If the variables containing the data to send to the database come from an
@@ -439,8 +439,8 @@ provided methods</span></a> instead.</p></li>
 </div>
 <p>The correct way to pass variables in a SQL command is using the second
 argument of the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQL</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO authors (name) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span>  <span class="c1"># Note: no quotes</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;O&#39;Reilly&quot;</span><span class="p">,</span> <span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQL</span> <span class="o">=</span> <span class="s2">"INSERT INTO authors (name) VALUES (</span><span class="si">%s</span><span class="s2">)"</span>  <span class="c1"># Note: no quotes</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="p">)</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>  <span class="c1"># Note: no % operator</span>
 </pre></div>
 </div>
@@ -491,7 +491,7 @@ the query using <a class="reference internal" href="../api/cursors.html#psycopg.
 requesting binary results is a clear winner is when you have large binary data
 in the database, such as images:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">&quot;SELECT image_data FROM images WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">image_id</span><span class="p">],</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="s2">"SELECT image_data FROM images WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">image_id</span><span class="p">],</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>

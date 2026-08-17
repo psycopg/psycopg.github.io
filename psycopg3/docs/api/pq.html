@@ -320,10 +320,10 @@ module constant.</p>
 and will fail if none is usable. You can force the use of a specific
 implementation by exporting the env var <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_IMPL</span></code>: importing the
 library will fail if the requested implementation is not available:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ PSYCOPG_IMPL=c python -c &quot;import psycopg&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ PSYCOPG_IMPL=c python -c "import psycopg"
 Traceback (most recent call last):
    ...
-ImportError: couldn&#39;t import requested psycopg &#39;c&#39; implementation: No module named &#39;psycopg_c&#39;
+ImportError: couldn't import requested psycopg 'c' implementation: No module named 'psycopg_c'
 </pre></div>
 </div>
 </section>
@@ -427,7 +427,7 @@ but none was available.</p>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-misc.html#LIBPQ-PQENCRYPTPASSWORDCONN"><span class="pre">PQencryptPasswordConn</span></a></code> for details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">enc</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">encrypted</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">encrypt_password</span><span class="p">(</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">rolename</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">))</span>
-<span class="go">b&#39;SCRAM-SHA-256$4096:...</span>
+<span class="go">b'SCRAM-SHA-256$4096:...</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -472,21 +472,21 @@ but none was available.</p>
 
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">set_trace_flags</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">SUPPRESS_TIMESTAMPS</span> <span class="o">|</span> <span class="n">pq</span><span class="o">.</span><span class="n">Trace</span><span class="o">.</span><span class="n">REGRESS_MODE</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select now()&quot;</span><span class="p">)</span>
-<span class="go">F       13      Parse    &quot;&quot; &quot;BEGIN&quot; 0</span>
-<span class="go">F       14      Bind     &quot;&quot; &quot;&quot; 0 0 1 0</span>
-<span class="go">F       6       Describe         P &quot;&quot;</span>
-<span class="go">F       9       Execute  &quot;&quot; 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select now()"</span><span class="p">)</span>
+<span class="go">F       13      Parse    "" "BEGIN" 0</span>
+<span class="go">F       14      Bind     "" "" 0 0 1 0</span>
+<span class="go">F       6       Describe         P ""</span>
+<span class="go">F       9       Execute  "" 0</span>
 <span class="go">F       4       Sync</span>
 <span class="go">B       4       ParseComplete</span>
 <span class="go">B       4       BindComplete</span>
 <span class="go">B       4       NoData</span>
-<span class="go">B       10      CommandComplete  &quot;BEGIN&quot;</span>
+<span class="go">B       10      CommandComplete  "BEGIN"</span>
 <span class="go">B       5       ReadyForQuery    T</span>
-<span class="go">F       17      Query    &quot;select now()&quot;</span>
-<span class="go">B       28      RowDescription   1 &quot;now&quot; NNNN 0 NNNN 8 -1 0</span>
-<span class="go">B       39      DataRow  1 29 &#39;2022-09-14 14:12:16.648035+02&#39;</span>
-<span class="go">B       13      CommandComplete  &quot;SELECT 1&quot;</span>
+<span class="go">F       17      Query    "select now()"</span>
+<span class="go">B       28      RowDescription   1 "now" NNNN 0 NNNN 8 -1 0</span>
+<span class="go">B       39      DataRow  1 29 '2022-09-14 14:12:16.648035+02'</span>
+<span class="go">B       13      CommandComplete  "SELECT 1"</span>
 <span class="go">B       5       ReadyForQuery    T</span>
 <span class="go">&lt;psycopg.Cursor [TUPLES_OK] [INTRANS] (database=postgres) at 0x7f18a18ba040&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">pgconn</span><span class="o">.</span><span class="n">untrace</span><span class="p">()</span>

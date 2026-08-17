@@ -408,33 +408,33 @@ which should return a new instance of the object to load. See
 type on the fly, stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo.python_type</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.composite</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompositeInfo</span><span class="p">,</span> <span class="n">register_composite</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE card AS (value int, suit text)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE card AS (value int, suit text)"</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;card&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"card"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_composite</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_card</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">python_type</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;hearts&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_card</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">python_type</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">"hearts"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">my_card</span>
-<span class="go">card(value=8, suit=&#39;hearts&#39;)</span>
+<span class="go">card(value=8, suit='hearts')</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%(card)s</span><span class="s2">), (</span><span class="si">%(card)s</span><span class="s2">).suit&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">my_card</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="s2">"SELECT pg_typeof(</span><span class="si">%(card)s</span><span class="s2">), (</span><span class="si">%(card)s</span><span class="s2">).suit"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"card"</span><span class="p">:</span> <span class="n">my_card</span><span class="p">}</span>
 <span class="gp">... </span>    <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">(&#39;card&#39;, &#39;hearts&#39;)</span>
+<span class="go">('card', 'hearts')</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)::card&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;spades&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">card(value=1, suit=&#39;spades&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)::card"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"spades"</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">card(value=1, suit='spades')</span>
 </pre></div>
 </div>
 <p>Nested composite types are handled as expected, provided that the type of the
 composite components are registered as well:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE card_back AS (face card, back text)&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE card_back AS (face card, back text)"</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info2</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;card_back&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info2</span> <span class="o">=</span> <span class="n">CompositeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"card_back"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_composite</span><span class="p">(</span><span class="n">info2</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ((8, &#39;hearts&#39;), &#39;blue&#39;)::card_back&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">card_back(face=card(value=8, suit=&#39;hearts&#39;), back=&#39;blue&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT ((8, 'hearts'), 'blue')::card_back"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">card_back(face=card(value=8, suit='hearts'), back='blue')</span>
 </pre></div>
 </div>
 </section>
@@ -460,8 +460,8 @@ the information in the type <a class="reference internal" href="#psycopg.types.c
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">Card</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">field_names</span><span class="p">,</span> <span class="n">values</span><span class="p">)))</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_composite</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">make_object</span><span class="o">=</span><span class="n">card_from_db</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;(1,spades)&#39;::card&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">Card(suit=&#39;spades&#39;, value=1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '(1,spades)'::card"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">Card(suit='spades', value=1)</span>
 </pre></div>
 </div>
 <p>The previous example only configures loaders to convert data from PostgreSQL
@@ -478,10 +478,10 @@ into a sequence matching the composite fields:</p>
 <span class="gp">... </span>    <span class="n">make_object</span><span class="o">=</span><span class="n">card_from_db</span><span class="p">,</span> <span class="n">make_sequence</span><span class="o">=</span><span class="n">card_to_db</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;select </span><span class="si">%(card)s</span><span class="s2">.value + 1, </span><span class="si">%(card)s</span><span class="s2">.suit&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">Card</span><span class="p">(</span><span class="n">suit</span><span class="o">=</span><span class="s2">&quot;hearts&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">8</span><span class="p">)},</span>
+<span class="gp">... </span>    <span class="s2">"select </span><span class="si">%(card)s</span><span class="s2">.value + 1, </span><span class="si">%(card)s</span><span class="s2">.suit"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"card"</span><span class="p">:</span> <span class="n">Card</span><span class="p">(</span><span class="n">suit</span><span class="o">=</span><span class="s2">"hearts"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">8</span><span class="p">)},</span>
 <span class="gp">... </span>    <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">(9, &#39;hearts&#39;)</span>
+<span class="go">(9, 'hearts')</span>
 </pre></div>
 </div>
 </section>
@@ -624,15 +624,15 @@ connections.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.range</span><span class="w"> </span><span class="kn">import</span> <span class="n">Range</span><span class="p">,</span> <span class="n">RangeInfo</span><span class="p">,</span> <span class="n">register_range</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE strrange AS RANGE (SUBTYPE = text)&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">RangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;strrange&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE strrange AS RANGE (SUBTYPE = text)"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">RangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"strrange"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_range</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Range</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&#39;strrange&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Range</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'strrange'</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;[a,z]&#39;::strrange&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">Range(&#39;a&#39;, &#39;z&#39;, &#39;[]&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '[a,z]'::strrange"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">Range('a', 'z', '[]')</span>
 </pre></div>
 </div>
 </section>
@@ -739,18 +739,18 @@ connections.</p>
 <span class="gp">... </span>    <span class="n">Multirange</span><span class="p">,</span> <span class="n">MultirangeInfo</span><span class="p">,</span> <span class="n">register_multirange</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.range</span><span class="w"> </span><span class="kn">import</span> <span class="n">Range</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE strrange AS RANGE (SUBTYPE = text)&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">MultirangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;strmultirange&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE strrange AS RANGE (SUBTYPE = text)"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">MultirangeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"strmultirange"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_multirange</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%(mr)s</span><span class="s2">), </span><span class="si">%(mr)s</span><span class="s2">&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;mr&quot;</span><span class="p">:</span> <span class="n">Multirange</span><span class="p">([</span><span class="n">Range</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">),</span> <span class="n">Range</span><span class="p">(</span><span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)])})</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="s2">"SELECT pg_typeof(</span><span class="si">%(mr)s</span><span class="s2">), </span><span class="si">%(mr)s</span><span class="s2">"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"mr"</span><span class="p">:</span> <span class="n">Multirange</span><span class="p">([</span><span class="n">Range</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"q"</span><span class="p">),</span> <span class="n">Range</span><span class="p">(</span><span class="s2">"l"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)])})</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&#39;strmultirange&#39;</span>
+<span class="go">'strmultirange'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="go">Multirange([Range(&#39;a&#39;, &#39;z&#39;, &#39;[)&#39;)])</span>
+<span class="go">Multirange([Range('a', 'z', '[)')])</span>
 </pre></div>
 </div>
 </section>
@@ -806,14 +806,14 @@ connections.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeInfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.hstore</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_hstore</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;hstore&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"hstore"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_hstore</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">}])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&#39;hstore&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[{</span><span class="s2">"a"</span><span class="p">:</span> <span class="s2">"b"</span><span class="p">}])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'hstore'</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;foo =&gt; bar&#39;::hstore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">{&#39;foo&#39;: &#39;bar&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'foo =&gt; bar'::hstore"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">{'foo': 'bar'}</span>
 </pre></div>
 </div>
 </section>
@@ -871,29 +871,29 @@ connections.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_shapely</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"geometry"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_shapely</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&#39;geometry&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_typeof(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'geometry'</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON(&#39;{</span>
-<span class="gp">... </span><span class="s2">    &quot;type&quot;:&quot;Point&quot;,</span>
-<span class="gp">... </span><span class="s2">    &quot;coordinates&quot;:[-48.23456,20.12345]}&#39;)</span>
-<span class="gp">... </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON('{</span>
+<span class="gp">... </span><span class="s2">    "type":"Point",</span>
+<span class="gp">... </span><span class="s2">    "coordinates":[-48.23456,20.12345]}')</span>
+<span class="gp">... </span><span class="s2">"""</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">&lt;shapely.geometry.multipolygon.MultiPolygon object at 0x7fb131f3cd90&gt;</span>
 </pre></div>
 </div>
 <p>Notice that, if the geometry adapters are registered on a specific object (a
 connection or cursor), other connections and cursors will be unaffected:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn2</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">CONN_STR</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON(&#39;{</span>
-<span class="gp">... </span><span class="s2">    &quot;type&quot;:&quot;Point&quot;,</span>
-<span class="gp">... </span><span class="s2">    &quot;coordinates&quot;:[-48.23456,20.12345]}&#39;)</span>
-<span class="gp">... </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&#39;0101000020E61000009279E40F061E48C0F2B0506B9A1F3440&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="gp">... </span><span class="s2">SELECT ST_GeomFromGeoJSON('{</span>
+<span class="gp">... </span><span class="s2">    "type":"Point",</span>
+<span class="gp">... </span><span class="s2">    "coordinates":[-48.23456,20.12345]}')</span>
+<span class="gp">... </span><span class="s2">"""</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'0101000020E61000009279E40F061E48C0F2B0506B9A1F3440'</span>
 </pre></div>
 </div>
 </section>

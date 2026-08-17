@@ -311,10 +311,10 @@ Within the <code class="xref py py-obj docutils literal notranslate"><span class
 <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a> method, and use it as a context manager too:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT something FROM somewhere ...&quot;</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT something FROM somewhere ..."</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT something else...&quot;</span><span class="p">)</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT something else..."</span><span class="p">)</span>
 
     <span class="c1"># At the end of the `connection()` context, the transaction is committed</span>
     <span class="c1"># or rolled back, and the connection returned to the pool</span>
@@ -335,10 +335,10 @@ queue and is served a connection as soon as it’s available.</p>
 the methods requiring them:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="n">AsyncConnectionPool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT something FROM somewhere ...&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT something FROM somewhere ..."</span><span class="p">)</span>
 
         <span class="k">async</span> <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT something else...&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT something else..."</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -570,19 +570,19 @@ try to log at least the <code class="docutils literal notranslate"><span class="
 <span class="kn">from</span><span class="w"> </span><span class="nn">psycopg_pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectionPool</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">"</span>
 <span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;psycopg.pool&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"psycopg.pool"</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 <span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="n">min_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">pool</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;pool ready&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"pool ready"</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">rec</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2"> * </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The square of </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2"> * </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The square of </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
     <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
@@ -591,27 +591,27 @@ try to log at least the <code class="docutils literal notranslate"><span class="
 </pre></div>
 </div>
 <p>might print something like:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2023-09-20 11:02:39,718 INFO psycopg.pool: waiting for pool &#39;pool-1&#39; initialization
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2023-09-20 11:02:39,718 INFO psycopg.pool: waiting for pool 'pool-1' initialization
 2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
 2023-09-20 11:02:39,720 INFO psycopg.pool: adding new connection to the pool
-2023-09-20 11:02:39,720 INFO psycopg.pool: pool &#39;pool-1&#39; is ready to use
+2023-09-20 11:02:39,720 INFO psycopg.pool: pool 'pool-1' is ready to use
 2023-09-20 11:02:39,720 INFO root: pool ready
-2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
-2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by &#39;pool-1&#39;
-2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
-2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by &#39;pool-1&#39;
-2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
-2023-09-20 11:02:39,722 INFO psycopg.pool: connection requested from &#39;pool-1&#39;
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection given by 'pool-1'
+2023-09-20 11:02:39,721 INFO psycopg.pool: connection requested from 'pool-1'
+2023-09-20 11:02:39,722 INFO psycopg.pool: connection requested from 'pool-1'
 2023-09-20 11:02:40,724 INFO root: The square of 0 is 0.
 2023-09-20 11:02:40,724 INFO root: The square of 1 is 1.
-2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
-2023-09-20 11:02:40,725 INFO psycopg.pool: connection given by &#39;pool-1&#39;
-2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
-2023-09-20 11:02:40,726 INFO psycopg.pool: connection given by &#39;pool-1&#39;
+2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
+2023-09-20 11:02:40,725 INFO psycopg.pool: connection given by 'pool-1'
+2023-09-20 11:02:40,725 INFO psycopg.pool: returning connection to 'pool-1'
+2023-09-20 11:02:40,726 INFO psycopg.pool: connection given by 'pool-1'
 2023-09-20 11:02:41,728 INFO root: The square of 3 is 9.
 2023-09-20 11:02:41,729 INFO root: The square of 2 is 4.
-2023-09-20 11:02:41,729 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
-2023-09-20 11:02:41,730 INFO psycopg.pool: returning connection to &#39;pool-1&#39;
+2023-09-20 11:02:41,729 INFO psycopg.pool: returning connection to 'pool-1'
+2023-09-20 11:02:41,730 INFO psycopg.pool: returning connection to 'pool-1'
 </pre></div>
 </div>
 <p>Please do not rely on the messages generated to remain unchanged across
@@ -709,7 +709,7 @@ pool, instead of closing, when <code class="xref py py-obj docutils literal notr
 <span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy.pool</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy.ext.asyncio</span>
 
-<span class="n">db_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://postgres:postgres@hostname:port/database&quot;</span>
+<span class="n">db_url</span> <span class="o">=</span> <span class="s2">"postgresql://postgres:postgres@hostname:port/database"</span>
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1"># Create and open a Psycopg pool</span>
@@ -720,7 +720,7 @@ pool, instead of closing, when <code class="xref py py-obj docutils literal notr
 
     <span class="c1"># Create a SQLAlchemy engine using the pool just created</span>
     <span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">ext</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">create_async_engine</span><span class="p">(</span>
-        <span class="n">url</span><span class="o">=</span><span class="s2">&quot;postgresql+psycopg://&quot;</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="s2">"postgresql+psycopg://"</span><span class="p">,</span>
         <span class="n">poolclass</span><span class="o">=</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">NullPool</span><span class="p">,</span>
         <span class="n">async_creator</span><span class="o">=</span><span class="n">pgpool</span><span class="o">.</span><span class="n">getconn</span><span class="p">,</span>
     <span class="p">)</span>
@@ -728,7 +728,7 @@ pool, instead of closing, when <code class="xref py py-obj docutils literal notr
     <span class="c1"># Use the `engine` in the rest of your application.</span>
     <span class="k">await</span> <span class="n">run_my_app</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -738,9 +738,9 @@ version older than 3.3, you will need to create a subclass of the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> method, with an implementation similar to the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyAsyncConnection</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="p">):</span>
     <span class="c1"># If you need to subclass a sync connection, just drop the</span>
-    <span class="c1"># &#39;async&#39; and &#39;await&#39; keywords from this example.</span>
+    <span class="c1"># 'async' and 'await' keywords from this example.</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">pool</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_pool&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pool</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_pool"</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="c1"># Connection currently checked out from the pool.</span>
             <span class="c1"># Instead of closing it, return it to the pool.</span>
             <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">putconn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>

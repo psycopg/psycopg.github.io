@@ -328,23 +328,23 @@ of merging them on the client side. Server-side binding works for normal
 <code class="sql docutils literal notranslate"><span class="pre">SELECT</span></code> and data manipulation statements (<code class="sql docutils literal notranslate"><span class="pre">INSERT</span></code>, <code class="sql docutils literal notranslate"><span class="pre">UPDATE</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">DELETE</span></code>), but it doesn’t work with many other statements. For instance,
 it doesn’t work with <code class="sql docutils literal notranslate"><span class="pre">SET</span></code> or with <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TimeZone TO </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;UTC&quot;</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET TimeZone TO </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"UTC"</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
 <span class="x">LINE 1: SET TimeZone TO $1</span>
 <span class="x">                        ^</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;NOTIFY </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;chan&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"NOTIFY </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"chan"</span><span class="p">,</span> <span class="mi">42</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
 <span class="x">LINE 1: NOTIFY $1, $2</span>
 <span class="x">               ^</span>
 </pre></div>
 </div>
 <p>and with any data definition statement:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE foo (id int DEFAULT </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TABLE foo (id int DEFAULT </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.UndefinedParameter</span>: <span class="n">there is no parameter $1</span>
@@ -355,22 +355,22 @@ it doesn’t work with <code class="sql docutils literal notranslate"><span clas
 <p>Sometimes, PostgreSQL offers an alternative: for instance the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET">set_config()</a>
 function can be used instead of the <code class="sql docutils literal notranslate"><span class="pre">SET</span></code> statement, the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-notify.html#id-1.9.3.157.7.5">pg_notify()</a>
 function can be used instead of <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT set_config(&#39;TimeZone&#39;, </span><span class="si">%s</span><span class="s2">, false)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;UTC&quot;</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT set_config('TimeZone', </span><span class="si">%s</span><span class="s2">, false)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"UTC"</span><span class="p">])</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_notify(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;chan&quot;</span><span class="p">,</span> <span class="s2">&quot;42&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT pg_notify(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"chan"</span><span class="p">,</span> <span class="s2">"42"</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>If this is not possible, you must merge the query and the parameter on the
 client side. You can do so using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE foo (id int DEFAULT </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"CREATE TABLE foo (id int DEFAULT </span><span class="si">{}</span><span class="s2">)"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or creating a <a class="reference internal" href="../advanced/cursors.html#client-side-binding-cursors"><span class="std std-ref">client-side binding cursor</span></a>
 such as <a class="reference internal" href="../api/cursors.html#psycopg.ClientCursor" title="psycopg.ClientCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE foo (id int DEFAULT </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TABLE foo (id int DEFAULT </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>If you need <code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientCursor</span></code> often, you can set the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor_factory" title="psycopg.Connection.cursor_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.cursor_factory</span></code></a>
@@ -383,9 +383,9 @@ use the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" 
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 
 <span class="go"># This will quote the user and the password using the right quotes</span>
-<span class="go"># e.g.: ALTER USER &quot;foo&quot; SET PASSWORD &#39;bar&#39;</span>
+<span class="go"># e.g.: ALTER USER "foo" SET PASSWORD 'bar'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;ALTER USER </span><span class="si">{}</span><span class="s2"> SET PASSWORD </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"ALTER USER </span><span class="si">{}</span><span class="s2"> SET PASSWORD </span><span class="si">{}</span><span class="s2">"</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">username</span><span class="p">),</span> <span class="n">password</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -405,7 +405,7 @@ details.</p>
 when parameters are used, it is not possible to execute several statements in
 the same <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call, separating them by semicolon:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
@@ -419,14 +419,14 @@ can compose a multiple query on the client side and run them all in the same
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> call, using the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> objects:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sql</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">{}</span><span class="s2">); INSERT INTO foo values (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">{}</span><span class="s2">); INSERT INTO foo values (</span><span class="si">{}</span><span class="s2">)"</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or a <a class="reference internal" href="../advanced/cursors.html#client-side-binding-cursors"><span class="std std-ref">client-side binding cursor</span></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">ClientCursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">); INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -445,7 +445,7 @@ can compose a multiple query on the client side and run them all in the same
 <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>), it cannot be executed in batch with other
 statements, even if the connection is in autocommit mode:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE DATABASE foo; SELECT 1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE DATABASE foo; SELECT 1"</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.ActiveSqlTransaction</span>: <span class="n">CREATE DATABASE cannot run inside a transaction block</span>
@@ -463,7 +463,7 @@ send them to the server separately).</p>
 <span id="multi-results"></span><h2>Multiple results returned from multiple statements<a class="headerlink" href="#multiple-results-returned-from-multiple-statements" title="Link to this heading">¶</a></h2>
 <p>If more than one statement returning results is executed in psycopg2, only the
 result of the last statement is returned:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1; SELECT 2&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1; SELECT 2"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg2</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">(2,)</span>
 </pre></div>
@@ -473,7 +473,7 @@ the first result will be readily available in the cursor and can be consumed
 using the usual <code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch*()</span></code> methods. In order to access the following
 results, you can use the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.results" title="psycopg.Cursor.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.results()</span></code></a> method (or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.nextset" title="psycopg.Cursor.nextset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextset()</span></code></a>
 before Psycopg 3.3):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1; SELECT 2&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1; SELECT 2"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cur_pg3</span><span class="o">.</span><span class="n">results</span><span class="p">():</span>
 <span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="n">cur_pg3</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
 <span class="go">(1,)</span>
@@ -488,14 +488,14 @@ parameters to the query.</p>
 <span id="difference-cast-rules"></span><h2>Different cast rules<a class="headerlink" href="#different-cast-rules" title="Link to this heading">¶</a></h2>
 <p>In rare cases, especially around variadic functions, PostgreSQL might fail to
 find a function candidate for the given data types:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT json_build_array(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT json_build_array(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
 <span class="gr">psycopg.errors.IndeterminateDatatype</span>: <span class="n">could not determine data type of parameter $1</span>
 </pre></div>
 </div>
 <p>This can be worked around specifying the argument types explicitly via a cast:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT json_build_array(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT json_build_array(</span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
@@ -503,10 +503,10 @@ find a function candidate for the given data types:</p>
 <span id="in-and-tuple"></span><h2>You cannot use <code class="docutils literal notranslate"><span class="pre">IN</span> <span class="pre">%s</span></code> with a tuple<a class="headerlink" href="#you-cannot-use-in-s-with-a-tuple" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">IN</span></code> cannot be used with a tuple as single parameter, as was possible with
 <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE id IN </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">)])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE id IN </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">)])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
 <span class="x">LINE 1: SELECT * FROM foo WHERE id IN $1</span>
 <span class="x">                                      ^</span>
 </pre></div>
@@ -514,7 +514,7 @@ find a function candidate for the given data types:</p>
 <p>What you can do is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparisons.html#id-1.5.8.30.16">= ANY()</a> construct and pass the candidate
 values as a list instead of a tuple, which will be adapted to a PostgreSQL
 array:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
 </pre></div>
 </div>
 <p>Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">ANY()</span></code> can be used with <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> too, and has the advantage of
@@ -524,10 +524,10 @@ the <code class="sql docutils literal notranslate"><span class="pre">IN</span></
 <section id="you-cannot-use-is-s">
 <span id="is-null"></span><h2>You cannot use <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code><a class="headerlink" href="#you-cannot-use-is-s" title="Link to this heading">¶</a></h2>
 <p>You cannot use <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code> or <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">%s</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE field IS </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE field IS </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="c">...</span>
-<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
 <span class="x">LINE 1: SELECT * FROM foo WHERE field IS $1</span>
 <span class="x">                                     ^</span>
 </pre></div>
@@ -537,7 +537,7 @@ PostgreSQL; rather, <code class="sql docutils literal notranslate"><span class="
 and you cannot use <code class="sql docutils literal notranslate"><span class="pre">IS</span></code> with anything else on the right hand side.
 Testing in psql:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=# SELECT 10 IS 10;
-ERROR:  syntax error at or near &quot;10&quot;
+ERROR:  syntax error at or near "10"
 LINE 1: SELECT 10 IS 10;
                      ^
 </pre></div>
@@ -545,7 +545,7 @@ LINE 1: SELECT 10 IS 10;
 <p>What you can do is to use <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparison.html">IS [NOT] DISTINCT FROM</a> predicate instead:
 <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">%s</span></code> can be used in place of <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">%s</span></code> (please
 pay attention to the awkwardly reversed <code class="sql docutils literal notranslate"><span class="pre">NOT</span></code>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM foo WHERE field IS NOT DISTINCT FROM </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM foo WHERE field IS NOT DISTINCT FROM </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Analogously you can use <code class="sql docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">%s</span></code> as a parametric version of

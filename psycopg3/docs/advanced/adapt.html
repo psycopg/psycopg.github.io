@@ -418,17 +418,17 @@ too many ways of handling XML in Python. Creating a loader to parse the
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Register the loader on the adapters of a context.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="n">XmlLoader</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"xml"</span><span class="p">,</span> <span class="n">XmlLoader</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now just query the database returning XML data.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span><span class="w">    </span><span class="sd">&quot;&quot;&quot;select XMLPARSE (DOCUMENT &#39;&lt;?xml version=&quot;1.0&quot;?&gt;</span>
-<span class="gp">... </span><span class="sd">           &lt;book&gt;&lt;title&gt;Manual&lt;/title&gt;&lt;chapter&gt;...&lt;/chapter&gt;&lt;/book&gt;&#39;)</span>
-<span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="w">    </span><span class="sd">"""select XMLPARSE (DOCUMENT '&lt;?xml version="1.0"?&gt;</span>
+<span class="gp">... </span><span class="sd">           &lt;book&gt;&lt;title&gt;Manual&lt;/title&gt;&lt;chapter&gt;...&lt;/chapter&gt;&lt;/book&gt;')</span>
+<span class="gp">... </span><span class="sd">    """</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
-<span class="go">&lt;Element &#39;book&#39; at 0x7ffb55142ef0&gt;</span>
+<span class="go">&lt;Element 'book' at 0x7ffb55142ef0&gt;</span>
 </pre></div>
 </div>
 <p>The opposite operation, converting Python objects to PostgreSQL, is performed
@@ -438,7 +438,7 @@ you only need to implement the <a class="reference internal" href="../api/abc.ht
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">XmlDumper</span><span class="p">(</span><span class="n">Dumper</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="c1"># Setting an OID is not necessary but can be helpful</span>
-<span class="gp">... </span>    <span class="n">oid</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;xml&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span>
+<span class="gp">... </span>    <span class="n">oid</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"xml"</span><span class="p">]</span><span class="o">.</span><span class="n">oid</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
@@ -447,8 +447,8 @@ you only need to implement the <a class="reference internal" href="../api/abc.ht
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_dumper</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span> <span class="n">XmlDumper</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now, in that context, it is possible to use ET.Element objects as parameters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT xpath(&#39;//title/text()&#39;, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">elem</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">[&#39;Manual&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT xpath('//title/text()', </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">elem</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">['Manual']</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -457,23 +457,23 @@ you only need to implement the <a class="reference internal" href="../api/abc.ht
 any <a class="reference internal" href="../api/abc.html#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a>, to obtain information on builtin types, in
 the form of a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code> object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Global types registry</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">TypeInfo</span><span class="p">:</span> <span class="n">text</span> <span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="n">array</span> <span class="n">oid</span><span class="p">:</span> <span class="mi">1009</span><span class="p">)</span><span class="o">&gt;</span>
 
 <span class="c1"># Types registry on a connection</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;integer&quot;</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"integer"</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">TypeInfo</span><span class="p">:</span> <span class="n">int4</span> <span class="p">(</span><span class="n">oid</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span> <span class="n">array</span> <span class="n">oid</span><span class="p">:</span> <span class="mi">1007</span><span class="p">)</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>The same method can be used to get information about extension types if
 they have been registered on that context using the
 <a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo" title="psycopg.types.TypeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code></a>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.register" title="psycopg.types.TypeInfo.register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register()</span></code></a> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t</span> <span class="o">:=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;hstore&quot;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t</span> <span class="o">:=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">TypeInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"hstore"</span><span class="p">))</span>
 <span class="go">&lt;TypeInfo: hstore (oid: 770082, array oid: 770087)&gt;</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>  <span class="c1"># globally</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">&quot;hstore&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="s2">"hstore"</span><span class="p">]</span>
 <span class="go">&lt;TypeInfo: hstore (oid: 770082, array oid: 770087)&gt;</span>
 </pre></div>
 </div>
@@ -498,8 +498,8 @@ to return <code class="xref py py-obj docutils literal notranslate"><span class=
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_dumper</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">NullStrDumper</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;  &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">(&#39;foo&#39;, None, &#39;bar&#39;, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"foo"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">,</span> <span class="s2">"  "</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">('foo', None, 'bar', None)</span>
 </pre></div>
 </div>
 </section>
@@ -520,12 +520,12 @@ representation of both floats and decimal is the same, the two loaders are
 compatible.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 123.45&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="c1"># Decimal(&#39;123.45&#39;)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Decimal('123.45')</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">&quot;numeric&quot;</span><span class="p">,</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">numeric</span><span class="o">.</span><span class="n">FloatLoader</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"numeric"</span><span class="p">,</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">numeric</span><span class="o">.</span><span class="n">FloatLoader</span><span class="p">)</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 123.45&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 123.45"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># 123.45</span>
 </pre></div>
 </div>
@@ -536,10 +536,10 @@ compatible.</p>
 <span id="adapt-example-inf-date"></span><h2>Example: handling infinity date<a class="headerlink" href="#example-handling-infinity-date" title="Link to this heading">¶</a></h2>
 <p>Suppose you want to work with the “infinity” date which is available in
 PostgreSQL but not handled by Python:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;infinity&#39;::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="w">   </span><span class="c">...</span>
-<span class="gr">DataError</span>: <span class="n">date too large (after year 10K): &#39;infinity&#39;</span>
+<span class="gr">DataError</span>: <span class="n">date too large (after year 10K): 'infinity'</span>
 </pre></div>
 </div>
 <p>One possibility would be to store Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> as PostgreSQL
@@ -554,28 +554,28 @@ cursor):</p>
 <span class="k">class</span><span class="w"> </span><span class="nc">InfDateDumper</span><span class="p">(</span><span class="n">DateDumper</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">"infinity"</span>
         <span class="k">elif</span> <span class="n">obj</span> <span class="o">==</span> <span class="n">date</span><span class="o">.</span><span class="n">min</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;-infinity&quot;</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">"-infinity"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">InfDateLoader</span><span class="p">(</span><span class="n">DateLoader</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;infinity&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"infinity"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span>
-        <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;-infinity&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"-infinity"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">min</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="c1"># The new classes can be registered globally, on a connection, on a cursor</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_dumper</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">InfDateDumper</span><span class="p">)</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">InfDateLoader</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">register_loader</span><span class="p">(</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">InfDateLoader</span><span class="p">)</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="c1"># (&#39;2020-12-31&#39;, &#39;infinity&#39;)</span>
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2020-12-31&#39;::date, &#39;infinity&#39;::date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">::text, </span><span class="si">%s</span><span class="s2">::text"</span><span class="p">,</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">date</span><span class="o">.</span><span class="n">max</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="c1"># ('2020-12-31', 'infinity')</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2020-12-31'::date, 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="c1"># (datetime.date(2020, 12, 31), datetime.date(9999, 12, 31))</span>
 </pre></div>
 </div>

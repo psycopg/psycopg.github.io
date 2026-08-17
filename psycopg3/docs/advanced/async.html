@@ -350,14 +350,14 @@ state.</p>
 ones: in order to use them you will only have to scatter the <code class="xref py py-obj docutils literal notranslate"><span class="pre">await</span></code> keyword
 here and there.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-        <span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
+        <span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">aconn</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">aconn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">acur</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
-        <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
+            <span class="s2">"INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">"abc'def"</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM test"</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">acur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="c1"># will return (1, 100, &quot;abc&#39;def&quot;)</span>
+        <span class="c1"># will return (1, 100, "abc'def")</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">acur</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </pre></div>
@@ -388,7 +388,7 @@ the <a class="reference external" href="https://docs.python.org/3/library/asynci
 <span id="async-with"></span><span id="index-2"></span><h2><code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> async connections<a class="headerlink" href="#with-async-connections" title="Link to this heading">¶</a></h2>
 <p>As seen in <a class="reference internal" href="../basic/usage.html#usage"><span class="std std-ref">the basic usage</span></a>, connections and cursors can act as
 context managers, so you can run:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
     <span class="c1"># the cursor is closed upon leaving the context</span>
@@ -481,12 +481,12 @@ attribute of the errors raised by the server:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">log_notice</span><span class="p">(</span><span class="n">diag</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The server says: </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">message_primary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The server says: </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">diag</span><span class="o">.</span><span class="n">message_primary</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">add_notice_handler</span><span class="p">(</span><span class="n">log_notice</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ROLLBACK&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"ROLLBACK"</span><span class="p">)</span>
 <span class="go">The server says: WARNING - there is no transaction in progress</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">statusmessage</span><span class="p">)</span>
 <span class="go">ROLLBACK</span>
@@ -533,29 +533,29 @@ or up to a certain number.</p>
 <p>The following example will print notifications and stop when one containing
 the <code class="docutils literal notranslate"><span class="pre">&quot;stop&quot;</span></code> message is received.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;LISTEN mychan&quot;</span><span class="p">)</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"LISTEN mychan"</span><span class="p">)</span>
 <span class="n">gen</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">notifies</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">notify</span> <span class="ow">in</span> <span class="n">gen</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">notify</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">notify</span><span class="o">.</span><span class="n">payload</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">notify</span><span class="o">.</span><span class="n">payload</span> <span class="o">==</span> <span class="s2">"stop"</span><span class="p">:</span>
         <span class="n">gen</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;there, I stopped&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"there, I stopped"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If you run some <code class="sql docutils literal notranslate"><span class="pre">NOTIFY</span></code> in a <strong class="program">psql</strong> session:</p>
-<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hello&#39;</span><span class="p">;</span>
+<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">;</span>
 <span class="go">NOTIFY</span>
-<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hey&#39;</span><span class="p">;</span>
+<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">'hey'</span><span class="p">;</span>
 <span class="go">NOTIFY</span>
-<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stop&#39;</span><span class="p">;</span>
+<span class="gp">=#</span><span class="w"> </span><span class="k">NOTIFY</span><span class="w"> </span><span class="n">mychan</span><span class="p">,</span><span class="w"> </span><span class="s1">'stop'</span><span class="p">;</span>
 <span class="go">NOTIFY</span>
 </pre></div>
 </div>
 <p>You may get output from the Python process such as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
-<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;hey&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
-<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">&#39;mychan&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">'mychan'</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">'hello'</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">'mychan'</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">'hey'</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
+<span class="n">Notify</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s1">'mychan'</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">'stop'</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="mi">961823</span><span class="p">)</span>
 <span class="n">there</span><span class="p">,</span> <span class="n">I</span> <span class="n">stopped</span>
 </pre></div>
 </div>
@@ -585,14 +585,14 @@ callback function, which will be invoked whenever a notification is received,
 during the normal query processing; you will be then able to use the
 connection normally. Please note that in this case notifications will not be
 received immediately, but only during a connection operation, such as a query.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">add_notify_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;got this: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">add_notify_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"got this: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
 
 <span class="c1"># meanwhile in psql...</span>
-<span class="c1"># =# NOTIFY mychan, &#39;hey&#39;;</span>
+<span class="c1"># =# NOTIFY mychan, 'hey';</span>
 <span class="c1"># NOTIFY</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
-<span class="c1"># got this: Notify(channel=&#39;mychan&#39;, payload=&#39;hey&#39;, pid=961823)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
+<span class="c1"># got this: Notify(channel='mychan', payload='hey', pid=961823)</span>
 <span class="c1"># (1,)</span>
 </pre></div>
 </div>
@@ -626,10 +626,10 @@ something else to do too.</p>
 
     <span class="c1"># Activity detected. Is the connection still ok?</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
         <span class="c1"># You were disconnected: do something useful such as panicking</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;we lost our database!&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"we lost our database!"</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -649,7 +649,7 @@ something similar using <a class="reference external" href="https://docs.python.
 
     <span class="c1"># Activity detected. Is the connection still ok?</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
         <span class="c1"># Guess what happened</span>
         <span class="o">...</span>

@@ -307,20 +307,20 @@ working with it.</p>
 disappointed by it), is likely:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<span class="c1"># Creating a cursor doesn&#39;t start a transaction or affect the connection</span>
+<span class="c1"># Creating a cursor doesn't start a transaction or affect the connection</span>
 <span class="c1"># in any way.</span>
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
 <span class="c1"># - BEGIN</span>
 <span class="c1"># - SELECT count(*) FROM my_table</span>
 <span class="c1"># So now a transaction has started.</span>
 
 <span class="c1"># If your program spends a long time in this state, the server will keep</span>
-<span class="c1"># a connection &quot;idle in transaction&quot;, which is likely something undesired</span>
+<span class="c1"># a connection "idle in transaction", which is likely something undesired</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
 <span class="c1"># This statement is executed inside the transaction</span>
 
 <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -340,13 +340,13 @@ sequence of database statements:</p>
 </span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># This function call executes:</span>
     <span class="c1"># - BEGIN</span>
     <span class="c1"># - SELECT count(*) FROM my_table</span>
     <span class="c1"># So now a transaction has started.</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
     <span class="c1"># This statement is executed inside the transaction</span>
 
 <span class="c1"># No exception at the end of the block:</span>
@@ -388,12 +388,12 @@ inside a transaction, such as <code class="sql docutils literal notranslate"><sp
 </span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># This function call now only executes:</span>
     <span class="c1"># - SELECT count(*) FROM my_table</span>
     <span class="c1"># and no transaction starts.</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
     <span class="c1"># The result of this statement is persisted immediately by the database</span>
 
 <span class="c1"># The connection is closed at the end of the block but, because it is not</span>
@@ -421,14 +421,14 @@ use a <code class="xref py py-obj docutils literal notranslate"><span class="pre
 
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
     <span class="c1"># The connection is autocommit, so no BEGIN executed.</span>
 
 <span class="hll">    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
 </span>        <span class="c1"># BEGIN is executed, a transaction started</span>
 
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO times VALUES (now())&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO times VALUES (now())"</span><span class="p">)</span>
         <span class="c1"># These two operation run atomically in the same transaction</span>
 
     <span class="c1"># COMMIT is executed at the end of the block.</span>
@@ -446,7 +446,7 @@ as explained in <a class="reference internal" href="#transactions"><span class="
 
 <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
 
-<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT count(*) FROM my_table&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM my_table"</span><span class="p">)</span>
 <span class="c1"># This function call executes:</span>
 <span class="c1"># - BEGIN</span>
 <span class="c1"># - SELECT count(*) FROM my_table</span>
@@ -456,7 +456,7 @@ as explained in <a class="reference internal" href="#transactions"><span class="
     <span class="c1"># The block starts with a transaction already open, so it will execute</span>
     <span class="c1"># - SAVEPOINT</span>
 
-    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
 
 <span class="c1"># The block was executing a sub-transaction so on exit it will only run:</span>
 <span class="c1"># - RELEASE SAVEPOINT</span>
@@ -500,7 +500,7 @@ number of operations successfully processed.</p>
             <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx2</span><span class="p">:</span>
                 <span class="n">unreliable_operation</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num_ok</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -550,13 +550,13 @@ please check its documentation for the possible values.</p>
 <span class="c1"># Successful transaction</span>
 <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
     <span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,))</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
 <span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">COMMITTED</span>
 
 <span class="c1"># Transaction rolled back with an error</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;World&quot;</span><span class="p">,))</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"World"</span><span class="p">,))</span>
         <span class="mi">1</span> <span class="o">/</span> <span class="mi">0</span>  <span class="c1"># Causes an exception</span>
 <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
     <span class="k">pass</span>
@@ -564,13 +564,13 @@ please check its documentation for the possible values.</p>
 
 <span class="c1"># Explicit rollback</span>
 <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Test&quot;</span><span class="p">,))</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Test"</span><span class="p">,))</span>
     <span class="k">raise</span> <span class="n">Rollback</span><span class="p">()</span>
 <span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ROLLED_BACK_EXPLICITLY</span>
 
 <span class="c1"># Force rollback</span>
 <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="n">force_rollback</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Temp&quot;</span><span class="p">,))</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Temp"</span><span class="p">,))</span>
 <span class="k">assert</span> <span class="n">tx</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">tx</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ROLLED_BACK_EXPLICITLY</span>
 </pre></div>
 </div>

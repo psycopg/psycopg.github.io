@@ -299,8 +299,8 @@ customise the conversion you should take a look at <a class="reference internal"
 <span id="adapt-bool"></span><span id="index-1"></span><h2>Booleans adaptation<a class="headerlink" href="#booleans-adaptation" title="Link to this heading">¶</a></h2>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> values <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code> are converted to the equivalent
 <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-boolean.html">PostgreSQL boolean type</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-<span class="go"># equivalent to &quot;SELECT true, false&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+<span class="go"># equivalent to "SELECT true, false"</span>
 </pre></div>
 </div>
 <div class="versionchanged">
@@ -350,10 +350,10 @@ an adapter to <a class="reference internal" href="../advanced/adapt.html#adapt-e
 such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="s2">&quot;INSERT INTO menu (id, entry) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Crème Brûlée at 4.99€&quot;</span><span class="p">))</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT entry FROM menu WHERE id = 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s1">&#39;Crème Brûlée at 4.99€&#39;</span>
+    <span class="s2">"INSERT INTO menu (id, entry) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"Crème Brûlée at 4.99€"</span><span class="p">))</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s1">'Crème Brûlée at 4.99€'</span>
 </pre></div>
 </div>
 <p>PostgreSQL databases <a class="reference external" href="https://www.postgresql.org/docs/current/sql-createdatabase.html">have an encoding</a>, and <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html">the session has an encoding</a>
@@ -364,29 +364,29 @@ application only deals with the non-ASCII chars that the database can handle;
 failing to do so may result in encoding/decoding errors:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The encoding is set at connection time according to the db configuration</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">encoding</span>
-<span class="s1">&#39;utf-8&#39;</span>
+<span class="s1">'utf-8'</span>
 
 <span class="c1"># The Latin-9 encoding can manage some European accented letters</span>
 <span class="c1"># and the Euro symbol</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET client_encoding TO LATIN9&quot;</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT entry FROM menu WHERE id = 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s1">&#39;Crème Brûlée at 4.99€&#39;</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN9"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s1">'Crème Brûlée at 4.99€'</span>
 
-<span class="c1"># The Latin-1 encoding doesn&#39;t have a representation for the Euro symbol</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET client_encoding TO LATIN1&quot;</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT entry FROM menu WHERE id = 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># The Latin-1 encoding doesn't have a representation for the Euro symbol</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO LATIN1"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Traceback (most recent call last)</span>
 <span class="c1"># ...</span>
 <span class="c1"># UntranslatableCharacter: character with byte sequence 0xe2 0x82 0xac</span>
-<span class="c1"># in encoding &quot;UTF8&quot; has no equivalent in encoding &quot;LATIN1&quot;</span>
+<span class="c1"># in encoding "UTF8" has no equivalent in encoding "LATIN1"</span>
 </pre></div>
 </div>
 <p>In rare cases you may have strings with unexpected encodings in the database.
 Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> client encoding  will disable decoding of the data
 coming from the database, which will be returned as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET client_encoding TO SQL_ASCII&quot;</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT entry FROM menu WHERE id = 1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="sa">b</span><span class="s1">&#39;Cr</span><span class="se">\xc3\xa8</span><span class="s1">me Br</span><span class="se">\xc3\xbb</span><span class="s1">l</span><span class="se">\xc3\xa9</span><span class="s1">e at 4.99</span><span class="se">\xe2\x82\xac</span><span class="s1">&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO SQL_ASCII"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="sa">b</span><span class="s1">'Cr</span><span class="se">\xc3\xa8</span><span class="s1">me Br</span><span class="se">\xc3\xbb</span><span class="s1">l</span><span class="se">\xc3\xa9</span><span class="s1">e at 4.99</span><span class="se">\xe2\x82\xac</span><span class="s1">'</span>
 </pre></div>
 </div>
 <p>Alternatively you can cast the unknown encoding data to <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> to
@@ -428,10 +428,10 @@ time and more bandwidth. See <a class="reference internal" href="params.html#bin
 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.ZoneInfo" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoneInfo</span></code></a> object in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.info</span></code>.<a class="reference internal" href="../api/objects.html#psycopg.ConnectionInfo.timezone" title="psycopg.ConnectionInfo.timezone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a>
 attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timezone</span>
-<span class="go">zoneinfo.ZoneInfo(key=&#39;Europe/London&#39;)</span>
+<span class="go">zoneinfo.ZoneInfo(key='Europe/London')</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;2048-07-08 12:00&#39;::timestamptz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">datetime.datetime(2048, 7, 8, 12, 0, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/London&#39;))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '2048-07-08 12:00'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">datetime.datetime(2048, 7, 8, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Europe/London'))</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -439,10 +439,10 @@ attribute:</p>
 <p>PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">timestamptz</span></code> doesn’t store “a timestamp with a timezone
 attached”: it stores a timestamp always in UTC, which is converted, on
 output, to the connection TimeZone setting:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TIMEZONE to &#39;Europe/Rome&#39;&quot;</span><span class="p">)</span>  <span class="c1"># UTC+2 in summer</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET TIMEZONE to 'Europe/Rome'"</span><span class="p">)</span>  <span class="c1"># UTC+2 in summer</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-07-01 12:00Z&#39;::timestamptz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># UTC input</span>
-<span class="go">datetime.datetime(2042, 7, 1, 14, 0, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/Rome&#39;))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2042-07-01 12:00Z'::timestamptz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># UTC input</span>
+<span class="go">datetime.datetime(2042, 7, 1, 14, 0, tzinfo=zoneinfo.ZoneInfo(key='Europe/Rome'))</span>
 </pre></div>
 </div>
 <p>Check out the <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES">PostgreSQL documentation about timezones</a> for all the
@@ -458,14 +458,14 @@ PostgreSQL. However they are only supported with fixed offset timezones:
 Postgres <code class="sql docutils literal notranslate"><span class="pre">timetz</span></code> values loaded from the database will result in
 Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code> objects with <code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code> attributes specified as fixed
 offset, for instance by a <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timezone" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timezone</span></code></a> value:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TIMEZONE to &#39;Europe/Rome&#39;&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET TIMEZONE to 'Europe/Rome'"</span><span class="p">)</span>
 
 <span class="go"># UTC+1 in winter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-01-01 12:00Z&#39;::timestamptz::timetz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2042-01-01 12:00Z'::timestamptz::timetz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">datetime.time(13, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600)))</span>
 
 <span class="go"># UTC+2 in summer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;2042-07-01 12:00Z&#39;::timestamptz::timetz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '2042-07-01 12:00Z'::timestamptz::timetz"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">datetime.time(14, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)))</span>
 </pre></div>
 </div>
@@ -500,9 +500,9 @@ with a different setting is not supported.</p>
 <p>If your server is configured with different settings by default, you can
 obtain a connection in a supported style using the <code class="docutils literal notranslate"><span class="pre">options</span></code> connection
 parameter; for example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="s2">&quot;-c datestyle=ISO,YMD&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;show datestyle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go"># &#39;ISO, YMD&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="s2">"-c datestyle=ISO,YMD"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"show datestyle"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go"># 'ISO, YMD'</span>
 </pre></div>
 </div>
 <p>These GUC parameters only affects loading in text format; loading timestamps
@@ -520,8 +520,8 @@ Psycopg requires you to wrap the object to dump as JSON into a wrapper:
 either <a class="reference internal" href="../api/types.html#psycopg.types.json.Json" title="psycopg.types.json.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.json.Json</span></code></a> or <a class="reference internal" href="../api/types.html#psycopg.types.json.Jsonb" title="psycopg.types.json.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jsonb</span>
 
-<span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
+<span class="n">thing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"foo"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"bar"</span><span class="p">,</span> <span class="mi">42</span><span class="p">]}</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">(</span><span class="n">thing</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>By default Psycopg uses the standard library <a class="reference external" href="https://docs.python.org/3/library/json.html#json.dumps" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json.dumps</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/json.html#json.loads" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json.loads</span></code></a>
@@ -541,8 +541,8 @@ to a specific context (connection or cursor).</p>
 <span class="c1"># Return floating point values as Decimal, just in one connection</span>
 <span class="n">set_json_loads</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span> <span class="n">parse_float</span><span class="o">=</span><span class="n">Decimal</span><span class="p">),</span> <span class="n">conn</span><span class="p">)</span>
 
-<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">123.45</span><span class="p">})])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="c1"># {&#39;value&#39;: Decimal(&#39;123.45&#39;)}</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Jsonb</span><span class="p">({</span><span class="s2">"value"</span><span class="p">:</span> <span class="mf">123.45</span><span class="p">})])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># {'value': Decimal('123.45')}</span>
 </pre></div>
 </div>
 <p>If you need an even more specific dump customisation only for certain objects
@@ -553,16 +553,16 @@ take precedence over what is specified by <code class="xref py py-obj docutils l
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">UUIDEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A JSON encoder which can dump UUID.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A JSON encoder which can dump UUID."""</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">UUID</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
 <span class="n">uuid_dumps</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">UUIDEncoder</span><span class="p">)</span>
-<span class="n">obj</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()}</span>
-<span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO objs VALUES </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dumps</span><span class="o">=</span><span class="n">uuid_dumps</span><span class="p">)])</span>
-<span class="c1"># will insert: {&#39;uuid&#39;: &#39;0a40799d-3980-4c65-8315-2956b18ab0e1&#39;}</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"uuid"</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()}</span>
+<span class="n">cnn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO objs VALUES </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">Json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dumps</span><span class="o">=</span><span class="n">uuid_dumps</span><span class="p">)])</span>
+<span class="c1"># will insert: {'uuid': '0a40799d-3980-4c65-8315-2956b18ab0e1'}</span>
 </pre></div>
 </div>
 </section>
@@ -575,17 +575,17 @@ list may contain <code class="xref py py-obj docutils literal notranslate"><span
 <p class="admonition-title">Note</p>
 <p>If you have a list of values which you want to use with the <code class="sql docutils literal notranslate"><span class="pre">IN</span></code>
 operator… don’t. It won’t work (neither with a list nor with a tuple):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM mytable WHERE id IN </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM mytable WHERE id IN </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
 <span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near &quot;$1&quot;</span>
+  File <span class="nb">"&lt;stdin&gt;"</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">psycopg.errors.SyntaxError</span>: <span class="n">syntax error at or near "$1"</span>
 <span class="x">LINE 1: SELECT * FROM mytable WHERE id IN $1</span>
 <span class="x">                                          ^</span>
 </pre></div>
 </div>
 <p>What you want to do instead is to use the <a class="reference external" href="https://www.postgresql.org/docs/current/functions-comparisons.html#id-1.5.8.30.16">‘= ANY()’ expression</a> and pass
 the values as a list (not a tuple).</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM mytable WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM mytable WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
 </pre></div>
 </div>
 <p>This has also the advantage of working with an empty list, whereas <code class="docutils literal notranslate"><span class="pre">IN</span>
@@ -595,11 +595,11 @@ the values as a list (not a tuple).</p>
 <section id="uuid-adaptation">
 <span id="adapt-uuid"></span><h2>UUID adaptation<a class="headerlink" href="#uuid-adaptation" title="Link to this heading">¶</a></h2>
 <p>Python <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uuid.UUID</span></code></a> objects are adapted to PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-uuid.html">UUID type</a> and back:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select gen_random_uuid()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">UUID(&#39;97f0dd62-3bd2-459e-89b8-a5e36ea3c16c&#39;)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select gen_random_uuid()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">UUID('97f0dd62-3bd2-459e-89b8-a5e36ea3c16c')</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select gen_random_uuid() = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">uuid4</span><span class="p">()])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select gen_random_uuid() = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="n">uuid4</span><span class="p">()])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">False  # long shot</span>
 </pre></div>
 </div>
@@ -619,11 +619,11 @@ back.</p></li>
 <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Network" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Network</span></code></a> objects follow the same rules, with IPv6
 <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> and <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> values.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;192.168.0.1&#39;::inet, &#39;192.168.0.1/24&#39;::inet&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">(IPv4Address(&#39;192.168.0.1&#39;), IPv4Interface(&#39;192.168.0.1/24&#39;))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '192.168.0.1'::inet, '192.168.0.1/24'::inet"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="go">(IPv4Address('192.168.0.1'), IPv4Interface('192.168.0.1/24'))</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select &#39;::ffff:1.2.3.0/120&#39;::cidr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">IPv6Network(&#39;::ffff:102:300/120&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select '::ffff:1.2.3.0/120'::cidr"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">IPv6Network('::ffff:102:300/120')</span>
 </pre></div>
 </div>
 </section>
@@ -742,9 +742,9 @@ PostgreSQL enum labels.</p>
 <span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TYPE user_role AS ENUM (&#39;ADMIN&#39;, &#39;EDITOR&#39;, &#39;GUEST&#39;)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE user_role AS ENUM ('ADMIN', 'EDITOR', 'GUEST')"</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;user_role&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"user_role"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">UserRole</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">some_editor</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">enum</span><span class="o">.</span><span class="n">EDITOR</span>
@@ -752,13 +752,13 @@ PostgreSQL enum labels.</p>
 <span class="go">&lt;UserRole.EDITOR: 2&gt;</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;SELECT pg_typeof(</span><span class="si">%(editor)s</span><span class="s2">), </span><span class="si">%(editor)s</span><span class="s2">&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;editor&quot;</span><span class="p">:</span> <span class="n">some_editor</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="s2">"SELECT pg_typeof(</span><span class="si">%(editor)s</span><span class="s2">), </span><span class="si">%(editor)s</span><span class="s2">"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"editor"</span><span class="p">:</span> <span class="n">some_editor</span><span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="go">(&#39;user_role&#39;, &lt;UserRole.EDITOR: 2&gt;)</span>
+<span class="go">('user_role', &lt;UserRole.EDITOR: 2&gt;)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;SELECT ARRAY[</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"SELECT ARRAY[</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">]"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">GUEST</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 <span class="go">[&lt;UserRole.ADMIN: 1&gt;, &lt;UserRole.GUEST: 3&gt;]</span>
@@ -775,41 +775,41 @@ matters: if an element on either side is specified more than once, the last
 pair in the sequence will take precedence:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Legacy roles, defined in medieval times.</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="o">...</span>     <span class="s2">&quot;CREATE TYPE abbey_role AS ENUM (&#39;ABBOT&#39;, &#39;SCRIBE&#39;, &#39;MONK&#39;, &#39;GUEST&#39;)&quot;</span><span class="p">)</span>
+<span class="o">...</span>     <span class="s2">"CREATE TYPE abbey_role AS ENUM ('ABBOT', 'SCRIBE', 'MONK', 'GUEST')"</span><span class="p">)</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;abbey_role&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"abbey_role"</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">register_enum</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">UserRole</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="p">[</span>
-<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="s2">&quot;ABBOT&quot;</span><span class="p">),</span>
-<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">&quot;SCRIBE&quot;</span><span class="p">),</span>
-<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">&quot;MONK&quot;</span><span class="p">)])</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="s2">"ABBOT"</span><span class="p">),</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">"SCRIBE"</span><span class="p">),</span>
+<span class="o">...</span>     <span class="p">(</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span> <span class="s2">"MONK"</span><span class="p">)])</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;{ABBOT,SCRIBE,MONK,GUEST}&#39;::abbey_role[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT '{ABBOT,SCRIBE,MONK,GUEST}'::abbey_role[]"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">[</span><span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span>
  <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span>
  <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">:</span> <span class="mi">2</span><span class="o">&gt;</span><span class="p">,</span>
  <span class="o">&lt;</span><span class="n">UserRole</span><span class="o">.</span><span class="n">GUEST</span><span class="p">:</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">%s</span><span class="s2">::text[]&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">UserRole</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;ABBOT&#39;</span><span class="p">,</span> <span class="s1">&#39;MONK&#39;</span><span class="p">,</span> <span class="s1">&#39;GUEST&#39;</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT </span><span class="si">%s</span><span class="s2">::text[]"</span><span class="p">,</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">UserRole</span><span class="p">)])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">'ABBOT'</span><span class="p">,</span> <span class="s1">'MONK'</span><span class="p">,</span> <span class="s1">'GUEST'</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>A particularly useful case is when the PostgreSQL labels match the <em>values</em> of
 a <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>-based Enum. In this case it is possible to use something like <code class="docutils literal notranslate"><span class="pre">{m:</span>
 <span class="pre">m.value</span> <span class="pre">for</span> <span class="pre">m</span> <span class="pre">in</span> <span class="pre">enum}</span></code> as mapping:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">LowercaseRole</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
-<span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="s2">&quot;editor&quot;</span>
-<span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="s2">&quot;guest&quot;</span>
+<span class="gp">... </span>    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">"admin"</span>
+<span class="gp">... </span>    <span class="n">EDITOR</span> <span class="o">=</span> <span class="s2">"editor"</span>
+<span class="gp">... </span>    <span class="n">GUEST</span> <span class="o">=</span> <span class="s2">"guest"</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;CREATE TYPE lowercase_role AS ENUM (&#39;admin&#39;, &#39;editor&#39;, &#39;guest&#39;)&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="s2">"CREATE TYPE lowercase_role AS ENUM ('admin', 'editor', 'guest')"</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;lowercase_role&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">EnumInfo</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">"lowercase_role"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_enum</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">info</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">LowercaseRole</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">LowercaseRole</span><span class="p">})</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT &#39;editor&#39;::lowercase_role&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">&lt;LowercaseRole.EDITOR: &#39;editor&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'editor'::lowercase_role"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;LowercaseRole.EDITOR: 'editor'&gt;</span>
 </pre></div>
 </div>
 </section>

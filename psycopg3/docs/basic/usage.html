@@ -300,38 +300,38 @@ the <a class="reference external" href="https://www.python.org/dev/peps/pep-0249
 <span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 
 <span class="c1"># Connect to an existing database</span>
-<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"dbname=test user=postgres"</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 
     <span class="c1"># Open a cursor to perform database operations</span>
     <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
 
         <span class="c1"># Execute a command: this creates a new table</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">            CREATE TABLE test (</span>
 <span class="s2">                id serial PRIMARY KEY,</span>
 <span class="s2">                num integer,</span>
 <span class="s2">                data text)</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">            """</span><span class="p">)</span>
 
         <span class="c1"># Pass data to fill a query placeholders and let Psycopg perform</span>
         <span class="c1"># the correct conversion (no SQL injections!)</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="s2">&quot;INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;abc&#39;def&quot;</span><span class="p">))</span>
+            <span class="s2">"INSERT INTO test (num, data) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">"abc'def"</span><span class="p">))</span>
 
         <span class="c1"># Query the database and obtain data as Python objects.</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM test&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM test"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())</span>
-        <span class="c1"># will print (1, 100, &quot;abc&#39;def&quot;)</span>
+        <span class="c1"># will print (1, 100, "abc'def")</span>
 
         <span class="c1"># You can use `cur.executemany()` to perform an operation in batch</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
-            <span class="s2">&quot;INSERT INTO test (num) values (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="s2">"INSERT INTO test (num) values (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
             <span class="p">[(</span><span class="mi">33</span><span class="p">,),</span> <span class="p">(</span><span class="mi">66</span><span class="p">,),</span> <span class="p">(</span><span class="mi">99</span><span class="p">,)])</span>
 
         <span class="c1"># You can use `cur.fetchmany()`, `cur.fetchall()` to return a list</span>
         <span class="c1"># of several records, or even iterate on the cursor</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, num FROM test order by num&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT id, num FROM test order by num"</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 
@@ -413,7 +413,7 @@ a fetch operation, such as <a class="reference internal" href="../api/cursors.ht
 </ul>
 <p>Using them together, in simple cases, you can go from creating a connection to
 using a result in a single expression:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT now()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DSN</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT now()"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 <span class="c1"># 2042-07-12 18:15:10.706497+01:00</span>
 </pre></div>
 </div>
@@ -500,21 +500,21 @@ performed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;psycopg&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"psycopg"</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
-<span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;host=192.0.2.1,localhost connect_timeout=10&quot;</span><span class="p">)</span>
+<span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"host=192.0.2.1,localhost connect_timeout=10"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this example Psycopg will first try to connect to a non responsive server,
 only stopping after hitting the timeout, and will move on to a working server.
 The resulting log might look like:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2045-05-10 11:45:54,364 DEBUG connection attempt: host: &#39;192.0.2.1&#39;, port: None, hostaddr: &#39;192.0.2.1&#39;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2045-05-10 11:45:54,364 DEBUG connection attempt: host: '192.0.2.1', port: None, hostaddr: '192.0.2.1'
 2045-05-10 11:45:54,365 DEBUG connection started: &lt;psycopg_c.pq.PGconn [STARTED] at 0x79dff6d26160&gt;
 2045-05-10 11:45:54,365 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
-2045-05-10 11:46:04,392 DEBUG connection failed: host: &#39;192.0.2.1&#39;, port: None, hostaddr: &#39;192.0.2.1&#39;: connection timeout expired
-2045-05-10 11:46:04,392 DEBUG connection attempt: host: &#39;localhost&#39;, port: None, hostaddr: &#39;127.0.0.1&#39;
+2045-05-10 11:46:04,392 DEBUG connection failed: host: '192.0.2.1', port: None, hostaddr: '192.0.2.1': connection timeout expired
+2045-05-10 11:46:04,392 DEBUG connection attempt: host: 'localhost', port: None, hostaddr: '127.0.0.1'
 2045-05-10 11:46:04,393 DEBUG connection started: &lt;psycopg_c.pq.PGconn [STARTED] at 0x79dff6d26160&gt;
 2045-05-10 11:46:04,394 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
 2045-05-10 11:46:04,394 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [SSL_STARTUP] at 0x79dff6d26160&gt;
@@ -523,7 +523,7 @@ The resulting log might look like:</p>
 2045-05-10 11:46:04,423 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [MADE] at 0x79dff6d26160&gt;
 2045-05-10 11:46:04,424 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [AWAITING_RESPONSE] at 0x79dff6d26160&gt;
 2045-05-10 11:46:04,426 DEBUG connection polled: &lt;psycopg_c.pq.PGconn [IDLE] (host=localhost database=piro) at 0x79dff6d26160&gt;
-2045-05-10 11:46:04,426 DEBUG connection succeeded: host: &#39;localhost&#39;, port: None, hostaddr: &#39;127.0.0.1&#39;
+2045-05-10 11:46:04,426 DEBUG connection succeeded: host: 'localhost', port: None, hostaddr: '127.0.0.1'
 </pre></div>
 </div>
 <p>Please note that a connection attempt might try to reach different servers:

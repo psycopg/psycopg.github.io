@@ -332,7 +332,7 @@ execute the statement and describe the results back as a stream of messages,
 terminating with a <strong>ReadyForQuery</strong>, telling the client that it may now send a
 new query.</p>
 <p>For example, the statement (returning no result):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"hello"</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>results in the following two groups of messages:</p>
@@ -375,7 +375,7 @@ new query.</p>
 </table>
 </div>
 <p>and the query:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT data FROM mytable WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM mytable WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>results in the two groups of messages:</p>
@@ -423,8 +423,8 @@ times, once per leg.</p>
 streams of messages to the server, then to receive more than one response in a
 single batch. If we execute the two operations above in a pipeline:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT data FROM mytable WHERE id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"hello"</span><span class="p">])</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT data FROM mytable WHERE id = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>they will result in a single roundtrip between the client and the server:</p>
@@ -484,12 +484,12 @@ object. At the end of block, the connection resumes the normal operation mode.</
 several operations, using <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> and
 <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
-<span class="gp">... </span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"hello"</span><span class="p">])</span>
 <span class="gp">... </span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO othertable VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;world&quot;</span><span class="p">])</span>
+<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO othertable VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"world"</span><span class="p">])</span>
 <span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
-<span class="gp">... </span>            <span class="s2">&quot;INSERT INTO elsewhere VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="p">[(</span><span class="s2">&quot;one&quot;</span><span class="p">,),</span> <span class="p">(</span><span class="s2">&quot;two&quot;</span><span class="p">,),</span> <span class="p">(</span><span class="s2">&quot;four&quot;</span><span class="p">,)])</span>
+<span class="gp">... </span>            <span class="s2">"INSERT INTO elsewhere VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="p">[(</span><span class="s2">"one"</span><span class="p">,),</span> <span class="p">(</span><span class="s2">"two"</span><span class="p">,),</span> <span class="p">(</span><span class="s2">"four"</span><span class="p">,)])</span>
 </pre></div>
 </div>
 <p>Unlike in normal mode, Psycopg will not wait for the server to receive the
@@ -542,13 +542,13 @@ the previous Sync, and will propagate to the following Sync.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
 <span class="gp">... </span>        <span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;one&quot;</span><span class="p">])</span>
-<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO no_such_table (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;two&quot;</span><span class="p">])</span>
-<span class="gp">... </span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;three&quot;</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"one"</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO no_such_table (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"two"</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"three"</span><span class="p">])</span>
 <span class="gp">... </span>            <span class="n">p</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
 <span class="gp">... </span>        <span class="k">except</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">UndefinedTable</span><span class="p">:</span>
 <span class="gp">... </span>            <span class="k">pass</span>
-<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;four&quot;</span><span class="p">])</span>
+<span class="gp">... </span>        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO mytable (data) VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"four"</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>there will be an error in the block, <code class="docutils literal notranslate"><span class="pre">relation</span> <span class="pre">&quot;no_such_table&quot;</span> <span class="pre">does</span> <span class="pre">not</span>
