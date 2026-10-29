@@ -299,10 +299,15 @@
 connection (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1428">#1428</a>).</p></li>
 <li><p>Fix <a class="reference internal" href="api/connections.html#psycopg.Connection.cancel_safe" title="psycopg.Connection.cancel_safe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel_safe()</span></code></a> failing if the cancel connection is not
 ready immediately, for instance on a slow network (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1440">#1440</a>).</p></li>
+<li><p>Fix reference cycles created every time a list is dumped as an array, which
+kept the dumped data in memory until the next garbage collection
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1443">#1443</a>).</p></li>
 <li><p>Fix loading intervals with a very large number of hours in text format,
 which could lose microseconds (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1446">#1446</a>).</p></li>
 <li><p>Roll back the transaction if entering a <a class="reference internal" href="api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a> block is
 interrupted, for instance by a task cancellation (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1451">#1451</a>).</p></li>
+<li><p>Quote array elements with Unicode white space, which CockroachDB would
+otherwise strip from strings (<a class="reference external" href="https://github.com/cockroachdb/cockroach/issues/176211">cockroach#176211</a>, ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1465">#1465</a>).</p></li>
 <li><p>Set the system SSL root certificate directory to <code class="docutils literal notranslate"><span class="pre">/etc/ssl</span></code> in the binary
 packages on Linux and macOS.</p></li>
 </ul>
@@ -447,7 +452,7 @@ as JSON dumper/loader function (ticket <a class="reference external" href="https
 </ul>
 </section>
 <section id="psycopg-3-2-10">
-<span id="id1"></span><h3>Psycopg 3.2.10<a class="headerlink" href="#psycopg-3-2-10" title="Link to this heading">¶</a></h3>
+<span id="id2"></span><h3>Psycopg 3.2.10<a class="headerlink" href="#psycopg-3-2-10" title="Link to this heading">¶</a></h3>
 <ul>
 <li><p>Fix <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeError</span></code> shadowing <a class="reference external" href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CancelledError</span></code></a> upon task cancellation
 during pipeline execution (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1005">#1005</a>).</p></li>
@@ -465,7 +470,7 @@ reception</span></a> behaviour.</p>
 <p>If a notification is received when a handler is registered via
 <a class="reference internal" href="api/connections.html#psycopg.Connection.add_notify_handler" title="psycopg.Connection.add_notify_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_notify_handler()</span></code></a> and the <a class="reference internal" href="api/connections.html#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">notifies()</span></code></a>
 generator is not running the notification will not be yielded by the
-generator. This is a behaviour similar to before <a class="reference internal" href="#id2">Psycopg 3.2.4</a>, but
+generator. This is a behaviour similar to before <a class="reference internal" href="#id3">Psycopg 3.2.4</a>, but
 <em>notifications are not lost if no handler is registered</em>.</p>
 <p>Using both the generator and handlers to receive notifications on the same
 connection is therefore deprecated and will now generate a runtime
@@ -537,7 +542,7 @@ connection failure (ticket <a class="reference external" href="https://github.co
 </ul>
 </section>
 <section id="psycopg-3-2-4">
-<span id="id2"></span><h3>Psycopg 3.2.4<a class="headerlink" href="#psycopg-3-2-4" title="Link to this heading">¶</a></h3>
+<span id="id3"></span><h3>Psycopg 3.2.4<a class="headerlink" href="#psycopg-3-2-4" title="Link to this heading">¶</a></h3>
 <ul>
 <li><p>Don’t lose notifies received whilst the <a class="reference internal" href="api/connections.html#psycopg.Connection.notifies" title="psycopg.Connection.notifies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">notifies()</span></code></a> iterator
 is not running (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/962">#962</a>).</p>
