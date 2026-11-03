@@ -303,6 +303,9 @@ ready immediately, for instance on a slow network (ticket <a class="reference ex
 memory until the next garbage collection (tickets <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1443">#1443</a>, <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1462">#1462</a>).</p></li>
 <li><p>Fix loading intervals with a very large number of hours in text format,
 which could lose microseconds (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1446">#1446</a>).</p></li>
+<li><p>Fix leak of adapters calling <a class="reference internal" href="basic/pgtypes.html#psycopg.types.composite.register_composite" title="psycopg.types.composite.register_composite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_composite()</span></code></a>
+repeatedly without custom <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_object</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_sequence</span></code> functions
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1449">#1449</a>).</p></li>
 <li><p>Roll back the transaction if entering a <a class="reference internal" href="api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code></a> block is
 interrupted, for instance by a task cancellation (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1451">#1451</a>).</p></li>
 <li><p>Quote array elements with Unicode white space, which CockroachDB would
