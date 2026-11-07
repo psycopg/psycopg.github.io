@@ -295,6 +295,9 @@
 <section id="psycopg-3-3-9-unreleased">
 <h3>Psycopg 3.3.9 (unreleased)<a class="headerlink" href="#psycopg-3-3-9-unreleased" title="Link to this heading">¶</a></h3>
 <ul class="simple">
+<li><p>Use the C implementation of the wait functions on Windows too. It was
+disabled because of an excessive CPU usage, fixed in Psycopg 3.2.11
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/645">#645</a>).</p></li>
 <li><p>Limit the memory used by <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code> if the server consumes data
 slower than it is produced. Add a <code class="xref py py-obj docutils literal notranslate"><span class="pre">flush_threshold</span></code> parameter to
 <a class="reference internal" href="api/copy.html#psycopg.copy.LibpqWriter" title="psycopg.copy.LibpqWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LibpqWriter</span></code></a> to tune it (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1437">#1437</a>).</p></li>
@@ -302,6 +305,9 @@ slower than it is produced. Add a <code class="xref py py-obj docutils literal n
 made pipeline mode, <a class="reference internal" href="api/cursors.html#psycopg.AsyncCursor.executemany" title="psycopg.AsyncCursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> and <a class="reference internal" href="api/copy.html#psycopg.AsyncCopy.write" title="psycopg.AsyncCopy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write()</span></code></a>
 on async connections several times slower than on sync ones
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1468">#1468</a>).</p></li>
+<li><p>Speed up the C implementation of the sync wait function, in particular when
+the connection doesn’t need to wait, for instance at every <a class="reference internal" href="api/copy.html#psycopg.Copy.write" title="psycopg.Copy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write()</span></code></a>
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1484">#1484</a>).</p></li>
 </ul>
 </section>
 </section>
