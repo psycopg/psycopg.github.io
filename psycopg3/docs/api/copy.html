@@ -481,9 +481,23 @@ subclass.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.copy.LibpqWriter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.copy.</span></span><span class="sig-name descname"><span class="pre">LibpqWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><span class="pre">Cursor</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.copy.LibpqWriter" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.copy.</span></span><span class="sig-name descname"><span class="pre">LibpqWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cursors.html#psycopg.Cursor" title="psycopg.Cursor"><span class="pre">Cursor</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">flush_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.copy.LibpqWriter" title="Link to this definition">¶</a></dt>
 <dd><p>An <a class="reference internal" href="#psycopg.copy.Writer" title="psycopg.copy.Writer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Writer</span></code></a> to write copy data to a Postgres database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cursor</strong> – the cursor where the copy operation is performed.</p></li>
+<li><p><strong>flush_threshold</strong> – number of bytes to send to the libpq before waiting
+for them to be flushed to the server. A lower value limits the memory
+used if the server consumes data slower than it is produced. If 0,
+wait for every block of data to be flushed.</p></li>
+</ul>
+</dd>
+</dl>
 <p>This is the writer used by default if none is specified.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.3.7: </span>added the <code class="xref py py-obj docutils literal notranslate"><span class="pre">flush_threshold</span></code> parameter.</p>
+</div>
 </dd></dl>
 
 <dl class="py class">
@@ -531,8 +545,19 @@ offer an async interface.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="psycopg.copy.AsyncLibpqWriter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.copy.</span></span><span class="sig-name descname"><span class="pre">AsyncLibpqWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><span class="pre">AsyncCursor</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.copy.AsyncLibpqWriter" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.copy.</span></span><span class="sig-name descname"><span class="pre">AsyncLibpqWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cursors.html#psycopg.AsyncCursor" title="psycopg.AsyncCursor"><span class="pre">AsyncCursor</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">flush_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.copy.AsyncLibpqWriter" title="Link to this definition">¶</a></dt>
 <dd><p>An <a class="reference internal" href="#psycopg.copy.AsyncWriter" title="psycopg.copy.AsyncWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncWriter</span></code></a> to write copy data to a Postgres database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cursor</strong> – the cursor where the copy operation is performed.</p></li>
+<li><p><strong>flush_threshold</strong> – number of bytes to send to the libpq before waiting
+for them to be flushed to the server. A lower value limits the memory
+used if the server consumes data slower than it is produced. If 0,
+wait for every block of data to be flushed.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
