@@ -307,7 +307,7 @@ available as <a class="reference internal" href="adapt.html#psycopg.adapt.Dumper
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" title="(in Python v3.15)"><em>type</em></a>) – The type that will be managed by this dumper.</p></li>
+<li><p><strong>cls</strong> (<em>type</em>) – The type that will be managed by this dumper.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a> or None) – The context where the transformation is performed. If not
 specified the conversion might be inaccurate, for instance it will not
 be possible to know the connection encoding or the server date format.</p></li>
@@ -318,13 +318,13 @@ be possible to know the connection encoding or the server date format.</p></li>
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.format">
 <span class="sig-name descname"><span class="pre">format</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">Format</span></a></span><a class="headerlink" href="#psycopg.abc.Dumper.format" title="Link to this definition">¶</a></dt>
 <dd><p>The format that this class <a class="reference internal" href="#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code></a> method produces,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code>.</p>
+<a class="reference internal" href="pq.html#psycopg.pq.Format.TEXT" title="psycopg.pq.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a> or <a class="reference internal" href="pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>.</p>
 <p>This is a class attribute.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.dump">
-<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.15)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" title="(in Python v3.15)"><span class="pre">bytearray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" title="(in Python v3.15)"><span class="pre">memoryview</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#psycopg.abc.Dumper.dump" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.abc.Buffer" title="psycopg.abc.Buffer"><span class="pre">Buffer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#psycopg.abc.Dumper.dump" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the object <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code> to PostgreSQL representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -341,7 +341,7 @@ the database.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.quote">
-<span class="sig-name descname"><span class="pre">quote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.15)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" title="(in Python v3.15)"><span class="pre">bytearray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" title="(in Python v3.15)"><span class="pre">memoryview</span></a></span></span><a class="headerlink" href="#psycopg.abc.Dumper.quote" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">quote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.abc.Buffer" title="psycopg.abc.Buffer"><span class="pre">Buffer</span></a></span></span><a class="headerlink" href="#psycopg.abc.Dumper.quote" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the object <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code> to escaped representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -360,7 +360,7 @@ your cake. Don’t tell me I didn’t warn you.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.oid">
-<span class="sig-name descname"><span class="pre">oid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><a class="headerlink" href="#psycopg.abc.Dumper.oid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">oid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#psycopg.abc.Dumper.oid" title="Link to this definition">¶</a></dt>
 <dd><p>The oid to pass to the server, if known; 0 otherwise (class attribute).</p>
 <p>If the OID is not specified, PostgreSQL will try to infer the type
 from the context, but this may fail in some contexts and may require a
@@ -372,7 +372,7 @@ registry to custom types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.get_key">
-<span class="sig-name descname"><span class="pre">get_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="adapt.html#psycopg.adapt.PyFormat" title="psycopg.adapt.PyFormat"><span class="pre">PyFormat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" title="(in Python v3.15)"><span class="pre">type</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">DumperKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.abc.Dumper.get_key" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="adapt.html#psycopg.adapt.PyFormat" title="psycopg.adapt.PyFormat"><span class="pre">PyFormat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DumperKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.abc.Dumper.get_key" title="Link to this definition">¶</a></dt>
 <dd><p>Return an alternative key to upgrade the dumper to represent <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -408,7 +408,7 @@ the same <code class="xref py py-obj docutils literal notranslate"><span class="
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.abc.Dumper.upgrade">
-<span class="sig-name descname"><span class="pre">upgrade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="adapt.html#psycopg.adapt.PyFormat" title="psycopg.adapt.PyFormat"><span class="pre">PyFormat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><span class="pre">Dumper</span></a></span></span><a class="headerlink" href="#psycopg.abc.Dumper.upgrade" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">upgrade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="adapt.html#psycopg.adapt.PyFormat" title="psycopg.adapt.PyFormat"><span class="pre">PyFormat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><span class="pre">Dumper</span></a></span></span><a class="headerlink" href="#psycopg.abc.Dumper.upgrade" title="Link to this definition">¶</a></dt>
 <dd><p>Return a new dumper to manage <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -437,7 +437,7 @@ as <a class="reference internal" href="adapt.html#psycopg.adapt.Loader" title="p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>oid</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The type that will be managed by this dumper.</p></li>
+<li><p><strong>oid</strong> (<em>int</em>) – The type that will be managed by this dumper.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="#psycopg.abc.AdaptContext" title="psycopg.abc.AdaptContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptContext</span></code></a> or None) – The context where the transformation is performed. If not
 specified the conversion might be inaccurate, for instance it will not
 be possible to know the connection encoding or the server date format.</p></li>
@@ -448,13 +448,13 @@ be possible to know the connection encoding or the server date format.</p></li>
 <dt class="sig sig-object py" id="psycopg.abc.Loader.format">
 <span class="sig-name descname"><span class="pre">format</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><span class="pre">Format</span></a></span><a class="headerlink" href="#psycopg.abc.Loader.format" title="Link to this definition">¶</a></dt>
 <dd><p>The format that this class <a class="reference internal" href="#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load()</span></code></a> method can convert,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code>.</p>
+<a class="reference internal" href="pq.html#psycopg.pq.Format.TEXT" title="psycopg.pq.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a> or <a class="reference internal" href="pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>.</p>
 <p>This is a class attribute.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.abc.Loader.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.15)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" title="(in Python v3.15)"><span class="pre">bytearray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" title="(in Python v3.15)"><span class="pre">memoryview</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></span><a class="headerlink" href="#psycopg.abc.Loader.load" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psycopg.abc.Buffer" title="psycopg.abc.Buffer"><span class="pre">Buffer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#psycopg.abc.Loader.load" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the data returned by the database into a Python object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -486,17 +486,47 @@ connected.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="psycopg.abc.AdaptContext.connection">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">connection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">BaseConnection</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><a class="headerlink" href="#psycopg.abc.AdaptContext.connection" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">connection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a> <span class="pre">or</span> <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a> <span class="pre">or</span> <span class="pre">None</span></span><a class="headerlink" href="#psycopg.abc.AdaptContext.connection" title="Link to this definition">¶</a></dt>
 <dd><p>The connection used by this object, if available.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> or <a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
 
+<section id="type-aliases">
+<h2>Type aliases<a class="headerlink" href="#type-aliases" title="Link to this heading">¶</a></h2>
+<dl class="py type">
+<dt class="sig sig-object py" id="psycopg.abc.Buffer">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">Buffer</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">memoryview</span></span><a class="headerlink" href="#psycopg.abc.Buffer" title="Link to this definition">¶</a></dt>
+<dd><p>The type of the data handled by dumpers and loaders: an object
+implementing the buffer protocol.</p>
+<p>A <a class="reference internal" href="#psycopg.abc.Dumper.dump" title="psycopg.abc.Dumper.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper.dump()</span></code></a> method can return any of these types. A <a class="reference internal" href="#psycopg.abc.Loader.load" title="psycopg.abc.Loader.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader.load()</span></code></a>
+method must accept all of them: don’t assume to receive <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>, but
+convert the data with <code class="docutils literal notranslate"><span class="pre">bytes(data)</span></code> if you need methods such as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">decode()</span></code>.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="psycopg.abc.Query">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">Query</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#psycopg.abc.QueryNoTemplate" title="psycopg.abc.QueryNoTemplate"><span class="pre">QueryNoTemplate</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/string.templatelib.html#string.templatelib.Template" title="(in Python v3.15)"><span class="pre">Template</span></a></span><a class="headerlink" href="#psycopg.abc.Query" title="Link to this definition">¶</a></dt>
+<dd><p>The type of a query that can be passed to <a class="reference internal" href="cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> and
+similar methods. See <a class="reference internal" href="../basic/params.html#query-parameters"><span class="std std-ref">Passing parameters to SQL queries</span></a> and <a class="reference internal" href="../basic/tstrings.html#template-strings"><span class="std std-ref">Template string queries</span></a>.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="psycopg.abc.QueryNoTemplate">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">QueryNoTemplate</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.LiteralString" title="(in Python v3.15)"><span class="pre">LiteralString</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><span class="pre">sql.SQL</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><span class="pre">sql.Composed</span></a></span><a class="headerlink" href="#psycopg.abc.QueryNoTemplate" title="Link to this definition">¶</a></dt>
+<dd><p>Any <a class="reference internal" href="#psycopg.abc.Query" title="psycopg.abc.Query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Query</span></code></a> type except a template string: the type of the queries that
+can be used with separate <a class="reference internal" href="#psycopg.abc.Params" title="psycopg.abc.Params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Params</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="psycopg.abc.Params">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.abc.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#psycopg.abc.Params" title="Link to this definition">¶</a></dt>
+<dd><p>The type of the parameters of a query: a sequence, for <code class="docutils literal notranslate"><span class="pre">%s</span></code> positional
+placeholders, or a mapping, for <code class="docutils literal notranslate"><span class="pre">%(name)s</span></code> named placeholders.</p>
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -571,6 +601,13 @@ connected.</p>
 <li><a class="reference internal" href="#psycopg.abc.AdaptContext"><code class="docutils literal notranslate"><span class="pre">AdaptContext</span></code></a><ul>
 <li><a class="reference internal" href="#psycopg.abc.AdaptContext.adapters"><code class="docutils literal notranslate"><span class="pre">AdaptContext.adapters</span></code></a></li>
 <li><a class="reference internal" href="#psycopg.abc.AdaptContext.connection"><code class="docutils literal notranslate"><span class="pre">AdaptContext.connection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#type-aliases">Type aliases</a><ul>
+<li><a class="reference internal" href="#psycopg.abc.Buffer"><code class="docutils literal notranslate"><span class="pre">Buffer</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.abc.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.abc.QueryNoTemplate"><code class="docutils literal notranslate"><span class="pre">QueryNoTemplate</span></code></a></li>
+<li><a class="reference internal" href="#psycopg.abc.Params"><code class="docutils literal notranslate"><span class="pre">Params</span></code></a></li>
 </ul>
 </li>
 </ul>

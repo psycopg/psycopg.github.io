@@ -297,7 +297,7 @@ will not be visible until <a class="reference internal" href="../api/connections
 discarded by <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.rollback()</span></code></a>. The following operation on the same
 connection will start a new transaction.</p>
 <p>If a database operation fails, the server will refuse further commands, until
-a <code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code> is called.</p>
+a <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a> is called.</p>
 <p>If the connection is closed with a transaction open, no COMMIT command is sent
 to the server, which will then discard the connection. Certain middleware (such
 as PgBouncer) will also discard a connection left in transaction state, so, if
@@ -606,8 +606,8 @@ connection.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Applications running at <code class="xref py py-obj docutils literal notranslate"><span class="pre">REPEATABLE_READ</span></code> or
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">SERIALIZABLE</span></code> isolation level are exposed to serialization
+<p>Applications running at <a class="reference internal" href="../api/objects.html#psycopg.IsolationLevel.REPEATABLE_READ" title="psycopg.IsolationLevel.REPEATABLE_READ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REPEATABLE_READ</span></code></a> or
+<a class="reference internal" href="../api/objects.html#psycopg.IsolationLevel.SERIALIZABLE" title="psycopg.IsolationLevel.SERIALIZABLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SERIALIZABLE</span></code></a> isolation level are exposed to serialization
 failures. <a class="reference external" href="https://www.postgresql.org/docs/current/transaction-iso.html#XACT-REPEATABLE-READ">In certain concurrent update cases</a>, PostgreSQL will raise an
 exception looking like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psycopg2</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SerializationFailure</span><span class="p">:</span> <span class="n">could</span> <span class="ow">not</span> <span class="n">serialize</span> <span class="n">access</span>
