@@ -308,20 +308,20 @@ alternative ways to install.</p>
 <ul class="simple">
 <li><p>Python: from version 3.10 to 3.15</p>
 <ul>
-<li><p>Python 3.8 and 3.9 are supported before Psycopg 3.3</p></li>
-<li><p>Python 3.7 is supported before Psycopg 3.2</p></li>
-<li><p>Python 3.6 is supported before Psycopg 3.1</p></li>
+<li><p>Python 3.8 and 3.9 are supported in Psycopg versions before 3.3</p></li>
+<li><p>Python 3.7 is supported in Psycopg versions before 3.2</p></li>
+<li><p>Python 3.6 is supported in Psycopg versions before 3.1</p></li>
 </ul>
 </li>
 <li><p>PyPy: from version 3.10 to 3.11</p>
 <ul>
-<li><p>PyPy 3.9 is supported before Psycopg 3.3</p></li>
+<li><p>PyPy 3.9 is supported in Psycopg versions before 3.3</p></li>
 <li><p><strong>Note:</strong> Only the pure Python installation is currently supported.</p></li>
 </ul>
 </li>
 <li><p>PostgreSQL: from version 10 to 18</p>
 <ul>
-<li><p><strong>Note:</strong> PostgreSQL <a class="reference external" href="https://www.postgresql.org/support/versioning/">currently supported release</a> are actively tested
+<li><p><strong>Note:</strong> PostgreSQL <a class="reference external" href="https://www.postgresql.org/support/versioning/">currently supported releases</a> are actively tested
 in the CI. Out-of-support releases are supported on a best-effort basis.</p></li>
 </ul>
 </li>
@@ -332,12 +332,12 @@ in the CI. Out-of-support releases are supported on a best-effort basis.</p></li
 anything that is not tested there is not officially supported. This includes:</p>
 <ul class="simple">
 <li><p>Unofficial Python distributions such as Conda;</p></li>
-<li><p>Alternative PostgreSQL implementation;</p></li>
+<li><p>Alternative PostgreSQL implementations;</p></li>
 <li><p>Other platforms such as BSD or Solaris.</p></li>
 </ul>
 <p>If you use an unsupported system, things might work (because, for instance, the
 database may use the same wire protocol as PostgreSQL) but we cannot guarantee
-the correct working or a smooth ride.</p>
+correct operation or a smooth ride.</p>
 </section>
 <section id="what-to-install">
 <span id="install-grid"></span><h2>What to install?<a class="headerlink" href="#what-to-install" title="Link to this heading">¶</a></h2>
@@ -400,7 +400,7 @@ way to install Psycopg 3.</p>
 <p>For further information about the differences between the packages see
 <a class="reference internal" href="../api/pq.html#pq-impl"><span class="std std-ref">pq module implementations</span></a>.</p>
 </div>
-<p>If your platform is not supported, or if the libpq packaged is not suitable,
+<p>If your platform is not supported, or if the packaged libpq is not suitable,
 you should proceed to a <a class="reference internal" href="#local-installation"><span class="std std-ref">local installation</span></a> or a
 <a class="reference internal" href="#pure-python-installation"><span class="std std-ref">pure Python installation</span></a>.</p>
 <div class="admonition note">
@@ -423,8 +423,8 @@ features available.</p></li>
 <p class="admonition-title">Warning</p>
 <ul class="simple">
 <li><p>Starting from Psycopg 3.1.20, ARM64 macOS binary packages (i.e. for
-Apple M1 machines) are no more available for macOS versions before 14.0.
-Please upgrade your OS to at least 14.0 or use a <a class="reference internal" href="#local-installation"><span class="std std-ref">local</span></a> or a <a class="reference internal" href="#pure-python-installation"><span class="std std-ref">Python</span></a>
+Apple M1 machines) are no longer available for macOS versions before
+14.0. Please upgrade your OS to at least 14.0 or use a <a class="reference internal" href="#local-installation"><span class="std std-ref">local</span></a> or a <a class="reference internal" href="#pure-python-installation"><span class="std std-ref">Python</span></a>
 installation.</p></li>
 <li><p>The binary installation is not supported by PyPy.</p></li>
 </ul>
@@ -432,10 +432,10 @@ installation.</p></li>
 </section>
 <section id="local-installation">
 <span id="id7"></span><h2>Local installation<a class="headerlink" href="#local-installation" title="Link to this heading">¶</a></h2>
-<p>A “Local installation” results in a performing and maintainable library. The
-library will include the speed-up C module and will be linked to the system
-libraries (<code class="docutils literal notranslate"><span class="pre">libpq</span></code>, <code class="docutils literal notranslate"><span class="pre">libssl</span></code>…) so that system upgrade of libraries will
-upgrade the libraries used by Psycopg 3 too. This is the preferred way to
+<p>A “Local installation” results in a performant and maintainable library. The
+library will include the speed-up C package and will be linked to the system
+libraries (<code class="docutils literal notranslate"><span class="pre">libpq</span></code>, <code class="docutils literal notranslate"><span class="pre">libssl</span></code>…) so that a system upgrade of the libraries
+will upgrade the libraries used by Psycopg 3 too. This is the preferred way to
 install Psycopg for a production site.</p>
 <p>In order to perform a local installation you need some prerequisites:</p>
 <ul class="simple">
@@ -451,7 +451,7 @@ try this and use the <a class="reference internal" href="#binary-installation"><
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">"psycopg[c]"</span>
 </pre></div>
 </div>
-<p>This will install a self-contained package with all the libraries needed.
+<p>This will build the C package and link it to the system libraries.
 If you are coming from Psycopg 2, this is the equivalent of installing
 the <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> package, both in terms of build requirements and system
 dependencies at runtime.</p>
@@ -472,7 +472,7 @@ implementation. This is particularly handy for debugging and hacking.</p>
 <p class="admonition-title">Warning</p>
 <p>The pure Python installation is much slower than the
 <a class="reference internal" href="#binary-installation"><span class="std std-ref">Binary installation</span></a> or <a class="reference internal" href="#local-installation"><span class="std std-ref">Local installation</span></a>. It is likely
-sufficient for local developments or small tasks but, for production loads,
+sufficient for local development or small tasks but, for production loads,
 you might want to install one of the speed-up extensions too.</p>
 </div>
 <p>In order to use the pure Python installation you will need the <code class="docutils literal notranslate"><span class="pre">libpq</span></code>
@@ -499,7 +499,7 @@ separate package from the <code class="xref py py-obj docutils literal notransla
 different release cycle.</p>
 <p>In order to use the pool you must install the <code class="docutils literal notranslate"><span class="pre">pool</span></code> extra, using <code class="docutils literal notranslate"><span class="pre">pip</span>
 <span class="pre">install</span> <span class="pre">&quot;psycopg[pool]&quot;</span></code>, or install the <a class="reference internal" href="../api/pool.html#module-psycopg_pool" title="psycopg_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg_pool</span></code></a> package separately,
-which would allow to specify the release to install more precisely.</p>
+which would allow you to specify the release to install more precisely.</p>
 </section>
 <section id="handling-dependencies">
 <span id="install-dependencies"></span><h2>Handling dependencies<a class="headerlink" href="#handling-dependencies" title="Link to this heading">¶</a></h2>
@@ -513,8 +513,8 @@ interface and leaves the possibility of choosing a specific implementation
 to the end user of your library.</p></li>
 <li><p>If your project is a final application (e.g. a service running on a server)
 you can require a specific implementation, for instance <code class="docutils literal notranslate"><span class="pre">psycopg[c]</span></code>,
-after you have made sure that the prerequisites are met (e.g. the depending
-libraries and tools are installed in the host machine).</p></li>
+after you have made sure that the prerequisites are met (e.g. the required
+libraries and tools are installed on the host machine).</p></li>
 </ul>
 <p>In both cases you can specify which version of Psycopg to use using
 <a class="reference external" href="https://pip.pypa.io/en/stable/reference/requirement-specifiers/">requirement specifiers</a>.</p>

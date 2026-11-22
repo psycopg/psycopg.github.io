@@ -291,8 +291,8 @@
           <section id="copy-related-objects">
 <h1>COPY-related objects<a class="headerlink" href="#copy-related-objects" title="Link to this heading">¶</a></h1>
 <p>The main objects (<a class="reference internal" href="#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a>, <a class="reference internal" href="#psycopg.AsyncCopy" title="psycopg.AsyncCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCopy</span></code></a>) present the main interface to exchange
-data during a COPY operations. These objects are normally obtained by the
-methods <a class="reference internal" href="cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and <a class="reference internal" href="cursors.html#psycopg.AsyncCursor.copy" title="psycopg.AsyncCursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a>; however, they can be also
+data during a COPY operation. These objects are normally obtained by the
+methods <a class="reference internal" href="cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.copy()</span></code></a> and <a class="reference internal" href="cursors.html#psycopg.AsyncCursor.copy" title="psycopg.AsyncCursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncCursor.copy()</span></code></a>; however, they can also be
 created directly, for instance to write to a destination which is not a
 database (e.g. using a <a class="reference internal" href="#psycopg.copy.FileWriter" title="psycopg.copy.FileWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileWriter</span></code></a>).</p>
 <p>See <a class="reference internal" href="../basic/copy.html#copy"><span class="std std-ref">Using COPY TO and COPY FROM</span></a> for details.</p>
@@ -348,7 +348,7 @@ read its data row by row, using <code class="docutils literal notranslate"><span
 <dd><p>Iterate on the result of a <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code> operation record by record.</p>
 <p>Note that the records returned will be tuples of unparsed strings or
 bytes, unless data types are specified using <a class="reference internal" href="#psycopg.Copy.set_types" title="psycopg.Copy.set_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code></a>.</p>
-<p>Equivalent of iterating on <a class="reference internal" href="#psycopg.Copy.read_row" title="psycopg.Copy.read_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_row()</span></code></a> until it returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Equivalent to iterating on <a class="reference internal" href="#psycopg.Copy.read_row" title="psycopg.Copy.read_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_row()</span></code></a> until it returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -364,15 +364,15 @@ bytes, unless data types are specified using <a class="reference internal" href=
 <dt class="sig sig-object py" id="psycopg.Copy.set_types">
 <span class="sig-name descname"><span class="pre">set_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Copy.set_types" title="Link to this definition">¶</a></dt>
 <dd><p>Set the types expected in a COPY operation.</p>
-<p>The types must be specified as a sequence of oid or PostgreSQL type
+<p>The types must be specified as a sequence of oids or PostgreSQL type
 names (e.g. <code class="docutils literal notranslate"><span class="pre">int4</span></code>, <code class="docutils literal notranslate"><span class="pre">timestamptz[]</span></code>).</p>
 <p>This operation overcomes the lack of metadata returned by PostgreSQL
 when a COPY operation begins:</p>
 <ul class="simple">
-<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows to specify what types the
+<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">TO</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows you to specify what types the
 operation returns. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> is not used, the data will be
 returned as unparsed strings or bytes instead of Python objects.</p></li>
-<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows to choose what type the
+<li><p>On <code class="sql docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">FROM</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">set_types()</span></code> allows you to choose what type the
 database expects. This is especially useful in binary copy, because
 PostgreSQL will apply no cast rule.</p></li>
 </ul>
@@ -453,9 +453,9 @@ bytes, unless data types are specified using <a class="reference internal" href=
 <p>Copy writers are helper objects to specify where to write COPY-formatted data.
 By default, data is written to the database (using the <a class="reference internal" href="#psycopg.copy.LibpqWriter" title="psycopg.copy.LibpqWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LibpqWriter</span></code></a>). It is
 possible to write copy-data for offline use by using a <a class="reference internal" href="#psycopg.copy.FileWriter" title="psycopg.copy.FileWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileWriter</span></code></a>, or to
-customize further writing by implementing your own <a class="reference internal" href="#psycopg.copy.Writer" title="psycopg.copy.Writer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Writer</span></code></a> or <a class="reference internal" href="#psycopg.copy.AsyncWriter" title="psycopg.copy.AsyncWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncWriter</span></code></a>
+further customize writing by implementing your own <a class="reference internal" href="#psycopg.copy.Writer" title="psycopg.copy.Writer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Writer</span></code></a> or <a class="reference internal" href="#psycopg.copy.AsyncWriter" title="psycopg.copy.AsyncWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncWriter</span></code></a>
 subclass.</p>
-<p>Writers instances can be used passing them to the cursor
+<p>Writer instances can be used by passing them to the cursor
 <a class="reference internal" href="cursors.html#psycopg.Cursor.copy" title="psycopg.Cursor.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy()</span></code></a> method or to the <a class="reference internal" href="#psycopg.Copy" title="psycopg.Copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Copy</span></code></a> constructor, as the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">writer</span></code> argument.</p>
 <dl class="py class">
@@ -526,8 +526,8 @@ used as:</p>
 <dt class="sig sig-object py" id="psycopg.copy.AsyncWriter">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.copy.</span></span><span class="sig-name descname"><span class="pre">AsyncWriter</span></span><a class="headerlink" href="#psycopg.copy.AsyncWriter" title="Link to this definition">¶</a></dt>
 <dd><p>A class to write copy data somewhere (for async connections).</p>
-<p>This class methods have the same semantics of the ones of <a class="reference internal" href="#psycopg.copy.Writer" title="psycopg.copy.Writer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Writer</span></code></a>, but
-offer an async interface.</p>
+<p>The methods of this class have the same semantics as the ones of
+<a class="reference internal" href="#psycopg.copy.Writer" title="psycopg.copy.Writer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Writer</span></code></a>, but offer an async interface.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.copy.AsyncWriter.write">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="abc.html#psycopg.abc.Buffer" title="psycopg.abc.Buffer"><span class="pre">Buffer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.copy.AsyncWriter.write" title="Link to this definition">¶</a></dt>

@@ -297,7 +297,7 @@
 <ul class="simple">
 <li><p>Invoke the <code class="xref py py-obj docutils literal notranslate"><span class="pre">reconnect_failed</span></code> callback in <a class="reference internal" href="api/pool.html#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a>, where it was
 accepted but never called (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1424">#1424</a>).</p></li>
-<li><p>Fix the count of the connections in <a class="reference internal" href="api/pool.html#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a> becoming negative
+<li><p>Fix the count of connections in <a class="reference internal" href="api/pool.html#psycopg_pool.NullConnectionPool" title="psycopg_pool.NullConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NullConnectionPool</span></code></a> becoming negative
 after a failed <a class="reference internal" href="api/pool.html#psycopg_pool.NullConnectionPool.wait" title="psycopg_pool.NullConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a>.</p></li>
 <li><p>Don’t grow the pool when calling <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.check" title="psycopg_pool.ConnectionPool.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check()</span></code></a> (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1434">#1434</a>).</p></li>
 </ul>
@@ -334,7 +334,7 @@ after a failed <a class="reference internal" href="api/pool.html#psycopg_pool.Nu
 <ul class="simple">
 <li><p>Add <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.drain" title="psycopg_pool.ConnectionPool.drain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drain()</span></code></a> method (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1215">#1215</a>).</p></li>
 <li><p>Allow the <code class="xref py py-obj docutils literal notranslate"><span class="pre">conninfo</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code> <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> parameters to be callable
-to allow connection parameters update (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/851">#851</a>).</p></li>
+to allow updating connection parameters (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/851">#851</a>).</p></li>
 <li><p>Add <code class="xref py py-obj docutils literal notranslate"><span class="pre">close_returns</span></code> <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> parameter for <a class="reference internal" href="advanced/pool.html#pool-sqlalchemy"><span class="std std-ref">integration with
 SQLAlchemy</span></a> (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1046">#1046</a>).</p></li>
 </ul>
@@ -350,14 +350,15 @@ rollback, or other events (tickets <a class="reference external" href="https://g
 <ul class="simple">
 <li><p>Fix infinite loop with connections modified to return on close
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1124">#1124</a>).</p></li>
-<li><p>Fix request of excessive connections upon connection close failing and
-retrying (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1176">#1176</a>).</p></li>
+<li><p>Fix requesting too many connections when closing a connection fails and is
+retried (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1176">#1176</a>).</p></li>
 </ul>
 </section>
 <section id="psycopg-pool-3-2-6">
 <h3>psycopg_pool 3.2.6<a class="headerlink" href="#psycopg-pool-3-2-6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Reset transaction status of connection failing check (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1014">#1014</a>).</p></li>
+<li><p>Reset the transaction status of connections failing the check
+(ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/1014">#1014</a>).</p></li>
 </ul>
 </section>
 <section id="psycopg-pool-3-2-5">
@@ -370,7 +371,7 @@ retrying (ticket <a class="reference external" href="https://github.com/psycopg/
 <h3>psycopg_pool 3.2.4<a class="headerlink" href="#psycopg-pool-3-2-4" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Add a hint to the warning printed if threads fail to stop during
-<code class="docutils literal notranslate"><span class="pre">__del__</span></code>, which has been reported happening during interpreter shutdown
+<code class="docutils literal notranslate"><span class="pre">__del__</span></code>, which has been reported to happen during interpreter shutdown
 on Python 3.13 (see ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/954">#954</a>).</p></li>
 </ul>
 </section>
@@ -397,7 +398,7 @@ is open in the constructor.</p></li>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code> fails. Also avoid a busy-loop of checking; separate check attempts
 using an exponential backoff (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/709">#709</a>).</p></li>
 <li><p>Use <code class="xref py py-obj docutils literal notranslate"><span class="pre">typing.Self</span></code> as a more correct return value annotation of context
-managers and other self-returning methods (see ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/708">708</a>).</p></li>
+managers and other self-returning methods (see ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/708">#708</a>).</p></li>
 </ul>
 </section>
 </section>
@@ -407,13 +408,13 @@ managers and other self-returning methods (see ticket <a class="reference extern
 <li><p>Add support for async <code class="xref py py-obj docutils literal notranslate"><span class="pre">reconnect_failed</span></code> callbacks in <a class="reference internal" href="api/pool.html#psycopg_pool.AsyncConnectionPool" title="psycopg_pool.AsyncConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnectionPool</span></code></a>
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/520">#520</a>).</p></li>
 <li><p>Add <code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code> parameter to the pool constructor and
-<a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.check_connection" title="psycopg_pool.ConnectionPool.check_connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_connection()</span></code></a> method. (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/656">#656</a>).</p></li>
+<a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.check_connection" title="psycopg_pool.ConnectionPool.check_connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_connection()</span></code></a> method (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/656">#656</a>).</p></li>
 <li><p>Make connection pool classes generic on the connection type (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/559">#559</a>).</p></li>
-<li><p>Raise a warning if sync pools rely an implicit <code class="xref py py-obj docutils literal notranslate"><span class="pre">open=True</span></code> and the
+<li><p>Raise a warning if sync pools rely on an implicit <code class="xref py py-obj docutils literal notranslate"><span class="pre">open=True</span></code> and the
 pool context is not used. In the future the default will become <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/659">#659</a>).</p></li>
 <li><p>Raise a warning if async pools are opened in the constructor. In the future
-it will become an error. (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/659">#659</a>).</p></li>
+it will become an error (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/659">#659</a>).</p></li>
 </ul>
 <section id="psycopg-pool-3-1-9">
 <h3>psycopg_pool 3.1.9<a class="headerlink" href="#psycopg-pool-3-1-9" title="Link to this heading">¶</a></h3>
@@ -439,7 +440,7 @@ it will become an error. (ticket <a class="reference external" href="https://git
 <section id="psycopg-pool-3-1-6">
 <h3>psycopg_pool 3.1.6<a class="headerlink" href="#psycopg-pool-3-1-6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Declare all parameters in pools constructors, instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code>
+<li><p>Declare all parameters in pool constructors, instead of using <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code>
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/493">#493</a>).</p></li>
 </ul>
 </section>
@@ -454,7 +455,7 @@ it will become an error. (ticket <a class="reference external" href="https://git
 <section id="psycopg-pool-3-1-4">
 <h3>psycopg_pool 3.1.4<a class="headerlink" href="#psycopg-pool-3-1-4" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Fix async pool exhausting connections, happening if the pool is created
+<li><p>Fix async pool exhausting connections if the pool is created
 before the event loop is started (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/219">#219</a>).</p></li>
 </ul>
 </section>
@@ -467,7 +468,7 @@ before the event loop is started (ticket <a class="reference external" href="htt
 <section id="psycopg-pool-3-1-2">
 <h3>psycopg_pool 3.1.2<a class="headerlink" href="#psycopg-pool-3-1-2" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Fix possible failure to reconnect after losing connection from the server
+<li><p>Fix possible failure to reconnect after losing the connection to the server
 (ticket <a class="reference external" href="https://github.com/psycopg/psycopg/issues/370">#370</a>).</p></li>
 </ul>
 </section>
@@ -492,7 +493,7 @@ filling (ticket <a class="reference external" href="https://github.com/psycopg/p
 <ul class="simple">
 <li><p>Raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code> if <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">min_size</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_size</span></code> are both
 set to 0 (instead of hanging).</p></li>
-<li><p>Raise <a class="reference internal" href="api/pool.html#psycopg_pool.PoolClosed" title="psycopg_pool.PoolClosed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolClosed</span></code></a> calling <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.wait" title="psycopg_pool.ConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a> on a closed pool.</p></li>
+<li><p>Raise <a class="reference internal" href="api/pool.html#psycopg_pool.PoolClosed" title="psycopg_pool.PoolClosed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PoolClosed</span></code></a> when calling <a class="reference internal" href="api/pool.html#psycopg_pool.ConnectionPool.wait" title="psycopg_pool.ConnectionPool.wait"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait()</span></code></a> on a closed pool.</p></li>
 </ul>
 </section>
 <section id="psycopg-pool-3-0-2">

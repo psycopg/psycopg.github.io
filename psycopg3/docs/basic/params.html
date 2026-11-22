@@ -296,7 +296,7 @@
 However, starting from Python 3.14, you might be interested in using the
 more expressive <a class="reference internal" href="tstrings.html#template-strings"><span class="std std-ref">template string queries</span></a>.</p>
 </div>
-<p>Most of the times, writing a program you will have to mix bits of SQL
+<p>Most of the time, when writing a program, you will have to mix bits of SQL
 statements with values provided by the rest of the program:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">some</span><span class="p">,</span> <span class="n">fields</span> <span class="n">FROM</span> <span class="n">some_table</span> <span class="n">WHERE</span> <span class="nb">id</span> <span class="o">=</span> <span class="o">...</span>
 </pre></div>
@@ -321,12 +321,12 @@ example the Python function call:</p>
 <span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-11-18'</span><span class="p">,</span><span class="w"> </span><span class="s1">'O''Reilly'</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Note that the parameters will not be really merged to the query: query and the
-parameters are sent to the server separately: see <a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">Server-side binding</span></a>
-for details.</p>
+<p>Note that the parameters will not really be merged into the query: the query
+and the parameters are sent to the server separately: see
+<a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">Server-side binding</span></a> for details.</p>
 <p>Named arguments are supported too using <code class="samp docutils literal notranslate"><span class="pre">%(</span><em><span class="pre">name</span></em><span class="pre">)s</span></code> placeholders in the
-query and specifying the values into a mapping.  Using named arguments allows
-to specify the values in any order and to repeat the same value in several
+query and specifying the values in a mapping.  Using named arguments allows
+you to specify the values in any order and to repeat the same value in several
 places in the query:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">    INSERT INTO some_table (id, created_at, updated_at, last_name)</span>
@@ -342,12 +342,12 @@ can use the <code class="docutils literal notranslate"><span class="pre">%%</spa
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT (</span><span class="si">%s</span><span class="s2"> </span><span class="si">%%</span><span class="s2"> 2) = 0 AS even"</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span>      <span class="c1"># correct</span>
 </pre></div>
 </div>
-<p>While the mechanism resembles regular Python strings manipulation, there are a
+<p>While the mechanism resembles regular Python string manipulation, there are a
 few subtle differences you should care about when passing parameters to a
 query.</p>
 <ul>
 <li><p>The Python string operator <code class="docutils literal notranslate"><span class="pre">%</span></code> <em>must not be used</em>: the <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a>
-method accepts a tuple or dictionary of values as second parameter.
+method accepts a tuple or dictionary of values as the second parameter.
 <a class="reference internal" href="#sql-injection"><strong>Never</strong> use <code class="docutils literal notranslate"><span class="pre">%</span></code> or <code class="docutils literal notranslate"><span class="pre">+</span></code> to merge values
 into queries</a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO numbers VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span> <span class="o">%</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="c1"># WRONG</span>
@@ -355,7 +355,7 @@ into queries</a>:</p>
 </pre></div>
 </div>
 </li>
-<li><p>For positional variables binding, <em>the second argument must always be a
+<li><p>For positional variable binding, <em>the second argument must always be a
 sequence</em>, even if it contains a single variable (remember that Python
 requires a comma to create a single element tuple):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO foo VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"bar"</span><span class="p">)</span>    <span class="c1"># WRONG</span>
@@ -382,9 +382,9 @@ type of the argument: see <a class="reference internal" href="#binary-data"><spa
 </div>
 </li>
 <li><p>Only query values should be bound via this method: it shouldn’t be used to
-merge table or field names to the query. If you need to generate SQL queries
-dynamically (for instance choosing a table name at runtime) you can use the
-functionalities provided in the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module:</p>
+merge table or field names into the query. If you need to generate SQL
+queries dynamically (for instance choosing a table name at runtime) you can
+use the functionalities provided in the <a class="reference internal" href="../api/sql.html#module-psycopg.sql" title="psycopg.sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.sql</span></code></a> module:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO </span><span class="si">%s</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s1">'numbers'</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># WRONG</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>                                                <span class="c1"># correct</span>
     <span class="n">SQL</span><span class="p">(</span><span class="s2">"INSERT INTO </span><span class="si">{}</span><span class="s2"> VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Identifier</span><span class="p">(</span><span class="s1">'numbers'</span><span class="p">)),</span>
@@ -401,9 +401,9 @@ string representation. The typical example is with single quotes in strings:
 in SQL single quotes are used as string literal delimiters, so the ones
 appearing inside the string itself must be escaped, whereas in Python single
 quotes can be left unescaped if the string is delimited by double quotes.</p>
-<p>Because of the difference, sometimes subtle, between the data types
-representations, a naïve approach to query strings composition, such as using
-Python strings concatenation, is a recipe for <em>terrible</em> problems:</p>
+<p>Because of the difference, sometimes subtle, between the data type
+representations, a naïve approach to query string composition, such as using
+Python string concatenation, is a recipe for <em>terrible</em> problems:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQL</span> <span class="o">=</span> <span class="s2">"INSERT INTO authors (name) VALUES ('</span><span class="si">%s</span><span class="s2">')"</span> <span class="c1"># NEVER DO THIS</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"O'Reilly"</span><span class="p">,</span> <span class="p">)</span>
 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">SQL</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span> <span class="c1"># THIS WILL FAIL MISERABLY</span>
@@ -416,24 +416,24 @@ could easily craft a malformed string, either gaining access to unauthorized
 data or performing destructive operations on the database. This form of attack
 is called <a class="reference external" href="https://en.wikipedia.org/wiki/SQL_injection">SQL injection</a> and is known to be one of the most widespread forms
 of attack on database systems. Before continuing, please print <a class="reference external" href="https://xkcd.com/327/">this page</a>
-as a memo and hang it onto your desk.</p>
+as a memo and hang it above your desk.</p>
 <p>Psycopg can <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">automatically convert Python objects to SQL
 values</span></a>: using this feature your code will be more robust
 and reliable. We must stress this point:</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <ul class="simple">
-<li><p>Don’t manually merge values to a query: hackers from a foreign country
+<li><p>Don’t manually merge values into a query: hackers from a foreign country
 will break into your computer and steal not only your disks, but also
 your cds, leaving you only with the three most embarrassing records you
 ever bought. On cassette tapes.</p></li>
-<li><p>If you use the <code class="docutils literal notranslate"><span class="pre">%</span></code> operator to merge values to a query, con artists
+<li><p>If you use the <code class="docutils literal notranslate"><span class="pre">%</span></code> operator to merge values into a query, con artists
 will seduce your cat, who will run away taking your credit card
 and your sunglasses with them.</p></li>
-<li><p>If you use <code class="docutils literal notranslate"><span class="pre">+</span></code> to merge a textual value to a string, bad guys in
-balaclava will find their way to your fridge, drink all your beer, and
+<li><p>If you use <code class="docutils literal notranslate"><span class="pre">+</span></code> to merge a textual value into a string, bad guys in
+balaclavas will find their way to your fridge, drink all your beer, and
 leave your toilet seat up and your toilet paper in the wrong orientation.</p></li>
-<li><p>You don’t want to manually merge values to a query: <a class="reference internal" href="#query-parameters"><span class="std std-ref">use the
+<li><p>You don’t want to manually merge values into a query: <a class="reference internal" href="#query-parameters"><span class="std std-ref">use the
 provided methods</span></a> instead.</p></li>
 </ul>
 </div>
@@ -460,13 +460,13 @@ at <a class="reference internal" href="adapt.html#types-adaptation"><span class=
 <span id="binary-data"></span><span id="index-2"></span><h2>Binary parameters and results<a class="headerlink" href="#binary-parameters-and-results" title="Link to this heading">¶</a></h2>
 <p>PostgreSQL has two different ways to transmit data between client and server:
 <a class="reference internal" href="../api/pq.html#psycopg.pq.Format.TEXT" title="psycopg.pq.Format.TEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEXT</span></code></a>, always available, and <a class="reference internal" href="../api/pq.html#psycopg.pq.Format.BINARY" title="psycopg.pq.Format.BINARY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BINARY</span></code></a>,
-available most of the times but not always. Usually the binary format is more
+available most of the time but not always. Usually the binary format is more
 efficient to use.</p>
 <p>Psycopg can support both formats for each data type. Whenever a value
 is passed to a query using the normal <code class="docutils literal notranslate"><span class="pre">%s</span></code> placeholder, the best format
 available is chosen (often, but not always, the binary format is picked as the
 best choice).</p>
-<p>If you have a reason to select explicitly the binary format or the text format
+<p>If you have a reason to explicitly select the binary format or the text format
 for a value you can use respectively a <code class="docutils literal notranslate"><span class="pre">%b</span></code> placeholder or a <code class="docutils literal notranslate"><span class="pre">%t</span></code>
 placeholder instead of the normal <code class="docutils literal notranslate"><span class="pre">%s</span></code>. <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> will fail if a
 <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Dumper" title="psycopg.adapt.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> for the right data type and format is not available.</p>
@@ -481,8 +481,8 @@ results) or buffer (for binary results).</p>
 <p>The <a class="reference external" href="https://www.postgresql.org/docs/current/catalog-pg-type.html">pg_type</a> table defines which format is supported for each PostgreSQL
 data type. Text input/output is managed by the functions declared in the
 <code class="docutils literal notranslate"><span class="pre">typinput</span></code> and <code class="docutils literal notranslate"><span class="pre">typoutput</span></code> fields (always present), binary
-input/output is managed by the <code class="docutils literal notranslate"><span class="pre">typsend</span></code> and <code class="docutils literal notranslate"><span class="pre">typreceive</span></code> (which are
-optional).</p>
+input/output is managed by the <code class="docutils literal notranslate"><span class="pre">typsend</span></code> and <code class="docutils literal notranslate"><span class="pre">typreceive</span></code> fields (which
+are optional).</p>
 </div>
 <p>Because not every PostgreSQL type supports binary output, by default, the data
 will be returned in text format. In order to return data in binary format you

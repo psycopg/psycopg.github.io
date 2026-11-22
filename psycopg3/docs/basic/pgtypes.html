@@ -294,7 +294,7 @@
 Psycopg offers wrappers and conversion functions to allow their use.</p>
 <section id="composite-types-adaptation">
 <span id="adapt-composite"></span><span id="index-1"></span><h2>Composite types adaptation<a class="headerlink" href="#composite-types-adaptation" title="Link to this heading">¶</a></h2>
-<p>Psycopg can adapt PostgreSQL composite types (either created with the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> command or implicitly defined after a table row type) to and from
+<p>Psycopg can adapt PostgreSQL composite types (either created with the <a class="reference external" href="https://www.postgresql.org/docs/current/static/sql-createtype.html"><code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span></code></a> command or implicitly defined as a table row type) to and from
 Python tuples, <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">namedtuple</span></code></a>, or any suitably configured object.</p>
 <p>Before using a composite type it is necessary to get information about it
 using the <a class="reference internal" href="../api/types.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a> class and to register it
@@ -323,7 +323,7 @@ type on the fly, stored in <code class="xref py py-obj docutils literal notransl
 <span class="go">card(value=1, suit='spades')</span>
 </pre></div>
 </div>
-<p>Nested composite types are handled as expected, provided that the type of the
+<p>Nested composite types are handled as expected, provided that the types of the
 composite components are registered as well:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TYPE card_back AS (face card, back text)"</span><span class="p">)</span>
 
@@ -340,10 +340,10 @@ composite components are registered as well:</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 3.3.</span></p>
 </div>
-<p>If your Python type takes keyword arguments, or if the sequence of value
+<p>If your Python type takes keyword arguments, or if the sequence of values
 coming from the PostgreSQL type is not suitable for it, it is possible to
 specify a <code class="samp docutils literal notranslate"><span class="pre">make_object(</span><em><span class="pre">values</span></em><span class="pre">,</span> <em><span class="pre">info</span></em><span class="pre">)</span></code> function to adapt the values
-from the composite to the Python object to create, eventually making use of
+from the composite to the Python object to create, possibly making use of
 the information in the type <a class="reference internal" href="../api/types.html#psycopg.types.composite.CompositeInfo" title="psycopg.types.composite.CompositeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeInfo</span></code></a>, for example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -365,7 +365,7 @@ the information in the type <a class="reference internal" href="../api/types.htm
 to Python. If we are also interested in dumping Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Card</span></code> objects we need
 to specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">Card</span></code> as the factory (to declare which object we want to dump)
 and, because <code class="xref py py-obj docutils literal notranslate"><span class="pre">Card</span></code> is not a sequence, we need to specify a
-<code class="samp docutils literal notranslate"><span class="pre">make_sequence(</span><em><span class="pre">object</span></em><span class="pre">,</span> <em><span class="pre">info</span></em><span class="pre">)</span></code> function to convert objects attributes
+<code class="samp docutils literal notranslate"><span class="pre">make_sequence(</span><em><span class="pre">object</span></em><span class="pre">,</span> <em><span class="pre">info</span></em><span class="pre">)</span></code> function to convert object attributes
 into a sequence matching the composite fields:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">card_to_db</span><span class="p">(</span><span class="n">card</span><span class="p">:</span> <span class="n">Card</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">CompositeInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">card</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">field_names</span><span class="p">]</span>
@@ -392,7 +392,7 @@ definition of custom ones.</p>
 <p>All the PostgreSQL range types are loaded as the <a class="reference internal" href="../api/types.html#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>
 Python type, which is a <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code></a> type and can hold bounds of
 different types.</p>
-<p>The built-in range objects are adapted automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects
+<p>The built-in range objects are adapted automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> object
 contains <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a> bounds, it is dumped using the <code class="sql docutils literal notranslate"><span class="pre">daterange</span></code> OID,
 and of course <code class="sql docutils literal notranslate"><span class="pre">daterange</span></code> values are loaded back as <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range[date]</span></code>.</p>
 <p>If you create your own range type you can use <a class="reference internal" href="../api/types.html#psycopg.types.range.RangeInfo" title="psycopg.types.range.RangeInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RangeInfo</span></code></a>
@@ -418,11 +418,11 @@ its subtype and make it work like the builtin ones.</p>
 <p>Since PostgreSQL 14, every range type is associated with a <a class="reference external" href="https://www.postgresql.org/docs/current/rangetypes.html">multirange</a>, a
 type representing a disjoint set of ranges. A multirange is
 automatically available for every range, built-in and user-defined.</p>
-<p>All the PostgreSQL range types are loaded as the
+<p>All the PostgreSQL multirange types are loaded as the
 <a class="reference internal" href="../api/types.html#psycopg.types.multirange.Multirange" title="psycopg.types.multirange.Multirange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code></a> Python type, which is a mutable
 sequence of <a class="reference internal" href="../api/types.html#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a> elements.</p>
-<p>Like for <a class="reference internal" href="../api/types.html#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>, built-in multirange objects are adapted
-automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> object contains <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> with
+<p>As with <a class="reference internal" href="../api/types.html#psycopg.types.range.Range" title="psycopg.types.range.Range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code></a>, built-in multirange objects are adapted
+automatically: if a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange</span></code> object contains <code class="xref py py-obj docutils literal notranslate"><span class="pre">Range</span></code> objects with
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a> bounds, it is dumped using the <code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> OID, and
 <code class="sql docutils literal notranslate"><span class="pre">datemultirange</span></code> values are loaded back as <code class="xref py py-obj docutils literal notranslate"><span class="pre">Multirange[date]</span></code>.</p>
 <p>If you have created your own range type you can use
@@ -456,8 +456,8 @@ supports GiST or GIN indexes allowing search by keys or key/value pairs as
 well as regular BTree indexes for equality, uniqueness etc.</p>
 <p>Psycopg can convert Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> objects to and from <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> structures.
 Only dictionaries with string keys and values are supported. <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> is also
-allowed as value but not as a key.</p>
-<p>In order to use the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> data type it is necessary to load it in a
+allowed as a value but not as a key.</p>
+<p>In order to use the <code class="sql docutils literal notranslate"><span class="pre">hstore</span></code> data type it is necessary to load it into a
 database using:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>=# CREATE EXTENSION hstore;
 </pre></div>
@@ -499,7 +499,7 @@ install the library as an additional dependency of your project.</p>
 <p>This module is experimental and might be changed in the future according
 to users’ feedback.</p>
 </div>
-<p>Since PostgGIS is an extension, the <code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> type oid is not well
+<p>Since PostGIS is an extension, the <code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> type oid is not well
 known, so it is necessary to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeInfo</span></code>.<a class="reference internal" href="../api/types.html#psycopg.types.TypeInfo.fetch" title="psycopg.types.TypeInfo.fetch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch()</span></code></a> to query the database and find it. The
 resulting object can be passed to <a class="reference internal" href="../api/types.html#psycopg.types.shapely.register_shapely" title="psycopg.types.shapely.register_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_shapely()</span></code></a>
 to configure dumping <a class="reference external" href="https://shapely.readthedocs.io/en/stable/manual.html#shapely.geometry.shape">shape</a> instances to <code class="sql docutils literal notranslate"><span class="pre">geometry</span></code> columns and parsing

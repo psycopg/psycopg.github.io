@@ -293,7 +293,7 @@
 <p>Many standard Python types are adapted into SQL and returned as Python
 objects when a query is executed.</p>
 <p>Converting the following data types between Python and PostgreSQL works
-out-of-the-box and doesn’t require any configuration. In case you need to
+out-of-the-box and doesn’t require any configuration. If you need to
 customise the conversion you should take a look at <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">Data adaptation configuration</span></a>.</p>
 <section id="booleans-adaptation">
 <span id="adapt-bool"></span><span id="index-1"></span><h2>Booleans adaptation<a class="headerlink" href="#booleans-adaptation" title="Link to this heading">¶</a></h2>
@@ -320,7 +320,7 @@ customise the conversion you should take a look at <a class="reference internal"
 <code class="sql docutils literal notranslate"><span class="pre">integer</span></code>, <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code>, or <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code>, according to their numeric
 value. Psycopg will choose the smallest data type available, because
 PostgreSQL can automatically cast a type up (e.g. passing a <code class="xref py py-obj docutils literal notranslate"><span class="pre">smallint</span></code> where
-PostgreSQL expect an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> is gladly accepted) but will not cast down
+PostgreSQL expects an <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> is gladly accepted) but will not cast down
 automatically (e.g. if a function has an <code class="sql docutils literal notranslate"><span class="pre">integer</span></code> argument, passing it
 a <code class="sql docutils literal notranslate"><span class="pre">bigint</span></code> value will fail, even if the value is 1).</p></li>
 <li><p>Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> values are converted to PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">float8</span></code>.</p></li>
@@ -352,7 +352,7 @@ promoted to the larger Python counterpart.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Sometimes you may prefer to receive <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> data as <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>
-instead, for performance reason or ease of manipulation: you can configure
+instead, for performance reasons or ease of manipulation: you can configure
 an adapter to <a class="reference internal" href="../advanced/adapt.html#adapt-example-float"><span class="std std-ref">cast PostgreSQL numeric to Python float</span></a>. This of course may imply a loss of precision.</p>
 </div>
 <div class="versionchanged">
@@ -367,8 +367,9 @@ an adapter to <a class="reference internal" href="../advanced/adapt.html#adapt-e
 <li><p><a class="reference external" href="https://www.postgresql.org/docs/current/datatype-character.html">PostgreSQL character types</a></p></li>
 </ul>
 </div>
-<p>Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> are converted to PostgreSQL string syntax, and PostgreSQL types
-such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
+<p>Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> values are converted to PostgreSQL string syntax, and PostgreSQL
+types such as <code class="sql docutils literal notranslate"><span class="pre">text</span></code> and <code class="sql docutils literal notranslate"><span class="pre">varchar</span></code> are converted back to Python
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="s2">"INSERT INTO menu (id, entry) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
@@ -403,7 +404,7 @@ failing to do so may result in encoding/decoding errors:</p>
 </pre></div>
 </div>
 <p>In rare cases you may have strings with unexpected encodings in the database.
-Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> client encoding  will disable decoding of the data
+Using the <code class="docutils literal notranslate"><span class="pre">SQL_ASCII</span></code> client encoding will disable decoding of the data
 coming from the database, which will be returned as <code class="xref py py-obj docutils literal notranslate"><span class="pre">bytes</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SET client_encoding TO SQL_ASCII"</span><span class="p">)</span>
 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT entry FROM menu WHERE id = 1"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
@@ -411,7 +412,7 @@ coming from the database, which will be returned as <code class="xref py py-obj 
 </pre></div>
 </div>
 <p>Alternatively you can cast the unknown encoding data to <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> to
-retrieve it as bytes, leaving other strings unaltered: see <a class="reference internal" href="#adapt-binary"><span class="std std-ref">Binary adaptation</span></a></p>
+retrieve it as bytes, leaving other strings unaltered: see <a class="reference internal" href="#adapt-binary"><span class="std std-ref">Binary adaptation</span></a>.</p>
 <p>Note that PostgreSQL text cannot contain the <code class="docutils literal notranslate"><span class="pre">0x00</span></code> byte. If you need to
 store Python strings that may contain binary zeros you should use a
 <code class="sql docutils literal notranslate"><span class="pre">bytea</span></code> field.</p>
@@ -495,8 +496,8 @@ offset, for instance by a <a class="reference external" href="https://docs.pytho
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tzinfo</span></code></a> implementation resulting in the time’s
 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time.utcoffset" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utcoffset</span></code></a> returning a value.</p>
 </div>
-<section id="dates-and-times-limits-in-python">
-<span id="date-time-limits"></span><h3>Dates and times limits in Python<a class="headerlink" href="#dates-and-times-limits-in-python" title="Link to this heading">¶</a></h3>
+<section id="date-and-time-limits-in-python">
+<span id="date-time-limits"></span><h3>Date and time limits in Python<a class="headerlink" href="#date-and-time-limits-in-python" title="Link to this heading">¶</a></h3>
 <p>PostgreSQL date and time objects can represent values that cannot be
 represented by the Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> objects:</p>
 <ul class="simple">
@@ -508,7 +509,7 @@ represented by the Python <a class="reference external" href="https://docs.pytho
 <p>If you need to handle these values you can define your own mapping (for
 instance mapping every value greater than <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date.max" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date.max</span></code></a> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">date.max</span></code>,
 or the time 24:00 to 00:00) and write a subclass of the default loaders
-implementing the added capability; please see <a class="reference internal" href="../advanced/adapt.html#adapt-example-inf-date"><span class="std std-ref">this example</span></a> for a reference.</p>
+implementing the added capability; please see <a class="reference internal" href="../advanced/adapt.html#adapt-example-inf-date"><span class="std std-ref">this example</span></a> for reference.</p>
 </section>
 <section id="datestyle-and-intervalstyle-limits">
 <span id="datestyle"></span><span id="index-5"></span><h3>DateStyle and IntervalStyle limits<a class="headerlink" href="#datestyle-and-intervalstyle-limits" title="Link to this heading">¶</a></h3>
@@ -526,7 +527,7 @@ parameter; for example:</p>
 <span class="go"># 'ISO, YMD'</span>
 </pre></div>
 </div>
-<p>These GUC parameters only affects loading in text format; loading timestamps
+<p>These GUC parameters only affect loading in text format; loading timestamps
 or intervals in <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">binary format</span></a> is not affected by
 DateStyle or IntervalStyle.</p>
 </section>
@@ -534,10 +535,10 @@ DateStyle or IntervalStyle.</p>
 <section id="json-adaptation">
 <span id="adapt-json"></span><h2>JSON adaptation<a class="headerlink" href="#json-adaptation" title="Link to this heading">¶</a></h2>
 <p>Psycopg can map between Python objects and PostgreSQL <a class="reference external" href="https://www.postgresql.org/docs/current/datatype-json.html">json/jsonb
-types</a>, allowing to customise the load and dump function used.</p>
+types</a>, allowing you to customise the load and dump functions used.</p>
 <p>Because several Python objects could be considered JSON (dicts, lists,
 scalars, even date/time if using a dumps function customised to use them),
-Psycopg requires you to wrap the object to dump as JSON into a wrapper:
+Psycopg requires you to wrap the object to dump as JSON in a wrapper:
 either <a class="reference internal" href="../api/types.html#psycopg.types.json.Json" title="psycopg.types.json.Json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.types.json.Json</span></code></a> or <a class="reference internal" href="../api/types.html#psycopg.types.json.Jsonb" title="psycopg.types.json.Jsonb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Jsonb</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jsonb</span>
 
@@ -609,7 +610,7 @@ the values as a list (not a tuple).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM mytable WHERE id = ANY(</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p>This has also the advantage of working with an empty list, whereas <code class="docutils literal notranslate"><span class="pre">IN</span>
+<p>This also has the advantage of working with an empty list, whereas <code class="docutils literal notranslate"><span class="pre">IN</span>
 <span class="pre">()</span></code> is not valid SQL.</p>
 </div>
 </section>
@@ -633,7 +634,7 @@ address types</a>:</p>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Address" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Address</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Interface" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code></a> objects are converted
 to the PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> type. On the way back, <code class="sql docutils literal notranslate"><span class="pre">inet</span></code> values
 indicating a single address are converted to <code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Address</span></code>, otherwise they
-are converted to <code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code></p></li>
+are converted to <code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Interface</span></code>.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Network" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv4Network</span></code></a> objects are converted to the <code class="sql docutils literal notranslate"><span class="pre">cidr</span></code> type and
 back.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Address" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Address</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Interface" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPv6Interface</span></code></a>,
@@ -666,8 +667,8 @@ and registered enums is different.</p>
 names as value. The unknown oid is used, so PostgreSQL should be able to
 use this string in most contexts (such as an enum or a text field).</p>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 3.1: </span>In previous version dumping pure enums is not supported and raise a
-“cannot adapt” error.</p>
+<p><span class="versionmodified changed">Changed in version 3.1: </span>In previous versions dumping pure enums was not supported and raised
+a “cannot adapt” error.</p>
 </div>
 </li>
 <li><p>Mix-in enums are dumped according to their mix-in type (because a <code class="xref py py-obj docutils literal notranslate"><span class="pre">class</span>
@@ -681,7 +682,7 @@ and register them using <a class="reference internal" href="../api/types.html#ps
 <li><p>If the enum is registered (using <a class="reference internal" href="../api/types.html#psycopg.types.enum.EnumInfo" title="psycopg.types.enum.EnumInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnumInfo</span></code></a><code class="xref py py-obj docutils literal notranslate"><span class="pre">.fetch()</span></code> and
 <a class="reference internal" href="../api/types.html#psycopg.types.enum.register_enum" title="psycopg.types.enum.register_enum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_enum()</span></code></a>):</p>
 <ul class="simple">
-<li><p>Enums classes, both pure and mixed-in, are dumped by name.</p></li>
+<li><p>Enum classes, both pure and mixed-in, are dumped by name.</p></li>
 <li><p>The registered PostgreSQL enum is loaded back as the registered Python
 enum members.</p></li>
 </ul>
@@ -718,10 +719,10 @@ enum members.</p></li>
 <span class="go">[&lt;UserRole.ADMIN: 1&gt;, &lt;UserRole.GUEST: 3&gt;]</span>
 </pre></div>
 </div>
-<p>If the Python and the PostgreSQL enum don’t match 1:1 (for instance if members
-have a different name, or if more than one Python enum should map to the same
-PostgreSQL enum, or vice versa), you can specify the exceptions using the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code> parameter.</p>
+<p>If the Python and the PostgreSQL enums don’t match 1:1 (for instance if
+members have a different name, or if more than one Python enum should map to
+the same PostgreSQL enum, or vice versa), you can specify the exceptions using
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code> parameter.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code> should be a dictionary with Python enum members as keys and the
 matching PostgreSQL enum labels as values, or a list of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(member,</span> <span class="pre">label)</span></code>
 pairs with the same meaning (useful when some members are repeated). Order
@@ -829,7 +830,7 @@ a <code class="xref py py-obj docutils literal notranslate"><span class="pre">st
 <li><a class="reference internal" href="#strings-adaptation">Strings adaptation</a></li>
 <li><a class="reference internal" href="#binary-adaptation">Binary adaptation</a></li>
 <li><a class="reference internal" href="#date-time-types-adaptation">Date/time types adaptation</a><ul>
-<li><a class="reference internal" href="#dates-and-times-limits-in-python">Dates and times limits in Python</a></li>
+<li><a class="reference internal" href="#date-and-time-limits-in-python">Date and time limits in Python</a></li>
 <li><a class="reference internal" href="#datestyle-and-intervalstyle-limits">DateStyle and IntervalStyle limits</a></li>
 </ul>
 </li>

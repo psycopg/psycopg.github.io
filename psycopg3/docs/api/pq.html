@@ -301,16 +301,16 @@ structures.</p>
 same interface. Current implementations are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">python</span></code>: a pure-python implementation, implemented using the <a class="reference external" href="https://docs.python.org/3/library/ctypes.html#module-ctypes" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctypes</span></code></a>
-module. It is less performing than the others, but it doesn’t need a C
+module. It is slower than the others, but it doesn’t need a C
 compiler to install. It requires the libpq installed in the system.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: a C implementation of the libpq wrapper (more precisely, implemented
-in <a class="reference external" href="https://cython.org/">Cython</a>). It is much better performing than the <code class="docutils literal notranslate"><span class="pre">python</span></code>
+in <a class="reference external" href="https://cython.org/">Cython</a>). It is much faster than the <code class="docutils literal notranslate"><span class="pre">python</span></code>
 implementation, however it requires development packages installed on the
 client machine. It can be installed using the <code class="docutils literal notranslate"><span class="pre">c</span></code> extra, i.e. running
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;psycopg[c]&quot;</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">binary</span></code>: a pre-compiled C implementation, bundled with all the required
 libraries. It is the easiest option to deal with, fast to install and it
-should require no development tool or client library, however it may be not
+should require no development tool or client library, however it may not be
 available for every platform. You can install it using the <code class="docutils literal notranslate"><span class="pre">binary</span></code> extra,
 i.e. running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;psycopg[binary]&quot;</span></code>.</p></li>
 </ul>
@@ -341,7 +341,7 @@ ImportError: couldn't import requested psycopg 'c' implementation: No module nam
 <span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">__impl__</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'python'</span></span><a class="headerlink" href="#psycopg.pq.__impl__" title="Link to this definition">¶</a></dt>
 <dd><p>The currently loaded implementation of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.pq</span></code> package.</p>
 <p>Possible values include <code class="docutils literal notranslate"><span class="pre">python</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">binary</span></code>.</p>
-<p>The choice of implementation is automatic but can be forced setting the
+<p>The choice of implementation is automatic but can be forced by setting the
 <span class="target" id="index-2"></span><a class="reference internal" href="#envvar-PSYCOPG_IMPL"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PSYCOPG_IMPL</span></code></a> env var.</p>
 </dd></dl>
 
@@ -349,7 +349,7 @@ ImportError: couldn't import requested psycopg 'c' implementation: No module nam
 <dt class="sig sig-object py" id="psycopg.pq.version">
 <span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#psycopg.pq.version" title="Link to this definition">¶</a></dt>
 <dd><p>Return the version number of the libpq currently loaded.</p>
-<p>The number is in the same format of <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.server_version" title="psycopg.ConnectionInfo.server_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_version</span></code></a>.</p>
+<p>The number is in the same format as <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.server_version" title="psycopg.ConnectionInfo.server_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_version</span></code></a>.</p>
 <p>Certain features might not be available if the libpq library used is too old.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -359,9 +359,9 @@ ImportError: couldn't import requested psycopg 'c' implementation: No module nam
 
 <dl class="py data">
 <dt class="sig sig-object py" id="psycopg.pq.__build_version__">
-<span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">__build_version__</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">180006</span></span><a class="headerlink" href="#psycopg.pq.__build_version__" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">__build_version__</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">180007</span></span><a class="headerlink" href="#psycopg.pq.__build_version__" title="Link to this definition">¶</a></dt>
 <dd><p>The libpq version the C package was built with.</p>
-<p>A number in the same format of <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.server_version" title="psycopg.ConnectionInfo.server_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_version</span></code></a>
+<p>A number in the same format as <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.server_version" title="psycopg.ConnectionInfo.server_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_version</span></code></a>
 representing the libpq used to build the speedup module (<code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">binary</span></code>) if
 available.</p>
 <p>Certain features might not be available if the built version is too old.</p>
@@ -385,7 +385,7 @@ than the one loaded (see <a class="reference internal" href="#psycopg.pq.version
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.pgconn_ptr">
 <span class="sig-name descname"><span class="pre">pgconn_ptr</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#psycopg.pq.PGconn.pgconn_ptr" title="Link to this definition">¶</a></dt>
-<dd><p>The pointer to the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn</span></code> structure, as integer.</p>
+<dd><p>The pointer to the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn</span></code> structure, as an integer.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the connection is closed.</p>
 <p>The value can be used to pass the structure to libpq functions which
 Psycopg doesn’t (currently) wrap, either in C or in Python using FFI
@@ -656,7 +656,7 @@ than 18.</p>
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.server_version">
 <span class="sig-name descname"><span class="pre">server_version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#psycopg.pq.PGconn.server_version" title="Link to this definition">¶</a></dt>
 <dd><p>The version of the server, as an integer.</p>
-<p>The number is in the same format of
+<p>The number is in the same format as
 <a class="reference internal" href="objects.html#psycopg.ConnectionInfo.server_version" title="psycopg.ConnectionInfo.server_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">server_version</span></code></a>.</p>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-status.html#LIBPQ-PQSERVERVERSION"><span class="pre">PQserverVersion()</span></a></code> for details.</p>
 </dd></dl>
@@ -723,7 +723,7 @@ but none was available.</p>
 statement, separated by semicolons.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -764,7 +764,7 @@ the parameters are in text format.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -790,7 +790,7 @@ or if an OID is 0, the server infers the type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -825,7 +825,7 @@ the parameters are in text format.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -884,7 +884,7 @@ cursor declared with <code class="sql docutils literal notranslate"><span class=
 statement.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -907,7 +907,7 @@ than 17.</p></li>
 <dd class="field-odd"><p><strong>name</strong> – the name of the portal. <code class="docutils literal notranslate"><span class="pre">b&quot;&quot;</span></code> is the unnamed portal.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the command. A command failed on the server
+<dd class="field-even"><p>the result of the command. A command that failed on the server
 still returns a result: check its <a class="reference internal" href="#psycopg.pq.PGresult.status" title="psycopg.pq.PGresult.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -951,7 +951,7 @@ than 17.</p></li>
 <dd><p>Change a PostgreSQL password.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if the command to change password failed.</p>
+<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if the command to change the password failed.</p>
 </dd>
 </dl>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-misc.html#LIBPQ-PQCHANGEPASSWORD"><span class="pre">PQchangePassword</span></a></code> for details.</p>
@@ -1239,8 +1239,7 @@ than 14.</p>
 <dd><p>Enter pipeline mode.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – in case of failure to enter the pipeline
-mode.</p>
+<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if entering pipeline mode failed.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1251,8 +1250,7 @@ mode.</p>
 <dd><p>Exit pipeline mode.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – in case of failure to exit the pipeline
-mode.</p>
+<dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if exiting pipeline mode failed.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1272,7 +1270,7 @@ or if sync failed.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.send_flush_request">
 <span class="sig-name descname"><span class="pre">send_flush_request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.send_flush_request" title="Link to this definition">¶</a></dt>
-<dd><p>Sends a request for the server to flush its output buffer.</p>
+<dd><p>Send a request for the server to flush its output buffer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><strong>OperationalError</strong></a> – if the flush request failed.</p>
@@ -1406,7 +1404,7 @@ receive its result.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGconn.set_trace_flags">
 <span class="sig-name descname"><span class="pre">set_trace_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psycopg.pq.Trace" title="psycopg.pq.Trace"><span class="pre">Trace</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGconn.set_trace_flags" title="Link to this definition">¶</a></dt>
-<dd><p>Configure tracing behavior of client/server communication.</p>
+<dd><p>Configure the tracing behavior of the client/server communication.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>flags</strong> – operating mode of tracing.</p>
@@ -1453,7 +1451,7 @@ receive its result.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.pq.PGresult.pgresult_ptr">
 <span class="sig-name descname"><span class="pre">pgresult_ptr</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#psycopg.pq.PGresult.pgresult_ptr" title="Link to this definition">¶</a></dt>
-<dd><p>The pointer to the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code> structure, as integer.</p>
+<dd><p>The pointer to the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code> structure, as an integer.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the result was cleared.</p>
 <p>The value can be used to pass the structure to libpq functions which
 Psycopg doesn’t (currently) wrap, either in C or in Python using FFI
@@ -1711,7 +1709,7 @@ exactly one row into a table with OIDs. 0 otherwise.</p>
 <span class="sig-name descname"><span class="pre">set_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#psycopg.pq.PGresAttDesc" title="psycopg.pq.misc.PGresAttDesc"><span class="pre">PGresAttDesc</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGresult.set_attributes" title="Link to this definition">¶</a></dt>
 <dd><p>Set the description of the columns of the result.</p>
 <p>Only allowed on a result created by <a class="reference internal" href="#psycopg.pq.PGconn.make_empty_result" title="psycopg.pq.PGconn.make_empty_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGconn.make_empty_result()</span></code></a> and
-without columns yet.</p>
+with no columns yet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>descriptions</strong> – the description of each column.</p>
@@ -1836,7 +1834,7 @@ command.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGcancelConn.start">
 <span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGcancelConn.start" title="Link to this definition">¶</a></dt>
-<dd><p>Requests that the server abandons processing of the current command
+<dd><p>Requests that the server abandon processing of the current command
 in a non-blocking manner.</p>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-cancel.html#LIBPQ-PQCANCELSTART"><span class="pre">PQcancelStart</span></a></code> for details.</p>
 </dd></dl>
@@ -1844,7 +1842,7 @@ in a non-blocking manner.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.pq.PGcancelConn.blocking">
 <span class="sig-name descname"><span class="pre">blocking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PGcancelConn.blocking" title="Link to this definition">¶</a></dt>
-<dd><p>Requests that the server abandons processing of the current command
+<dd><p>Requests that the server abandon processing of the current command
 in a blocking manner.</p>
 <p>See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-cancel.html#LIBPQ-PQCANCELBLOCKING"><span class="pre">PQcancelBlocking</span></a></code> for details.</p>
 </dd></dl>
@@ -2101,7 +2099,7 @@ during the connection phase and are considered internal.
 <dt class="sig sig-object py" id="psycopg.pq.PollingStatus">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.pq.</span></span><span class="sig-name descname"><span class="pre">PollingStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.pq.PollingStatus" title="Link to this definition">¶</a></dt>
 <dd><p>The status of the socket during a connection.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">READING</span></code> or <code class="docutils literal notranslate"><span class="pre">WRITING</span></code> you may select before polling again.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">READING</span></code> or <code class="docutils literal notranslate"><span class="pre">WRITING</span></code>, you may select before polling again.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-connect.html#LIBPQ-PQCONNECTSTARTPARAMS"><span class="pre">PQconnectPoll</span></a></code> for a description of these states.</p>

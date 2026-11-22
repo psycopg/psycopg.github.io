@@ -290,7 +290,7 @@
         <article role="main" id="furo-main-content">
           <section id="data-adaptation-configuration">
 <span id="adaptation"></span><h1>Data adaptation configuration<a class="headerlink" href="#data-adaptation-configuration" title="Link to this heading">¶</a></h1>
-<p>The adaptation system is at the core of Psycopg and allows to customise the
+<p>The adaptation system is at the core of Psycopg and allows you to customise the
 way Python objects are converted to PostgreSQL when a query is performed and
 how PostgreSQL values are converted to Python objects when query results are
 returned.</p>
@@ -317,7 +317,7 @@ template adapters map using the <code class="xref py py-obj docutils literal not
 <img alt="../_images/adapt.svg" class="align-center" src="../_images/adapt.svg" />
 </li>
 <li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">adapters</span></code> attributes are <a class="reference internal" href="../api/adapt.html#psycopg.adapt.AdaptersMap" title="psycopg.adapt.AdaptersMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptersMap</span></code></a> instances, and contain the
-mapping from Python types and <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> classes, and from
+mapping from Python types to <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a> classes, and from
 PostgreSQL OIDs to <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> classes. Changing this mapping
 (e.g. writing and registering your own adapters, or using a different
 configuration of builtin adapters) affects how types are converted between
@@ -327,7 +327,7 @@ Python and PostgreSQL.</p>
 the objects used to perform the conversion from a Python object to a bytes
 sequence in a format understood by PostgreSQL. The string returned
 <em>shouldn’t be quoted</em>: the value will be passed to the database using
-functions such as <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-exec.html#LIBPQ-PQEXECPARAMS"><span class="pre">PQexecParams()</span></a></code> so quoting and quotes escaping is
+functions such as <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-exec.html#LIBPQ-PQEXECPARAMS"><span class="pre">PQexecParams()</span></a></code> so quoting and quote escaping are
 not necessary. The dumper usually also suggests to the server what type to
 use, via its <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.oid" title="psycopg.abc.Dumper.oid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oid</span></code></a> attribute.</p></li>
 <li><p>Loaders (objects implementing the <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> protocol) are
@@ -340,7 +340,7 @@ when a query is executed.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Changing adapters in a context only affects that context and its children
+<p>Changing adapters in a context only affects that context and its child
 objects created <em>afterwards</em>; the objects already created are not
 affected. For instance, changing the global context will only change newly
 created connections, not the ones already existing.</p>
@@ -361,8 +361,8 @@ Postgres and back.</p>
 <ul class="simple">
 <li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> copies the adapters configuration from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>,
 thus inheriting all the changes made to the global <a class="reference internal" href="../api/module.html#psycopg.adapters" title="psycopg.adapters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.adapters</span></code></a>
-configuration, the current <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>.</p></li>
-<li><p>For every Python type passed as query argument, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will
+configuration, the current <code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code>, and the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code>.</p></li>
+<li><p>For every Python type passed as a query argument, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will
 instantiate a <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper" title="psycopg.abc.Dumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code></a>. Usually all the objects of the same
 type will be converted by the same dumper instance.</p>
 <ul>
@@ -380,8 +380,8 @@ mechanism provided by <a class="reference internal" href="../api/abc.html#psycop
 <a class="reference internal" href="../api/abc.html#psycopg.abc.Dumper.upgrade" title="psycopg.abc.Dumper.upgrade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade()</span></code></a> is used to create more specific dumpers.</p></li>
 </ul>
 </li>
-<li><p>The query is executed. Upon successful request, the result is received as a
-<a class="reference internal" href="../api/pq.html#psycopg.pq.PGresult" title="psycopg.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a>.</p></li>
+<li><p>The query is executed. If the request is successful, the result is received
+as a <a class="reference internal" href="../api/pq.html#psycopg.pq.PGresult" title="psycopg.pq.PGresult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGresult</span></code></a>.</p></li>
 <li><p>For every OID returned by the query, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code> will instantiate a
 <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader" title="psycopg.abc.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a>. All the values with the same OID will be converted by
 the same loader instance.</p>
@@ -394,11 +394,11 @@ their <a class="reference internal" href="../api/abc.html#psycopg.abc.Loader.for
 <li><p>Recursive types (e.g. Python lists, PostgreSQL arrays and composite types)
 will use the same adaptation rules.</p></li>
 </ul>
-<p>As a consequence it is possible to perform certain choices only once per query
+<p>As a consequence it is possible to make certain choices only once per query
 (e.g. looking up the connection encoding) and then call a fast-path operation
 for each value to convert.</p>
 <p>Querying will fail if a Python object for which there isn’t a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dumper</span></code>
-registered (for the right <a class="reference internal" href="../api/pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></a>) is used as query parameter.
+registered (for the right <a class="reference internal" href="../api/pq.html#psycopg.pq.Format" title="psycopg.pq.Format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></a>) is used as a query parameter.
 If the query returns a data type whose OID doesn’t have a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code>, the
 value will be returned as a string (or bytes string for binary types).</p>
 </section>
@@ -485,9 +485,9 @@ they have been registered on that context using the
 <p><span class="versionmodified changed">Changed in version 3.2: </span>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">dump()</span></code> method can also return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, which will be stored as
 <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code> in the database.</p>
 </div>
-<p>If you prefer to store missing values as <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code>, in the database, but
+<p>If you prefer to store missing values as <code class="sql docutils literal notranslate"><span class="pre">NULL</span></code> in the database, but
 your input may contain empty strings, you can subclass the stock string dumper
-to return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> upon empty or whitespace-only strings:</p>
+to return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> for empty or whitespace-only strings:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.string</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrDumper</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">NullStrDumper</span><span class="p">(</span><span class="n">StrDumper</span><span class="p">):</span>
@@ -506,7 +506,7 @@ to return <code class="xref py py-obj docutils literal notranslate"><span class=
 <section id="example-postgresql-numeric-to-python-float">
 <span id="adapt-example-float"></span><h2>Example: PostgreSQL numeric to Python float<a class="headerlink" href="#example-postgresql-numeric-to-python-float" title="Link to this heading">¶</a></h2>
 <p>Normally PostgreSQL <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> values are converted to Python
-<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> instances, because both the types allow fixed-precision
+<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code></a> instances, because both types allow fixed-precision
 arithmetic and are not subject to rounding.</p>
 <p>Sometimes, however, you may want to perform floating-point math on
 <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> values, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Decimal</span></code> may get in the way (maybe because it is
@@ -516,7 +516,7 @@ errors).</p>
 receive <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> values as Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, you can register on
 <code class="sql docutils literal notranslate"><span class="pre">numeric</span></code> the same <a class="reference internal" href="../api/adapt.html#psycopg.adapt.Loader" title="psycopg.adapt.Loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Loader</span></code></a> class used to load
 <code class="sql docutils literal notranslate"><span class="pre">float4</span></code>/<code class="sql docutils literal notranslate"><span class="pre">float8</span></code> values. Because the PostgreSQL textual
-representation of both floats and decimal is the same, the two loaders are
+representation of both floats and decimals is the same, the two loaders are
 compatible.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
@@ -532,8 +532,8 @@ compatible.</p>
 <p>In this example the customised adaptation takes effect only on the connection
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">conn</span></code> and on any cursor created from it, not on other connections.</p>
 </section>
-<section id="example-handling-infinity-date">
-<span id="adapt-example-inf-date"></span><h2>Example: handling infinity date<a class="headerlink" href="#example-handling-infinity-date" title="Link to this heading">¶</a></h2>
+<section id="example-handling-the-infinity-date">
+<span id="adapt-example-inf-date"></span><h2>Example: handling the infinity date<a class="headerlink" href="#example-handling-the-infinity-date" title="Link to this heading">¶</a></h2>
 <p>Suppose you want to work with the “infinity” date which is available in
 PostgreSQL but not handled by Python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT 'infinity'::date"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
@@ -641,7 +641,7 @@ cursor):</p>
 <li><a class="reference internal" href="#writing-a-custom-adapter-xml">Writing a custom adapter: XML</a></li>
 <li><a class="reference internal" href="#example-converting-empty-strings-to-null">Example: converting empty strings to NULL</a></li>
 <li><a class="reference internal" href="#example-postgresql-numeric-to-python-float">Example: PostgreSQL numeric to Python float</a></li>
-<li><a class="reference internal" href="#example-handling-infinity-date">Example: handling infinity date</a></li>
+<li><a class="reference internal" href="#example-handling-the-infinity-date">Example: handling the infinity date</a></li>
 </ul>
 </li>
 </ul>

@@ -305,9 +305,9 @@ prefix instead of <code class="docutils literal notranslate"><span class="pre">f
 Python and passed to the rest of the program as an already formatted regular
 string; t-strings, instead, are evaluated by Psycopg, which has a chance to
 process query parameters in a safe way.</p>
-<p>For example you can pass to a query some strings parameters, which may contain
+<p>For example you can pass to a query some string parameters, which may contain
 unsafe characters such as <code class="docutils literal notranslate"><span class="pre">'</span></code>, or come from untrusted sources such as a web
-form, and leave Psycopg to perform the right processing:</p>
+form, and let Psycopg perform the right processing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="sa">t</span><span class="s2">"INSERT INTO mytable (first_name, last_name) VALUES (</span><span class="si">{</span><span class="n">first_name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">)"</span>
 <span class="p">)</span>
@@ -333,18 +333,19 @@ functions:</p>
 </pre></div>
 </div>
 <p>With template strings it is also easy to parametrize parts of the query other
-than parameter values, for example tables or fields names:</p>
+than parameter values, for example table or field names:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="sa">t</span><span class="s2">"INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">:</span><span class="s2">i</span><span class="si">}</span><span class="s2"> (first_name, last_name) VALUES (</span><span class="si">{</span><span class="n">first_name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">)"</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">:i</span></code> specifies to merge <code class="xref py py-obj docutils literal notranslate"><span class="pre">table_name</span></code> to the query on the client using
-the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS">identifier syntax</a> before continuing with the normal processing (which
-might involve preparing the query, sending the parameters separately, etc.)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">:i</span></code> tells Psycopg to merge <code class="xref py py-obj docutils literal notranslate"><span class="pre">table_name</span></code> into the query on the client
+using the <a class="reference external" href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS">identifier syntax</a> before continuing with the normal processing
+(which might involve preparing the query, sending the parameters separately,
+etc.)</p>
 <section id="format-specifiers">
 <h2>Format specifiers<a class="headerlink" href="#format-specifiers" title="Link to this heading">¶</a></h2>
-<p>Format specifiers can be associated to template strings interpolation using a
+<p>Format specifiers can be associated with template string interpolation using a
 <code class="docutils literal notranslate"><span class="pre">:</span></code> in the placeholder, for example in <code class="docutils literal notranslate"><span class="pre">{id:b}</span></code>. Psycopg supports a few
 format specifiers specifying <a class="reference internal" href="params.html#binary-data"><span class="std std-ref">how to pass a parameter to the server</span></a> and a few format specifiers specifying how to compose query
 parts on the client, in a way similar to what can be obtained using the
@@ -352,7 +353,7 @@ parts on the client, in a way similar to what can be obtained using the
 <p>The supported specifiers for parameter formats are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: automatic parameter format, similar to using <code class="docutils literal notranslate"><span class="pre">%s</span></code> in a classic
-query. This is the same effect of using no format specifier.</p></li>
+query. This is the same effect as using no format specifier.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">b</span></code>: use the binary format to pass the parameter, similar to using <code class="docutils literal notranslate"><span class="pre">%b</span></code>
 in a classic query.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: use the text format to pass the parameter, similar to using <code class="docutils literal notranslate"><span class="pre">%t</span></code>
@@ -362,9 +363,9 @@ in a classic query.</p></li>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">i</span></code>: the parameter is an <a class="reference external" href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS">identifier</a>, for example a table or column name.
 The parameter must be a string or a <a class="reference internal" href="../api/sql.html#psycopg.sql.Identifier" title="psycopg.sql.Identifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.Identifier</span></code></a> instance.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">l</span></code>: the parameter is a literal value, which will be merged to the
-query on the client. This allows to parametrize statements that <a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">don’t
-support parametrization in PostgreSQL</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">l</span></code>: the parameter is a literal value, which will be merged into the
+query on the client. This allows you to parametrize statements that
+<a class="reference internal" href="from_pg2.html#server-side-binding"><span class="std std-ref">don’t support parametrization in PostgreSQL</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the parameter is a snippet of statement to be included verbatim in
 the query. The parameter must be another template string or a
 <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a>/<a class="reference internal" href="../api/sql.html#psycopg.sql.Composed" title="psycopg.sql.Composed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Composed</span></code></a> instance.</p></li>
@@ -391,9 +392,9 @@ result in executing the statement <code class="docutils literal notranslate"><sp
 <p>A string template merges literal parts of the query with parameters. It is also
 possible to pass templates to templates in order to compose more and more
 complex and dynamic SQL statements.</p>
-<p>For example let’s say we have an <code class="xref py py-obj docutils literal notranslate"><span class="pre">User</span></code> Python object mapping to an <code class="docutils literal notranslate"><span class="pre">users</span></code>
+<p>For example let’s say we have a <code class="xref py py-obj docutils literal notranslate"><span class="pre">User</span></code> Python object mapping to a <code class="docutils literal notranslate"><span class="pre">users</span></code>
 database table. We might want to implement a <code class="xref py py-obj docutils literal notranslate"><span class="pre">search()</span></code> function to return
-users by a list of ids, by names pattern, by group. This function might
+users by a list of ids, by name pattern, by group. This function might
 be written as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">search_users</span><span class="p">(</span>
     <span class="n">conn</span><span class="p">:</span> <span class="n">Connection</span><span class="p">,</span>

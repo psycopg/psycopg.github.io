@@ -345,7 +345,7 @@ relate to each other:</p>
 <li><p>The function <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> creates a new database session and
 returns a new <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> instance. <a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection.connect" title="psycopg.AsyncConnection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.connect()</span></code></a>
 creates an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">asyncio</span></code></a> connection instead.</p></li>
-<li><p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows to:</p>
+<li><p>The <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> class encapsulates a database session. It allows you to:</p>
 <ul>
 <li><p>create new <a class="reference internal" href="../api/cursors.html#psycopg.Cursor" title="psycopg.Cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor</span></code></a> instances using the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method to
 execute database commands and queries,</p></li>
@@ -380,7 +380,7 @@ to close them and free their resources at the end of the block (notice that
 <p>The pattern above is familiar to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg2</span></code> users. However, Psycopg 3 also
 exposes a few simple extensions which make the above pattern leaner:</p>
 <ul>
-<li><p>the <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> objects exposes an <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method,
+<li><p>the <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> object exposes an <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method,
 equivalent to creating a cursor, calling its <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code></a> method, and
 returning it.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In Psycopg 2</span>
@@ -420,7 +420,7 @@ using a result in a single expression:</p>
 </section>
 <section id="connection-context">
 <span id="with-connection"></span><span id="index-1"></span><h2>Connection context<a class="headerlink" href="#connection-context" title="Link to this heading">¶</a></h2>
-<p>Psycopg 3 <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
+<p>A Psycopg 3 <a class="reference internal" href="../api/connections.html#psycopg.Connection" title="psycopg.Connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection</span></code></a> can be used as a context manager:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="o">...</span> <span class="c1"># use the connection</span>
 
@@ -466,14 +466,15 @@ a connection closed INTRANS and roll back the current transaction;</p></li>
 explicit COMMIT and the operations will be finalised.</p></li>
 </ul>
 <p>You should use a <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> block when your intention is just to execute a
-set of operations and then committing the result, which is the most usual
+set of operations and then commit the result, which is the most usual
 thing to do with a connection. If your connection life cycle and
-transaction pattern is different, and want more control on it, the use
-without <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> might be more convenient.</p>
+transaction pattern is different, and you want more control over it, the
+use without <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> might be more convenient.</p>
 <p>See <a class="reference internal" href="transactions.html#transactions"><span class="std std-ref">Transactions management</span></a> for more information.</p>
 </div>
-<p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can be also used as context manager, using <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>,
-but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for details.</p>
+<p><a class="reference internal" href="../api/connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection</span></code></a> can also be used as a context manager, using <code class="docutils literal notranslate"><span class="pre">async</span>
+<span class="pre">with</span></code>, but be careful about its quirkiness: see <a class="reference internal" href="../advanced/async.html#async-with"><span class="std std-ref">with async connections</span></a> for
+details.</p>
 </section>
 <section id="adapting-psycopg-to-your-program">
 <h2>Adapting Psycopg to your program<a class="headerlink" href="#adapting-psycopg-to-your-program" title="Link to this heading">¶</a></h2>
@@ -486,7 +487,7 @@ threads/processes, you can use <a class="reference internal" href="../advanced/a
 <li><p>If you want to customise the objects that the cursor returns, instead of
 receiving tuples, you can specify your <a class="reference internal" href="../advanced/rows.html#row-factories"><span class="std std-ref">row factories</span></a>.</p></li>
 <li><p>If you want to customise how Python values and PostgreSQL types are mapped
-into each other, beside the <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">basic type mapping</span></a>,
+into each other, besides the <a class="reference internal" href="adapt.html#types-adaptation"><span class="std std-ref">basic type mapping</span></a>,
 you can <a class="reference internal" href="../advanced/adapt.html#adaptation"><span class="std std-ref">configure your types</span></a>.</p></li>
 </ul>
 </section>
@@ -507,7 +508,7 @@ performed.</p>
 <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"host=192.0.2.1,localhost connect_timeout=10"</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this example Psycopg will first try to connect to a non responsive server,
+<p>In this example Psycopg will first try to connect to a non-responsive server,
 only stopping after hitting the timeout, and will move on to a working server.
 The resulting log might look like:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2045-05-10 11:45:54,364 DEBUG connection attempt: host: '192.0.2.1', port: None, hostaddr: '192.0.2.1'

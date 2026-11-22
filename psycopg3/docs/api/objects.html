@@ -381,7 +381,7 @@ returned as 90305, version 10.2 as 100002.</p>
 <dd><p>An integer representing the server full protocol version.</p>
 <p>Return a value in the format described in <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-status.html#LIBPQ-PQFULLPROTOCOLVERSION"><span class="pre">PQfullProtocolVersion()</span></a></code>.</p>
 <p>Only meaningful if the libpq used is version 18 or greater. If the
-version is lesser than that, return the value reported by
+version is lower than that, return the value reported by
 <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-status.html#LIBPQ-PQPROTOCOLVERSION"><span class="pre">PQprotocolVersion()</span></a></code> (but in the same format as above, e.g. 30000
 for version 3). You can use <a class="reference internal" href="#psycopg.Capabilities.has_full_protocol_version" title="psycopg.Capabilities.has_full_protocol_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Capabilities.has_full_protocol_version()</span></code></a>
 to verify if the value can be considered reliable.</p>
@@ -400,7 +400,7 @@ See <code class="docutils literal notranslate"><a class="reference external" hre
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.ConnectionInfo.get_parameters">
 <span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#psycopg.ConnectionInfo.get_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>Return the connection parameters values.</p>
+<dd><p>Return the connection parameter values.</p>
 <p>Return all the parameters set to a non-default value, which might come
 either from the connection string and parameters passed to
 <a class="reference internal" href="connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> or from environment variables. The password
@@ -408,7 +408,7 @@ is never returned (you can read it using the <a class="reference internal" href=
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <a class="reference internal" href="#psycopg.ConnectionInfo.dsn" title="psycopg.ConnectionInfo.dsn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dsn</span></code></a> attribute returns the same information in the form
-as a string.</p>
+of a string.</p>
 </div>
 </dd></dl>
 
@@ -475,8 +475,8 @@ See <code class="docutils literal notranslate"><a class="reference external" hre
 <dt class="sig sig-object py" id="psycopg.ConnectionInfo.parameter_status">
 <span class="sig-name descname"><span class="pre">parameter_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#psycopg.ConnectionInfo.parameter_status" title="Link to this definition">¶</a></dt>
 <dd><p>Return a parameter setting of the connection.</p>
-<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> is the parameter is unknown.</p>
-<p>Example of parameters are <code class="docutils literal notranslate"><span class="pre">server_version</span></code>,
+<p>Return <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> if the parameter is unknown.</p>
+<p>Examples of parameters are <code class="docutils literal notranslate"><span class="pre">server_version</span></code>,
 <code class="docutils literal notranslate"><span class="pre">standard_conforming_strings</span></code>… See <code class="docutils literal notranslate"><a class="reference external" href="https://www.postgresql.org/docs/18/libpq-status.html#LIBPQ-PQPARAMETERSTATUS"><span class="pre">PQparameterStatus()</span></a></code> for
 all the available parameters.</p>
 </dd></dl>
@@ -513,7 +513,7 @@ selected (currently <code class="docutils literal notranslate"><span class="pre"
 <dd><p>An object to check if a feature is supported by the libpq available on the client.</p>
 <p>An instance of this object is normally exposed by the module as the object
 <a class="reference internal" href="module.html#psycopg.capabilities" title="psycopg.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.capabilities</span></code></a>.</p>
-<p>Every feature check is implemented by an <code class="xref py py-obj docutils literal notranslate"><span class="pre">has_SOMETHING()</span></code> method. All
+<p>Every feature check is implemented by a <code class="xref py py-obj docutils literal notranslate"><span class="pre">has_SOMETHING()</span></code> method. All
 the methods return a boolean value stating if the capability is supported,
 which can be used by a program to degrade gracefully:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_pipeline</span><span class="p">()</span>
@@ -526,7 +526,7 @@ which can be used by a program to degrade gracefully:</p>
 </div>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, and the capability is not supported, raise a
 <a class="reference internal" href="errors.html#psycopg.NotSupportedError" title="psycopg.NotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a> instead of returning <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, explaining why the
-feature is not supported. This allows to make a check at import time,
+feature is not supported. This allows you to make a check at import time,
 crashing early and with a clear description of the problem.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psycopg</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">has_pipeline</span><span class="p">(</span><span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -546,7 +546,7 @@ crashing early and with a clear description of the problem.</p>
 <dd><p>Check if the <a class="reference internal" href="pq.html#psycopg.pq.PGconn.full_protocol_version" title="psycopg.pq.PGconn.full_protocol_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pq.PGconn.full_protocol_version</span></code></a> attribute is implemented.</p>
 <p>If the method is implemented, then <a class="reference internal" href="#psycopg.ConnectionInfo.full_protocol_version" title="psycopg.ConnectionInfo.full_protocol_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionInfo.full_protocol_version</span></code></a>
 will return a meaningful value.</p>
-<p>The feature requires libpq 18.0 and greater.</p>
+<p>The feature requires libpq 18.0 or greater.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 3.3.</span></p>
 </div>
@@ -606,7 +606,7 @@ the legacy <code class="docutils literal notranslate"><a class="reference extern
 <dt class="sig sig-object py" id="psycopg.Capabilities.has_stream_chunked">
 <span class="sig-name descname"><span class="pre">has_stream_chunked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#psycopg.Capabilities.has_stream_chunked" title="Link to this definition">¶</a></dt>
 <dd><p>Check if <a class="reference internal" href="cursors.html#psycopg.Cursor.stream" title="psycopg.Cursor.stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.stream()</span></code></a> can handle a <code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code> parameter value
-greater than 1 to retrieve results by chunks.</p>
+greater than 1 to retrieve results in chunks.</p>
 <p>The feature requires libpq 17.0 or greater.</p>
 </dd></dl>
 
@@ -630,7 +630,7 @@ greater than 1 to retrieve results by chunks.</p>
 <dt class="sig sig-object py" id="psycopg.Column">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Column</span></span><a class="headerlink" href="#psycopg.Column" title="Link to this definition">¶</a></dt>
 <dd><p>An object describing a column of data from a database result, <a class="reference external" href="https://www.python.org/dev/peps/pep-0249/#description">as described
-by the DBAPI</a>, so it can also be unpacked as a 7-items tuple.</p>
+by the DBAPI</a>, so it can also be unpacked as a 7-item tuple.</p>
 <p>The object is returned by <a class="reference internal" href="cursors.html#psycopg.Cursor.description" title="psycopg.Cursor.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.description</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Column.name">
@@ -648,7 +648,7 @@ by the DBAPI</a>, so it can also be unpacked as a 7-items tuple.</p>
 <dt class="sig sig-object py" id="psycopg.Column.type_display">
 <span class="sig-name descname"><span class="pre">type_display</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#psycopg.Column.type_display" title="Link to this definition">¶</a></dt>
 <dd><p>A pretty representation of the column type.</p>
-<p>It is composed by the type name, followed by eventual modifiers and
+<p>It is composed of the type name, followed by any modifiers and
 brackets to signify arrays, e.g. <code class="sql docutils literal notranslate"><span class="pre">text</span></code>, <code class="sql docutils literal notranslate"><span class="pre">varchar(42)</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">date[]</span></code>.</p>
 <div class="versionadded">
@@ -718,7 +718,7 @@ brackets to signify arrays, e.g. <code class="sql docutils literal notranslate">
 <dt class="sig sig-object py" id="psycopg.Pipeline">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.Connection" title="psycopg.Connection"><span class="pre">Connection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_no_lock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Pipeline" title="Link to this definition">¶</a></dt>
 <dd><p>Handler for (sync) connection in pipeline mode.</p>
-<p>This objects is returned by <a class="reference internal" href="connections.html#psycopg.Connection.pipeline" title="psycopg.Connection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.pipeline()</span></code></a>.</p>
+<p>This object is returned by <a class="reference internal" href="connections.html#psycopg.Connection.pipeline" title="psycopg.Connection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.pipeline()</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.Pipeline.sync">
 <span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Pipeline.sync" title="Link to this definition">¶</a></dt>
@@ -738,7 +738,7 @@ all available results.</p>
 <dt class="sig sig-object py" id="psycopg.AsyncPipeline">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_no_lock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncPipeline" title="Link to this definition">¶</a></dt>
 <dd><p>Handler for (async) connection in pipeline mode.</p>
-<p>This objects is returned by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.pipeline" title="psycopg.AsyncConnection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.pipeline()</span></code></a>.</p>
+<p>This object is returned by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.pipeline" title="psycopg.AsyncConnection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.pipeline()</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psycopg.AsyncPipeline.sync">
 <span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.AsyncPipeline.sync" title="Link to this definition">¶</a></dt>
@@ -821,7 +821,7 @@ will be rolled back with a <code class="xref py py-obj docutils literal notransl
 <dt class="sig sig-object py" id="psycopg.AsyncTransaction">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">AsyncTransaction</span></span><a class="headerlink" href="#psycopg.AsyncTransaction" title="Link to this definition">¶</a></dt>
 <dd><p>Returned by <a class="reference internal" href="connections.html#psycopg.AsyncConnection.transaction" title="psycopg.AsyncConnection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncConnection.transaction()</span></code></a> to handle a transaction block.</p>
-<p>The class differs from <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> for the following details:</p>
+<p>The class differs from <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> in the following details:</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.AsyncTransaction.connection">
 <span class="sig-name descname"><span class="pre">connection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="connections.html#psycopg.AsyncConnection" title="psycopg.AsyncConnection"><span class="pre">AsyncConnection</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#psycopg.AsyncTransaction.connection" title="Link to this definition">¶</a></dt>
@@ -885,10 +885,10 @@ transaction block.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="psycopg.Rollback">
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">psycopg.</span></span><span class="sig-name descname"><span class="pre">Rollback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transaction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><span class="pre">Transaction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#psycopg.AsyncTransaction" title="psycopg.AsyncTransaction"><span class="pre">AsyncTransaction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#psycopg.Rollback" title="Link to this definition">¶</a></dt>
-<dd><p>Exit the current <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> context immediately and rollback any changes
+<dd><p>Exit the current <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> context immediately and roll back any changes
 made within this context.</p>
-<p>If a transaction context is specified in the constructor, rollback
-enclosing transactions contexts up to and including the one specified.</p>
+<p>If a transaction context is specified in the constructor, roll back
+enclosing transaction contexts up to and including the one specified.</p>
 <p>It can be used as:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback</span></code>: roll back the operation that happened in the current
@@ -896,7 +896,7 @@ transaction block and continue the program after the block.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback()</span></code>: same effect as above</p></li>
 <li><p><code class="samp docutils literal notranslate"><span class="pre">raise</span> <span class="pre">Rollback(</span><em><span class="pre">tx</span></em><span class="pre">)</span></code>: roll back any operation that happened in
 the <a class="reference internal" href="#psycopg.Transaction" title="psycopg.Transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">tx</span></code> (returned by a statement such as <code class="samp docutils literal notranslate"><span class="pre">with</span>
-<span class="pre">conn.transaction()</span> <span class="pre">as</span> <em><span class="pre">tx</span></em><span class="pre">:</span></code> and all the blocks nested within. The
+<span class="pre">conn.transaction()</span> <span class="pre">as</span> <em><span class="pre">tx</span></em><span class="pre">:</span></code>) and all the blocks nested within. The
 program will continue after the <code class="xref py py-obj docutils literal notranslate"><span class="pre">tx</span></code> block.</p></li>
 </ul>
 </dd></dl>
@@ -942,14 +942,14 @@ ID of the transaction (in which case <a class="reference internal" href="#psycop
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Xid.owner">
 <span class="sig-name descname"><span class="pre">owner</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#psycopg.Xid.owner" title="Link to this definition">¶</a></dt>
-<dd><p>Named of the user that executed the transaction.</p>
+<dd><p>Name of the user that executed the transaction.</p>
 <p>Only available on recovered transactions.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psycopg.Xid.database">
 <span class="sig-name descname"><span class="pre">database</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#psycopg.Xid.database" title="Link to this definition">¶</a></dt>
-<dd><p>Named of the database in which the transaction was executed.</p>
+<dd><p>Name of the database in which the transaction was executed.</p>
 <p>Only available on recovered transactions.</p>
 </dd></dl>
 

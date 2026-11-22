@@ -301,9 +301,9 @@ a <a class="reference internal" href="../api/connections.html#psycopg.Connection
 <p>If the connection is closed with a transaction open, no COMMIT command is sent
 to the server, which will then discard the connection. Certain middleware (such
 as PgBouncer) will also discard a connection left in transaction state, so, if
-possible you will want to commit or rollback a connection before finishing
+possible you will want to commit or roll back a connection before finishing
 working with it.</p>
-<p>An example of what will happen, the first time you will use Psycopg (and to be
+<p>An example of what will happen, the first time you use Psycopg (and are
 disappointed by it), is likely:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
@@ -327,7 +327,7 @@ disappointed by it), is likely:</p>
 <span class="c1"># No COMMIT was sent: the INSERT was discarded.</span>
 </pre></div>
 </div>
-<p>There are a few things going wrong here, let’s see how they can be improved.</p>
+<p>There are a few things going wrong here; let’s see how they can be improved.</p>
 <p>One obvious problem after the run above is that, firing up <strong class="program">psql</strong>,
 you will see no new record in the table <code class="docutils literal notranslate"><span class="pre">data</span></code>. One way to fix the problem
 is to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">conn.commit()</span></code> before closing the connection. Thankfully, if you
@@ -353,10 +353,10 @@ sequence of database statements:</p>
 <span class="c1"># COMMIT is executed.</span>
 </pre></div>
 </div>
-<p>This way we don’t have to remember to call neither <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> nor <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code>
+<p>This way we don’t have to remember to call either <code class="xref py py-obj docutils literal notranslate"><span class="pre">close()</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">commit()</span></code>
 and the database operations actually have a persistent effect. The code might
 still do something you don’t expect: keep a transaction from the first
-operation to the connection closure. You can have a finer control over the
+operation to the connection closure. You can have finer control over the
 transactions using an <a class="reference internal" href="#autocommit"><span class="std std-ref">autocommit transaction</span></a> and/or
 <a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction contexts</span></a>.</p>
 <div class="admonition warning">
@@ -379,11 +379,11 @@ failed</strong> and the database session is in a state of error. You need to cal
 <section id="autocommit-transactions">
 <span id="autocommit"></span><h2>Autocommit transactions<a class="headerlink" href="#autocommit-transactions" title="Link to this heading">¶</a></h2>
 <p>The manual commit requirement can be suspended using <a class="reference internal" href="../api/connections.html#psycopg.Connection.autocommit" title="psycopg.Connection.autocommit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit</span></code></a>,
-either as connection attribute or as <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
+either as a connection attribute or as a <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a>
 parameter. This may be required to run operations that cannot be executed
 inside a transaction, such as <code class="sql docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">DATABASE</span></code>, <code class="sql docutils literal notranslate"><span class="pre">VACUUM</span></code>,
 <code class="sql docutils literal notranslate"><span class="pre">CALL</span></code> on <a class="reference external" href="https://www.postgresql.org/docs/current/xproc.html">stored procedures</a> using transaction control.</p>
-<p>With an autocommit transaction, the above sequence of operation results in:</p>
+<p>With an autocommit transaction, the above sequence of operations results in:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">with</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
 </span>
     <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
@@ -400,11 +400,12 @@ inside a transaction, such as <code class="sql docutils literal notranslate"><sp
 <span class="c1"># in a transaction state, no COMMIT is executed.</span>
 </pre></div>
 </div>
-<p>An autocommit transaction behaves more as someone coming from <strong class="program">psql</strong>
-would expect. This has a beneficial performance effect, because less queries
-are sent and less operations are performed by the database. The statements,
-however, are not executed in an atomic transaction; if you need to execute
-certain operations inside a transaction, you can achieve that with an
+<p>An autocommit transaction behaves more like someone coming from
+<strong class="program">psql</strong> would expect. This has a beneficial performance effect,
+because fewer queries are sent and fewer operations are performed by the
+database. The statements, however, are not executed in an atomic transaction;
+if you need to execute</p>
+<p>certain operations inside a transaction, you can achieve that with an
 autocommit connection too, using an explicit <a class="reference internal" href="#transaction-context"><span class="std std-ref">transaction block</span></a>.</p>
 </section>
 <section id="transaction-contexts">
@@ -429,7 +430,7 @@ use a <code class="xref py py-obj docutils literal notranslate"><span class="pre
 
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO data VALUES (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"Hello"</span><span class="p">,))</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO times VALUES (now())"</span><span class="p">)</span>
-        <span class="c1"># These two operation run atomically in the same transaction</span>
+        <span class="c1"># These two operations run atomically in the same transaction</span>
 
     <span class="c1"># COMMIT is executed at the end of the block.</span>
     <span class="c1"># The connection is in idle state again.</span>
@@ -437,8 +438,8 @@ use a <code class="xref py py-obj docutils literal notranslate"><span class="pre
 <span class="c1"># The connection is closed at the end of the block.</span>
 </pre></div>
 </div>
-<p>Note that connection blocks can also be used with non-autocommit connections:
-in this case you still need to pay attention to eventual transactions started
+<p>Note that transaction blocks can also be used with non-autocommit connections:
+in this case you still need to pay attention to any transactions started
 automatically. If an operation starts an implicit transaction, a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> block will only manage <a class="reference internal" href="#nested-transactions"><span class="std std-ref">a savepoint sub-transaction</span></a>, leaving the caller to deal with the main transaction,
 as explained in <a class="reference internal" href="#transactions"><span class="std std-ref">Transactions management</span></a>:</p>
@@ -468,7 +469,7 @@ as explained in <a class="reference internal" href="#transactions"><span class="
 </div>
 <p>If a <code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction()</span></code> block starts when no transaction is active then it will
 manage a proper transaction. In essence, a transaction context tries to leave
-a connection in the state it found it, and leaves you to deal with the wider
+a connection in the state it found it in, and leaves you to deal with the wider
 context.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
@@ -478,7 +479,7 @@ what’s demanded by the DBAPI, the personal preference of several experienced
 developers is to:</p>
 <ul class="simple">
 <li><p>use a connection block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">psycopg.connect(...)</span> <span class="pre">as</span> <span class="pre">conn</span></code>;</p></li>
-<li><p>use an autocommit connection, either passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit=True</span></code> as
+<li><p>use an autocommit connection, either passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">autocommit=True</span></code> as a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code> parameter or setting the attribute <code class="docutils literal notranslate"><span class="pre">conn.autocommit</span> <span class="pre">=</span>
 <span class="pre">True</span></code>;</p></li>
 <li><p>use <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span> <span class="pre">conn.transaction()</span></code> blocks to manage transactions only where
@@ -487,9 +488,9 @@ needed.</p></li>
 </div>
 <section id="nested-transactions">
 <span id="id2"></span><h3>Nested transactions<a class="headerlink" href="#nested-transactions" title="Link to this heading">¶</a></h3>
-<p>Transaction blocks can be also nested (internal transaction blocks are
+<p>Transaction blocks can also be nested (internal transaction blocks are
 implemented using <a class="reference external" href="https://www.postgresql.org/docs/current/sql-savepoint.html">SAVEPOINT</a>): an exception raised inside an inner block
-has a chance of being handled and not completely fail outer operations. The
+has a chance of being handled without completely failing outer operations. The
 following is an example where a series of operations interact with the
 database: operations are allowed to fail; at the end we also want to store the
 number of operations successfully processed.</p>
@@ -540,7 +541,7 @@ but not entirely committed yet.</p>
 <p><span class="versionmodified added">Added in version 3.3.</span></p>
 </div>
 <p>Each <code class="xref py py-obj docutils literal notranslate"><span class="pre">Transaction</span></code> object exposes a <a class="reference internal" href="../api/objects.html#psycopg.Transaction.status" title="psycopg.Transaction.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a> property allowing
-to inspect the current state of the transaction. This can be useful for
+you to inspect the current state of the transaction. This can be useful for
 debugging, logging, or implementing custom transaction management logic.</p>
 <p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code> property is a <a class="reference internal" href="../api/objects.html#psycopg.psycopg.Transaction.Status" title="psycopg.psycopg.Transaction.Status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psycopg.Transaction.Status</span></code></a> enum value:
 please check its documentation for the possible values.</p>
@@ -584,7 +585,7 @@ transaction outcomes or implement retry logic based on the transaction status.</
 <span id="id5"></span><h2>Transaction characteristics<a class="headerlink" href="#transaction-characteristics" title="Link to this heading">¶</a></h2>
 <p>You can set <a class="reference external" href="https://www.postgresql.org/docs/current/sql-set-transaction.html">transaction parameters</a> for the transactions that Psycopg
 handles. They affect the transactions started implicitly by non-autocommit
-transactions and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
+connections and the ones started explicitly by <a class="reference internal" href="../api/connections.html#psycopg.Connection.transaction" title="psycopg.Connection.transaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.transaction()</span></code></a> for
 both autocommit and non-autocommit transactions.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -644,14 +645,14 @@ database using <a class="reference internal" href="../api/connections.html#psyco
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_commit()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpc_rollback()</span></code>.</p>
 <p>PostgreSQL doesn’t follow the XA standard though, and the ID for a PostgreSQL
 prepared transaction can be any string up to 200 characters long. Psycopg’s
-<a class="reference internal" href="../api/objects.html#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xid</span></code></a> objects can represent both XA-style transactions IDs (such as the ones
+<a class="reference internal" href="../api/objects.html#psycopg.Xid" title="psycopg.Xid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xid</span></code></a> objects can represent both XA-style transaction IDs (such as the ones
 created by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">xid()</span></code> method) and PostgreSQL transaction IDs identified by
 an unparsed string.</p>
 <p>The format in which the Xids are converted into strings passed to the
-database is the same employed by the <a class="reference external" href="https://jdbc.postgresql.org/">PostgreSQL JDBC driver</a>: this should
-allow interoperation between tools written in Python and in Java. For example
-a recovery tool written in Python would be able to recognize the components of
-transactions produced by a Java program.</p>
+database is the same as the one used by the <a class="reference external" href="https://jdbc.postgresql.org/">PostgreSQL JDBC driver</a>: this
+should allow interoperation between tools written in Python and in Java. For
+example a recovery tool written in Python would be able to recognize the
+components of transactions produced by a Java program.</p>
 <p>For further details see the documentation for the <a class="reference internal" href="../api/connections.html#tpc-methods"><span class="std std-ref">Two-Phase Commit support methods</span></a>.</p>
 </section>
 </section>

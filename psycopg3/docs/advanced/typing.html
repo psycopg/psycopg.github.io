@@ -323,7 +323,7 @@ annotations such as <code class="xref py py-obj docutils literal notranslate"><s
 <span id="row-factory-static"></span><h2>Type of rows returned<a class="headerlink" href="#type-of-rows-returned" title="Link to this heading">¶</a></h2>
 <p>If you want to use connections and cursors returning your data as different
 types, for instance as dictionaries, you can use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> argument
-of the <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> method, which
+of the <a class="reference internal" href="../api/connections.html#psycopg.Connection.connect" title="psycopg.Connection.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect()</span></code></a> and the <a class="reference internal" href="../api/connections.html#psycopg.Connection.cursor" title="psycopg.Connection.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor()</span></code></a> methods, which
 will control what type of record is returned by the fetch methods of the
 cursors and annotate the returned objects accordingly. See
 <a class="reference internal" href="rows.html#row-factories"><span class="std std-ref">Row factories</span></a> for more details.</p>
@@ -345,8 +345,8 @@ cursors and annotate the returned objects accordingly. See
 <p><span class="versionmodified changed">Changed in version 3.3.</span></p>
 </div>
 <p>If you use a static type checker and you are 100% sure that the cursor will
-exactly one record, it is frustrating to be told that the returned row might
-be <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>. For example:</p>
+return exactly one record, it is frustrating to be told that the returned row
+might be <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">scalar_row</span>
 
@@ -366,7 +366,7 @@ to use an <code class="xref py py-obj docutils literal notranslate"><span class=
 <span class="pre">cur.fetchall()</span></code> or some other horrible trick).</p>
 <p>Since Psycopg 3.3, cursors are <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable">iterables</a>, therefore they support the
 <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#next" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next</span></code></a> function. A <code class="xref py py-obj docutils literal notranslate"><span class="pre">next(cur)</span></code> will behave like <code class="xref py py-obj docutils literal notranslate"><span class="pre">cur.fetchone()</span></code>, but it
-is guaranteed to return a row (in case there are no rows in the result set it
+is guaranteed to return a row (if there are no rows in the result set it
 will not return anything but will raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">StopIteration</span></code>). Therefore the
 function above can terminate with:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -386,7 +386,7 @@ function above can terminate with:</p>
 <p>The <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool" title="psycopg_pool.ConnectionPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConnectionPool</span></code></a> class and similar are generic on their
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code> argument. The <a class="reference internal" href="../api/pool.html#psycopg_pool.ConnectionPool.connection" title="psycopg_pool.ConnectionPool.connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connection()</span></code></a>
 method is annotated as returning a connection of that type, and the record
-returned will follow the rule as in <a class="reference internal" href="#row-factory-static"><span class="std std-ref">Type of rows returned</span></a>.</p>
+returned will follow the rules described in <a class="reference internal" href="#row-factory-static"><span class="std std-ref">Type of rows returned</span></a>.</p>
 <p>Note that, at the moment, if you use a generic class as <code class="xref py py-obj docutils literal notranslate"><span class="pre">connection_class</span></code>,
 you will need to specify a <code class="xref py py-obj docutils literal notranslate"><span class="pre">row_factory</span></code> consistently in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>,
 otherwise the typing system and the runtime will not agree.</p>
@@ -432,10 +432,10 @@ type is not parametric) then it’s not necessary to specify <code class="xref p
 <span id="example-pydantic"></span><h2>Example: returning records as Pydantic models<a class="headerlink" href="#example-returning-records-as-pydantic-models" title="Link to this heading">¶</a></h2>
 <p>Using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a> it is possible to enforce static typing at runtime. Using a
 Pydantic model factory the code can be checked statically using Mypy and
-querying the database will raise an exception if the rows returned is not
+querying the database will raise an exception if the rows returned are not
 compatible with the model.</p>
 <p>The following example can be checked with <code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span></code> without reporting
-any issue. Pydantic will also raise a runtime error in case the
+any issue. Pydantic will also raise a runtime error if the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code> is used with a query that returns incompatible data.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
@@ -504,7 +504,7 @@ argument to <code class="xref py py-obj docutils literal notranslate"><span clas
 </pre></div>
 </div>
 <p>If you are composing a query dynamically you should use the <a class="reference internal" href="../api/sql.html#psycopg.sql.SQL" title="psycopg.sql.SQL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sql.SQL</span></code></a> object
-and similar to escape safely table and field names. The parameter of the
+and similar to safely escape table and field names. The parameter of the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">SQL()</span></code> object should be a literal string:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_records</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">Connection</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">query</span> <span class="o">=</span> <span class="s2">"SELECT count(*) FROM </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">table</span>  <span class="c1"># BAD!</span>
@@ -519,7 +519,7 @@ and similar to escape safely table and field names. The parameter of the
 </div>
 <p>At the time of writing, no Python static analyzer implements this check (<a class="reference external" href="https://github.com/python/mypy/issues/12554">mypy
 doesn’t implement it</a>, <a class="reference external" href="https://pyre-check.org/">Pyre</a> does, but <a class="reference external" href="https://github.com/facebook/pyre-check/issues/636">doesn’t work with Psycopg yet</a>).
-Once the type checkers support will be complete, the above bad statements
+Once type checker support is complete, the above bad statements
 should be reported as errors.</p>
 </section>
 </section>

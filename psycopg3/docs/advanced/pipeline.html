@@ -318,7 +318,7 @@ buffered on the server side; the server flushes that buffer when a
 <li><p><a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pipeline-mode.html">pipeline mode</a></p></li>
 <li><p><a class="reference external" href="https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">extended query message flow</a></p></li>
 </ul>
-<p>contains many details around when it is most useful to use the pipeline
+<p>contains many details about when it is most useful to use the pipeline
 mode and about errors management and interaction with transactions.</p>
 </div>
 <section id="client-server-messages-flow">
@@ -479,8 +479,9 @@ single batch. If we execute the two operations above in a pipeline:</p>
 <span id="pipeline-usage"></span><h2>Pipeline mode usage<a class="headerlink" href="#pipeline-mode-usage" title="Link to this heading">¶</a></h2>
 <p>Psycopg supports the pipeline mode via the <a class="reference internal" href="../api/connections.html#psycopg.Connection.pipeline" title="psycopg.Connection.pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.pipeline()</span></code></a> method. The
 method is a context manager: entering the <code class="docutils literal notranslate"><span class="pre">with</span></code> block yields a <a class="reference internal" href="../api/objects.html#psycopg.Pipeline" title="psycopg.Pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pipeline</span></code></a>
-object. At the end of block, the connection resumes the normal operation mode.</p>
-<p>Within the pipeline block, you can use normally one or more cursors to execute
+object. At the end of the block, the connection resumes the normal operation
+mode.</p>
+<p>Within the pipeline block, you can normally use one or more cursors to execute
 several operations, using <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a> and
 <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">pipeline</span><span class="p">():</span>
@@ -492,9 +493,9 @@ several operations, using <a class="reference internal" href="../api/connections
 <span class="gp">... </span>            <span class="p">[(</span><span class="s2">"one"</span><span class="p">,),</span> <span class="p">(</span><span class="s2">"two"</span><span class="p">,),</span> <span class="p">(</span><span class="s2">"four"</span><span class="p">,)])</span>
 </pre></div>
 </div>
-<p>Unlike in normal mode, Psycopg will not wait for the server to receive the
-result of each query; the client will receive results in batches when the
-server flushes it output buffer. You can receive more than a single result
+<p>Unlike in normal mode, Psycopg will not wait to receive the result of each
+query from the server; the client will receive results in batches when the
+server flushes its output buffer. You can receive more than a single result
 by using more than one cursor in the same pipeline.</p>
 <p>If any statement encounters an error, the server aborts the current
 transaction and will not execute any subsequent command in the queue until the
@@ -514,15 +515,15 @@ opposite of batching!).</p></li>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Starting from Psycopg 3.1, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> makes use internally of
+<p>Starting from Psycopg 3.1, <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.executemany" title="psycopg.Cursor.executemany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code></a> internally makes use of
 the pipeline mode; as a consequence there is no need to handle a pipeline
 block just to call <code class="xref py py-obj docutils literal notranslate"><span class="pre">executemany()</span></code> once.</p>
 </div>
 </section>
 <section id="synchronization-points">
 <span id="pipeline-sync"></span><h2>Synchronization points<a class="headerlink" href="#synchronization-points" title="Link to this heading">¶</a></h2>
-<p>Flushing query results to the client can happen either when a synchronization
-point is established by Psycopg:</p>
+<p>Flushing query results to the client can happen when a synchronization point
+is established by Psycopg:</p>
 <ul class="simple">
 <li><p>using the <a class="reference internal" href="../api/objects.html#psycopg.Pipeline.sync" title="psycopg.Pipeline.sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pipeline.sync()</span></code></a> method;</p></li>
 <li><p>on <a class="reference internal" href="../api/connections.html#psycopg.Connection.commit" title="psycopg.Connection.commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.commit()</span></code></a> or <a class="reference internal" href="../api/connections.html#psycopg.Connection.rollback" title="psycopg.Connection.rollback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rollback()</span></code></a>;</p></li>
@@ -531,11 +532,11 @@ point is established by Psycopg:</p>
 <li><p>using a fetch method such as <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.fetchone" title="psycopg.Cursor.fetchone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.fetchone()</span></code></a> (which only flushes the
 query but doesn’t issue a Sync and doesn’t reset a pipeline state error).</p></li>
 </ul>
-<p>The server might perform a flush on its own initiative, for instance when the
-output buffer is full.</p>
+<p>The server might also perform a flush on its own initiative, for instance
+when the output buffer is full.</p>
 <p>Note that, even in <a class="reference internal" href="../basic/transactions.html#autocommit"><span class="std std-ref">autocommit</span></a>, the server wraps the
-statements sent in pipeline mode in an implicit transaction, which will be
-only committed when the Sync is received. As such, a failure in a group of
+statements sent in pipeline mode in an implicit transaction, which will
+only be committed when the Sync is received. As such, a failure in a group of
 statements will probably invalidate the effect of statements executed after
 the previous Sync, and will propagate to the following Sync.</p>
 <p>For example, in the following block:</p>
@@ -553,7 +554,7 @@ the previous Sync, and will propagate to the following Sync.</p>
 </div>
 <p>there will be an error in the block, <code class="docutils literal notranslate"><span class="pre">relation</span> <span class="pre">&quot;no_such_table&quot;</span> <span class="pre">does</span> <span class="pre">not</span>
 <span class="pre">exist</span></code> caused by the insert <code class="docutils literal notranslate"><span class="pre">two</span></code>, but probably raised by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">sync()</span></code>
-call. At at the end of the block, the table will contain:</p>
+call. At the end of the block, the table will contain:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=# SELECT * FROM mytable;
 +----+------+
 | id | data |
@@ -566,7 +567,8 @@ call. At at the end of the block, the table will contain:</p>
 <p>because:</p>
 <ul class="simple">
 <li><p>the value 1 of the sequence is consumed by the statement <code class="docutils literal notranslate"><span class="pre">one</span></code>, but
-the record discarded because of the error in the same implicit transaction;</p></li>
+the record is discarded because of the error in the same implicit
+transaction;</p></li>
 <li><p>the statement <code class="docutils literal notranslate"><span class="pre">three</span></code> is not executed because the pipeline is aborted (so
 it doesn’t consume a sequence item);</p></li>
 <li><p>the statement <code class="docutils literal notranslate"><span class="pre">four</span></code> is executed with
@@ -584,8 +586,8 @@ also sync the pipeline and raise an exception if there was any error in
 the commands executed so far.</p>
 </div>
 </section>
-<section id="the-fine-prints">
-<h2>The fine prints<a class="headerlink" href="#the-fine-prints" title="Link to this heading">¶</a></h2>
+<section id="the-fine-print">
+<h2>The fine print<a class="headerlink" href="#the-fine-print" title="Link to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The Pipeline mode is an experimental feature.</p>
@@ -661,7 +663,7 @@ sure your client has the right library.</p>
 <li><a class="reference internal" href="#client-server-messages-flow">Client-server messages flow</a></li>
 <li><a class="reference internal" href="#pipeline-mode-usage">Pipeline mode usage</a></li>
 <li><a class="reference internal" href="#synchronization-points">Synchronization points</a></li>
-<li><a class="reference internal" href="#the-fine-prints">The fine prints</a></li>
+<li><a class="reference internal" href="#the-fine-print">The fine print</a></li>
 </ul>
 </li>
 </ul>

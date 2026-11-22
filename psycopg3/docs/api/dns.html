@@ -327,7 +327,7 @@ with the looked-up entries.</p>
 <p>Raise <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a> if no lookup is successful and no host
 (looked up or unchanged) could be returned.</p>
 <p>In addition to the rules defined by RFC 2782 about the host name pattern,
-perform SRV lookup also if the the port is the string <code class="docutils literal notranslate"><span class="pre">SRV</span></code> (case
+also perform SRV lookup if the port is the string <code class="docutils literal notranslate"><span class="pre">SRV</span></code> (case
 insensitive).</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -375,7 +375,7 @@ insensitive).</p>
 <p class="admonition-title">Warning</p>
 <p>This is an experimental method.</p>
 </div>
-<p>This method is a subclass hook allowing to manipulate the connection
+<p>This method is a subclass hook allowing you to manipulate the connection
 parameters before performing the connection. Make sure to call the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">super()</span></code> implementation before further manipulation of the arguments:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@classmethod</span>
@@ -422,15 +422,15 @@ resolution automatically.</p>
 <p>If a <code class="docutils literal notranslate"><span class="pre">host</span></code> param is present but not <code class="docutils literal notranslate"><span class="pre">hostname</span></code>, resolve the host
 addresses dynamically.</p>
 <p>The function may change the input <code class="docutils literal notranslate"><span class="pre">host</span></code>, <code class="docutils literal notranslate"><span class="pre">hostname</span></code>, <code class="docutils literal notranslate"><span class="pre">port</span></code> to allow
-connecting without further DNS lookups, eventually removing hosts that are
+connecting without further DNS lookups, possibly removing hosts that are
 not resolved, keeping the lists of hosts and ports consistent.</p>
 <p>Raise <a class="reference internal" href="errors.html#psycopg.OperationalError" title="psycopg.OperationalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalError</span></code></a> if connection is not possible (e.g. no
-host resolve, inconsistent lists length).</p>
-<p>See <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">the PostgreSQL docs</a> for explanation of how these params are used,
-and how they support multiple entries.</p>
+host resolved, inconsistent list lengths).</p>
+<p>See <a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">the PostgreSQL docs</a> for an explanation of how these params are
+used, and how they support multiple entries.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Before Psycopg 3.1, this function doesn’t handle the <code class="docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file.</p>
+<p>Before Psycopg 3.1, this function didn’t handle the <code class="docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

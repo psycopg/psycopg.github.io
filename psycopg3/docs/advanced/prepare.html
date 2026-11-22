@@ -291,7 +291,7 @@
           <section id="prepared-statements">
 <span id="index-0"></span><span id="id1"></span><h1>Prepared statements<a class="headerlink" href="#prepared-statements" title="Link to this heading">¶</a></h1>
 <p>Psycopg uses an automatic system to manage <em>prepared statements</em>. When a
-query is prepared, its parsing and planning is stored in the server session,
+query is prepared, its parsing and planning are stored in the server session,
 so that further executions of the same query on the same connection (even with
 different parameters) are optimised.</p>
 <p>A query is prepared automatically after it is executed more than
@@ -304,7 +304,7 @@ the associated resources freed.</p>
 <li><p>You can decide to prepare a query immediately by passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare=True</span></code> to
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.execute" title="psycopg.Connection.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a> or <a class="reference internal" href="../api/cursors.html#psycopg.Cursor.execute" title="psycopg.Cursor.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cursor.execute()</span></code></a>. The query is prepared, if it
 wasn’t already, and executed as prepared from its first use.</p></li>
-<li><p>Conversely, passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare=False</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> will avoid to prepare
+<li><p>Conversely, passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare=False</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">execute()</span></code> will avoid preparing
 the query, regardless of the number of times it is executed. The default for
 the parameter is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, meaning that the query is prepared if the
 conditions described above are met.</p></li>
@@ -327,16 +327,16 @@ ones exposed by <code class="docutils literal notranslate"><a class="reference e
 <span id="pgbouncer"></span><h2>Using prepared statements with PgBouncer<a class="headerlink" href="#using-prepared-statements-with-pgbouncer" title="Link to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Unless a connection pooling middleware explicitly declares otherwise, they
-are not compatible with prepared statements, because the same client
+<p>Unless a connection pooling middleware explicitly declares otherwise, it
+is not compatible with prepared statements, because the same client
 connection may change the server session it refers to. If such middleware
 is used you should disable prepared statements, by setting the
 <a class="reference internal" href="../api/connections.html#psycopg.Connection.prepare_threshold" title="psycopg.Connection.prepare_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Connection.prepare_threshold</span></code></a> attribute to <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </div>
 <p>Starting from 3.2, Psycopg supports prepared statements when using the
-<a class="reference external" href="https://www.pgbouncer.org/">PgBouncer</a> middleware, using the following caveats:</p>
+<a class="reference external" href="https://www.pgbouncer.org/">PgBouncer</a> middleware, with the following caveats:</p>
 <ul class="simple">
-<li><p>PgBouncer version must be version <a class="reference external" href="https://www.pgbouncer.org/2024/01/pgbouncer-1-22-0">1.22</a> or newer.</p></li>
+<li><p>PgBouncer must be version <a class="reference external" href="https://www.pgbouncer.org/2024/01/pgbouncer-1-22-0">1.22</a> or newer.</p></li>
 <li><p>PgBouncer <a class="reference external" href="https://www.pgbouncer.org/config.html#max_prepared_statements">max_prepared_statements</a> must be greater than 0.</p></li>
 <li><p>The libpq version on the client must be from PostgreSQL 17 or newer
 (you can check the <a class="reference internal" href="../api/objects.html#psycopg.Capabilities.has_send_close_prepared" title="psycopg.Capabilities.has_send_close_prepared"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_send_close_prepared()</span></code></a> capability to
